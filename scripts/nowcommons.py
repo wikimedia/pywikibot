@@ -377,7 +377,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                 pywikibot.info(
                     'The file is not identical to the one on Commons.')
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Show a message if no files were found."""
         if self.generator_completed and not self.counter['read']:
             pywikibot.info('No transcluded files found for '

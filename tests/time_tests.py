@@ -64,7 +64,13 @@ class TestTimestamp(TestCase):
         ],
     }
 
-    def test_set_from_timestamp(self):
+    def test_clone(self) -> None:
+        """Validate that Timestamp.replace() returns a Timestamp."""
+        ts1 = Timestamp.now()
+        ts2 = ts1.replace()
+        self.assertIsInstance(ts2, Timestamp)
+
+    def test_set_from_timestamp(self) -> None:
         """Test creating instance from Timestamp object."""
         for func in Timestamp.utcnow, Timestamp.nowutc:
             with self.subTest(func=func.__qualname__):
@@ -73,7 +79,7 @@ class TestTimestamp(TestCase):
                 self.assertIs(t1, t2)
                 self.assertIsInstance(t2, Timestamp)
 
-    def test_set_from_datetime(self):
+    def test_set_from_datetime(self) -> None:
         """Test creating instance from datetime.datetime object."""
         for tz in (None, timezone.utc):
             with self.subTest(tzinfo=bool(tz)):
@@ -96,7 +102,7 @@ class TestTimestamp(TestCase):
 
         return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
 
-    def _test_set_from_string_fmt(self, fmt):
+    def _test_set_from_string_fmt(self, fmt) -> None:
         """Test creating instance from <FMT> string."""
         for timestr, posix in self.test_results[fmt]:
             with self.subTest(timestr):
@@ -104,19 +110,19 @@ class TestTimestamp(TestCase):
                 self.assertEqual(ts, self._compute_posix(posix))
                 self.assertEqual(ts.posix_timestamp_format(), posix)
 
-    def test_set_from_string_mw(self):
+    def test_set_from_string_mw(self) -> None:
         """Test creating instance from MW string."""
         self._test_set_from_string_fmt('MW')
 
-    def test_set_from_string_iso8601(self):
+    def test_set_from_string_iso8601(self) -> None:
         """Test creating instance from ISO8601 string."""
         self._test_set_from_string_fmt('ISO8601')
 
-    def test_set_from_string_posix(self):
+    def test_set_from_string_posix(self) -> None:
         """Test creating instance from POSIX string."""
         self._test_set_from_string_fmt('POSIX')
 
-    def test_set_from_string_invalid(self):
+    def test_set_from_string_invalid(self) -> None:
         """Test failure creating instance from invalid string."""
         for timestr, _posix in self.test_results['INVALID']:
             regex = "time data '[^']*?' does not match"
@@ -124,7 +130,7 @@ class TestTimestamp(TestCase):
                     self.assertRaisesRegex(ValueError, regex):
                 Timestamp.set_timestamp(timestr)
 
-    def test_instantiate_from_instance(self):
+    def test_instantiate_from_instance(self) -> None:
         """Test passing instance to factory methods works."""
         for func in Timestamp.utcnow, Timestamp.nowutc:
             with self.subTest(func=func.__qualname__):
@@ -137,7 +143,7 @@ class TestTimestamp(TestCase):
                 self.assertIsInstance(Timestamp.fromtimestampformat(t1),
                                       Timestamp)
 
-    def test_iso_format(self):
+    def test_iso_format(self) -> None:
         """Test conversion from and to ISO format."""
         sep = 'T'
         # note: fromISOformat does not respect timezone
@@ -157,8 +163,8 @@ class TestTimestamp(TestCase):
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
 
-    @unittest.expectedFailure
-    def test_iso_format_with_sep(self):
+    @unittest.expectedFailure  # T396723
+    def test_iso_format_with_sep(self) -> None:
         """Test conversion from and to ISO format with separator."""
         sep = '*'
         t1 = Timestamp.utcnow().replace(microsecond=0)
@@ -173,13 +179,13 @@ class TestTimestamp(TestCase):
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
 
-    def test_iso_format_property(self):
+    def test_iso_format_property(self) -> None:
         """Test iso format properties."""
         self.assertEqual(Timestamp.ISO8601Format, Timestamp._ISO8601Format())
         self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
                          Timestamp.mediawikiTSFormat)
 
-    def test_mediawiki_format(self):
+    def test_mediawiki_format(self) -> None:
         """Test conversion from and to Timestamp format."""
         t1 = Timestamp.utcnow()
         if not t1.microsecond:  # T191827: ensure microsecond is not 0
@@ -193,7 +199,7 @@ class TestTimestamp(TestCase):
         self.assertEqual(t1, t2)
         self.assertEqual(ts1, ts2)
 
-    def test_short_mediawiki_format(self):
+    def test_short_mediawiki_format(self) -> None:
         """Test short mw timestamp conversion from and to Timestamp format."""
         t1 = Timestamp(2018, 12, 17)
         t2 = Timestamp.fromtimestampformat('20181217')  # short timestamp
@@ -229,7 +235,7 @@ class TestTimestamp(TestCase):
                     ValueError, f'time data {mw_ts!r} does not match MW'):
                 Timestamp.fromtimestampformat(mw_ts, strict=True)
 
-    def test_add_timedelta(self):
+    def test_add_timedelta(self) -> None:
         """Test addin a timedelta to a Timestamp."""
         t1 = Timestamp.nowutc()
         t2 = t1 + timedelta(days=1)
@@ -240,7 +246,7 @@ class TestTimestamp(TestCase):
         self.assertIsInstance(t1, Timestamp)
         self.assertIsInstance(t2, Timestamp)
 
-    def test_sub_timedelta(self):
+    def test_sub_timedelta(self) -> None:
         """Test subtracting a timedelta from a Timestamp."""
         t1 = Timestamp.nowutc()
         t2 = t1 - timedelta(days=1)
@@ -251,7 +257,7 @@ class TestTimestamp(TestCase):
         self.assertIsInstance(t1, Timestamp)
         self.assertIsInstance(t2, Timestamp)
 
-    def test_sub_timedate(self):
+    def test_sub_timedate(self) -> None:
         """Test subtracting two timestamps."""
         t1 = Timestamp.nowutc()
         t2 = t1 - timedelta(days=1)
@@ -266,7 +272,7 @@ class TestTimeFunctions(TestCase):
 
     net = False
 
-    def test_str2timedelta(self):
+    def test_str2timedelta(self) -> None:
         """Test for parsing the shorthand notation of durations."""
         date = datetime(2017, 1, 1)  # non leap year
         self.assertEqual(str2timedelta('0d'), timedelta(0))
@@ -280,7 +286,7 @@ class TestTimeFunctions(TestCase):
         with self.assertRaises(ValueError):
             str2timedelta('$1')
 
-    def test_parse_duration(self):
+    def test_parse_duration(self) -> None:
         """Test for extracting key and duration from shorthand notation."""
         self.assertEqual(parse_duration('400s'), ('s', 400))
         self.assertEqual(parse_duration('7d'), ('d', 7))

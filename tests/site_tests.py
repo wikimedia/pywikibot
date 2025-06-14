@@ -42,14 +42,14 @@ class TestSiteObject(DefaultSiteTestCase):
 
     cached = True
 
-    def test_pickle_ability(self):
+    def test_pickle_ability(self) -> None:
         """Test pickle ability."""
         mysite = self.get_site()
         mysite_str = pickle.dumps(mysite, protocol=config.pickle_protocol)
         mysite_pickled = pickle.loads(mysite_str)
         self.assertEqual(mysite, mysite_pickled)
 
-    def test_repr(self):
+    def test_repr(self) -> None:
         """Test __repr__."""
         code = self.site.family.obsolete.get(self.code) or self.code
         expect = f"Site('{code}', '{self.family}')"
@@ -57,7 +57,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(reprs.endswith(expect),
                         f'\n{reprs} does not end with {expect}')
 
-    def test_constructors(self):
+    def test_constructors(self) -> None:
         """Test cases for site constructors."""
         test_list = [
             ['alswiki', 'wikipedia:als'],  # see T345036
@@ -84,7 +84,7 @@ class TestSiteObject(DefaultSiteTestCase):
                     pywikibot.site.APISite.fromDBName(dbname, site),
                     pywikibot.Site(sitename))
 
-    def test_codes_property(self):
+    def test_codes_property(self) -> None:
         """Test cases for codes property and related methods."""
         mysite = self.get_site()
         codes = mysite.codes
@@ -101,7 +101,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIn(item, codes)
             self.assertIsNone(self.site.namespaces.lookup_name(item))
 
-    def test_namespace_methods(self):
+    def test_namespace_methods(self) -> None:
         """Test cases for methods manipulating namespace names."""
         mysite = self.get_site()
         ns = mysite.namespaces
@@ -132,13 +132,13 @@ class TestSiteObject(DefaultSiteTestCase):
                 with self.subTest(value=val, name=name):
                     self.assertIsInstance(name, str)
 
-    def test_user_attributes_return_types(self):
+    def test_user_attributes_return_types(self) -> None:
         """Test returned types of user attributes."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.logged_in(), bool)
         self.assertIsInstance(mysite.userinfo, dict)
 
-    def test_messages(self):
+    def test_messages(self) -> None:
         """Test MediaWiki: messages."""
         mysite = self.get_site()
         for msg in ('about', 'aboutpage', 'aboutsite', 'accesskey-n-portal'):
@@ -215,7 +215,7 @@ class TestSiteObject(DefaultSiteTestCase):
         with self.subTest(test='list_to_text'):
             self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
 
-    def test_english_specific_methods(self):
+    def test_english_specific_methods(self) -> None:
         """Test Site methods using English specific inputs and outputs."""
         mysite = self.get_site()
         if mysite.lang != 'en':
@@ -228,7 +228,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(mysite.list_to_text(('This', 'that', 'the other')),
                          'This, that and the other')
 
-    def test_page_methods(self):
+    def test_page_methods(self) -> None:
         """Test ApiSite methods for getting page-specific info."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
@@ -246,13 +246,13 @@ class TestSiteObject(DefaultSiteTestCase):
         if a:
             self.assertEqual(a[0], mainpage)
 
-    def test_maxlimit(self):
+    def test_maxlimit(self) -> None:
         """Test maxlimit property."""
         limit = self.site.maxlimit
         self.assertIsInstance(limit, int)
         self.assertIn(limit, [10, 50, 500, 5000])
 
-    def test_ratelimit(self):
+    def test_ratelimit(self) -> None:
         """Test ratelimit method."""
         actions = ('edit', 'move', 'purge', 'invalid')
         if self.site.logged_in():
@@ -279,7 +279,7 @@ class TestLockingPage(DefaultSiteTestCase):
 
     cached = True
 
-    def worker(self):
+    def worker(self) -> None:
         """Lock a page, wait few seconds and unlock the page."""
         page = pywikibot.Page(self.site, 'Foo')
         page.site.lock_page(page=page, block=True)
@@ -287,7 +287,7 @@ class TestLockingPage(DefaultSiteTestCase):
         time.sleep(wait)
         page.site.unlock_page(page=page)
 
-    def test_threads_locking_page(self):
+    def test_threads_locking_page(self) -> None:
         """Test lock_page and unlock_page methods for multiple threads."""
         # Start few threads
         threads = []
@@ -305,7 +305,7 @@ class TestLockingPage(DefaultSiteTestCase):
                 self.assertFalse(thread.is_alive(),
                                  'test page is still locked')
 
-    def test_lock_page(self):
+    def test_lock_page(self) -> None:
         """Test the site.lock_page() and site.unlock_page() method."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'Foo')
@@ -325,7 +325,7 @@ class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
 
     login = True
 
-    def test_methods(self):
+    def test_methods(self) -> None:
         """Test user related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.is_blocked(), bool)
@@ -339,13 +339,13 @@ class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
                     'nosuchright'):
             self.assertIsInstance(mysite.has_right(rgt), bool)
 
-    def test_deprecated_methods(self):
+    def test_deprecated_methods(self) -> None:
         """Test deprecated user related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.messages(), bool)
         self.assertOneDeprecation()
 
-    def test_logevents(self):
+    def test_logevents(self) -> None:
         """Test the site.logevents() method."""
         mysite = self.get_site()
         for entry in mysite.logevents(user=mysite.user(), total=3):
@@ -358,7 +358,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
 
     rights = 'delete'
 
-    def test_methods(self):
+    def test_methods(self) -> None:
         """Test sysop related methods."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.is_blocked(), bool)
@@ -368,7 +368,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         self.assertFalse(mysite.has_group('nonexistent_group'))
         self.assertTrue(mysite.has_right(self.rights))
 
-    def test_deletedrevs(self):
+    def test_deletedrevs(self) -> None:
         """Test the site.deletedrevs() method."""
         mysite = self.get_site()
         if not mysite.has_right('deletedhistory'):
@@ -467,7 +467,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
                                      reverse=True)
             next(gen)
 
-    def test_alldeletedrevisions(self):
+    def test_alldeletedrevisions(self) -> None:
         """Test the site.alldeletedrevisions() method."""
         mysite = self.get_site()
         myuser = mysite.user()
@@ -542,7 +542,7 @@ class TestSiteSysopWrite(TestCase):
     write = True
     rights = 'delete,deleterevision,protect'
 
-    def test_protect(self):
+    def test_protect(self) -> None:
         """Test the site.protect() method."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
@@ -571,7 +571,7 @@ class TestSiteSysopWrite(TestCase):
                      reason='Pywikibot unit test')
         self.assertEqual(site.page_restrictions(page=p1), {})
 
-    def test_protect_alt(self):
+    def test_protect_alt(self) -> None:
         """Test the site.protect() method, works around T78522."""
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
@@ -602,7 +602,7 @@ class TestSiteSysopWrite(TestCase):
                      reason='Pywikibot unit test')
         self.assertEqual(site.page_restrictions(page=p1), {})
 
-    def test_protect_exception(self):
+    def test_protect_exception(self) -> None:
         """Test that site.protect() throws an exception for invalid args."""
         site = self.get_site()
         page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
@@ -618,7 +618,7 @@ class TestSiteSysopWrite(TestCase):
             site.protect(protections={'edit': 'anInvalidLevel'},
                          page=page, reason='Pywikibot unit test')
 
-    def test_delete(self):
+    def test_delete(self) -> None:
         """Test the site.delete() and site.undelete() methods."""
         site = self.get_site()
         p = pywikibot.Page(site, 'User:Unicodesnowman/DeleteTestSite')
@@ -644,7 +644,7 @@ class TestSiteSysopWrite(TestCase):
         revs = list(p.revisions())
         self.assertGreater(len(revs), 2)
 
-    def test_revdel_page(self):
+    def test_revdel_page(self) -> None:
         """Test deleting and undeleting page revisions."""
         site = self.get_site()
         # Verify state
@@ -693,7 +693,7 @@ class TestSiteSysopWrite(TestCase):
                         reason='pywikibot unit tests')
 
     @unittest.expectedFailure  # T367309
-    def test_revdel_file(self):
+    def test_revdel_file(self) -> None:
         """Test deleting and undeleting file revisions."""
         site = pywikibot.Site('test')
 
@@ -748,7 +748,7 @@ class TestSiteSysopWrite(TestCase):
                         reason='pywikibot unit tests',
                         target='File:T276726.png')
 
-    def test_delete_oldimage(self):
+    def test_delete_oldimage(self) -> None:
         """Test deleting and undeleting specific versions of files."""
         site = self.get_site()
         fp = pywikibot.FilePage(site, 'File:T276725.png')
@@ -791,7 +791,7 @@ class TestUsernameInUsers(DefaultSiteTestCase):
     login = True
     cached = True
 
-    def test_username_in_users(self):
+    def test_username_in_users(self) -> None:
         """Test the site.users() method with bot username."""
         mysite = self.get_site()
         us = list(mysite.users(mysite.user()))
@@ -805,7 +805,7 @@ class TestSiteExtensions(WikimediaDefaultSiteTestCase):
 
     cached = True
 
-    def test_extensions(self):
+    def test_extensions(self) -> None:
         """Test Extensions."""
         mysite = self.get_site()
         # test automatically getting extensions cache
@@ -824,12 +824,12 @@ class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     """Test site.loadrevisions() caching."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = self.get_mainpage(force=True)
         super().setUp()
 
-    def test_page_text(self):
+    def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
         self._test_page_text()
 
@@ -843,7 +843,7 @@ class TestCommonsSite(TestCase):
 
     cached = True
 
-    def test_interwiki_forward(self):
+    def test_interwiki_forward(self) -> None:
         """Test interwiki forward."""
         self.site = self.get_site()
         self.mainpage = pywikibot.Page(pywikibot.Link('Main Page', self.site))
@@ -863,7 +863,7 @@ class TestWiktionarySite(TestCase):
 
     cached = True
 
-    def test_namespace_case(self):
+    def test_namespace_case(self) -> None:
         """Test namespace case."""
         site = self.get_site()
 
@@ -882,7 +882,7 @@ class TestNonEnglishWikipediaSite(TestCase):
 
     cached = True
 
-    def test_namespace_aliases(self):
+    def test_namespace_aliases(self) -> None:
         """Test namespace aliases."""
         site = self.get_site()
 
@@ -921,7 +921,7 @@ class TestUploadEnabledSite(TestCase):
 
     login = True
 
-    def test_is_uploaddisabled(self, key):
+    def test_is_uploaddisabled(self, key) -> None:
         """Test is_uploaddisabled()."""
         site = self.get_site(key)
         self.assertEqual(site.is_uploaddisabled(), self.sites[key]['disabled'])
@@ -946,13 +946,13 @@ class TestSametitleSite(TestCase):
         }
     }
 
-    def test_enwp(self):
+    def test_enwp(self) -> None:
         """Test sametitle for enwp."""
         self.assertTrue(self.get_site('enwp').sametitle('Foo', 'foo'))
         self.assertFalse(self.get_site('enwp').sametitle(
             'Template:Test template', 'Template:Test Template'))
 
-    def test_dewp(self):
+    def test_dewp(self) -> None:
         """Test sametitle for dewp."""
         site = self.get_site('dewp')
         self.assertTrue(site.sametitle('Foo', 'foo'))
@@ -960,11 +960,11 @@ class TestSametitleSite(TestCase):
         self.assertTrue(site.sametitle('Benutzerin:Foo', 'User:Foo'))
         self.assertTrue(site.sametitle('Benutzerin:Foo', 'Benutzer:Foo'))
 
-    def test_enwt(self):
+    def test_enwt(self) -> None:
         """Test sametitle for enwt."""
         self.assertFalse(self.get_site('enwt').sametitle('Foo', 'foo'))
 
-    def test_general(self, code):
+    def test_general(self, code) -> None:
         """Test sametitle."""
         site = self.get_site(code)
         self.assertTrue(site.sametitle('File:Foo', 'Image:Foo'))
@@ -987,7 +987,7 @@ class TestLinktrails(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def test_has_linktrail(self):
+    def test_has_linktrail(self) -> None:
         """Verify that every code has a linktrail.
 
         Test all smallest wikis and the others randomly.
@@ -1002,7 +1002,7 @@ class TestLinktrails(TestCase):
             with self.subTest(site=site):
                 self.assertIsInstance(site.linktrail(), str)
 
-    def test_linktrails(self):
+    def test_linktrails(self) -> None:
         """Test special linktrails.
 
         This is a subset of the old `family.linktrails` dict.
@@ -1052,7 +1052,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         },
     }
 
-    def test_twn(self):
+    def test_twn(self) -> None:
         """Test translatewiki.net."""
         url = 'translatewiki.net'
         site = self.get_site('i18n')
@@ -1072,7 +1072,7 @@ class TestSubdomainFamilySite(TestCase):
     code = 'en'
     family = 'wowwiki'
 
-    def test_wow(self):
+    def test_wow(self) -> None:
         """Test wowwiki.fandom.com."""
         url = 'wowwiki-archive.fandom.com'
         site = self.site
@@ -1115,7 +1115,7 @@ class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
         },
     }
 
-    def test_commons(self):
+    def test_commons(self) -> None:
         """Test Wikimedia Commons."""
         site = self.get_site('commons')
         self.assertEqual(site.hostname(), 'commons.wikimedia.org')
@@ -1138,7 +1138,7 @@ class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
         with self.assertRaises(UnknownSiteError):
             pywikibot.Site()
 
-    def test_wikidata(self):
+    def test_wikidata(self) -> None:
         """Test Wikidata family, with sites for test and production."""
         site = self.get_site('wikidata')
         self.assertEqual(site.hostname(), 'www.wikidata.org')
@@ -1178,7 +1178,7 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
 
     cached = True
 
-    def test_cache_proofreadinfo_on_site_with_proofreadpage(self):
+    def test_cache_proofreadinfo_on_site_with_proofreadpage(self) -> None:
         """Test Site._cache_proofreadinfo()."""
         site = self.get_site('en-ws')
         ql_res = {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
@@ -1192,7 +1192,7 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
         del site._proofread_page_ns  # Check that property reloads.
         self.assertEqual(site.namespaces[104], site.proofread_page_ns)
 
-    def test_cache_proofreadinfo_on_site_without_proofreadpage(self):
+    def test_cache_proofreadinfo_on_site_without_proofreadpage(self) -> None:
         """Test Site._cache_proofreadinfo()."""
         site = self.get_site('en-wp')
         with self.assertRaises(UnknownExtensionError):
@@ -1222,7 +1222,7 @@ class TestPropertyNames(DefaultSiteTestCase):
 
     cached = True
 
-    def test_get_property_names(self, key):
+    def test_get_property_names(self, key) -> None:
         """Test get_property_names method."""
         mysite = self.get_site(key)
         pnames = mysite.get_property_names()
@@ -1283,14 +1283,14 @@ class TestPageFromWikibase(DefaultSiteTestCase):
 
     ITEM = 'Q131303'
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Validate page_from_repository."""
         site = self.get_site(key)
         page = site.page_from_repository(self.ITEM)
         self.assertIsInstance(page, pywikibot.Page)
         self.assertEqual(page.title(), self.sites[key]['result'])
 
-    def test_page_from_repository_none(self):
+    def test_page_from_repository_none(self) -> None:
         """Validate page_from_repository return NoneType."""
         site = pywikibot.Site('pdc', 'wikipedia')
         page = site.page_from_repository(self.ITEM)
@@ -1321,14 +1321,14 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
 
     ITEM = 'Q6939656'
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Validate page_from_repository."""
         site = self.get_site(key)
         page = site.page_from_repository(self.ITEM)
         self.assertIsInstance(page, pywikibot.Category)
         self.assertEqual(page.title(), self.sites[key]['result'])
 
-    def test_page_from_repository_none(self):
+    def test_page_from_repository_none(self) -> None:
         """Validate page_from_repository return NoneType."""
         site = pywikibot.Site('pdc', 'wikipedia')
         page = site.page_from_repository(self.ITEM)

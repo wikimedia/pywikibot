@@ -173,7 +173,8 @@ class SupersetQuery(WaitingMixin):
         :param site: The target site
         :raises TypeError: if site and schema_name are both defined'
         :raises TypeError: If determined database_id is not an integer.
-        :raises TypeError: If neither site nor schema_name is determined.
+        :raises TypeError: If neither site nor schema_name is
+            determined.
         :return: A tuple containing database_id and schema_name.
         """
         if site and schema_name:

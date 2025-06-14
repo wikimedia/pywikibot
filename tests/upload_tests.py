@@ -31,7 +31,7 @@ class TestUpload(TestCase):
     arrow_png = join_images_path('1rightarrow.png')
 
     @unittest.expectedFailure  # T367319
-    def test_png(self):
+    def test_png(self) -> None:
         """Test uploading a png using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         self.site.upload(page, source_filename=self.sounds_png,
@@ -39,16 +39,16 @@ class TestUpload(TestCase):
                          ignore_warnings=True)
 
     @unittest.expectedFailure  # T367320
-    def test_png_chunked(self):
+    def test_png_chunked(self) -> None:
         """Test uploading a png in two chunks using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb-chunked.png')
         self.site.upload(page, source_filename=self.sounds_png,
                          comment='pywikibot test',
                          ignore_warnings=True, chunk_size=1024)
 
-    def _init_upload(self, chunk_size):
+    def _init_upload(self, chunk_size) -> None:
         """Do an initial upload causing an abort because of warnings."""
-        def warn_callback(warnings):
+        def warn_callback(warnings) -> None:
             """A simple callback not automatically finishing the upload."""
             self.assertCountEqual([w.code for w in warnings], expected_warns)
             # by now we know there are only two but just make sure
@@ -75,7 +75,7 @@ class TestUpload(TestCase):
         self.assertRegex(self._file_key, r'[0-9a-z]+.[0-9a-z]+.\d+.png')
         self._verify_stash()
 
-    def _verify_stash(self):
+    def _verify_stash(self) -> None:
         info = self.site.stash_info(self._file_key, ['size', 'sha1'])
         if info['size'] == 1024:
             self.assertEqual('3503db342c8dfb0a38db0682b7370ddd271fa163',
@@ -84,7 +84,7 @@ class TestUpload(TestCase):
             self.assertEqual('0408a0f6a5e057e701f3aed96b0d1fb913c3d9d0',
                              info['sha1'])
 
-    def _finish_upload(self, chunk_size, file_name):
+    def _finish_upload(self, chunk_size, file_name) -> None:
         """Finish the upload."""
         # Finish/continue upload with the given file key
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
@@ -92,7 +92,7 @@ class TestUpload(TestCase):
                          comment='pywikibot test', chunk_size=chunk_size,
                          ignore_warnings=True, report_success=False)
 
-    def _test_continue_filekey(self, chunk_size):
+    def _test_continue_filekey(self, chunk_size) -> None:
         """Test uploading a chunk first and finish in a separate upload."""
         self._init_upload(chunk_size)
         self._finish_upload(chunk_size, self.sounds_png)
@@ -105,17 +105,17 @@ class TestUpload(TestCase):
                         '"File not found"')
 
     @unittest.expectedFailure  # T367314
-    def test_continue_filekey_once(self):
+    def test_continue_filekey_once(self) -> None:
         """Test continuing to upload a file without using chunked mode."""
         self._test_continue_filekey(0)
 
     @unittest.expectedFailure  # T133288
-    def test_continue_filekey_chunked(self):
+    def test_continue_filekey_chunked(self) -> None:
         """Test continuing to upload a file with using chunked mode."""
         self._test_continue_filekey(1024)
 
     @unittest.expectedFailure  # T367321
-    def test_sha1_mismatch(self):
+    def test_sha1_mismatch(self) -> None:
         """Test trying to continue with a different file."""
         self._init_upload(1024)
         with self.assertRaises(ValueError) as cm:
@@ -128,7 +128,7 @@ class TestUpload(TestCase):
         self._verify_stash()
 
     @unittest.expectedFailure  # T367316
-    def test_offset_mismatch(self):
+    def test_offset_mismatch(self) -> None:
         """Test trying to continue with a different offset."""
         self._init_upload(1024)
         self._offset = 0
@@ -142,7 +142,7 @@ class TestUpload(TestCase):
         self._verify_stash()
 
     @unittest.expectedFailure  # T367317
-    def test_offset_oversize(self):
+    def test_offset_oversize(self) -> None:
         """Test trying to continue with an offset which is to large."""
         self._init_upload(1024)
         self._offset = 2000

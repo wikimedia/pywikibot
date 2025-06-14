@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from typing import NoReturn
 
 from pywikibot.tools import (
     PYTHON_VERSION,
@@ -26,24 +27,24 @@ from tests.aspects import DeprecationTestCase
 def noop(foo=None):
     """Dummy decorator."""
     def decorator(obj):
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> NoReturn:
             raise Exception(obj.__full_name__)
         return wrapper
     return decorator
 
 
 @noop()
-def decorated_func():
+def decorated_func() -> None:
     """Test dummy decorator."""
 
 
 @noop(foo='bar')
-def decorated_func2():
+def decorated_func2() -> None:
     """Test dummy decorator."""
 
 
 @noop('baz')
-def decorated_func3():
+def decorated_func3() -> None:
     """Test dummy decorator."""
 
 
@@ -53,7 +54,7 @@ class DecoratorFullNameTestCase(DeprecationTestCase):
 
     net = False
 
-    def test_add_full_name_decorator(self):
+    def test_add_full_name_decorator(self) -> None:
         """Test add_decorated_full_name() method."""
         with self.assertRaisesRegex(Exception,
                                     __name__ + '.decorated_func'):
@@ -142,7 +143,7 @@ def deprecated_func_arg3(foo=None):
 
 
 @remove_last_args(['foo', 'bar'])
-def deprecated_all():
+def deprecated_all() -> None:
     """Test remove_last_args with all args removed."""
     return
 
@@ -230,7 +231,7 @@ class DeprecatedMethodClass:
         return foo
 
     @remove_last_args(['foo', 'bar'])
-    def deprecated_all(self):
+    def deprecated_all(self) -> None:
         """Deprecating positional parameters."""
         return
 
@@ -257,7 +258,7 @@ class DeprecatedClass:
 
     """Deprecated class."""
 
-    def __init__(self, foo=None):
+    def __init__(self, foo=None) -> None:
         """Initializer."""
         self.foo = foo
 
@@ -268,13 +269,13 @@ class DeprecatorTestCase(DeprecationTestCase):
 
     net = False
 
-    def test_deprecated_function_zero_arg(self):
+    def test_deprecated_function_zero_arg(self) -> None:
         """Test @deprecated with functions, with zero arguments."""
         rv = deprecated_func()
         self.assertIsNone(rv)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func')
 
-    def test_deprecated_function(self):
+    def test_deprecated_function(self) -> None:
         """Test @deprecated with functions."""
         rv = deprecated_func('a')
         self.assertEqual(rv, 'a')
@@ -284,7 +285,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, 1)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func')
 
-    def test_deprecated_function2(self):
+    def test_deprecated_function2(self) -> None:
         """Test @deprecated with functions."""
         rv = deprecated_func2('a')
         self.assertEqual(rv, 'a')
@@ -294,14 +295,14 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, 1)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func2')
 
-    def test_deprecated_function_instead(self):
+    def test_deprecated_function_instead(self) -> None:
         """Test @deprecated with functions, using instead."""
         rv = deprecated_func_instead('a')
         self.assertEqual(rv, 'a')
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_instead',
                                        'baz')
 
-    def test_deprecated_function_docstring(self):
+    def test_deprecated_function_docstring(self) -> None:
         """Test @deprecated docstring modification."""
         testcases = [
             (deprecated_func, 'Deprecated.\n\nDeprecated function.'),
@@ -320,7 +321,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             with self.subTest(function=rv.__name__):
                 self.assertEqual(rv.__doc__, doc)
 
-    def test_deprecated_function_multiline_docstring(self):
+    def test_deprecated_function_multiline_docstring(self) -> None:
         """Test @deprecated docstring modification on multiline docstring.
 
         Python 3.13 strips the doc string, see
@@ -333,7 +334,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             self.assertEqual(deprecated_func_docstring_arg2.__doc__,
                              doc.replace(' ' * 4, ''))
 
-    def test_deprecated_function_bad_args(self):
+    def test_deprecated_function_bad_args(self) -> None:
         """Test @deprecated function with bad arguments."""
         rv = deprecated_func_bad_args(None)
         self.assertIsNone(rv)
@@ -352,7 +353,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, f)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_bad_args')
 
-    def test_deprecated_instance_method(self):
+    def test_deprecated_instance_method(self) -> None:
         """Test @deprecated instance method."""
         f = DeprecatedMethodClass()
 
@@ -374,7 +375,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(
             __name__ + '.DeprecatedMethodClass.instance_method')
 
-    def test_deprecated_instance_method2(self):
+    def test_deprecated_instance_method2(self) -> None:
         """Test @deprecated instance method 2."""
         f = DeprecatedMethodClass()
 
@@ -384,7 +385,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(
             __name__ + '.DeprecatedMethodClass.instance_method2')
 
-    def test_deprecated_class_method(self):
+    def test_deprecated_class_method(self) -> None:
         """Test @deprecated with class methods."""
         rv = DeprecatedMethodClass.class_method()
         self.assertIsNone(rv)
@@ -401,14 +402,14 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(
             __name__ + '.DeprecatedMethodClass.class_method')
 
-    def test_deprecated_static_method_zero_args(self):
+    def test_deprecated_static_method_zero_args(self) -> None:
         """Test @deprecated with static methods, with zero arguments."""
         rv = DeprecatedMethodClass.static_method()
         self.assertIsNone(rv)
         self.assertOneDeprecationParts(
             __name__ + '.DeprecatedMethodClass.static_method')
 
-    def test_deprecated_static_method(self):
+    def test_deprecated_static_method(self) -> None:
         """Test @deprecated with static methods."""
         rv = DeprecatedMethodClass.static_method('a')
         self.assertEqual(rv, 'a')
@@ -420,7 +421,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(
             __name__ + '.DeprecatedMethodClass.static_method')
 
-    def test_deprecate_class_zero_arg(self):
+    def test_deprecate_class_zero_arg(self) -> None:
         """Test @deprecated with classes, without arguments."""
         df = DeprecatedClassNoInit()
         self.assertEqual(df.__doc__, 'Deprecated class.')
@@ -430,15 +431,15 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertIsNone(df.foo)
         self.assertOneDeprecationParts(__name__ + '.DeprecatedClass')
 
-    def test_deprecate_class(self):
+    def test_deprecate_class(self) -> None:
         """Test @deprecated with classes."""
         df = DeprecatedClass('a')
         self.assertEqual(df.foo, 'a')
         self.assertOneDeprecationParts(__name__ + '.DeprecatedClass')
 
-    def test_deprecate_function_arg(self):
+    def test_deprecate_function_arg(self) -> None:
         """Test @deprecated function argument."""
-        def tests(func):
+        def tests(func) -> None:
             """Test function."""
             rv = func()
             self.assertIsNone(rv)
@@ -470,7 +471,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         tests(deprecated_func_arg)
         tests(deprecated_func_arg2)
 
-    def test_deprecate_and_remove_function_args(self):
+    def test_deprecate_and_remove_function_args(self) -> None:
         """Test @deprecated and removed function argument."""
         deprecation_msg = f' argument of {__name__}.deprecated_func_arg3'
         rv = deprecated_func_arg3()
@@ -494,7 +495,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, 4)
         self.assertNoDeprecation()
 
-    def test_function_remove_last_args(self):
+    def test_function_remove_last_args(self) -> None:
         """Test @remove_last_args on functions."""
         msg_foo = ("The trailing arguments ('foo', 'bar') of "
                    f'{__name__}.deprecated_all are deprecated. The value(s)'
@@ -547,7 +548,7 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         self._reset_messages()
 
-    def test_method_remove_last_args(self):
+    def test_method_remove_last_args(self) -> None:
         """Test @remove_last_args on functions."""
         f = DeprecatedMethodClass()
 
@@ -612,7 +613,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             " The value(s) provided for 'bar' have been dropped."
         )
 
-    def test_deprecate_positionals(self):
+    def test_deprecate_positionals(self) -> None:
         """Test deprecation of positional parameters."""
         msg = ('Passing {param} as positional argument(s) to {func}() is '
                'deprecated; use keyword arguments like {instead} instead.')
@@ -689,7 +690,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             self.assertEqual(rv2, 81)
             self.assertNoDeprecation()
 
-    def test_remove_last_args_invalid(self):
+    def test_remove_last_args_invalid(self) -> None:
         """Test invalid @remove_last_args on functions."""
         with self.assertRaisesRegex(
                 TypeError,
@@ -729,7 +730,7 @@ class DeprecatorTestCase(DeprecationTestCase):
                 r'arguments (but 3 were given|\(3 given\))'):
             f.deprecated_all2(1, 2, 3)
 
-    def test_deprecated_instance_method_zero_arg(self):
+    def test_deprecated_instance_method_zero_arg(self) -> None:
         """Test @deprecate_arg with classes, without arguments."""
         f = DeprecatedMethodClass()
 
@@ -738,7 +739,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertIsNone(f.foo)
         self.assertNoDeprecation()
 
-    def test_deprecated_instance_method_arg(self):
+    def test_deprecated_instance_method_arg(self) -> None:
         """Test @deprecate_arg with instance methods."""
         f = DeprecatedMethodClass()
 
@@ -761,7 +762,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(f.foo, 1)
         self.assertNoDeprecation()
 
-    def test_deprecated_instance_method_args(self):
+    def test_deprecated_instance_method_args(self) -> None:
         """Test @deprecate_arg with instance methods and two args."""
         f = DeprecatedMethodClass()
 
@@ -796,7 +797,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, (1, 2))
         self.assertNoDeprecation()
 
-    def test_deprecated_instance_method_args_multi(self):
+    def test_deprecated_instance_method_args_multi(self) -> None:
         """Test @deprecated_args with instance methods and two args."""
         f = DeprecatedMethodClass()
 
@@ -831,7 +832,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, (1, 2))
         self.assertNoDeprecation()
 
-    def test_deprecated_instance_method_and_arg(self):
+    def test_deprecated_instance_method_and_arg(self) -> None:
         """Test @deprecate_arg and @deprecated with instance methods."""
         f = DeprecatedMethodClass()
 
@@ -861,7 +862,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             __name__
             + '.DeprecatedMethodClass.deprecated_instance_method_and_arg')
 
-    def test_deprecated_instance_method_and_arg2(self):
+    def test_deprecated_instance_method_and_arg2(self) -> None:
         """Test @deprecated and @deprecate_arg with instance methods."""
         f = DeprecatedMethodClass()
 

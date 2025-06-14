@@ -38,7 +38,6 @@ Commandline parameters:
 -recentchanges     Run on complete unpatrolled recentchanges
                    (default for any project except Wikipedia Projects)
 -usercontribs      Filter generators above to the given user
-
 """
 #
 # (C) Pywikibot team, 2011-2024
@@ -86,7 +85,8 @@ class PatrolBot(BaseBot):
 
         :keyword ask: If True, confirm each patrol action
         :keyword whitelist: page title for whitelist (optional)
-        :keyword autopatroluserns: Takes user consent to automatically patrol
+        :keyword autopatroluserns: Takes user consent to automatically
+            patrol
         :keyword versionchecktime: Check versionchecktime lapse in sec
         """
         super().__init__(**kwargs)
@@ -111,7 +111,7 @@ class PatrolBot(BaseBot):
 
         self._load_prefix_index_aliases()
 
-    def _load_prefix_index_aliases(self):
+    def _load_prefix_index_aliases(self) -> None:
         """Load _prefixindex_aliases."""
         for entry in self.site.siteinfo['specialpagealiases']:
             if entry['realname'] == 'Prefixindex':
@@ -121,7 +121,7 @@ class PatrolBot(BaseBot):
         else:
             raise RuntimeError('No alias for "prefixindex"')
 
-    def setup(self):
+    def setup(self) -> None:
         """Load most recent watchlist_page for further processing."""
         # Check for a more recent version after versionchecktime in sec.
         if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts
@@ -275,7 +275,7 @@ class PatrolBot(BaseBot):
             return True
         return False
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """It loads the given page, does some changes, and saves it."""
         choice = False
 

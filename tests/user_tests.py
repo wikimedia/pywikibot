@@ -23,7 +23,7 @@ class TestUserClass(TestCase):
     family = 'wikipedia'
     code = 'de'
 
-    def _tests_unregistered_user(self, user, prop='invalid'):
+    def _tests_unregistered_user(self, user, prop='invalid') -> None:
         """Proceed user tests."""
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
@@ -33,25 +33,25 @@ class TestUserClass(TestCase):
         self.assertFalse(user.is_thankable)
         self.assertIn(prop, user.getprops())
 
-    def test_anonymous_user(self):
+    def test_anonymous_user(self) -> None:
         """Test registered user."""
         user = User(self.site, '123.45.67.89')
         self._tests_unregistered_user(user)
         self.assertTrue(user.isAnonymous())
 
-    def test_unregistered_user(self):
+    def test_unregistered_user(self) -> None:
         """Test unregistered user."""
         user = User(self.site, 'This user name is not registered yet')
         self._tests_unregistered_user(user, prop='missing')
         self.assertFalse(user.isAnonymous())
 
-    def test_invalid_user(self):
+    def test_invalid_user(self) -> None:
         """Test invalid user."""
         user = User(self.site, 'Invalid char\x9f in Name')
         self._tests_unregistered_user(user)
         self.assertFalse(user.isAnonymous())
 
-    def test_registered_user(self):
+    def test_registered_user(self) -> None:
         """Test registered user."""
         user = User(self.site, 'Xqt')
         self.assertEqual(user.title(with_ns=False), user.username)
@@ -89,7 +89,7 @@ class TestUserClass(TestCase):
         self.assertIn('edit', user.rights())
         self.assertFalse(user.is_locked())
 
-    def test_registered_user_without_timestamp(self):
+    def test_registered_user_without_timestamp(self) -> None:
         """Test registered user when registration timestamp is None."""
         user = User(self.site, 'Ulfb')
         self.assertTrue(user.isRegistered())
@@ -101,7 +101,7 @@ class TestUserClass(TestCase):
         self.assertIn('userid', user.getprops())
         self.assertTrue(user.is_thankable)
 
-    def test_female_user(self):
+    def test_female_user(self) -> None:
         """Test female user."""
         user = User(self.site, 'Catrin')
         self.assertTrue(user.isRegistered())
@@ -111,13 +111,13 @@ class TestUserClass(TestCase):
         self.assertIn('userid', user.getprops())
         self.assertTrue(user.is_thankable)
 
-    def test_bot_user(self):
+    def test_bot_user(self) -> None:
         """Test bot user."""
         user = User(self.site, 'Xqbot')
         self.assertIn('bot', user.groups())
         self.assertFalse(user.is_thankable)
 
-    def test_autoblocked_user(self):
+    def test_autoblocked_user(self) -> None:
         """Test autoblocked user."""
         with patch.object(pywikibot, 'info') as p:
             user = User(self.site, '#1242976')
@@ -140,7 +140,7 @@ class TestUserClass(TestCase):
                 'This is an autoblock ID'):
             user.getUserTalkPage()
 
-    def test_autoblocked_user_with_namespace(self):
+    def test_autoblocked_user_with_namespace(self) -> None:
         """Test autoblocked user."""
         # Suppress output: This is an autoblock ID, you can only use to unblock
         with patch.object(pywikibot, 'info'):
@@ -162,7 +162,7 @@ class TestUserClass(TestCase):
                 'This is an autoblock ID'):
             user.getUserTalkPage()
 
-    def test_locked_user(self):
+    def test_locked_user(self) -> None:
         """Test global lock."""
         user = User(self.site, 'TonjaHeritage2')
         self.assertTrue(user.is_locked())
@@ -174,7 +174,7 @@ class TestUserMethods(DefaultSiteTestCase):
 
     login = True
 
-    def test_contribution(self):
+    def test_contribution(self) -> None:
         """Test the User.usercontribs() method."""
         total = 50
         mysite = self.get_site()
@@ -197,7 +197,7 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertIsInstance(t, Timestamp)
             self.assertIsInstance(c, str)
 
-    def test_logevents(self):
+    def test_logevents(self) -> None:
         """Test the User.logevents() method."""
         mysite = self.get_site()
         user = User(mysite, mysite.user())

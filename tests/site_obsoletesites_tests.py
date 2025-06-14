@@ -22,7 +22,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
 
     """Test 'closed' and obsolete code sites."""
 
-    def test_locked_site(self):
+    def test_locked_site(self) -> None:
         """Test Wikimedia closed/locked site."""
         with suppress_warnings('Interwiki removal mh is in wikipedia codes'):
             site = pywikibot.Site('mh', 'wikipedia')
@@ -37,7 +37,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertEqual(site.siteinfo['lang'], 'mh')
         self.assertTrue(site.is_uploaddisabled())
 
-    def test_removed_site(self):
+    def test_removed_site(self) -> None:
         """Test Wikimedia offline site."""
         site = pywikibot.Site('ru-sib', 'wikipedia')
         self.assertIsInstance(site, pywikibot.site.RemovedSite)
@@ -48,7 +48,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
             site.hostname()
         # See also http_tests, which tests that ru-sib.wikipedia.org is offline
 
-    def test_alias_code_site(self):
+    def test_alias_code_site(self) -> None:
         """Test Wikimedia site with an alias code."""
         with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             site = pywikibot.Site('jp', 'wikipedia')

@@ -28,22 +28,22 @@ class TestMediaWikiVersion(TestCase):
         self.assertEqual(str(v), version)
         return v
 
-    def test_normal_versions(self):
+    def test_normal_versions(self) -> None:
         """Test comparison between release versions."""
         self.assertGreater(self._make('1.33'), self._make('1.32.0'))
         self.assertEqual(self._make('1.33'), self._make('1.33'))
 
-    def test_wmf_versions(self):
+    def test_wmf_versions(self) -> None:
         """Test comparison between wmf versions."""
         self.assertGreater(self._make('1.33wmf10'), self._make('1.33wmf9'))
         self.assertEqual(self._make('1.33wmf10'), self._make('1.33wmf10'))
 
-    def test_combined_versions(self):
+    def test_combined_versions(self) -> None:
         """Test comparison between wmf versions and release versions."""
         self.assertGreater(self._make('1.33wmf10'), self._make('1.32.3'))
         self.assertGreater(self._make('1.33'), self._make('1.33wmf10'))
 
-    def test_non_wmf_scheme(self):
+    def test_non_wmf_scheme(self) -> None:
         """Test version numbers not following the wmf-scheme."""
         self.assertGreater(self._make('1.33alpha'), self._make('1.32.3'))
         self.assertGreater(self._make('1.33alpha'), self._make('1.33wmf1'))
@@ -54,13 +54,13 @@ class TestMediaWikiVersion(TestCase):
         self.assertGreater(self._make('1.33'), self._make('1.33-rc.2'))
         self.assertEqual(self._make('1.33rc1'), self._make('1.33-rc.1'))
 
-    def _version_check(self, version, digits, dev_version, suffix):
+    def _version_check(self, version, digits, dev_version, suffix) -> None:
         v = self._make(version)
         self.assertEqual(v.version, digits)
         self.assertEqual(v._dev_version, dev_version)
         self.assertEqual(v.suffix, suffix)
 
-    def test_invalid_type_comparison(self):
+    def test_invalid_type_comparison(self) -> None:
         """Compare with a type other than a version or string."""
         self.assertNotEqual(self._make('1.32.0'), ['wrong type'])
 
@@ -69,7 +69,7 @@ class TestMediaWikiVersion(TestCase):
         with self.assertRaisesRegex(TypeError, exc):
             assert self._make('1.32.0') > ['wrong type']
 
-    def test_interpretation(self):
+    def test_interpretation(self) -> None:
         """Test if the data is correctly interpreted."""
         self._version_check('1.33', (1, 33), (4, ), '')
         self._version_check('1.33wmf1', (1, 33), (0, 1), 'wmf1')
@@ -81,7 +81,7 @@ class TestMediaWikiVersion(TestCase):
         self._version_check('1.33-rc.1', (1, 33), (3, 1), '-rc.1')
         self._version_check('1.33text', (1, 33), (4, ), 'text')
 
-    def test_invalid_versions(self):
+    def test_invalid_versions(self) -> None:
         """Verify that insufficient version fail creating."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -100,7 +100,7 @@ class TestMediaWikiVersion(TestCase):
                 'Found "wmf" in "wmf-1"'):
             MediaWikiVersion('1.33wmf-1')
 
-    def test_generator(self):
+    def test_generator(self) -> None:
         """Test from_generator classmethod."""
         self.assertEqual(MediaWikiVersion.from_generator('MediaWiki 1.2.3'),
                          self._make('1.2.3'))

@@ -96,16 +96,16 @@ class CacheEntry(api.CachedRequest):
 
     """A Request cache entry."""
 
-    def __init__(self, directory: str, filename: str):
+    def __init__(self, directory: str, filename: str) -> None:
         """Initializer."""
         self.directory = directory
         self.filename = filename
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return string equivalent of object."""
         return self.filename
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Representation of object."""
         return str(self._cachefile_path())
 
@@ -129,7 +129,7 @@ class CacheEntry(api.CachedRequest):
         """
         return self._get_cache_dir() / self._create_file_name()
 
-    def _load_cache(self):
+    def _load_cache(self) -> bool:
         """Load the cache entry."""
         with self._cachefile_path().open('rb') as f:
             self.key, self._data, self._cachetime = pickle.load(f)
@@ -192,7 +192,7 @@ class CacheEntry(api.CachedRequest):
         self._parsed_key = (site, username, login_status, params)
         return self._parsed_key
 
-    def _rebuild(self):
+    def _rebuild(self) -> None:
         """Reconstruct the original Request from the key."""
         if hasattr(self, '_parsed_key'):
             (site, username, login_status, params) = self._parsed_key
@@ -213,14 +213,14 @@ class CacheEntry(api.CachedRequest):
                 value = value.decode(self.site.encoding())
             self._params[key] = value.split('|')
 
-    def _delete(self):
+    def _delete(self) -> None:
         """Delete the cache entry."""
         self._cachefile_path().unlink()
 
 
 def process_entries(cache_path, func, use_accesstime: bool | None = None,
                     output_func=None, action_func=None, *,
-                    tests: int | None = None):
+                    tests: int | None = None) -> None:
     """Check the contents of the cache.
 
     This program tries to use file access times to determine whether
@@ -419,7 +419,7 @@ def parameters(entry):
     return lines
 
 
-def main():
+def main() -> None:
     """Process command line arguments and invoke bot."""
     local_args = pywikibot.handle_args()
     cache_paths = None

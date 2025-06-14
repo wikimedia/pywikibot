@@ -8,13 +8,12 @@
    Also EXTERNAL EDITOR SETTINGS section can be copied.
 """
 #
-# (C) Pywikibot team, 2010-2024
+# (C) Pywikibot team, 2010-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import os
 import re
 import sys
@@ -119,7 +118,8 @@ def get_site_and_lang(
     :param default_family: The default family which should be chosen.
     :param default_lang: The default site code which should be chosen,
         if the family supports it.
-    :param default_username: The default username which should be chosen.
+    :param default_username: The default username which should be
+        chosen.
     :return: The family, site code and username
     """
     known_families = sorted(pywikibot.config.family_files.keys())
@@ -243,8 +243,7 @@ def parse_sections() -> list:
     data = []
 
     config_path = Path(__file__).resolve().parents[1].joinpath('config.py')
-    with codecs.open(config_path, 'r', 'utf-8') as config_f:
-        config_file = config_f.read()
+    config_file = config_path.read_text(encoding='utf-8')
 
     result = re.findall(
         '^(?P<section># #{5,} (?P<head>[A-Z][A-Z_ ]+[A-Z]) #{5,}\r?\n'
@@ -351,13 +350,13 @@ def create_user_config(
     main_code: str,
     main_username: str,
     force: bool = False
-):
+) -> None:
     """Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
     """
-    _fnc = os.path.join(base_dir, USER_BASENAME)
-    _fncpass = os.path.join(base_dir, PASS_BASENAME)
+    f_user = Path(base_dir, USER_BASENAME)
+    f_pass = Path(base_dir, PASS_BASENAME)
 
     userlist = []
     if force and not config.verbose_output:
@@ -376,7 +375,7 @@ def create_user_config(
     # BotPassword (username, BotPassword name, BotPassword pass)
     msg: str | None = fill(
         f'See {__url__}/BotPasswords to know how to get codes. '
-        f'Please note that plain text in {_fncpass} and anyone with read'
+        f'Please note that plain text in {f_pass} and anyone with read'
         ' access to that directory will be able read the file.'
     )
     botpasswords = []
@@ -421,26 +420,32 @@ def create_user_config(
 
     try:
         # Finally save user-config.py
-        with codecs.open(_fnc, 'w', 'utf-8') as f:
-            f.write(config_content.format(
+        f_user.write_text(
+            config_content.format(
                 main_family=main_family,
                 main_code=main_code,
                 usernames=usernames,
                 config_text=config_text,
                 botpasswords='password_file = ' + (f'"{PASS_BASENAME}"'
-                                                   if botpasswords
-                                                   else 'None')))
-        pywikibot.info(f"'{_fnc}' written.")
+                                                   if botpasswords else 'None')
+            ),
+            encoding='utf-8'
+        )
+        pywikibot.info(f"'{f_user}' written.")
     except BaseException:
-        if os.path.exists(_fnc):
-            os.remove(_fnc)
+        f_user.unlink(missing_ok=True)
         raise
 
-    save_botpasswords(botpasswords, _fncpass)
+    save_botpasswords(botpasswords, f_pass)
 
 
-def save_botpasswords(botpasswords, _fncpass):
-    """Write botpasswords to file."""
+def save_botpasswords(botpasswords: str, path: Path) -> None:
+    """Write botpasswords to file.
+
+    :param botpasswords: botpasswords for password file
+    :param path: file path for password file
+    :raises OSError: OSError during writing the file
+    """
     if botpasswords:
         # Save user-password.py if necessary
         # user-config.py is already created at this point
@@ -448,28 +453,25 @@ def save_botpasswords(botpasswords, _fncpass):
         from pywikibot.tools import file_mode_checker
         try:
             # First create an empty file with good permissions, before writing
-            # in it
-            with codecs.open(_fncpass, 'w', 'utf-8') as f:
-                f.write('')
-                file_mode_checker(_fncpass,
+            # the content
+            for content in ('',
+                            PASSFILE_CONFIG.format(botpasswords=botpasswords)):
+                path.write_text(content, encoding='utf-8')
+                file_mode_checker(path,
                                   mode=config.private_files_permission,
-                                  quiet=True)
-            with codecs.open(_fncpass, 'w', 'utf-8') as f:
-                f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
-                file_mode_checker(_fncpass,
-                                  mode=config.private_files_permission)
-                pywikibot.info(f"'{_fncpass}' written.")
+                                  quiet=not content)
+            pywikibot.info(f"'{path}' written.")
         except OSError:
-            os.remove(_fncpass)
+            path.unlink(missing_ok=True)
             raise
 
 
 def ask_for_dir_change(force) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
-    Only give option for directory change if user-config.py or user-password
-    already exists in the directory. This will repeat if user-config.py also
-    exists in the requested directory.
+    Only give option for directory change if user-config.py or user-
+    password already exists in the directory. This will repeat if user-
+    config.py also exists in the requested directory.
 
     :param force: Skip asking for directory change
     :type force: bool

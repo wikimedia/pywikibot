@@ -36,23 +36,23 @@ class TestXMLPageGenerator(TestCase):
             text_predicate=predicate)
         return list(gen)
 
-    def test_no_match(self):
+    def test_no_match(self) -> None:
         """Test pages without any desired templates."""
         self.assertIsEmpty(self.generator('foobar'))
 
-    def test_match(self):
+    def test_match(self) -> None:
         """Test pages with one match without parameters."""
         pages = self.generator('stack begin')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Pear'], site=self.site)
 
-    def test_match_with_params(self):
+    def test_match_with_params(self) -> None:
         """Test pages with one match with parameters."""
         pages = self.generator('Taxobox')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Pear'], site=self.site)
 
-    def test_match_any(self):
+    def test_match_any(self) -> None:
         """Test pages with one of many matches."""
         template1 = pywikibot.Page(self.site, 'Template:stack begin')
         template2 = pywikibot.Page(self.site, 'Template:foobar')
@@ -77,14 +77,14 @@ class TestXMLPageGenerator(TestCase):
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Pear'], site=self.site)
 
-    def test_match_msg(self):
+    def test_match_msg(self) -> None:
         """Test pages with {{msg:..}}."""
         pages = self.generator('Foo', 'dummy-template.xml')
         self.assertLength(pages, 1)
         self.assertPageTitlesEqual(pages, ['Fake page with msg'],
                                    site=self.site)
 
-    def test_match_unnecessary_template_prefix(self):
+    def test_match_unnecessary_template_prefix(self) -> None:
         """Test pages with {{template:..}}."""
         pages = self.generator('Bar', 'dummy-template.xml')
         self.assertLength(pages, 1)
@@ -92,7 +92,7 @@ class TestXMLPageGenerator(TestCase):
             pages, ['Fake page with unnecessary template prefix'],
             site=self.site)
 
-    def test_nested_match(self):
+    def test_nested_match(self) -> None:
         """Test pages with one match inside another template."""
         pages = self.generator('boo', 'dummy-template.xml')
         self.assertLength(pages, 1)

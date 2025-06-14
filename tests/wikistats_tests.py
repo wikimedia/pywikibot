@@ -22,7 +22,7 @@ class WikiStatsTestCase(TestCase):
 
     net = True
 
-    def test_sort_numeric(self):
+    def test_sort_numeric(self) -> None:
         """Test sorted results."""
         keys = ('good', 'prefix', 'total')
 
@@ -48,7 +48,7 @@ class WikiStatsTestCase(TestCase):
         self.assertGreater(int(top['good']), int(bottom['good']))
         self.assertGreater(int(top['total']), int(bottom['total']))
 
-    def test_sort_alphabetic(self):
+    def test_sort_alphabetic(self) -> None:
         """Test alphabetic sorted results."""
         ws = WikiStats()
         for reverse in (True, False):
@@ -63,7 +63,7 @@ class WikiStatsTestCase(TestCase):
                         self.assertLess(last, code)
                     last = code
 
-    def test_sorting_order(self):
+    def test_sorting_order(self) -> None:
         """Test sorting order of languages_by_size."""
         family = 'wikipedia'
         ws = WikiStats()
@@ -78,7 +78,7 @@ class WikiStatsTestCase(TestCase):
             last = curr
             last_code = code
 
-    def test_wikipedia(self):
+    def test_wikipedia(self) -> None:
         """Test WikiStats wikipedia data content."""
         ws = WikiStats()
         data = ws.get_dict('wikipedia')
@@ -93,7 +93,7 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('prefix', data)
         self.assertIn('total', data)
 
-    def test_wikisource(self):
+    def test_wikisource(self) -> None:
         """Test WikiStats wikisource data content."""
         ws = WikiStats()
         data = ws.get_dict('wikisource')

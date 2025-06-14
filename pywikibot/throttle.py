@@ -24,7 +24,7 @@ from pywikibot.tools import deprecated
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
 
 pid: bool | int = False
-"""global process identifier
+"""Global process identifier.
 
 When the first Throttle is instantiated, it will set this variable to a
 positive integer, which will apply to all throttle objects created by
@@ -205,7 +205,10 @@ class Throttle:
         writedelay=None,
         absolute: bool = False
     ) -> None:
-        """Set the nominal delays in seconds. Defaults to config values."""
+        """Set the nominal delays in seconds.
+
+        Defaults to config values.
+        """
         with self.lock:
             delay = delay or self.mindelay
             writedelay = writedelay or config.put_throttle
@@ -289,7 +292,6 @@ class Throttle:
 
         Because this seizes the throttle lock, it will prevent any other
         thread from writing to the same site until the wait expires.
-
         """
         lock = self.lock_write if write else self.lock_read
         with lock:

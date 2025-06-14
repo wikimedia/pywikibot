@@ -30,16 +30,15 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import json
-import os
 from importlib import import_module
+from pathlib import Path
 
 from pywikibot import config
 
@@ -48,7 +47,7 @@ class i18nBot:  # noqa: N801
 
     """I18n bot."""
 
-    def __init__(self, script, *args, **kwargs):
+    def __init__(self, script, *args, **kwargs) -> None:
         """Initializer."""
         modules = script.split('.')
         self.scriptname = modules[0]
@@ -66,7 +65,7 @@ class i18nBot:  # noqa: N801
             self.messages[old] = new.replace('_', '-')
         self.dict = {}
 
-    def print_all(self):
+    def print_all(self) -> None:
         """Pretty print the dict as a file content to screen."""
         if not self.dict:
             print('No messages found, read them first.\n'
@@ -90,7 +89,7 @@ class i18nBot:  # noqa: N801
             print('    },')
         print('};')
 
-    def read(self, oldmsg, newmsg=None):
+    def read(self, oldmsg, newmsg=None) -> None:
         """Read a single message from source script."""
         msg = getattr(self.script, oldmsg)
         keys = list(msg.keys())
@@ -111,7 +110,7 @@ class i18nBot:  # noqa: N801
         if 'en' not in keys:
             print('WARNING: "en" key missing for message ' + newmsg)
 
-    def run(self, quiet=False):
+    def run(self, quiet=False) -> None:
         """Run the bot, read the messages from source and print the dict.
 
         :param quiet: print the result if False
@@ -122,7 +121,7 @@ class i18nBot:  # noqa: N801
         if not quiet:
             self.print_all()
 
-    def to_json(self, quiet=True):
+    def to_json(self, quiet=True) -> None:
         """Run the bot and create json files.
 
         :param quiet: Print the result if False
@@ -132,24 +131,23 @@ class i18nBot:  # noqa: N801
 
         if not self.dict:
             self.run(quiet)
-        json_dir = os.path.join(
-            config.base_dir, 'scripts/i18n', self.scriptname)
-        if not os.path.exists(json_dir):
-            os.makedirs(json_dir)
+        json_dir = Path(config.base_dir, 'scripts/i18n', self.scriptname)
+        json_dir.mkdir(exist_ok=True)
+
         for lang in self.dict:
-            file_name = os.path.join(json_dir, f'{lang}.json')
-            if os.path.isfile(file_name):
-                with codecs.open(file_name, 'r', 'utf-8') as json_file:
-                    new_dict = json.load(json_file)
-            else:
-                new_dict = {}
+            new_dict = {}
+
+            file_path = json_dir / f'{lang}.json'
+            if file_path.is_file():
+                new_dict = json.load(file_path.read_text(encoding='utf-8'))
+
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
-            with codecs.open(file_name, 'w', 'utf-8') as json_file:
-                new_dict.update(self.dict[lang])
-                s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
-                               indent=indent, separators=(',', ': '))
-                s = s.replace(' ' * indent, '\t')
-                json_file.write(s)
+            new_dict.update(self.dict[lang])
+            s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
+                           indent=indent, separators=(',', ': '))
+            s = s.replace(' ' * indent, '\t')
+
+            file_path.write_text(s, encoding='utf-8')
 
 
 if __name__ == '__main__':

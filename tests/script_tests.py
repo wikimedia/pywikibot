@@ -33,7 +33,7 @@ script_deps = {
 }
 
 
-def check_script_deps(script_name):
+def check_script_deps(script_name) -> bool:
     """Detect whether all dependencies are installed."""
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
@@ -173,7 +173,7 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-def import_script(script_name: str):
+def import_script(script_name: str) -> None:
     """Import script for coverage only (T305795)."""
     if not ci_test_run:
         return  # pragma: no cover
@@ -197,7 +197,7 @@ class ScriptTestMeta(MetaTestCaseClass):
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_set)
 
-            def test_script(self):
+            def test_script(self) -> None:
                 global_args_msg = \
                     'For global options use -help:global or run pwb'
                 global_args = ['-pwb_close_matches:1']
@@ -347,9 +347,9 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     """Test cases for running scripts with -simulate.
 
     This class sets the 'user' attribute on every test, thereby ensuring
-    that the test runner has a username for the default site, and so that
-    Site.login() is called in the test runner, which means that the scripts
-    run in pwb can automatically login using the saved cookies.
+    that the test runner has a username for the default site, and so
+    that Site.login() is called in the test runner, which means that the
+    scripts run in pwb can automatically login using the saved cookies.
     """
 
     login = True

@@ -408,8 +408,7 @@ DUPLICATES_REGEX = {
 }
 
 CATEGORIES_WITH_LICENSES = 'Q4481876', 'Q7451504'
-"""Category items with the licenses; subcategories may contain other
-licenses.
+"""Category items with the licenses; subcategories may contain other licenses.
 
 .. versionchanged:: 7.2
    uses wikibase items instead of category titles.
@@ -1166,10 +1165,10 @@ class CheckImagesBot:
     def template_in_list(self) -> None:
         """Check if template is in list.
 
-        The problem is the calls to the MediaWiki system because they can be
-        pretty slow. While searching in a list of objects is really fast, so
-        first of all let's see if we can find something in the info that we
-        already have, then make a deeper check.
+        The problem is the calls to the MediaWiki system because they
+        can be pretty slow. While searching in a list of objects is
+        really fast, so first of all let's see if we can find something
+        in the info that we already have, then make a deeper check.
         """
         for template in self.licenses_found:
             if self.mini_template_check(template):
@@ -1185,8 +1184,8 @@ class CheckImagesBot:
         """Detect templates.
 
         The bot instead of checking if there's a simple template in the
-        image's description, checks also if that template is a license or
-        something else. In this sense this type of check is smart.
+        image's description, checks also if that template is a license
+        or something else. In this sense this type of check is smart.
         """
         self.seems_ok = False
         self.license_found = None
@@ -1323,7 +1322,8 @@ class CheckImagesBot:
     def wait(generator, wait_time) -> Generator[pywikibot.FilePage]:
         """Skip the images uploaded before x seconds.
 
-        Let the users to fix the image's problem alone in the first x seconds.
+        Let the users to fix the image's problem alone in the first x
+        seconds.
         """
         print_with_time_zone(
             f'Skipping the files uploaded less than {wait_time} seconds ago..')

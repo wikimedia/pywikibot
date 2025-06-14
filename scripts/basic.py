@@ -77,11 +77,11 @@ class BasicBot(
 
     """An incomplete sample bot.
 
-    :ivar summary_key: Edit summary message key. The message that should be
-        used is placed on /i18n subdirectory. The file containing these
-        messages should have the same name as the caller script (i.e. basic.py
-        in this case). Use summary_key to set a default edit summary message.
-
+    :ivar summary_key: Edit summary message key. The message that should
+        be used is placed on /i18n subdirectory. The file containing
+        these messages should have the same name as the caller script
+        (i.e. basic.py in this case). Use summary_key to set a default
+        edit summary message.
     :type summary_key: str
     """
 

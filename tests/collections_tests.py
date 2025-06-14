@@ -25,7 +25,7 @@ class DataCollectionTestCase(WikidataTestCase):
 
     collection_class = None
 
-    def _test_new_empty(self):
+    def _test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         cls = self.collection_class
         result = cls.new_empty(self.get_repo())
@@ -43,34 +43,34 @@ class TestLanguageDict(DataCollectionTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': 'foo', 'zh': 'bar'}
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test LanguageDict initializer."""
         ld = LanguageDict()
         self.assertLength(ld, 0)
         ld = LanguageDict(self.lang_out)
         self.assertLength(ld, 2)
 
-    def test_setitem(self):
+    def test_setitem(self) -> None:
         """Test LanguageDict.__setitem__ metamethod."""
         ld = LanguageDict(self.lang_out)
         self.assertIn('en', ld)
         ld[self.site] = 'bar'
         self.assertIn('en', ld)
 
-    def test_getitem(self):
+    def test_getitem(self) -> None:
         """Test LanguageDict.__getitem__ metamethod."""
         ld = LanguageDict(self.lang_out)
         self.assertEqual(ld['en'], 'foo')
         self.assertEqual(ld[self.site], 'foo')
         self.assertIsNone(ld.get('de'))
 
-    def test_delitem(self):
+    def test_delitem(self) -> None:
         """Test LanguageDict.__delitem__ metamethod."""
         ld = LanguageDict(self.lang_out)
         ld.pop(self.site)
@@ -79,7 +79,7 @@ class TestLanguageDict(DataCollectionTestCase):
         self.assertNotIn('zh', ld)
         self.assertLength(ld, 0)
 
-    def test_fromJSON(self):
+    def test_fromJSON(self) -> None:
         """Test LanguageDict.fromJSON method."""
         ld = LanguageDict.fromJSON(
             {'en': {'language': 'en', 'value': 'foo'},
@@ -87,7 +87,7 @@ class TestLanguageDict(DataCollectionTestCase):
         self.assertIsInstance(ld, LanguageDict)
         self.assertEqual(ld, LanguageDict(self.lang_out))
 
-    def test_toJSON(self):
+    def test_toJSON(self) -> None:
         """Test LanguageDict.toJSON method."""
         ld = LanguageDict()
         self.assertEqual(ld.toJSON(), {})
@@ -96,7 +96,7 @@ class TestLanguageDict(DataCollectionTestCase):
             ld.toJSON(), {'en': {'language': 'en', 'value': 'foo'},
                           'zh': {'language': 'zh', 'value': 'bar'}})
 
-    def test_toJSON_diffto(self):
+    def test_toJSON_diffto(self) -> None:
         """Test LanguageDict.toJSON method."""
         ld = LanguageDict({'de': 'foo', 'zh': 'bar'})
         diffto = {
@@ -108,14 +108,14 @@ class TestLanguageDict(DataCollectionTestCase):
              'en': {'language': 'en', 'value': ''},
              'zh': {'language': 'zh', 'value': 'bar'}})
 
-    def test_normalizeData(self):
+    def test_normalizeData(self) -> None:
         """Test LanguageDict.normalizeData method."""
         self.assertEqual(
             LanguageDict.normalizeData(self.lang_out),
             {'en': {'language': 'en', 'value': 'foo'},
              'zh': {'language': 'zh', 'value': 'bar'}})
 
-    def test_new_empty(self):
+    def test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         self._test_new_empty()
 
@@ -131,21 +131,21 @@ class TestAliasesDict(DataCollectionTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': ['foo', 'bar'],
                          'zh': ['foo', 'bar']}
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test AliasesDict initializer."""
         ad = AliasesDict()
         self.assertLength(ad, 0)
         ad = AliasesDict(self.lang_out)
         self.assertLength(ad, 2)
 
-    def test_setitem(self):
+    def test_setitem(self) -> None:
         """Test AliasesDict.__setitem__ metamethod."""
         ad = AliasesDict(self.lang_out)
         self.assertIn('en', ad)
@@ -153,14 +153,14 @@ class TestAliasesDict(DataCollectionTestCase):
         ad[self.site] = ['baz']
         self.assertIn('en', ad)
 
-    def test_getitem(self):
+    def test_getitem(self) -> None:
         """Test AliasesDict.__getitem__ metamethod."""
         ad = AliasesDict(self.lang_out)
         self.assertEqual(ad['en'], ['foo', 'bar'])
         self.assertEqual(ad[self.site], ['foo', 'bar'])
         self.assertIsNone(ad.get('de'))
 
-    def test_delitem(self):
+    def test_delitem(self) -> None:
         """Test AliasesDict.__delitem__ metamethod."""
         ad = AliasesDict(self.lang_out)
         ad.pop(self.site)
@@ -169,7 +169,7 @@ class TestAliasesDict(DataCollectionTestCase):
         self.assertNotIn('zh', ad)
         self.assertLength(ad, 0)
 
-    def test_fromJSON(self):
+    def test_fromJSON(self) -> None:
         """Test AliasesDict.fromJSON method."""
         ad = AliasesDict.fromJSON(
             {'en': [{'language': 'en', 'value': 'foo'},
@@ -180,7 +180,7 @@ class TestAliasesDict(DataCollectionTestCase):
         self.assertIsInstance(ad, AliasesDict)
         self.assertEqual(ad, AliasesDict(self.lang_out))
 
-    def test_toJSON(self):
+    def test_toJSON(self) -> None:
         """Test AliasesDict.toJSON method."""
         ad = AliasesDict()
         self.assertEqual(ad.toJSON(), {})
@@ -193,7 +193,7 @@ class TestAliasesDict(DataCollectionTestCase):
                     {'language': 'zh', 'value': 'bar'}],
              })
 
-    def test_toJSON_diffto(self):
+    def test_toJSON_diffto(self) -> None:
         """Test AliasesDict.toJSON method."""
         ad = AliasesDict(self.lang_out)
         diffto = {
@@ -215,7 +215,7 @@ class TestAliasesDict(DataCollectionTestCase):
                     {'language': 'zh', 'value': 'bar'}]
              })
 
-    def test_normalizeData(self):
+    def test_normalizeData(self) -> None:
         """Test AliasesDict.normalizeData method."""
         data_in = {'en': [
             {'language': 'en', 'value': 'foo'},
@@ -229,7 +229,7 @@ class TestAliasesDict(DataCollectionTestCase):
         ]}
         self.assertEqual(AliasesDict.normalizeData(data_in), data_out)
 
-    def test_new_empty(self):
+    def test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         self._test_new_empty()
 
@@ -240,7 +240,7 @@ class TestClaimCollection(DataCollectionTestCase):
 
     collection_class = ClaimCollection
 
-    def test_new_empty(self):
+    def test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         self._test_new_empty()
 
@@ -251,7 +251,7 @@ class TestSiteLinkCollection(DataCollectionTestCase):
 
     collection_class = SiteLinkCollection
 
-    def test_new_empty(self):
+    def test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         self._test_new_empty()
 

@@ -83,7 +83,7 @@ class BaseSite(ComparableMixin):
                     pywikibot.config.mylang = self.__code
                     warn('Global configuration variable "mylang" changed to '
                          f'"{self.__code}" while instantiating site {self}',
-                         UserWarning)
+                         UserWarning, stacklevel=2)
             else:
                 error_msg = (f"Language '{self.__code}' does not exist in "
                              f'family {self.__family.name}')
@@ -97,7 +97,7 @@ class BaseSite(ComparableMixin):
 
     @property
     @deprecated(since='8.5.0')
-    def use_hard_category_redirects(self):
+    def use_hard_category_redirects(self) -> bool:
         """Hard redirects are used for this site.
 
         Originally create as property for future use for a proposal to
@@ -111,7 +111,10 @@ class BaseSite(ComparableMixin):
     @property
     @cached
     def throttle(self):
-        """Return this Site's throttle. Initialize a new one if needed."""
+        """Return this Site's throttle.
+
+        Initialize a new one if needed.
+        """
         return Throttle(self)
 
     @property
@@ -132,7 +135,8 @@ class BaseSite(ComparableMixin):
     def lang(self):
         """The ISO language code for this Site.
 
-        Presumed to be equal to the site code, but this can be overridden.
+        Presumed to be equal to the site code, but this can be
+        overridden.
         """
         return self.__code
 
@@ -306,7 +310,7 @@ class BaseSite(ComparableMixin):
         """Return list of localized PAGENAMEE tags for the site."""
         return ['PAGENAMEE']
 
-    def lock_page(self, page, block: bool = True):
+    def lock_page(self, page, block: bool = True) -> None:
         """Lock page for writing. Must be called before writing any page.
 
         We don't want different threads trying to write to the same page
@@ -314,9 +318,9 @@ class BaseSite(ComparableMixin):
 
         :param page: the page to be locked
         :type page: pywikibot.Page
-        :param block: if true, wait until the page is available to be locked;
-            otherwise, raise an exception if page can't be locked
-
+        :param block: if true, wait until the page is available to be
+            locked; otherwise, raise an exception if page can't be
+            locked
         """
         title = page.title(with_section=False)
         with self._pagemutex:
@@ -331,7 +335,6 @@ class BaseSite(ComparableMixin):
 
         :param page: the page to be locked
         :type page: pywikibot.Page
-
         """
         with self._pagemutex:
             self._locked_pages.discard(page.title(with_section=False))
@@ -369,8 +372,9 @@ class BaseSite(ComparableMixin):
     def isInterwikiLink(self, text):  # noqa: N802
         """Return True if text is in the form of an interwiki link.
 
-        If a link object constructed using "text" as the link text parses
-        as belonging to a different site, this method returns True.
+        If a link object constructed using "text" as the link text
+        parses as belonging to a different site, this method returns
+        True.
         """
         linkfam, linkcode = pywikibot.Link(text, self).parse_site()
         return linkfam != self.family.name or linkcode != self.code
@@ -395,8 +399,8 @@ class BaseSite(ComparableMixin):
     def sametitle(self, title1: str, title2: str) -> bool:
         """Return True if title1 and title2 identify the same wiki page.
 
-        title1 and title2 may be unequal but still identify the same page,
-        if they use different aliases for the same namespace.
+        title1 and title2 may be unequal but still identify the same
+        page, if they use different aliases for the same namespace.
         """
         def ns_split(title):
             """Separate the namespace from the name."""

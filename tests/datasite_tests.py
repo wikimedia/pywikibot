@@ -18,7 +18,7 @@ class TestDataSitePreloading(WikidataTestCase):
 
     """Test DataSite.preload_entities for repo pages."""
 
-    def test_item(self):
+    def test_item(self) -> None:
         """Test that ItemPage preloading works for Item objects."""
         datasite = self.get_repo()
         items = [pywikibot.ItemPage(datasite, 'q' + str(num))
@@ -32,7 +32,7 @@ class TestDataSitePreloading(WikidataTestCase):
             seen.append(item)
         self.assertLength(seen, 5)
 
-    def test_item_as_page(self):
+    def test_item_as_page(self) -> None:
         """Test that ItemPage preloading works for Page objects."""
         site = self.get_site()
         datasite = self.get_repo()
@@ -47,7 +47,7 @@ class TestDataSitePreloading(WikidataTestCase):
             seen.append(item)
         self.assertLength(seen, 5)
 
-    def test_property(self):
+    def test_property(self) -> None:
         """Test that preloading works for properties."""
         datasite = self.get_repo()
         page = pywikibot.Page(datasite, 'P6')
@@ -60,7 +60,7 @@ class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
 
     """Test DataSite.preload_entities for client pages."""
 
-    def test_non_item(self):
+    def test_non_item(self) -> None:
         """Test that ItemPage preloading works with Page generator."""
         mainpage = self.get_mainpage()
         datasite = self.get_repo()
@@ -75,7 +75,7 @@ class TestDataSiteSearchEntities(WikidataTestCase):
 
     """Test DataSite.search_entities."""
 
-    def test_general(self):
+    def test_general(self) -> None:
         """Test basic search_entities functionality."""
         datasite = self.get_repo()
         pages = list(datasite.search_entities('abc', 'en', total=50))
@@ -86,7 +86,7 @@ class TestDataSiteSearchEntities(WikidataTestCase):
         self.assertIsNotEmpty(pages)
         self.assertLessEqual(len(pages), 50)
 
-    def test_continue(self):
+    def test_continue(self) -> None:
         """Test that continue parameter in search_entities works."""
         datasite = self.get_repo()
         kwargs = {'total': 50}
@@ -95,7 +95,7 @@ class TestDataSiteSearchEntities(WikidataTestCase):
         pages_continue = datasite.search_entities('Rembrandt', 'en', **kwargs)
         self.assertNotEqual(list(pages), list(pages_continue))
 
-    def test_invalid_language(self):
+    def test_invalid_language(self) -> None:
         """Test behavior of search_entities with invalid language provided."""
         datasite = self.get_repo()
         with self.assertRaises(ValueError):

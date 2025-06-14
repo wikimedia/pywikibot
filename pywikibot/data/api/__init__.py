@@ -61,25 +61,21 @@ def _invalidate_superior_cookies(family) -> None:
 
 # Bug: T113120, T228841
 # Subclassing necessary to fix bug of the email package in Python 3:
-# see https://bugs.python.org/issue19003
-# see https://bugs.python.org/issue18886
+# see https://github.com/python/cpython/issues/63086
 # The following solution might be removed if the bug is fixed for
-# Python versions which are supported by PWB, probably with Python 3.5
+# Python versions which are supported by PWB
 
 class CTEBinaryBytesGenerator(BytesGenerator):
 
     """Workaround for bug in python 3 email handling of CTE binary."""
 
-    def __init__(self, *args, **kwargs) -> None:
-        """Initializer."""
-        super().__init__(*args, **kwargs)
-        self._writeBody = self._write_body
-
-    def _write_body(self, msg) -> None:
+    def _handle_text(self, msg) -> None:
         if msg['content-transfer-encoding'] == 'binary':
             self._fp.write(msg.get_payload(decode=True))
         else:
             super()._handle_text(msg)
+
+    _writeBody = _handle_text  # noqa: N815
 
 
 class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
@@ -90,7 +86,7 @@ class CTEBinaryMIMEMultipart(MIMEMultipartOrig):
         """Return unmodified binary payload."""
         policy = self.policy if policy is None else policy
         fp = BytesIO()
-        g = CTEBinaryBytesGenerator(fp, mangle_from_=False, policy=policy)
+        g = CTEBinaryBytesGenerator(fp, policy=policy)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 

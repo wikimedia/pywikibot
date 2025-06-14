@@ -20,7 +20,7 @@ class TestDrySite(DefaultDrySiteTestCase):
 
     dry = True
 
-    def test_logged_in(self):
+    def test_logged_in(self) -> None:
         """Test logged_in() method."""
         x = self.get_site()
         x._userinfo = {'name': None, 'groups': [], 'id': 1}
@@ -55,7 +55,7 @@ class TestDrySite(DefaultDrySiteTestCase):
         with self.subTest(variant='sysop'):
             self.assertTrue(x.logged_in())
 
-    def test_user_agent(self):
+    def test_user_agent(self) -> None:
         """Test different variants of user agents."""
         x = self.get_site()
 

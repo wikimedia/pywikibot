@@ -27,12 +27,11 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
     needed by the test case.
 
     Test is skipped if site version is not compatible.
-
     """
 
     login = True
 
-    def test_tokens(self):
+    def test_tokens(self) -> None:
         """Test tokens."""
         redirected_tokens = ['edit', 'move', 'delete']
         for ttype in [*redirected_tokens, 'patrol', 'deleteglobalaccount']:
@@ -44,7 +43,7 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
                 self._do_test_warning_filename = False
                 self.assertDeprecationParts(f'Token {ttype!r}', "'csrf'")
 
-    def test_invalid_token(self):
+    def test_invalid_token(self) -> None:
         """Test invalid token."""
         with self.assertRaises(KeyError):
             self.site.tokens['invalidtype']
@@ -54,7 +53,7 @@ class TokenTestBase(TestCaseBase):
 
     """Verify token exists before running tests."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Skip test if user does not have token and clear site wallet."""
         super().setUp()
         mysite = self.get_site()
@@ -72,7 +71,7 @@ class TokenTestBase(TestCaseBase):
         self._orig_wallet = self.site.tokens
         self.site.tokens.clear()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore site tokens."""
         self.site._tokens = self._orig_wallet
         super().tearDown()
@@ -88,7 +87,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
     rights = 'patrol'
     token_type = 'patrol'
 
-    def test_patrol(self):
+    def test_patrol(self) -> None:
         """Test the site.patrol() method."""
         mysite = self.get_site()
 

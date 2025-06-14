@@ -12,6 +12,7 @@ import types
 import unittest
 from collections import defaultdict
 from contextlib import suppress
+from typing import NoReturn
 from unittest.mock import patch
 
 import pywikibot.family
@@ -29,7 +30,7 @@ class TestApiFunctions(DefaultSiteTestCase):
     """API Request object test class."""
 
     @suppress_warnings(r'Request\(\) invoked without a site', RuntimeWarning)
-    def testObjectCreation(self):
+    def testObjectCreation(self) -> None:
         """Test api.Request() constructor with implicit site creation."""
         req = api.Request(parameters={'action': 'test', 'foo': '',
                                       'bar': 'test'})
@@ -41,7 +42,7 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
 
     """API Request object test class."""
 
-    def testObjectCreation(self):
+    def testObjectCreation(self) -> None:
         """Test api.Request() constructor."""
         mysite = self.get_site()
         req = api.Request(site=mysite, parameters={'action': 'test', 'foo': '',
@@ -63,7 +64,7 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
         DeprecationWarning)
-    def test_mixed_mode(self):
+    def test_mixed_mode(self) -> None:
         """Test if parameters is used with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')
         self.assertIn('parameters', req1._params)
@@ -78,7 +79,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
     """Test ParamInfo."""
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test common initialization."""
         site = self.get_site()
         pi = api.ParamInfo(site)
@@ -92,7 +93,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
 
-    def test_init_query_first(self):
+    def test_init_query_first(self) -> None:
         """Test init where it first adds query and then main."""
         pi = api.ParamInfo(self.site, {'query', 'main'})
         self.assertIsEmpty(pi)
@@ -100,7 +101,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
 
-    def test_init_pageset(self):
+    def test_init_pageset(self) -> None:
         """Test initializing with deprecated pageset."""
         site = self.get_site()
         self.assertNotIn('query', api.ParamInfo.init_modules)
@@ -119,7 +120,7 @@ class TestParamInfo(DefaultSiteTestCase):
                                     "paraminfo for 'pageset' not loaded"):
             pi.parameter('pageset', 'generator')
 
-    def test_generators(self):
+    def test_generators(self) -> None:
         """Test requesting the generator parameter."""
         site = self.get_site()
         pi = api.ParamInfo(site, {'query'})
@@ -136,7 +137,7 @@ class TestParamInfo(DefaultSiteTestCase):
         for submodule, query in query_generators_param['submodules'].items():
             self.assertEqual('query+' + submodule, query)
 
-    def test_with_module_info(self):
+    def test_with_module_info(self) -> None:
         """Test requesting the module info."""
         site = self.get_site()
         pi = api.ParamInfo(site)
@@ -160,7 +161,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('protection', param['type'])
 
-    def test_with_module_revisions(self):
+    def test_with_module_revisions(self) -> None:
         """Test requesting the module revisions."""
         site = self.get_site()
         pi = api.ParamInfo(site)
@@ -184,7 +185,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('user', param['type'])
 
-    def test_multiple_modules(self):
+    def test_multiple_modules(self) -> None:
         """Test requesting multiple modules in one fetch."""
         site = self.get_site()
         pi = api.ParamInfo(site)
@@ -198,7 +199,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertLength(pi, 2 + len(pi._preloaded_modules))
 
-    def test_with_invalid_module(self):
+    def test_with_invalid_module(self) -> None:
         """Test requesting different kind of invalid modules."""
         site = self.get_site()
         pi = api.ParamInfo(site)
@@ -219,7 +220,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertLength(pi, pi._preloaded_modules)
 
-    def test_submodules(self):
+    def test_submodules(self) -> None:
         """Test another module apart from query having submodules."""
         pi = api.ParamInfo(self.site)
         self.assertFalse(pi._modules)
@@ -242,7 +243,7 @@ class TestParamInfo(DefaultSiteTestCase):
         with self.assertRaises(KeyError):
             pi.submodules('edit')
 
-    def test_module_paths(self):
+    def test_module_paths(self) -> None:
         """Test module paths use the complete paths."""
         pi = api.ParamInfo(self.site)
         self.assertIn('help', pi.module_paths)
@@ -251,7 +252,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('allpages', pi.module_paths)
         self.assertIn('query+allpages', pi.module_paths)
 
-    def test_prefix_map(self):
+    def test_prefix_map(self) -> None:
         """Test module prefixes use the path."""
         pi = api.ParamInfo(self.site)
         self.assertIn('query+revisions', pi.prefix_map)
@@ -260,7 +261,7 @@ class TestParamInfo(DefaultSiteTestCase):
         for mod in pi.prefix_map:
             self.assertEqual(mod, pi[mod]['path'])
 
-    def test_attributes(self):
+    def test_attributes(self) -> None:
         """Test attributes method."""
         pi = api.ParamInfo(self.site)
         attributes = pi.attributes('mustbeposted')
@@ -274,11 +275,11 @@ class TestParaminfoModules(DefaultSiteTestCase):
 
     """Test loading all paraminfo modules."""
 
-    def test_action_modules(self):
+    def test_action_modules(self) -> None:
         """Test loading all action modules."""
         self.site._paraminfo.fetch(self.site._paraminfo.action_modules)
 
-    def test_query_modules(self):
+    def test_query_modules(self) -> None:
         """Test loading all query modules."""
         self.site._paraminfo.fetch(self.site._paraminfo.query_modules)
 
@@ -290,7 +291,7 @@ class TestOptionSet(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_non_lazy_load(self):
+    def test_non_lazy_load(self) -> None:
         """Test OptionSet with initialised site."""
         options = api.OptionSet(self.get_site(), 'recentchanges', 'show')
         with self.assertRaises(KeyError):
@@ -316,7 +317,7 @@ class TestOptionSet(TestCase):
         self.assertEqual([], list(options))
         self.assertEqual([], list(options.api_iter()))
 
-    def test_lazy_load(self):
+    def test_lazy_load(self) -> None:
         """Test OptionSet with delayed site initialisation."""
         options = api.OptionSet()
         options['invalid_name'] = True
@@ -326,7 +327,8 @@ class TestOptionSet(TestCase):
         with self.assertRaises(KeyError):
             options._set_site(self.get_site(), 'recentchanges', 'show')
         self.assertLength(options, 2)
-        options._set_site(self.get_site(), 'recentchanges', 'show', True)
+        options._set_site(self.get_site(), 'recentchanges', 'show',
+                          clear_invalid=True)
         self.assertLength(options, 1)
         with self.assertRaises(TypeError):
             options._set_site(self.get_site(), 'recentchanges', 'show')
@@ -336,7 +338,7 @@ class TestDryOptionSet(DefaultDrySiteTestCase):
 
     """OptionSet class test class."""
 
-    def test_mutable_mapping(self):
+    def test_mutable_mapping(self) -> None:
         """Test keys, values and items from MutableMapping."""
         options = api.OptionSet()
         options['a'] = True
@@ -363,7 +365,7 @@ class TestDryPageGenerator(TestCase):
     titles = ('Broadcaster (definition)', 'Wiktionary', 'Broadcaster.com',
               'Wikipedia:Disambiguation')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         super().setUp()
         mysite = self.get_site()
@@ -402,34 +404,34 @@ class TestDryPageGenerator(TestCase):
             self.site.namespaces._namespace_names['wikipedia'] = (
                 self.site.namespaces[4])
 
-    def test_results(self):
+    def test_results(self) -> None:
         """Test that PageGenerator yields pages with expected attributes."""
         self.assertPageTitlesEqual(self.gen, self.titles)
 
-    def test_initial_limit(self):
+    def test_initial_limit(self) -> None:
         """Test the default limit."""
         self.assertIsNone(self.gen.limit)  # limit is initially None
 
-    def test_set_limit_as_number(self):
+    def test_set_limit_as_number(self) -> None:
         """Test setting the limit using an int."""
         for i in range(-2, 4):
             self.gen.set_maximum_items(i)
             self.assertEqual(self.gen.limit, i)
 
-    def test_set_limit_as_string(self):
+    def test_set_limit_as_string(self) -> None:
         """Test setting the limit using an int cast into a string."""
         for i in range(-2, 4):
             self.gen.set_maximum_items(str(i))
             self.assertEqual(self.gen.limit, i)
 
-    def test_set_limit_not_number(self):
+    def test_set_limit_not_number(self) -> None:
         """Test setting the limit to not a number."""
         with self.assertRaisesRegex(
                 ValueError,
                 r"invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')
 
-    def test_limit_range(self):
+    def test_limit_range(self) -> None:
         """Test that PageGenerator yields the requested amount of pages."""
         for i in range(1, 6):
             with self.subTest(amount=i):
@@ -437,17 +439,17 @@ class TestDryPageGenerator(TestCase):
                 self.assertPageTitlesEqual(self.gen, self.titles[:i])
                 self.gen.restart()
 
-    def test_limit_zero(self):
+    def test_limit_zero(self) -> None:
         """Test that a limit of zero is the same as limit None."""
         self.gen.set_maximum_items(0)
         self.assertPageTitlesEqual(self.gen, self.titles)
 
-    def test_limit_omit(self):
+    def test_limit_omit(self) -> None:
         """Test that limit omitted is the same as limit None."""
         self.gen.set_maximum_items(-1)
         self.assertPageTitlesEqual(self.gen, self.titles)
 
-    def test_namespace(self):
+    def test_namespace(self) -> None:
         """Test PageGenerator set_namespace."""
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
@@ -462,7 +464,7 @@ class TestPropertyGenerator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_info(self):
+    def test_info(self) -> None:
         """Test PropertyGenerator with prop 'info'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
@@ -478,7 +480,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('lastrevid', pagedata)
         self.assertLength(links, count)
 
-    def test_one_continuation(self):
+    def test_one_continuation(self) -> None:
         """Test PropertyGenerator with prop 'revisions'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
@@ -496,7 +498,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('revid', pagedata['revisions'][0])
         self.assertLength(links, count)
 
-    def test_two_continuations(self):
+    def test_two_continuations(self) -> None:
         """Test PropertyGenerator with prop 'revisions' and 'coordinates'."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
@@ -514,7 +516,7 @@ class TestPropertyGenerator(TestCase):
             self.assertIn('revid', pagedata['revisions'][0])
         self.assertLength(links, count)
 
-    def test_many_continuations_limited(self):
+    def test_many_continuations_limited(self) -> None:
         """Test PropertyGenerator with many limited props."""
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=30))
@@ -543,7 +545,7 @@ class TestPropertyGenerator(TestCase):
                 self.assertIn('pageid', pagedata)
         self.assertLength(links, count)
 
-    def test_two_continuations_limited(self):
+    def test_two_continuations_limited(self) -> None:
         """Test PropertyGenerator with many limited props and continuations."""
         total = 20
         increment = total // 4
@@ -574,9 +576,8 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
 
     """Test setting of namespace param with ListGenerator.
 
-    Generators with different characteristics are used.
-    site._paraminfo is not always faithful to API, but serves the purpose
-    here.
+    Generators with different characteristics are used. site._paraminfo
+    is not always faithful to API, but serves the purpose here.
     """
 
     family = 'wikipedia'
@@ -584,7 +585,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         super().setUp()
         self.site = self.get_site()
@@ -606,7 +607,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
             'prefix': 'pl',
         }
 
-    def test_namespace_for_module_with_no_limit(self):
+    def test_namespace_for_module_with_no_limit(self) -> None:
         """Test PageGenerator set_namespace."""
         self.gen = api.PageGenerator(site=self.site,
                                      generator='links',
@@ -619,32 +620,32 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
     @suppress_warnings(
         r'^set_namespace\(\) will be modified to raise TypeError*',
         FutureWarning)
-    def test_namespace_param_is_not_settable(self):
+    def test_namespace_param_is_not_settable(self) -> None:
         """Test ListGenerator support_namespace."""
         self.gen = api.ListGenerator(listaction='querypage', site=self.site)
         self.assertFalse(self.gen.support_namespace())
         self.assertFalse(self.gen.set_namespace([0, 1]))
 
-    def test_namespace_none(self):
+    def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
         with self.assertRaises(TypeError):
             self.gen.set_namespace(None)
 
-    def test_namespace_non_multi(self):
+    def test_namespace_non_multi(self) -> None:
         """Test ListGenerator set_namespace when non multi."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
         with self.assertRaises(TypeError):
             self.gen.set_namespace([0, 1])
         self.assertIsNone(self.gen.set_namespace(0))
 
-    def test_namespace_multi(self):
+    def test_namespace_multi(self) -> None:
         """Test ListGenerator set_namespace when multi."""
         self.gen = api.ListGenerator(listaction='allpages', site=self.site)
         self.assertTrue(self.gen.support_namespace())
         self.assertIsNone(self.gen.set_namespace([0, 1]))
 
-    def test_namespace_resolve_failed(self):
+    def test_namespace_resolve_failed(self) -> None:
         """Test ListGenerator set_namespace when resolve fails."""
         self.gen = api.ListGenerator(listaction='allpages', site=self.site)
         self.assertTrue(self.gen.support_namespace())
@@ -661,7 +662,7 @@ class TestDryListGenerator(TestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test case."""
         super().setUp()
         mysite = self.get_site()
@@ -672,12 +673,12 @@ class TestDryListGenerator(TestCase):
         }
         self.gen = api.ListGenerator(listaction='allpages', site=mysite)
 
-    def test_namespace_none(self):
+    def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
         with self.assertRaises(TypeError):
             self.gen.set_namespace(None)
 
-    def test_namespace_zero(self):
+    def test_namespace_zero(self) -> None:
         """Test ListGenerator set_namespace with 0."""
         self.assertIsNone(self.gen.set_namespace(0))
 
@@ -691,7 +692,7 @@ class TestCachedRequest(DefaultSiteTestCase):
 
     cached = False
 
-    def test_normal_use(self):
+    def test_normal_use(self) -> None:
         """Test the caching of CachedRequest with an ordinary request."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
@@ -717,7 +718,7 @@ class TestCachedRequest(DefaultSiteTestCase):
         self.assertIsNotNone(req3._cachetime)
         self.assertEqual(req2._cachetime, req3._cachetime)
 
-    def test_internals(self):
+    def test_internals(self) -> None:
         """Test the caching of CachedRequest by faking a unique request."""
         mysite = self.get_site()
         # Run tests on a missing page unique to this test run so it can
@@ -755,18 +756,20 @@ class TestLazyLoginBase(TestCase):
 
     """Test that it tries to login when read API access is denied.
 
-    Because there is no such family configured it creates an AutoFamily and
-    BaseSite on it's own. It's testing against steward.wikimedia.org.
+    Because there is no such family configured it creates an AutoFamily
+    and BaseSite on it's own. It's testing against
+    steward.wikimedia.org.
 
-    These tests are split into two subclasses as only the first failed login
-    behaves as expected. All subsequent logins will raise an APIError, making
-    it impossible to test two scenarios with the same APISite object.
+    These tests are split into two subclasses as only the first failed
+    login behaves as expected. All subsequent logins will raise an
+    APIError, making it impossible to test two scenarios with the same
+    APISite object.
     """
 
     hostname = 'steward.wikimedia.org'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up steward Family."""
         super().setUpClass()
         fam = pywikibot.family.AutoFamily(
@@ -782,20 +785,20 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     # for a password even if the username does not exist, and even if
     # pywikibot is not connected to a tty. T100964
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch the LoginManager to avoid UI interaction."""
         super().setUp()
         self.orig_login_manager = pywikibot.login.ClientLoginManager
         pywikibot.login.ClientLoginManager = FakeLoginManager
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore the original LoginManager."""
         pywikibot.login.ClientLoginManager = self.orig_login_manager
         super().tearDown()
 
     @patch.object(pywikibot, 'info')
     @patch.object(pywikibot, 'warning')
-    def test_access_denied_notexist_username(self, warning, info):
+    def test_access_denied_notexist_username(self, warning, info) -> None:
         """Test the query with a username which does not exist."""
         self.site._username = 'Not registered username'
         req = api.Request(site=self.site, parameters={'action': 'query'})
@@ -817,7 +820,7 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
 
     @patch.object(pywikibot, 'warning')
     @patch.object(pywikibot.config, 'usernames', defaultdict(dict))
-    def test_access_denied_no_username(self, warning):
+    def test_access_denied_no_username(self, warning) -> None:
         """Test the query without a username."""
         self.site._username = None
         req = api.Request(site=self.site, parameters={'action': 'query'})
@@ -837,7 +840,7 @@ class TestUrlEncoding(TestCase):
 
     net = False
 
-    def test_url_encoding_from_list(self):
+    def test_url_encoding_from_list(self) -> None:
         """Test moving 'token' parameters from a list to the end."""
         query = [('action', 'edit'), ('token', 'a'), ('supertoken', 'b'),
                  ('text', 'text')]
@@ -846,7 +849,7 @@ class TestUrlEncoding(TestCase):
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
 
-    def test_url_encoding_from_dict(self):
+    def test_url_encoding_from_dict(self) -> None:
         """Test moving 'token' parameters from a dict to the end."""
         # do not add other keys because dictionary is not deterministic
         query = {'supertoken': 'b', 'text': 'text'}
@@ -855,7 +858,7 @@ class TestUrlEncoding(TestCase):
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
 
-    def test_url_encoding_from_unicode(self):
+    def test_url_encoding_from_unicode(self) -> None:
         """Test encoding unicode values."""
         query = {'token': 'токен'}
         expect = 'token=%D1%82%D0%BE%D0%BA%D0%B5%D0%BD'
@@ -863,7 +866,7 @@ class TestUrlEncoding(TestCase):
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
 
-    def test_url_encoding_from_str(self):
+    def test_url_encoding_from_str(self) -> None:
         """Test encoding str values."""
         query = {'token': 'test\xe2\x80\x94test'}
         expect = 'token=test%C3%A2%C2%80%C2%94test'
@@ -871,7 +874,7 @@ class TestUrlEncoding(TestCase):
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
 
-    def test_moving_special_tokens(self):
+    def test_moving_special_tokens(self) -> None:
         """Test moving wpEditToken to the very end."""
         query = {'wpEditToken': 'c', 'token': 'b', 'text': 'a'}
         expect = 'text=a&token=b&wpEditToken=c'
@@ -884,7 +887,7 @@ class DummyThrottle(Throttle):
 
     """Dummy Throttle class."""
 
-    def lag(self, lag):
+    def lag(self, lag) -> NoReturn:
         """Override lag method, save the lag value and exit the api loop."""
         self._lagvalue = lag  # save the lag value
         raise SystemExit  # exit the api loop
@@ -896,7 +899,7 @@ class TestLagpattern(DefaultSiteTestCase):
 
     cached = False
 
-    def test_valid_lagpattern(self):
+    def test_valid_lagpattern(self) -> None:
         """Test whether api lagpattern is valid."""
         mysite = self.get_site()
         if ('dbrepllag' not in mysite.siteinfo
@@ -923,7 +926,7 @@ class TestLagpattern(DefaultSiteTestCase):
         self.assertIsInstance(mythrottle.retry_after, int)
         self.assertGreaterEqual(mythrottle.retry_after, 0)
 
-    def test_individual_patterns(self):
+    def test_individual_patterns(self) -> None:
         """Test api lagpattern with example patterns."""
         patterns = {
             'Waiting for 10.64.32.115: 0.14024019241333 seconds lagged':

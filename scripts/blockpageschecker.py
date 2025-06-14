@@ -42,7 +42,6 @@ Examples::
     python pwb.py blockpageschecker -cat:Geography -always
 
     python pwb.py blockpageschecker -show -protectedpages:4
-
 """
 #
 # (C) Pywikibot team, 2007-2025
@@ -236,7 +235,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
         summary = i18n.twtranslate(self.site, 'blockpageschecker-' + key)
         self.userPut(page, page.text, newtext, summary=summary)
 
-    def skip_page(self, page):
+    def skip_page(self, page) -> bool:
         """Skip if the user has not permission to edit."""
         # FIXME: This check does not work :
         # PreloadingGenerator cannot set correctly page.edit_restrictioniction

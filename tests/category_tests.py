@@ -35,13 +35,13 @@ class TestCategoryObject(TestCase):
 
     cached = True
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test the category's __init__ for one condition that can't be dry."""
         site = self.get_site('enwp')
         with self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE):
             pywikibot.Category(site, 'Wikipedia:Test')
 
-    def test_is_empty(self):
+    def test_is_empty(self) -> None:
         """Test if category is empty or not."""
         site = self.get_site('enwp')
         cat_empty = pywikibot.Category(site, 'Category:foooooo')
@@ -50,7 +50,7 @@ class TestCategoryObject(TestCase):
         self.assertTrue(cat_empty.isEmptyCategory())
         self.assertFalse(cat_not_empty.isEmptyCategory())
 
-    def test_is_hidden(self):
+    def test_is_hidden(self) -> None:
         """Test isHiddenCategory."""
         site = self.get_site('enwp')
         cat_hidden = pywikibot.Category(site, 'Category:Hidden categories')
@@ -58,7 +58,7 @@ class TestCategoryObject(TestCase):
         self.assertTrue(cat_hidden.isHiddenCategory())
         self.assertFalse(cat_not_hidden.isHiddenCategory())
 
-    def test_categoryinfo(self):
+    def test_categoryinfo(self) -> None:
         """Test the categoryinfo property."""
         site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Female Wikipedians')
@@ -76,7 +76,7 @@ class TestCategoryObject(TestCase):
         categoryinfo2 = cat_files.categoryinfo
         self.assertGreater(categoryinfo2['files'], 0)
 
-    def test_members(self):
+    def test_members(self) -> None:
         """Test the members method."""
         site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
@@ -102,7 +102,7 @@ class TestCategoryObject(TestCase):
         members_total = list(cat.members(total=2))
         self.assertLength(members_total, 2)
 
-    def test_subcategories(self):
+    def test_subcategories(self) -> None:
         """Test the subcategories method."""
         site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
@@ -117,7 +117,7 @@ class TestCategoryObject(TestCase):
         subcategories_total = list(cat.subcategories(total=2))
         self.assertLength(subcategories_total, 2)
 
-    def test_subcategories_recurse(self):
+    def test_subcategories_recurse(self) -> None:
         """Test the subcategories method with recurse=True."""
         site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedians by gender')
@@ -128,7 +128,7 @@ class TestCategoryObject(TestCase):
         self.assertIn(c1, subcategories_recurse)
         self.assertIn(c2, subcategories_recurse)
 
-    def test_subcategories_infinite_recurse(self):
+    def test_subcategories_infinite_recurse(self) -> None:
         """Test infinite subcategories method with recurse."""
         site = self.get_site('test2')
         cat = pywikibot.Category(site, 'Categories')
@@ -143,7 +143,7 @@ class TestCategoryObject(TestCase):
         for member in set(result):
             self.assertIsInstance(member, pywikibot.Category)
 
-    def test_articles(self):
+    def test_articles(self) -> None:
         """Test the articles method."""
         site = self.get_site('enwp')
         cat = pywikibot.Category(site, 'Category:Wikipedia legal policies')
@@ -165,7 +165,7 @@ class TestCategoryObject(TestCase):
         articles_total = list(cat.articles(total=2))
         self.assertLength(articles_total, 2)
 
-    def test_redirects(self):
+    def test_redirects(self) -> None:
         """Test the redirects method."""
         site = self.get_site('enwp')
         cat1 = pywikibot.Category(site, 'Category:Fonts')
@@ -205,7 +205,7 @@ class TestCategoryDryObject(TestCase):
 
     dry = True
 
-    def test_init_dry(self):
+    def test_init_dry(self) -> None:
         """Test the category's __init__."""
         site = self.get_site()
         cat_normal = pywikibot.Category(site, 'Category:Foo')
@@ -227,7 +227,7 @@ class TestCategoryDryObject(TestCase):
         with self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE):
             pywikibot.Category(site, 'Talk:Foo')
 
-    def test_section(self):
+    def test_section(self) -> None:
         """Test the section method."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Foo#bar')
@@ -235,7 +235,7 @@ class TestCategoryDryObject(TestCase):
         cat2 = pywikibot.Category(site, 'Category:Foo')
         self.assertIsNone(cat2.section())
 
-    def test_aslink(self):
+    def test_aslink(self) -> None:
         """Test the title method with as_link=True."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia Categories')
@@ -250,7 +250,7 @@ class TestCategoryDryObject(TestCase):
         self.assertEqual(cat_dup.title(as_link=True, insite=cat_dup.site),
                          '[[Category:Wikipedia:Test]]')
 
-    def test_sortkey(self):
+    def test_sortkey(self) -> None:
         """Test the sortKey attribute."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia categories',
@@ -270,7 +270,7 @@ class CategoryNewestPages(TestCase):
 
     cached = True
 
-    def test_newest_pages(self):
+    def test_newest_pages(self) -> None:
         """Test that the pages are getting older."""
         cat = pywikibot.Category(self.get_site(), 'Catégorie:Yukon Quest 2015')
         last = pywikibot.Timestamp.max

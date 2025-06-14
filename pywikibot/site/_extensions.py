@@ -28,7 +28,7 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        :keyword Optional[str] format: If specified, notifications will
+        :keyword str | None format: If specified, notifications will
             be returned formatted this way. Its value is either ``model``,
             ``special`` or ``None``. Default is ``special``.
 
@@ -192,7 +192,6 @@ class PageImagesMixin:
 
         :param page: The page for which to obtain the image
         :type page: pywikibot.Page
-
         :raises APIError: PageImages extension is not installed
         """
         title = page.title(with_section=False)
@@ -213,10 +212,11 @@ class GlobalUsageMixin:
 
         :param page: the page to return global image usage for.
         :type page: pywikibot.FilePage
-        :param total: iterate no more than this number of pages in total.
+        :param total: iterate no more than this number of pages in
+            total.
         :raises TypeError: input page is not a FilePage.
-        :raises pywikibot.exceptions.SiteDefinitionError: Site could not be
-            defined for a returned entry in API response.
+        :raises pywikibot.exceptions.SiteDefinitionError: Site could not
+            be defined for a returned entry in API response.
         """
         if not isinstance(page, pywikibot.FilePage):
             raise TypeError(f'Page {page} must be a FilePage.')
@@ -276,25 +276,21 @@ class LinterMixin:
         """Return a generator to pages containing linter errors.
 
         :param lint_categories: categories of lint errors
-        :type lint_categories: an iterable that returns values (str),
-            or a pipe-separated string of values.
-
+        :type lint_categories: an iterable that returns values (str), or
+            a pipe-separated string of values.
         :param total: if not None, yielding this many items in total
         :type total: int
-
         :param namespaces: only iterate pages in these namespaces
-        :type namespaces: iterable of str or Namespace key,
-            or a single instance of those types. May be a '|' separated
-            list of namespace identifiers.
-
-        :param pageids: only include lint errors from the specified pageids
-        :type pageids: an iterable that returns pageids (str or int),
-            or a comma- or pipe-separated string of pageids
-            (e.g. '945097,1483753, 956608' or '945097|483753|956608')
-
+        :type namespaces: iterable of str or Namespace key, or a single
+            instance of those types. May be a '|' separated list of
+            namespace identifiers.
+        :param pageids: only include lint errors from the specified
+            pageids
+        :type pageids: an iterable that returns pageids (str or int), or
+            a comma- or pipe-separated string of pageids (e.g.
+            '945097,1483753, 956608' or '945097|483753|956608')
         :param lint_from: Lint ID to start querying from
         :type lint_from: str representing digit or integer
-
         :return: pages with Linter errors.
         :rtype: typing.Iterable[pywikibot.Page]
         """

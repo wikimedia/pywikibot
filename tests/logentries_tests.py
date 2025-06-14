@@ -71,7 +71,7 @@ class TestLogentriesBase(TestCase):
             le = next(self.site.logevents(logtype=logtype, total=1))
         return le
 
-    def _test_logevent(self, logtype):
+    def _test_logevent(self, logtype) -> None:
         """Test a single logtype entry."""
         logentry = self._get_logentry(logtype)
         self.assertIn(logtype, logentry.__class__.__name__.lower())
@@ -139,7 +139,7 @@ class LogentriesTestMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_method(logtype):
-            def test_logevent(self, key):
+            def test_logevent(self, key) -> None:
                 """Test a single logtype entry."""
                 site = self.sites[key]['site']
                 if logtype not in site.logtypes:
@@ -170,7 +170,7 @@ class TestSimpleLogentries(TestLogentriesBase):
 
     """Test logentry classes without special classes."""
 
-    def test_simple_entries(self, key):
+    def test_simple_entries(self, key) -> None:
         """Test those entries which don't have an extra LogEntry subclass."""
         # Unfortunately it's not possible to use the metaclass to create a
         # bunch of test methods for this too as the site instances haven't
@@ -192,7 +192,7 @@ class TestLogentryParams(TestLogentriesBase):
 
     """Test LogEntry properties specific to their action."""
 
-    def test_block_entry(self, key):
+    def test_block_entry(self, key) -> None:
         """Test BlockEntry methods."""
         # only 'block' entries can be tested
         for logentry in self.site.logevents(logtype='block', total=5):
@@ -214,13 +214,13 @@ class TestLogentryParams(TestLogentriesBase):
                     self.assertIsNone(logentry.duration())
                 break
 
-    def test_rights_entry(self, key):
+    def test_rights_entry(self, key) -> None:
         """Test RightsEntry methods."""
         logentry = self._get_logentry('rights')
         self.assertIsInstance(logentry.oldgroups, list)
         self.assertIsInstance(logentry.newgroups, list)
 
-    def test_move_entry(self, key):
+    def test_move_entry(self, key) -> None:
         """Test MoveEntry methods."""
         logentry = self._get_logentry('move')
         if 'actionhidden' in logentry:
@@ -233,14 +233,14 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(logentry.target_page, pywikibot.Page)
         self.assertIsInstance(logentry.suppressedredirect(), bool)
 
-    def test_patrol_entry(self, key):
+    def test_patrol_entry(self, key) -> None:
         """Test PatrolEntry methods."""
         logentry = self._get_logentry('patrol')
         self.assertIsInstance(logentry.current_id, int)
         self.assertIsInstance(logentry.previous_id, int)
         self.assertIsInstance(logentry.auto, bool)
 
-    def test_moved_target(self, key):
+    def test_moved_target(self, key) -> None:
         """Test moved_target method."""
         # main page was moved around
         mainpage = self.get_mainpage(self.site)
@@ -253,26 +253,26 @@ class TestLogentryParams(TestLogentriesBase):
         # main page was moved back again, we test it.
         self.assertEqual(mainpage, target.moved_target())
 
-    def test_moved_target_fail_old(self):
+    def test_moved_target_fail_old(self) -> None:
         """Test moved_target method failing on older wiki."""
         site = self.get_site('old')
         with self.assertRaises(NoMoveTargetError):
             self.get_mainpage(site).moved_target()
 
-    def test_moved_target_fail_de(self):
+    def test_moved_target_fail_de(self) -> None:
         """Test moved_target method failing on de-wiki."""
         page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
         with self.assertRaises(NoMoveTargetError):
             page.moved_target()
 
-    def test_thanks_page(self, key):
+    def test_thanks_page(self, key) -> None:
         """Test Thanks page method return type."""
         if not self.site.has_extension('Thanks'):
             self.skipTest('Thanks extension not available.')
         logentry = self._get_logentry('thanks')
         self.assertIsInstance(logentry.page(), pywikibot.User)
 
-    def test_equality(self):
+    def test_equality(self) -> None:
         """Test equality of LogEntry instances."""
         site = self.get_site('dewp')
         other_site = self.get_site('tewp')

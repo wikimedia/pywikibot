@@ -13,7 +13,7 @@ Useful for editing the contents of an article.
 .. seealso:: :mod:`editor`
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -84,25 +84,21 @@ class TextEditor(ScrolledText):
     @staticmethod
     def _initialize_config(theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
-        config = {
+        return {
             'padx': 5,
             'wrap': 'word',
             'undo': 'True',
             'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
+            'foreground': idleConf.GetHighlight(theme, 'normal')['foreground'],
+            'background': idleConf.GetHighlight(theme, 'normal')['background'],
+            'highlightcolor': idleConf.GetHighlight(
+                theme, 'hilite')['foreground'],
+            'highlightbackground': idleConf.GetHighlight(
+                theme, 'hilite')['background'],
+            'insertbackground': idleConf.GetHighlight(
+                theme, 'cursor')['foreground'],
         }
-
-        config['foreground'] = idleConf.GetHighlight(
-            theme, 'normal')['foreground']
-        config['background'] = idleConf.GetHighlight(
-            theme, 'normal')['background']
-        config['highlightcolor'] = idleConf.GetHighlight(
-            theme, 'hilite')['foreground']
-        config['highlightbackground'] = idleConf.GetHighlight(
-            theme, 'hilite')['background']
-        config['insertbackground'] = idleConf.GetHighlight(
-            theme, 'cursor')['foreground']
-        return config
 
     def add_bindings(self) -> None:
         """Assign key and events bindings to methods."""
@@ -209,11 +205,10 @@ class TextEditor(ScrolledText):
     def find_all(self, s):
         """Highlight all occurrences of string s, and select the first one.
 
-        If the string has already been highlighted, jump to the next occurrence
-        after the current selection. (You cannot go backwards using the
-        button, but you can manually place the cursor anywhere in the
-        document to start searching from that point.)
-
+        If the string has already been highlighted, jump to the next
+        occurrence after the current selection. (You cannot go backwards
+        using the button, but you can manually place the cursor anywhere
+        in the document to start searching from that point.)
         """
         if hasattr(self, '_highlight') and self._highlight == s:
             try:
@@ -263,7 +258,7 @@ class TextEditor(ScrolledText):
         self.tag_add(tkinter.SEL, start, end)
         self.focus_set()
 
-    def goto_line_event(self, event):
+    def goto_line_event(self, event) -> str | None:
         """Perform goto line operation."""
         lineno = simpledialog.askinteger('Goto', 'Go to line number:',
                                          parent=self)
@@ -385,9 +380,10 @@ class EditBoxWindow(Frame):
 
         :param text: the text to be edited
         :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be highlighted
-        :return: the modified text, or None if the user didn't save the text
-            file in his text editor
+        :param highlight: each occurrence of this substring will be
+            highlighted
+        :return: the modified text, or None if the user didn't save the
+            text file in his text editor
         """
         self.text = None
         # put given text into our textarea
@@ -429,8 +425,8 @@ class EditBoxWindow(Frame):
     def pressedOK(self) -> None:  # noqa: N802
         """Perform OK operation.
 
-        Called when user pushes the OK button.
-        Saves the buffer into a variable, and closes the window.
+        Called when user pushes the OK button. Saves the buffer into a
+        variable, and closes the window.
         """
         self.text = self.editbox.get('1.0', tkinter.END)
         self.parent.destroy()

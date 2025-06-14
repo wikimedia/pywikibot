@@ -76,7 +76,7 @@ class ParamInfo(Sized, Container):
         else:
             self._modules[name] = modules
 
-    def _init(self):
+    def _init(self) -> None:
         assert ('query' in self._modules) is ('main' in self._paraminfo)
 
         # Skip if ParamInfo is already initialized
@@ -141,7 +141,8 @@ class ParamInfo(Sized, Container):
     def _fetch(self, modules: set | frozenset) -> None:
         """Get paraminfo for multiple modules without initializing beforehand.
 
-        :param modules: API modules to load and which haven't been loaded yet.
+        :param modules: API modules to load and which haven't been
+            loaded yet.
         """
         def module_generator():
             """A generator yielding batches of modules."""

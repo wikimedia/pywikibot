@@ -52,8 +52,8 @@ class _NotImplementedWarning(RuntimeWarning):
 def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     """Extract full object name, including class, and store in __full_name__.
 
-    This must be done on all decorators that are chained together, otherwise
-    the second decorator will have the wrong full name.
+    This must be done on all decorators that are chained together,
+    otherwise the second decorator will have the wrong full name.
 
     :param obj: An object being decorated
     :type obj: object
@@ -115,8 +115,7 @@ def add_full_name(obj):
     decorator that does not add __full_name__ will prevent other
     decorators in the same chain from being able to obtain it.
 
-    This can be used to monkey-patch decorators in other modules.
-    e.g.
+    This can be used to monkey-patch decorators in other modules. e.g.
     <xyz>.foo = add_full_name(<xyz>.foo)
 
     :param obj: The function to decorate
@@ -127,9 +126,10 @@ def add_full_name(obj):
     def outer_wrapper(*outer_args, **outer_kwargs):
         """Outer wrapper.
 
-        The outer wrapper may be the replacement function if the decorated
-        decorator was called without arguments, or the replacement decorator
-        if the decorated decorator was called without arguments.
+        The outer wrapper may be the replacement function if the
+        decorated decorator was called without arguments, or the
+        replacement decorator if the decorated decorator was called
+        without arguments.
 
         :param outer_args: args
         :param outer_kwargs: kwargs
@@ -137,9 +137,10 @@ def add_full_name(obj):
         def inner_wrapper(*args, **kwargs):
             """Replacement function.
 
-            If the decorator supported arguments, they are in outer_args,
-            and this wrapper is used to process the args which belong to
-            the function that the decorated decorator was decorating.
+            If the decorator supported arguments, they are in
+            outer_args, and this wrapper is used to process the args
+            which belong to the function that the decorated decorator
+            was decorating.
 
             :param args: args passed to the decorated function.
             :param kwargs: kwargs passed to the decorated function.
@@ -191,7 +192,7 @@ def issue_deprecation_warning(name: str,
                               instead: str | None = None,
                               depth: int = 2, *,
                               warning_class: type | None = None,
-                              since: str | None = None):
+                              since: str | None = None) -> None:
     """Issue a deprecation warning.
 
     .. versionchanged:: 7.0
@@ -485,9 +486,9 @@ def deprecate_positionals(since: str = ''):
 
             :param args: args passed to the decorated function or method
             :param kwargs: kwargs passed to the decorated function or
-                method
+                  method
             :return: the value returned by the decorated function or
-                method
+                  method
             """
             if len(args) > positionals:
                 replace_args = list(zip(arg_keys[positionals:],
@@ -671,7 +672,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
                             replacement_name: str | None = None,
                             warning_message: str | None = None,
                             since: str = '',
-                            future_warning: bool = True):
+                            future_warning: bool = True) -> None:
         """Add the name to the local deprecated names dict.
 
         .. versionchanged:: 7.0

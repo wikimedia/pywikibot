@@ -21,12 +21,12 @@ class MetaPluralRulesTest(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create a new test case which tests all plural rules."""
         def create_test(rule):
-            def test_static_rule(self):
+            def test_static_rule(self) -> None:
                 """Test a rule which is just one integer."""
                 self.assertEqual(rule['nplurals'], 1)
                 self.assertEqual(rule['plural'], 0)
 
-            def test_callable_rule(self):
+            def test_callable_rule(self) -> None:
                 """Test a rule which is callable."""
                 # in theory a static rule could be also callable
                 self.assertGreater(rule['nplurals'], 0)

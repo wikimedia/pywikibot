@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,7 +49,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Initialize the fake requests."""
         super().setUp()
         self.params = {'action': 'query',
@@ -71,14 +71,14 @@ class DryCachedRequestTests(SiteAttributeTestCase):
             self.deprecated_asterisks = CachedRequest(
                 expiry=1, site=self.basesite, **self.params)
 
-    def test_expiry_formats(self):
+    def test_expiry_formats(self) -> None:
         """Test using a timedelta as expiry."""
         self.assertEqual(self.req.expiry,
                          CachedRequest(datetime.timedelta(days=1),
                                        site=self.basesite,
                                        parameters=self.params).expiry)
 
-    def test_expired(self):
+    def test_expired(self) -> None:
         """Test if the request is expired."""
         now = pywikibot.Timestamp.nowutc()
         self.assertFalse(self.req._expired(now))
@@ -86,7 +86,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
             self.req._expired(now - datetime.timedelta(days=2)),
             msg=f'\nreq.expiry: {self.req.expiry}, now: {now}')
 
-    def test_parameter_types(self):
+    def test_parameter_types(self) -> None:
         """Test _uniquedescriptionstr is identical using different ways."""
         # This test is done as create_file_name and cachefile_path only use
         # the hashed name which is not very helpful
@@ -103,13 +103,13 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.assertNotEqual(self.req._uniquedescriptionstr(),
                             self.diffsite._uniquedescriptionstr())
 
-    def test_get_cache_dir(self):
+    def test_get_cache_dir(self) -> None:
         """Test that 'apicache' is in the cache dir."""
         retval = self.req._get_cache_dir()
         self.assertIsInstance(retval, Path)
         self.assertIn('apicache', retval.parts)
 
-    def test_create_file_name(self):
+    def test_create_file_name(self) -> None:
         """Test the file names for the cache."""
         self.assertEqual(self.req._create_file_name(),
                          self.req._create_file_name())
@@ -122,7 +122,7 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.assertNotEqual(self.req._create_file_name(),
                             self.diffreq._create_file_name())
 
-    def test_cachefile_path(self):
+    def test_cachefile_path(self) -> None:
         """Test the file paths for the cache."""
         self.assertEqual(self.req._cachefile_path(),
                          self.req._cachefile_path())
@@ -144,12 +144,12 @@ class MockCachedRequestKeyTests(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create a mock family and site."""
         class MockFamily(Family):
 
             @property
-            def name(self):
+            def name(self) -> str:
                 return 'mock'
 
         class MockSite(pywikibot.site.APISite):
@@ -158,15 +158,15 @@ class MockCachedRequestKeyTests(TestCase):
 
             _namespaces = {2: ['User']}
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self._user = 'anon'
                 pywikibot.site.BaseSite.__init__(self, 'mock', MockFamily())
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
-            def version(self):
+            def version(self) -> str:
                 return '1.31'  # lowest supported release
 
-            def protocol(self):
+            def protocol(self) -> str:
                 return 'http'
 
             @property
@@ -176,7 +176,7 @@ class MockCachedRequestKeyTests(TestCase):
             def user(self):
                 return self._user
 
-            def encoding(self):
+            def encoding(self) -> str:
                 return 'utf-8'
 
             def encodings(self):
@@ -186,7 +186,7 @@ class MockCachedRequestKeyTests(TestCase):
             def siteinfo(self):
                 return self._siteinfo
 
-            def __repr__(self):
+            def __repr__(self) -> str:
                 return 'MockSite()'
 
             def __getattr__(self, attr):
@@ -195,7 +195,7 @@ class MockCachedRequestKeyTests(TestCase):
         self.mocksite = MockSite()
         super().setUp()
 
-    def test_cachefile_path_different_users(self):
+    def test_cachefile_path_different_users(self) -> None:
         """Test and compare file paths when different usernames are used."""
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -218,7 +218,7 @@ class MockCachedRequestKeyTests(TestCase):
         self.assertNotEqual(anonpath, otherpath)
         self.assertNotEqual(userpath, otherpath)
 
-    def test_unicode(self):
+    def test_unicode(self) -> None:
         """Test caching with Unicode content."""
         self.mocksite._userinfo = {'name': 'محمد الفلسطيني'}
         self.mocksite._loginstatus = LoginStatus.AS_USER
@@ -233,7 +233,7 @@ class MockCachedRequestKeyTests(TestCase):
                             parameters={'action': 'query', 'meta': 'siteinfo'})
 
         expect = ('MockSite()User(User:محمد الفلسطيني)'
-                  + "[('action', 'query'), ('meta', 'siteinfo')]")
+                  "[('action', 'query'), ('meta', 'siteinfo')]")
 
         self.assertEqual(repr(req._uniquedescriptionstr()), repr(expect))
 
@@ -249,7 +249,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
 
     """Test client site write assert."""
 
-    def test_no_user(self):
+    def test_no_user(self) -> None:
         """Test Request object when not a user."""
         self.site._userinfo = {}
         with self.subTest(userinfo=self.site._userinfo), \
@@ -262,7 +262,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
                 self.assertRaisesRegex(Error, " as IP '1.2.3.4'"):
             Request(site=self.site, parameters={'action': 'edit'})
 
-    def test_unexpected_user(self):
+    def test_unexpected_user(self) -> None:
         """Test Request object when username is not correct."""
         self.site._userinfo = {'name': 'other_username', 'groups': [],
                                'id': '1'}
@@ -274,7 +274,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         self.assertNotEqual(self.site.userinfo['name'], self.site.username())
         self.assertFalse(self.site.logged_in())
 
-    def test_normal(self):
+    def test_normal(self) -> None:
         """Test Request object when username is correct."""
         self.site._userinfo = {'name': 'myusername', 'groups': [], 'id': '1'}
         self.site._username = 'myusername'
@@ -289,7 +289,7 @@ class DryMimeTests(TestCase):
 
     net = False
 
-    def test_mime_file_payload(self):
+    def test_mime_file_payload(self) -> None:
         """Test Request._generate_mime_part loads binary as binary."""
         local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
@@ -299,7 +299,7 @@ class DryMimeTests(TestCase):
             {'filename': local_filename})
         self.assertEqual(file_content, submsg.get_payload(decode=True))
 
-    def test_mime_file_container(self):
+    def test_mime_file_container(self) -> None:
         """Test Request._build_mime_request encodes binary."""
         local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
@@ -330,7 +330,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
                             'index': 1,
                             'name': 'prop',
                             'type': [
-                                'displaytitle'
+                                'displaytitle',
                                 'notificationtimestamp',
                                 'protection',
                                 'subjectid',
@@ -384,7 +384,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         }
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Add a real ParamInfo to the DrySite."""
         super().setUp()
         site = self.get_site()
@@ -397,7 +397,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         data = site._paraminfo.normalize_paraminfo(self.paraminfodata)
         site._paraminfo._paraminfo.update(data)
 
-    def test_format(self):
+    def test_format(self) -> None:
         """Test using a dummy formatted in the new modules-only mode."""
         pi = self.get_site()._paraminfo
         self.assertIn('query+info', pi._paraminfo)
@@ -406,13 +406,13 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         self.assertIn('info', pi)
         self.assertIn('tokens', pi)
 
-    def test_attribute(self):
+    def test_attribute(self) -> None:
         """Test using __getitem__."""
         pi = self.get_site()._paraminfo
         self.assertEqual(pi._paraminfo['query+info']['group'], 'prop')
         self.assertEqual(pi['query+info']['prefix'], 'in')
 
-    def test_info_parameter(self):
+    def test_info_parameter(self) -> None:
         """Test parameter() method with 'info' module."""
         pi = self.get_site()._paraminfo
         param = pi.parameter('info', 'prop')
@@ -423,7 +423,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         self.assertIn('preload', param['type'])
         self.assertIn('preloadcontent', param['type'])
 
-    def test_tokens_parameter(self):
+    def test_tokens_parameter(self) -> None:
         """Test parameter() method with 'tokens' module."""
         pi = self.get_site()._paraminfo
         param = pi.parameter('tokens', 'type')
@@ -438,7 +438,7 @@ class QueryGenTests(DefaultDrySiteTestCase):
 
     """Test QueryGenerator with a real site."""
 
-    def test_query_constructor(self):
+    def test_query_constructor(self) -> None:
         """Test QueryGenerator constructor."""
         q_gen1 = QueryGenerator(
             site=self.site, parameters={'action': 'query', 'meta': 'siteinfo'})

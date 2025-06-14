@@ -37,7 +37,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
     dry = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
 
@@ -48,7 +48,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
             'pl': DryPage(cls.plwikt, 'origin'),
         }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup interwiki_graph data."""
         super().setUp()
         data = interwiki_graph.Subject(self.pages['en'])
@@ -57,12 +57,12 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
         data.found_in[self.pages['pl']] = [self.pages['en'], self.pages['fr']]
         self.data = data
 
-    def test_simple_graph(self):
+    def test_simple_graph(self) -> None:
         """Test that GraphDrawer.createGraph does not raise exception."""
         drawer = interwiki_graph.GraphDrawer(self.data)
         drawer.createGraph()
 
-    def test_octagon(self):
+    def test_octagon(self) -> None:
         """Test octagon nodes."""
         self.data.found_in[self.pages['en2']] = [self.pages['fr']]
         drawer = interwiki_graph.GraphDrawer(self.data)

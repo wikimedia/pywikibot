@@ -43,7 +43,7 @@ of the images used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -181,14 +181,15 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
         :type generator: iterable
         :keyword target_site: Site to send image to, default none
         :type target_site: pywikibot.site.APISite
-        :keyword interwiki: Look for images in interwiki links, default false
+        :keyword interwiki: Look for images in interwiki links, default
+            false
         :type interwiki: boolean
-        :keyword keepname: Keep the filename and do not verify description
-            while replacing, default false
+        :keyword keepname: Keep the filename and do not verify
+            description while replacing, default false
         :type keepname: boolean
         :keyword force_if_shared: Upload the file even if it's currently
-            shared to the target site (e.g. when moving from Commons to another
-            wiki)
+            shared to the target site (e.g. when moving from Commons to
+            another wiki)
         :type force_if_shared: boolean
         :keyword asynchronous: Upload to stash.
         :type asynchronous: boolean
@@ -206,7 +207,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
 
         :return: the filename which was used to upload the image
         """
-        def delete_source(old_filename, target_filename):
+        def delete_source(_old_filename: str, target_filename: str) -> None:
             """Delete source image or tag nowCommons template to it.
 
             This function is called when upload to Commons was
@@ -223,15 +224,14 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                and sourceImagePage.delete(reason):
                 return
 
-            if sourceSite.lang in nowCommonsTemplate \
-               and sourceSite.family.name in config.usernames \
-               and sourceSite.lang in config.usernames[sourceSite.family.name]:
+            tmpl = i18n.translate(sourceSite.code, nowCommonsTemplate)
+            if tmpl and sourceSite.family.name in config.usernames \
+               and sourceSite.code in config.usernames[sourceSite.family.name]:
                 # add the nowCommons template.
                 pywikibot.info('Adding nowCommons template to '
                                + sourceImagePage.title())
                 sourceImagePage.put(sourceImagePage.get() + '\n\n'
-                                    + nowCommonsTemplate[sourceSite.code]
-                                    % target_filename,
+                                    + tmpl % target_filename,
                                     summary=reason)
 
         sourceSite = sourceImagePage.site

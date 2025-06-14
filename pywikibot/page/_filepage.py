@@ -103,8 +103,8 @@ class FilePage(Page):
     def latest_file_info(self):
         """Retrieve and store information of latest Image rev. of FilePage.
 
-        At the same time, the whole history of Image is fetched and cached in
-        self._file_revisions
+        At the same time, the whole history of Image is fetched and
+        cached in self._file_revisions
 
         :return: instance of FileInfo()
         """
@@ -117,8 +117,8 @@ class FilePage(Page):
     def oldest_file_info(self):
         """Retrieve and store information of oldest Image rev. of FilePage.
 
-        At the same time, the whole history of Image is fetched and cached in
-        self._file_revisions
+        At the same time, the whole history of Image is fetched and
+        cached in self._file_revisions
 
         :return: instance of FileInfo()
         """
@@ -156,8 +156,8 @@ class FilePage(Page):
     def getImagePageHtml(self) -> str:  # noqa: N802
         """Download the file page, and return the HTML, as a string.
 
-        Caches the HTML code, so that if you run this method twice on the
-        same FilePage object, the page will only be downloaded once.
+        Caches the HTML code, so that if you run this method twice on
+        the same FilePage object, the page will only be downloaded once.
         """
         if not hasattr(self, '_imagePageHtml'):
             path = (f'{self.site.scriptpath()}/index.php?'
@@ -480,7 +480,7 @@ class FileInfo:
         self._metadata = None
         self.update(file_revision)
 
-    def update(self, file_revision):
+    def update(self, file_revision) -> None:
         """Update FileInfo with new values.
 
         .. versionadded:: 8.6
@@ -517,7 +517,7 @@ class FileInfo:
         return self._metadata
 
     @metadata.setter
-    def metadata(self, value):
+    def metadata(self, value) -> None:
         """Set metadata.
 
         .. versionadded:: 8.6

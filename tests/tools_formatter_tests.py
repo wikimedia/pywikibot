@@ -20,7 +20,7 @@ class TestListOutputter(TestCase):
 
     net = False
 
-    def test_SequenceOutputter(self):
+    def test_SequenceOutputter(self) -> None:
         """Test format method."""
         options = ['foo', 'bar']
         outputter = formatter.SequenceOutputter(options)

@@ -4,9 +4,6 @@
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graph/badge.svg
    :alt: Code coverage
    :target: https://app.codecov.io/gh/wikimedia/pywikibot
-.. image:: https://api.codeclimate.com/v1/badges/de6ca4c66e7c7bee4156/maintainability
-   :alt: Maintainability
-   :target: https://codeclimate.com/github/wikimedia/pywikibot
 .. image:: https://img.shields.io/pypi/pyversions/pywikibot.svg
    :alt: Python
    :target: https://www.python.org/downloads/
@@ -28,6 +25,10 @@
 .. image:: https://img.shields.io/github/last-commit/wikimedia/pywikibot
    :alt: Last commit
    :target: https://gerrit.wikimedia.org/r/plugins/gitiles/pywikibot/core/
+.. image:: https://snyk.io/advisor/python/pywikibot/badge.svg
+   :target: https://snyk.io/advisor/python/pywikibot
+   :alt: pywikibot
+
 
 *********
 Pywikibot

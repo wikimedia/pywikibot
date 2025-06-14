@@ -40,9 +40,9 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
 
     """Bot to delete pages which are tagged as speedy deletion.
 
-    This bot will load a list of pages from the category of candidates for
-    speedy deletion on the language's wiki and give the user an interactive
-    prompt to decide whether each should be deleted or not.
+    This bot will load a list of pages from the category of candidates
+    for speedy deletion on the language's wiki and give the user an
+    interactive prompt to decide whether each should be deleted or not.
     """
 
     LINES = 22  #: maximum lines to extract from wiki page

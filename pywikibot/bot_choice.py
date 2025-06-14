@@ -98,7 +98,8 @@ class Option(ABC):
     def handled(self, value: str) -> Option | None:
         """Return the Option object that applies to the given value.
 
-        If this Option object doesn't know which applies it returns None.
+        If this Option object doesn't know which applies it returns
+        None.
         """
         return self if self.test(value) else None
 
@@ -215,8 +216,8 @@ class NestedOption(OutputOption, StandardOption):
 
     """An option containing other options.
 
-    It will return True in test if this option applies but False if a sub
-    option applies while handle returns the sub option.
+    It will return True in test if this option applies but False if a
+    sub option applies while handle returns the sub option.
     """
 
     def __init__(self, option: str, shortcut: str, description: str,
@@ -294,7 +295,10 @@ class Choice(StandardOption):
 
     @abstractmethod
     def handle(self) -> Any:
-        """Handle this choice. Must be implemented."""
+        """Handle this choice.
+
+        Must be implemented.
+        """
         raise NotImplementedError
 
     def handle_link(self) -> bool:
@@ -653,12 +657,12 @@ class InteractiveReplace:
                  automatic_quit: bool = True) -> None:
         """Initializer.
 
-        :param old_link: The old link which is searched. The label and section
-            are ignored.
+        :param old_link: The old link which is searched. The label and
+            section are ignored.
         :param new_link: The new link with which it should be replaced.
-            Depending on the replacement mode it'll use this link's label and
-            section. If False it'll unlink all and the attributes beginning
-            with allow_replace are ignored.
+            Depending on the replacement mode it'll use this link's
+            label and section. If False it'll unlink all and the
+            attributes beginning with allow_replace are ignored.
         :param default: The default answer as the shortcut
         :param automatic_quit: Add an option to quit and raise a
             QuitKeyboardException.

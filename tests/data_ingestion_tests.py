@@ -29,7 +29,7 @@ class TestPhoto(TestCase):
         },
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         url = ('http://upload.wikimedia.org/wikipedia/commons/f/'
@@ -46,23 +46,23 @@ class TestPhoto(TestCase):
                       'name': 'Sound icon'},
             site=self.get_site('commons'))
 
-    def test_download_photo(self):
+    def test_download_photo(self) -> None:
         """Test download from http://upload.wikimedia.org/."""
         with open(join_images_path('MP_sounds.png'), 'rb') as f:
             self.assertEqual(f.read(), self.obj.download_photo().read())
 
-    def test_find_duplicate_images(self):
+    def test_find_duplicate_images(self) -> None:
         """Test finding duplicates on Wikimedia Commons."""
         duplicates = self.obj.find_duplicate_images()
         self.assertIn('MP sounds.png',
                       [dup.replace('_', ' ') for dup in duplicates])
 
-    def test_get_title(self):
+    def test_get_title(self) -> None:
         """Test getTitle()."""
         self.assertEqual(self.obj.get_title('%(name)s - %(set)s.%(_ext)s'),
                          'Sound icon - Crystal SVG icon set.png')
 
-    def test_get_description(self):
+    def test_get_description(self) -> None:
         """Test getDescription()."""
         self.assertEqual(self.obj.get_description('CrystalTemplate'),
                          """{{CrystalTemplate
@@ -82,7 +82,7 @@ class TestCSVReader(TestCase):
     family = 'commons'
     code = 'commons'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
         with open(join_data_path('csv_ingestion.csv')) as fileobj:
@@ -90,18 +90,18 @@ class TestCSVReader(TestCase):
                                                      site=self.get_site())
             self.obj = next(self.iterator)
 
-    def test_photo_url(self):
+    def test_photo_url(self) -> None:
         """Test PhotoURL()."""
         self.assertEqual(
             self.obj.URL,
             'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
 
-    def test_get_title(self):
+    def test_get_title(self) -> None:
         """Test getTitle()."""
         self.assertEqual(self.obj.get_title('%(name)s - %(set)s.%(_ext)s'),
                          'Sound icon - Crystal SVG icon set.png')
 
-    def test_get_description(self):
+    def test_get_description(self) -> None:
         """Test getDescription()."""
         self.assertEqual(self.obj.get_description('CrystalTemplate'),
                          """{{CrystalTemplate
@@ -122,7 +122,7 @@ class TestDataIngestionBot(ScriptMainTestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def test_existing_file(self):
+    def test_existing_file(self) -> None:
         """Test uploading a file that already exists."""
         with empty_sites():
             data_ingestion.main(

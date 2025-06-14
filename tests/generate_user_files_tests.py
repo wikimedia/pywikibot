@@ -21,18 +21,18 @@ class TestGenerateUserFiles(TestCase):
 
     dry = True
 
-    def test_ask_for_dir_change(self):
+    def test_ask_for_dir_change(self) -> None:
         """Test ask_for_dir_change function."""
         userfile, passfile = guf.ask_for_dir_change(force=True)
         self.assertIsInstance(userfile, bool)
         self.assertIsInstance(passfile, bool)
 
-    def test_base_names(self):
+    def test_base_names(self) -> None:
         """Test basename constants."""
         self.assertTrue(guf.USER_BASENAME.endswith('.py'))
         self.assertTrue(guf.PASS_BASENAME.endswith('.py'))
 
-    def test_config_test(self):
+    def test_config_test(self) -> None:
         """Test config text strings."""
         args = {'main_family': '', 'main_code': '', 'usernames': '',
                 'botpasswords': ''}
@@ -47,19 +47,19 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual(config_text,
                          re.sub('{[a-z_]+}', '', guf.PASSFILE_CONFIG))
 
-    def test_file_exists(self):
+    def test_file_exists(self) -> None:
         """Test file_exists function."""
         self.assertFalse(guf.file_exists('This file does not exist'))
         self.assertTrue(guf.file_exists('pwb.py'))
 
-    def test_default_get_site_and_lang(self):
+    def test_default_get_site_and_lang(self) -> None:
         """Test get_site_and_lang function with defaults."""
         family, code, user = guf.get_site_and_lang(force=True)
         self.assertEqual(family, 'wikipedia')
         self.assertEqual(code, 'en')
         self.assertIsNone(user)
 
-    def test_get_site_and_lang(self):
+    def test_get_site_and_lang(self) -> None:
         """Test get_site_and_lang function with parameters."""
         family, code, user = guf.get_site_and_lang(
             default_family='wikisource', default_lang='foo',
@@ -69,7 +69,7 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual(code, 'en')
         self.assertEqual(user, 'bar')
 
-    def test_parse_sections(self):
+    def test_parse_sections(self) -> None:
         """Test parse_sections regex."""
         sections = guf.parse_sections()
         self.assertGreater(len(sections), 10)
@@ -82,13 +82,13 @@ class TestGenerateUserFiles(TestCase):
         self.assertIn(last.head, last.section)
         self.assertIn(last.info[:10], last.section)
 
-    def test_copy_sections_not_found(self):
+    def test_copy_sections_not_found(self) -> None:
         """Test copy_sections function for sections not in config text."""
         config_text = guf.copy_sections(force=True, default='a')
         for section in guf.DISABLED_SECTIONS | guf.OBSOLETE_SECTIONS:
             self.assertNotIn(section, config_text)
 
-    def test_copy_sections_found(self):
+    def test_copy_sections_found(self) -> None:
         """Test copy_sections function for sections found in config text."""
         config_text = guf.copy_sections(force=True, default='a')
         self.assertIsNotNone(config_text)
@@ -97,7 +97,7 @@ class TestGenerateUserFiles(TestCase):
         lines = config_text.splitlines()
         self.assertGreater(len(lines), 200)
 
-    def test_copy_sections_none(self):
+    def test_copy_sections_none(self) -> None:
         """Test read_sections function."""
         config_text = guf.copy_sections(force=True)
         self.assertEqual(config_text, '')

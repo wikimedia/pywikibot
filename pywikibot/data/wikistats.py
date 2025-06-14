@@ -117,8 +117,8 @@ class WikiStats:
 
         :param table: name of table of data
         :param key: data table key
-        :param reverse: If set to True the sorting order is reversed.
-            If None the sorting order for numeric keys are reversed whereas
+        :param reverse: If set to True the sorting order is reversed. If
+            None the sorting order for numeric keys are reversed whereas
             alphanumeric keys are sorted in normal way.
         :return: The sorted table
         """

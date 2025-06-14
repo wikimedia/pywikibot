@@ -42,7 +42,6 @@ For example:
 
 .. seealso:: :python:`Supported .ini File Structure
    <library/configparser.html#supported-ini-file-structure>`
-
 """
 #
 # (C) Pywikibot team, 2006-2025
@@ -229,7 +228,7 @@ class SandboxBot(Bot, ConfigParserBot):
 
             self.generator = pages
 
-    def treat(self, page):
+    def treat(self, page) -> None:
         """Treat a single page."""
         if not page.exists():
             pywikibot.info('*** The sandbox is not existent, skipping.')

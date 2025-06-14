@@ -199,7 +199,7 @@ else:
                                  script_test_modules)
 
 
-def unittest_print(*args, **kwargs):
+def unittest_print(*args, **kwargs) -> None:
     """Print information in test log."""
     print(*args, **kwargs)  # noqa: T201
 
@@ -286,7 +286,7 @@ class TestRequest(CachedRequest):
 
     """Add caching to every Request except logins."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(0, *args, **kwargs)
 
@@ -295,7 +295,7 @@ class TestRequest(CachedRequest):
         """Circumvent CachedRequest implementation."""
         return cls(site=req_site, parameters=kwargs)
 
-    def _expired(self, dt):
+    def _expired(self, dt) -> bool:
         """Never invalidate cached data."""
         return False
 
@@ -319,7 +319,7 @@ class TestRequest(CachedRequest):
 original_expired = None
 
 
-def patch_request():
+def patch_request() -> None:
     """Patch Request classes with TestRequest."""
     global original_expired
     pywikibot.data.api.Request = TestRequest
@@ -327,7 +327,7 @@ def patch_request():
     pywikibot.data.api.CachedRequest._expired = lambda *args, **kwargs: False
 
 
-def unpatch_request():
+def unpatch_request() -> None:
     """Un-patch Request classes with TestRequest."""
     pywikibot.data.api.Request = _original_Request
     pywikibot.data.api.CachedRequest._expired = original_expired

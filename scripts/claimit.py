@@ -42,7 +42,6 @@ property and target and some qualifiers already exists:
 
 Note that the ordering of the letters in the 'exists' argument does not matter,
 but 'p' must be included.
-
 """
 #
 # (C) Pywikibot team, 2013-2024
@@ -72,7 +71,8 @@ class ClaimRobot(WikidataBot):
 
         :param claims: A list of wikidata claims
         :type claims: list
-        :param exists_arg: String specifying how to handle duplicate claims
+        :param exists_arg: String specifying how to handle duplicate
+            claims
         """
         self.available_options['always'] = True
         super().__init__(**kwargs)

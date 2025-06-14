@@ -21,24 +21,24 @@ class TestFixes(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Backup the current fixes."""
         super().setUp()
         self._old_fixes = fixes.fixes
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Recover the current fixes."""
         fixes.fixes = self._old_fixes
         super().tearDown()
 
-    def test_overwrite_value(self):
+    def test_overwrite_value(self) -> None:
         """Test loading a fix file overwriting the fixes."""
         fixes.fixes = {}
         old_fixes = fixes.fixes
         fixes._load_file(join_data_path('set-fixes.py'))
         self.assertIsNot(fixes.fixes, old_fixes)
 
-    def test_update_value(self):
+    def test_update_value(self) -> None:
         """Test loading a fix file changing the fixes."""
         fixes.fixes = {}
         old_fixes = fixes.fixes

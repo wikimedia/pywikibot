@@ -40,14 +40,14 @@ class TestSaveFailure(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def test_nobots(self):
+    def test_nobots(self) -> None:
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
         with patch.object(config, 'ignore_bot_templates', False), \
                 self.assertRaisesRegex(OtherPageSaveError, 'nobots'):
             page.save()
 
-    def test_touch(self):
+    def test_touch(self) -> None:
         """Test that Page.touch() does not do a real edit."""
         page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
         old_text = page.text
@@ -56,19 +56,19 @@ class TestSaveFailure(TestCase):
         new_text = page.get(force=True)
         self.assertEqual(old_text, new_text)
 
-    def test_createonly(self):
+    def test_createonly(self) -> None:
         """Test that Page.save with createonly fails if page exists."""
         page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
         with self.assertRaises(PageCreatedConflictError):
             page.save(createonly=True)
 
-    def test_nocreate(self):
+    def test_nocreate(self) -> None:
         """Test that Page.save with nocreate fails if page does not exist."""
         page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
         with self.assertRaises(NoCreateError):
             page.save(nocreate=True)
 
-    def test_no_recreate(self):
+    def test_no_recreate(self) -> None:
         """Test that Page.save with recreate disabled fails if page existed."""
         page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
         with self.assertRaisesRegex(
@@ -86,19 +86,19 @@ class TestNonSysopSaveFailure(TestCase):
     code = 'test'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Skip tests for sysop accounts."""
         super().setUpClass()
         if cls.site.has_group('sysop'):
             raise unittest.SkipTest('Testing failure with a sysop account')
 
-    def test_protected(self):
+    def test_protected(self) -> None:
         """Test that protected titles raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
         with self.assertRaises(LockedPageError):
             page.save()
 
-    def test_spam(self):
+    def test_spam(self) -> None:
         """Test that spam in content raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
@@ -106,7 +106,7 @@ class TestNonSysopSaveFailure(TestCase):
                 SpamblacklistError, 'badsite.com'):
             page.save()
 
-    def test_titleblacklist(self):
+    def test_titleblacklist(self) -> None:
         """Test that title blacklist raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
         with self.assertRaises(TitleblacklistError):
@@ -121,7 +121,7 @@ class TestActionFailure(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def test_movepage(self):
+    def test_movepage(self) -> None:
         """Test that site.movepage raises the appropriate exceptions."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
@@ -143,7 +143,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
     code = 'test'
     write = True
 
-    def test_itempage_save(self):
+    def test_itempage_save(self) -> None:
         """Test ItemPage save method inherited from superclass Page."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q6')
@@ -158,7 +158,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim.setTarget(target)
         return claim
 
-    def test_WbMonolingualText_invalid_language(self):
+    def test_WbMonolingualText_invalid_language(self) -> None:
         """Attempt adding a monolingual text with an invalid language."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
@@ -170,7 +170,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                 r'modification-failed: "foo" is not a known language code.'):
             item.addClaim(claim)
 
-    def test_WbMonolingualText_invalid_text(self):
+    def test_WbMonolingualText_invalid_text(self) -> None:
         """Attempt adding a monolingual text with invalid non-string text."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
@@ -181,7 +181,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                 r'Edit to page \[\[(wikidata:test:)?Q68]] failed:'):
             item.addClaim(claim)
 
-    def test_math_invalid_function(self):
+    def test_math_invalid_function(self) -> None:
         """Attempt adding invalid latex to a math claim."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
@@ -193,7 +193,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                 r'modification-failed: Malformed input:'):
             item.addClaim(claim)
 
-    def test_url_malformed_url(self):
+    def test_url_malformed_url(self) -> None:
         """Attempt adding a malformed URL to a url claim."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
@@ -207,7 +207,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                 r'Not a URL at all'):
             item.addClaim(claim)
 
-    def test_url_invalid_protocol(self):
+    def test_url_invalid_protocol(self) -> None:
         """Attempt adding a URL with an invalid protocol to a url claim."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')

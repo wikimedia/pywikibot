@@ -32,18 +32,17 @@ base directory.
    If the url scheme is missing, ``https`` will be used.
 """
 #
-# (C) Pywikibot team, 2010-2024
+# (C) Pywikibot team, 2010-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
-import os
 import re
 import string
 import sys
 from contextlib import suppress
+from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
 
@@ -256,12 +255,11 @@ class FamilyFileGenerator:
 
     def writefile(self, verify) -> None:
         """Write the family file."""
-        fn = os.path.join(self.base_dir, 'families',
-                          f'{self.name}_family.py')
-        print(f'Writing {fn}... ')
+        fp = Path(self.base_dir, 'families', f'{self.name}_family.py')
+        print(f'Writing {fp}... ')
 
-        if os.path.exists(fn) and input(
-                f'{fn} already exists. Overwrite? (y/n) ').lower() == 'n':
+        if fp.exists() and input(
+                f'{fp} already exists. Overwrite? (y/n) ').lower() == 'n':
             print('Terminating.')
             sys.exit(1)
 
@@ -289,9 +287,8 @@ class FamilyFileGenerator:
     def verify_SSL_certificate(self, code: str) -> bool:
         return False
 """
-        os.makedirs(os.path.dirname(fn), exist_ok=True)
-        with codecs.open(fn, 'w', 'utf-8') as fh:
-            fh.write(content)
+        fp.parent.mkdir(parents=True, exist_ok=True)
+        fp.write_text(content, encoding='utf-8')
 
 
 family_template = """\

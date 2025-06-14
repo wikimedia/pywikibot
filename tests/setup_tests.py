@@ -21,22 +21,22 @@ class TestSetup(TestCase):
     site = False
     net = False
 
-    def test_read_project(self):
+    def test_read_project(self) -> None:
         """Test :func:`setup.read_project` function."""
         self.assertEqual(setup.read_project(), 'pywikibot')
 
-    def test_get_validated_version(self):
+    def test_get_validated_version(self) -> None:
         """Test :func:`setup.get_validated_version` function."""
         self.assertEqual(setup.get_validated_version('pywikibot'),
                          pywikibot.__version__)
 
-    def test_read_desc(self):
+    def test_read_desc(self) -> None:
         """Test :func:`setup.read_desc` function."""
         desc = setup.read_desc('README.rst')
         coc = setup.read_desc('CODE_OF_CONDUCT.rst')
         self.assertIn(coc, desc)
 
-    def test_get_pywikibot_packages(self):
+    def test_get_pywikibot_packages(self) -> None:
         """Test :func:`setup.get_packages` function for pywikibot."""
         name = 'pywikibot'
         packages = setup.get_packages(name)
@@ -44,7 +44,7 @@ class TestSetup(TestCase):
         self.assertIn(name + '.scripts', packages)
         self.assertLength(packages, 14)
 
-    def test_get_tests_packages(self):
+    def test_get_tests_packages(self) -> None:
         """Test :func:`setup.get_packages` function for tests."""
         name = 'tests'
         packages = setup.get_packages(name)
@@ -52,7 +52,7 @@ class TestSetup(TestCase):
         self.assertIn(name + '.data', packages)
         self.assertLength(packages, 10)
 
-    def test_get_scripts_packages(self):
+    def test_get_scripts_packages(self) -> None:
         """Test :func:`setup.get_packages` function for scripts."""
         name = 'scripts'
         packages = setup.get_packages(name)

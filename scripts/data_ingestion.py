@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-r"""A generic bot to do data ingestion (batch uploading) of photos or other files.
+r"""A generic bot to do data ingestion (batch uploas) of photos or other files.
 
 In addition it installs related metadata. The uploading is primarily from a url
 to a wiki-site.
@@ -87,7 +87,6 @@ Example
    pwb.py data_ingestion -csvdir:"test/data" -page:"User:<Your-Username>/data_ingestion_test_template"
 
 .. warning:: Put it in one line, otherwise it won't work correctly.
-
 """  # noqa: E501,W505
 #
 # (C) Pywikibot team, 2012-2025
@@ -97,7 +96,6 @@ Example
 from __future__ import annotations
 
 import base64
-import codecs
 import csv
 import hashlib
 import io
@@ -122,8 +120,8 @@ class Photo(pywikibot.FilePage):
         """Initializer.
 
         :param url: URL of photo
-        :param metadata: metadata about the photo that can be referred to
-            from the title & template
+        :param metadata: metadata about the photo that can be referred
+            to from the title & template
         :param site: target site
         """
         self.URL = url
@@ -318,7 +316,7 @@ def main(*args: str) -> None:
 
         filename = os.path.join(csv_dir, configuration['csvFile'])
         try:
-            f = codecs.open(filename, 'r', configuration['csvEncoding'])
+            f = open(filename, encoding=configuration['csvEncoding'])
         except OSError as e:
             pywikibot.error(f'{filename} could not be opened: {e}')
         else:

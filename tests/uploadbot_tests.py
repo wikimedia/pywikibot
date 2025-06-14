@@ -35,7 +35,7 @@ class TestUploadbot(TestCase):
         ignore_warning=True,
     )
 
-    def test_png_list(self):
+    def test_png_list(self) -> None:
         """Test uploading a list of pngs using upload.py."""
         image_list = []
         for directory_info in os.walk(join_images_path()):
@@ -46,14 +46,14 @@ class TestUploadbot(TestCase):
                           **self.params)
         bot.run()
 
-    def test_png(self):
+    def test_png(self) -> None:
         """Test uploading a png using upload.py."""
         bot = UploadRobot(
             url=[join_images_path('MP_sounds.png')],
             target_site=self.get_site(), **self.params)
         bot.run()
 
-    def test_png_url(self):
+    def test_png_url(self) -> None:
         """Test uploading a png from url using upload.py."""
         link = 'https://upload.wikimedia.org/'
         link += 'wikipedia/commons/f/fc/MP_sounds.png'
@@ -75,7 +75,7 @@ class TestDryUploadbot(DefaultSiteTestCase):
         ignore_warning=True,
     )
 
-    def test_png_file(self):
+    def test_png_file(self) -> None:
         """Test UploadRobot attributes and methods."""
         bot = UploadRobot(url=['test.png'], target_site=self.site,
                           **self.params)

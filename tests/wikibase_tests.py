@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,12 +50,12 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     """Test site.loadrevisions() caching."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         self._page = ItemPage(self.get_repo(), 'Q15169668')
         super().setUp()
 
-    def test_page_text(self):
+    def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
         with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
             self._test_page_text()
@@ -66,13 +66,13 @@ class TestGeneral(WikidataTestCase):
     """General Wikibase tests."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
         enwiki = pywikibot.Site('en', 'wikipedia')
         cls.mainpage = pywikibot.Page(pywikibot.page.Link('Main Page', enwiki))
 
-    def testWikibase(self):
+    def testWikibase(self) -> None:
         """Wikibase tests."""
         repo = self.get_repo()
         item_namespace = repo.namespaces[0]
@@ -103,7 +103,7 @@ class TestGeneral(WikidataTestCase):
         self.assertEqual(claim._formatValue(), {'entity-type': 'item',
                                                 'numeric-id': 1})
 
-    def test_cmp(self):
+    def test_cmp(self) -> None:
         """Test WikibasePage comparison."""
         self.assertEqual(ItemPage.fromPage(self.mainpage),
                          ItemPage(self.get_repo(), 'q5296'))
@@ -113,20 +113,20 @@ class TestWikibaseParser(WikidataTestCase):
 
     """Test passing various datatypes to wikibase parser."""
 
-    def test_wbparse_strings(self):
+    def test_wbparse_strings(self) -> None:
         """Test that strings return unchanged."""
         test_list = ['test string', 'second test']
         parsed_strings = self.site.parsevalue('string', test_list)
         self.assertEqual(parsed_strings, test_list)
 
-    def test_wbparse_time(self):
+    def test_wbparse_time(self) -> None:
         """Test parsing of a time value."""
         parsed_date = self.site.parsevalue(
             'time', ['1994-02-08'], {'precision': 9})[0]
         self.assertEqual(parsed_date['time'], '+1994-02-08T00:00:00Z')
         self.assertEqual(parsed_date['precision'], 9)
 
-    def test_wbparse_quantity(self):
+    def test_wbparse_quantity(self) -> None:
         """Test parsing of quantity values."""
         parsed_quantities = self.site.parsevalue(
             'quantity',
@@ -151,7 +151,7 @@ class TestWikibaseParser(WikidataTestCase):
         self.assertEqual(parsed_quantities[3]['lowerBound'],
                          '+26900000000000000000000000000000000')
 
-    def test_wbparse_raises_valueerror(self):
+    def test_wbparse_raises_valueerror(self) -> None:
         """Test invalid value condition."""
         with self.assertRaises(ValueError):
             self.site.parsevalue('quantity', ['Not a quantity'])
@@ -163,7 +163,7 @@ class TestLoadUnknownType(WikidataTestCase):
 
     dry = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         wikidata = self.get_repo()
@@ -172,7 +172,7 @@ class TestLoadUnknownType(WikidataTestCase):
         with open(join_pages_path('Q60_unknown_datatype.wd')) as f:
             self.wdp._content = json.load(f)
 
-    def test_load_unknown(self):
+    def test_load_unknown(self) -> None:
         """Ensure unknown value is loaded but raises a warning."""
         self.wdp.get()
         unknown_value = self.wdp.claims['P99999'][0].getTarget()
@@ -190,7 +190,7 @@ class TestItemPageExtensibility(TestCase):
 
     dry = True
 
-    def test_ItemPage_extensibility(self):
+    def test_ItemPage_extensibility(self) -> None:
         """Test ItemPage extensibility."""
         class MyItemPage(ItemPage):
 
@@ -230,18 +230,18 @@ class TestItemLoad(WikidataTestCase):
     }
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
         cls.site = cls.get_site('enwiki')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
                                                       self.site))
 
-    def test_item_normal(self):
+    def test_item_normal(self) -> None:
         """Test normal wikibase item."""
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
@@ -257,7 +257,7 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(hasattr(item, '_content'))
 
-    def test_item_lazy_initialization(self):
+    def test_item_lazy_initialization(self) -> None:
         """Test that Wikibase items are properly initialized lazily."""
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
@@ -273,7 +273,7 @@ class TestItemLoad(WikidataTestCase):
             with self.subTest(attr=attr, note='after loading'):
                 self.assertIn(attr, item.__dict__)
 
-    def test_load_item_set_id(self):
+    def test_load_item_set_id(self) -> None:
         """Test setting item.id attribute on empty item."""
         wikidata = self.get_repo()
         item = ItemPage(wikidata, '-1')
@@ -289,12 +289,12 @@ class TestItemLoad(WikidataTestCase):
         self.assertIn(item.labels['en'], ['New York', 'New York City'])
         self.assertEqual(item.title(), 'Q60')
 
-    def test_reuse_item_set_id(self):
+    def test_reuse_item_set_id(self) -> None:
         """Test modifying item.id attribute.
 
-        Some scripts are using item.id = 'Q60' semantics, which does work
-        but modifying item.id does not currently work, and this test
-        highlights that it breaks silently.
+        Some scripts are using item.id = 'Q60' semantics, which does
+        work but modifying item.id does not currently work, and this
+        test highlights that it breaks silently.
         """
         # label could change
         label = ['New York', 'New York City']
@@ -315,11 +315,11 @@ class TestItemLoad(WikidataTestCase):
         # The labels are not updated; assertion showing undesirable behaviour:
         self.assertIn(item.labels['en'], label)
 
-    def test_empty_item(self):
+    def test_empty_item(self) -> None:
         """Test empty wikibase item.
 
-        should not raise an error as the constructor only requires
-        the site parameter, with the title parameter defaulted to None.
+        should not raise an error as the constructor only requires the
+        site parameter, with the title parameter defaulted to None.
         """
         wikidata = self.get_repo()
         item = ItemPage(wikidata)
@@ -330,7 +330,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertLength(item.claims, 0)
         self.assertLength(item.sitelinks, 0)
 
-    def test_item_invalid_titles(self):
+    def test_item_invalid_titles(self) -> None:
         """Test invalid titles of wikibase items."""
         wikidata = self.get_repo()
 
@@ -345,7 +345,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(InvalidTitleError, regex):
             ItemPage(wikidata, '')
 
-    def test_item_untrimmed_title(self):
+    def test_item_untrimmed_title(self) -> None:
         """Test intrimmed titles of wikibase items.
 
         Spaces in the title should not cause an error.
@@ -356,7 +356,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(item.title(), 'Q60')
         item.get()
 
-    def test_item_missing(self):
+    def test_item_missing(self) -> None:
         """Test nmissing item."""
         wikidata = self.get_repo()
         # this item has never existed
@@ -385,7 +385,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(item.getID(), 'Q7')
         self.assertEqual(item.title(), 'Q7')
 
-    def test_item_never_existed(self):
+    def test_item_never_existed(self) -> None:
         """Test non-existent item."""
         wikidata = self.get_repo()
         # this item has not been created
@@ -396,7 +396,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(NoPageError, regex):
             item.get()
 
-    def test_fromPage_noprops(self):
+    def test_fromPage_noprops(self) -> None:
         """Test item from page without properties."""
         page = self.nyc
         item = ItemPage.fromPage(page)
@@ -411,7 +411,7 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def test_fromPage_noprops_with_section(self):
+    def test_fromPage_noprops_with_section(self) -> None:
         """Test item from page with section."""
         page = pywikibot.Page(self.nyc.site, self.nyc.title() + '#foo')
         item = ItemPage.fromPage(page)
@@ -426,7 +426,7 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def test_fromPage_props(self):
+    def test_fromPage_props(self) -> None:
         """Test item from page with properties."""
         page = self.nyc
         # fetch page properties
@@ -447,7 +447,7 @@ class TestItemLoad(WikidataTestCase):
         item2 = ItemPage.fromPage(page)
         self.assertTrue(item is item2)
 
-    def test_fromPage_lazy(self):
+    def test_fromPage_lazy(self) -> None:
         """Test item from page with lazy_load."""
         page = pywikibot.Page(pywikibot.page.Link('New York City', self.site))
         item = ItemPage.fromPage(page, lazy_load=True)
@@ -464,7 +464,7 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(item.exists())
 
-    def _test_fromPage_noitem(self, link):
+    def _test_fromPage_noitem(self, link) -> None:
         """Helper function to test a page without an associated item.
 
         It tests two of the ways to fetch an item:
@@ -519,7 +519,7 @@ class TestItemLoad(WikidataTestCase):
                 with self.assertRaisesRegex(NoPageError, regex):
                     ItemPage.fromPage(page)
 
-    def test_fromPage_redirect(self):
+    def test_fromPage_redirect(self) -> None:
         """Test item from redirect page.
 
         A redirect should not have a wikidata item.
@@ -527,7 +527,7 @@ class TestItemLoad(WikidataTestCase):
         link = pywikibot.page.Link('Main page', self.site)
         self._test_fromPage_noitem(link)
 
-    def test_fromPage_missing(self):
+    def test_fromPage_missing(self) -> None:
         """Test item from deleted page.
 
         A deleted page should not have a wikidata item.
@@ -535,7 +535,7 @@ class TestItemLoad(WikidataTestCase):
         link = pywikibot.page.Link('Test page', self.site)
         self._test_fromPage_noitem(link)
 
-    def test_fromPage_noitem(self):
+    def test_fromPage_noitem(self) -> None:
         """Test item from new page.
 
         A new created page should not have a wikidata item yet.
@@ -544,7 +544,7 @@ class TestItemLoad(WikidataTestCase):
         link = page._link
         self._test_fromPage_noitem(link)
 
-    def test_fromPage_missing_lazy(self):
+    def test_fromPage_missing_lazy(self) -> None:
         """Test lazy loading of item from nonexistent source page."""
         # this is a deleted page, and should not have a wikidata item
         link = pywikibot.page.Link('Test page', self.site)
@@ -567,14 +567,14 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(NoPageError, 'Test page'):
             item.get()
 
-    def test_from_entity_uri(self):
+    def test_from_entity_uri(self) -> None:
         """Test ItemPage.from_entity_uri."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q124'
         self.assertEqual(ItemPage.from_entity_uri(repo, entity_uri),
                          ItemPage(repo, 'Q124'))
 
-    def test_from_entity_uri_not_a_data_repo(self):
+    def test_from_entity_uri_not_a_data_repo(self) -> None:
         """Test ItemPage.from_entity_uri with a non-Wikibase site."""
         repo = self.site
         entity_uri = 'http://www.wikidata.org/entity/Q124'
@@ -582,7 +582,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(TypeError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
-    def test_from_entity_uri_wrong_repo(self):
+    def test_from_entity_uri_wrong_repo(self) -> None:
         """Test ItemPage.from_entity_uri with unexpected item repo."""
         repo = self.get_repo()
         entity_uri = 'http://test.wikidata.org/entity/Q124'
@@ -591,7 +591,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
-    def test_from_entity_uri_invalid_title(self):
+    def test_from_entity_uri_invalid_title(self) -> None:
         """Test ItemPage.from_entity_uri with an invalid item title format."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Nonsense'
@@ -599,7 +599,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(InvalidTitleError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
-    def test_from_entity_uri_no_item(self):
+    def test_from_entity_uri_no_item(self) -> None:
         """Test ItemPage.from_entity_uri with non-existent item."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
@@ -607,7 +607,7 @@ class TestItemLoad(WikidataTestCase):
         with self.assertRaisesRegex(NoPageError, regex):
             ItemPage.from_entity_uri(repo, entity_uri)
 
-    def test_from_entity_uri_no_item_lazy(self):
+    def test_from_entity_uri_no_item_lazy(self) -> None:
         """Test ItemPage.from_entity_uri with lazy loaded non-existent item."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
@@ -623,7 +623,7 @@ class TestRedirects(WikidataTestCase):
 
     """Test redirect and non-redirect items."""
 
-    def test_normal_item(self):
+    def test_normal_item(self) -> None:
         """Test normal item."""
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q1')
@@ -633,7 +633,7 @@ class TestRedirects(WikidataTestCase):
         with self.assertRaisesRegex(IsNotRedirectPageError, regex):
             item.getRedirectTarget()
 
-    def test_redirect_item(self):
+    def test_redirect_item(self) -> None:
         """Test redirect item."""
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q10008448')
@@ -648,7 +648,7 @@ class TestRedirects(WikidataTestCase):
         with self.assertRaisesRegex(IsRedirectPageError, regex):
             item.get()
 
-    def test_redirect_item_without_get(self):
+    def test_redirect_item_without_get(self) -> None:
         """Test redirect item without explicit get operation."""
         wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q10008448')
@@ -662,21 +662,21 @@ class TestPropertyPage(WikidataTestCase):
 
     """Test PropertyPage."""
 
-    def test_property_empty_property(self):
+    def test_property_empty_property(self) -> None:
         """Test creating a PropertyPage without a title and datatype."""
         wikidata = self.get_repo()
         regex = r'^"datatype" is required for new property\.$'
         with self.assertRaisesRegex(TypeError, regex):
             PropertyPage(wikidata)
 
-    def test_property_empty_title(self):
+    def test_property_empty_title(self) -> None:
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
         regex = r"^Property's title cannot be empty$"
         with self.assertRaisesRegex(InvalidTitleError, regex):
             PropertyPage(wikidata, title='')
 
-    def test_globe_coordinate(self):
+    def test_globe_coordinate(self) -> None:
         """Test a coordinate PropertyPage has the correct type."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P625')
@@ -685,14 +685,14 @@ class TestPropertyPage(WikidataTestCase):
         claim = pywikibot.Claim(wikidata, 'P625')
         self.assertEqual(claim.type, 'globe-coordinate')
 
-    def test_get(self):
+    def test_get(self) -> None:
         """Test PropertyPage.get() method."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P625')
         property_page.get()
         self.assertEqual(property_page.type, 'globe-coordinate')
 
-    def test_new_claim(self):
+    def test_new_claim(self) -> None:
         """Test that PropertyPage.newClaim uses cached datatype."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P625')
@@ -707,7 +707,7 @@ class TestPropertyPage(WikidataTestCase):
         claim = property_page.newClaim()
         self.assertEqual(claim.type, 'wikibase-item')
 
-    def test_as_target(self):
+    def test_as_target(self) -> None:
         """Test that PropertyPage can be used as a value."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P1687')
@@ -716,8 +716,8 @@ class TestPropertyPage(WikidataTestCase):
         self.assertEqual(claim.type, 'wikibase-property')
         self.assertEqual(claim.target, property_page)
 
-    @unittest.expectedFailure
-    def test_exists(self):
+    @unittest.expectedFailure  # T145971
+    def test_exists(self) -> None:
         """Test the exists method of PropertyPage."""
         wikidata = self.get_repo()
         property_page = PropertyPage(wikidata, 'P1687')
@@ -730,7 +730,7 @@ class TestClaim(WikidataTestCase):
 
     """Test Claim object functionality."""
 
-    def test_claim_eq_simple(self):
+    def test_claim_eq_simple(self) -> None:
         """Test comparing two claims.
 
         If they have the same property and value, they are equal.
@@ -743,11 +743,11 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim1, claim2)
         self.assertEqual(claim2, claim1)
 
-    def test_claim_eq_simple_different_value(self):
+    def test_claim_eq_simple_different_value(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and different values,
-        they are not equal.
+        If they have the same property and different values, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -757,7 +757,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim1, claim2)
         self.assertNotEqual(claim2, claim1)
 
-    def test_claim_eq_simple_different_rank(self):
+    def test_claim_eq_simple_different_rank(self) -> None:
         """Test comparing two claims.
 
         If they have the same property and value and different ranks,
@@ -772,11 +772,11 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim1, claim2)
         self.assertEqual(claim2, claim1)
 
-    def test_claim_eq_simple_different_snaktype(self):
+    def test_claim_eq_simple_different_snaktype(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and different snaktypes,
-        they are not equal.
+        If they have the same property and different snaktypes, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -786,11 +786,11 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim1, claim2)
         self.assertNotEqual(claim2, claim1)
 
-    def test_claim_eq_simple_different_property(self):
+    def test_claim_eq_simple_different_property(self) -> None:
         """Test comparing two claims.
 
-        If they have the same value and different properties,
-        they are not equal.
+        If they have the same value and different properties, they are
+        not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -800,10 +800,11 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim1, claim2)
         self.assertNotEqual(claim2, claim1)
 
-    def test_claim_eq_with_qualifiers(self):
+    def test_claim_eq_with_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property, value and qualifiers, they are equal.
+        If they have the same property, value and qualifiers, they are
+        equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -819,11 +820,11 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim1, claim2)
         self.assertEqual(claim2, claim1)
 
-    def test_claim_eq_with_different_qualifiers(self):
+    def test_claim_eq_with_different_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and value and different qualifiers,
-        they are not equal.
+        If they have the same property and value and different
+        qualifiers, they are not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -839,11 +840,11 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim1, claim2)
         self.assertNotEqual(claim2, claim1)
 
-    def test_claim_eq_one_without_qualifiers(self):
+    def test_claim_eq_one_without_qualifiers(self) -> None:
         """Test comparing two claims.
 
-        If they have the same property and value and one of them has
-        no qualifiers while the other one does, they are not equal.
+        If they have the same property and value and one of them has no
+        qualifiers while the other one does, they are not equal.
         """
         wikidata = self.get_repo()
         claim1 = pywikibot.Claim(wikidata, 'P31')
@@ -856,7 +857,7 @@ class TestClaim(WikidataTestCase):
         self.assertNotEqual(claim1, claim2)
         self.assertNotEqual(claim2, claim1)
 
-    def test_claim_eq_with_different_sources(self):
+    def test_claim_eq_with_different_sources(self) -> None:
         """Test comparing two claims.
 
         If they have the same property and value and different sources,
@@ -876,7 +877,7 @@ class TestClaim(WikidataTestCase):
         self.assertEqual(claim1, claim2)
         self.assertEqual(claim2, claim1)
 
-    def test_claim_copy_is_equal(self):
+    def test_claim_copy_is_equal(self) -> None:
         """Test making a copy of a claim.
 
         The copy of a claim should be always equal to the claim.
@@ -893,7 +894,7 @@ class TestClaim(WikidataTestCase):
         copy = claim.copy()
         self.assertEqual(claim, copy)
 
-    def test_claim_copy_is_equal_qualifier(self):
+    def test_claim_copy_is_equal_qualifier(self) -> None:
         """Test making a copy of a claim.
 
         The copy of a qualifier should be always equal to the qualifier.
@@ -906,7 +907,7 @@ class TestClaim(WikidataTestCase):
         self.assertTrue(qualifier.isQualifier)
         self.assertTrue(copy.isQualifier)
 
-    def test_claim_copy_is_equal_source(self):
+    def test_claim_copy_is_equal_source(self) -> None:
         """Test making a copy of a claim.
 
         The copy of a source should be always equal to the source.
@@ -924,7 +925,7 @@ class TestClaimSetValue(WikidataTestCase):
 
     """Test setting claim values."""
 
-    def test_set_website(self):
+    def test_set_website(self) -> None:
         """Test setting claim of url type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P856')
@@ -933,7 +934,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_WbMonolingualText(self):
+    def test_set_WbMonolingualText(self) -> None:
         """Test setting claim of monolingualtext type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P1450')
@@ -942,7 +943,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_WbQuantity(self):
+    def test_set_WbQuantity(self) -> None:
         """Test setting claim of quantity type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P1106')
@@ -952,7 +953,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_math(self):
+    def test_set_math(self) -> None:
         """Test setting claim of math type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P2535')
@@ -961,7 +962,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_identifier(self):
+    def test_set_identifier(self) -> None:
         """Test setting claim of external-id type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P214')
@@ -970,7 +971,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_date(self):
+    def test_set_date(self) -> None:
         """Test setting claim of time type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
@@ -981,7 +982,7 @@ class TestClaimSetValue(WikidataTestCase):
         self.assertEqual(claim.target.month, 1)
         self.assertEqual(claim.target.day, 1)
 
-    def test_set_musical_notation(self):
+    def test_set_musical_notation(self) -> None:
         """Test setting claim of musical-notation type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P6604')
@@ -990,7 +991,7 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
-    def test_set_incorrect_target_value(self):
+    def test_set_incorrect_target_value(self) -> None:
         """Test setting claim of the incorrect value."""
         wikidata = self.get_repo()
         date_claim = pywikibot.Claim(wikidata, 'P569')
@@ -1012,17 +1013,17 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of ItemPage methods inherited from BasePage."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = ItemPage(self.get_repo(), 'Q60')
         super().setUp()
 
-    def test_basepage_methods(self):
+    def test_basepage_methods(self) -> None:
         """Test ItemPage methods inherited from superclass BasePage."""
         self._test_invoke()
         self._test_no_wikitext()
 
-    def test_item_is_hashable(self):
+    def test_item_is_hashable(self) -> None:
         """Ensure that ItemPages are hashable."""
         list_of_dupes = [self._page, self._page]
         self.assertLength(set(list_of_dupes), 1)
@@ -1032,12 +1033,12 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of Page methods for wikibase item."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         self._page = pywikibot.Page(self.site, 'Q60')
         super().setUp()
 
-    def test_basepage_methods(self):
+    def test_basepage_methods(self) -> None:
         """Test Page methods inherited from superclass BasePage with Q60."""
         self._test_invoke()
         self._test_no_wikitext()
@@ -1047,9 +1048,9 @@ class TestLinks(WikidataTestCase):
 
     """Test cases to test links stored in Wikidata.
 
-    Uses a stored data file for the wikibase item.
-    However wikibase creates site objects for each sitelink, and the unit test
-    directly creates a Site for 'wikipedia:af' to use in a comparison.
+    Uses a stored data file for the wikibase item. However wikibase
+    creates site objects for each sitelink, and the unit test directly
+    creates a Site for 'wikipedia:af' to use in a comparison.
     """
 
     sites = {
@@ -1063,7 +1064,7 @@ class TestLinks(WikidataTestCase):
         }
     }
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup Tests."""
         super().setUp()
         self.wdp = ItemPage(self.get_repo(), 'Q60')
@@ -1072,13 +1073,13 @@ class TestLinks(WikidataTestCase):
             self.wdp._content = json.load(f)
         self.wdp.get()
 
-    def test_iterlinks_page_object(self):
+    def test_iterlinks_page_object(self) -> None:
         """Test iterlinks for page objects."""
         page = next(pg for pg in self.wdp.iterlinks() if pg.site.code == 'af')
         self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'),
                          'New York Stad'))
 
-    def test_iterlinks_filtering(self):
+    def test_iterlinks_filtering(self) -> None:
         """Test iterlinks for a given family."""
         wikilinks = list(self.wdp.iterlinks('wikipedia'))
         wvlinks = list(self.wdp.iterlinks('wikivoyage'))
@@ -1097,7 +1098,7 @@ class TestWriteNormalizeData(TestCase):
 
     net = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.data_out = {
@@ -1109,7 +1110,7 @@ class TestWriteNormalizeData(TestCase):
             ]},
         }
 
-    def test_normalize_data(self):
+    def test_normalize_data(self) -> None:
         """Test _normalizeData() method."""
         data_in = {
             'labels': {'en': 'Foo'},
@@ -1123,7 +1124,7 @@ class TestWriteNormalizeData(TestCase):
         response = ItemPage._normalizeData(data_in)
         self.assertEqual(response, self.data_out)
 
-    def test_normalized_data(self):
+    def test_normalized_data(self) -> None:
         """Test _normalizeData() method for normalized data."""
         response = ItemPage._normalizeData(
             copy.deepcopy(self.data_out))
@@ -1145,7 +1146,7 @@ class TestPreloadingEntityGenerator(TestCase):
         }
     }
 
-    def test_non_item_gen(self):
+    def test_non_item_gen(self) -> None:
         """Test PreloadingEntityGenerator with getReferences()."""
         site = self.get_site('wikidata')
         page = pywikibot.Page(site, 'Property:P31')
@@ -1154,7 +1155,7 @@ class TestPreloadingEntityGenerator(TestCase):
         for item in gen:
             self.assertIsInstance(item, ItemPage)
 
-    def test_foreign_page_item_gen(self):
+    def test_foreign_page_item_gen(self) -> None:
         """Test PreloadingEntityGenerator with connected pages."""
         site = self.get_site('enwiki')
         page_gen = [pywikibot.Page(site, 'Main Page'),
@@ -1168,11 +1169,11 @@ class TestNamespaces(WikidataTestCase):
 
     """Test cases to test namespaces of Wikibase entities."""
 
-    def test_empty_wikibase_page(self):
+    def test_empty_wikibase_page(self) -> None:
         """Test empty wikibase page.
 
-        As a base class it should be able to instantiate
-        it with minimal arguments
+        As a base class it should be able to instantiate it with minimal
+        arguments
         """
         wikidata = self.get_repo()
         page = WikibasePage(wikidata)
@@ -1202,7 +1203,7 @@ class TestNamespaces(WikidataTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             WikibasePage(wikidata, ns=120, entity_type='item')
 
-    def test_wikibase_link_namespace(self):
+    def test_wikibase_link_namespace(self) -> None:
         """Test the title resolved to a namespace correctly."""
         wikidata = self.get_repo()
         # title without any namespace clues (ns or entity_type)
@@ -1212,7 +1213,7 @@ class TestNamespaces(WikidataTestCase):
         page = WikibasePage(wikidata, title='Property:P60')
         self.assertEqual(page.namespace(), 120)
 
-    def test_wikibase_namespace_selection(self):
+    def test_wikibase_namespace_selection(self) -> None:
         """Test various ways to correctly specify the namespace."""
         wikidata = self.get_repo()
 
@@ -1254,7 +1255,7 @@ class TestNamespaces(WikidataTestCase):
         self.assertEqual(page.namespace(), 120)
         page.get()
 
-    def test_wrong_namespaces(self):
+    def test_wrong_namespaces(self) -> None:
         """Test incorrect namespaces for Wikibase entities."""
         wikidata = self.get_repo()
         # All subclasses of WikibasePage raise a ValueError
@@ -1268,7 +1269,7 @@ class TestNamespaces(WikidataTestCase):
         with self.assertRaisesRegex(ValueError, regex):
             PropertyPage(wikidata, 'File:P60')
 
-    def test_item_unknown_namespace(self):
+    def test_item_unknown_namespace(self) -> None:
         """Test unknown namespaces for Wikibase entities."""
         # The 'Invalid:' is not a known namespace, so is parsed to be
         # part of the title in namespace 0
@@ -1288,7 +1289,7 @@ class TestAlternateNamespaces(WikidataTestCase):
     dry = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Setup test class."""
         super().setUpClass()
 
@@ -1303,7 +1304,7 @@ class TestAlternateNamespaces(WikidataTestCase):
                           defaultcontentmodel='wikibase-property')
         })
 
-    def test_alternate_item_namespace(self):
+    def test_alternate_item_namespace(self) -> None:
         """Test alternate item namespace."""
         item = ItemPage(self.repo, 'Q60')
         self.assertEqual(item.namespace(), 90)
@@ -1317,7 +1318,7 @@ class TestAlternateNamespaces(WikidataTestCase):
         self.assertEqual(item.title(), 'Item:Q60')
         self.assertEqual(item._defined_by(), {'ids': 'Q60'})
 
-    def test_alternate_property_namespace(self):
+    def test_alternate_property_namespace(self) -> None:
         """Test alternate property namespace."""
         prop = PropertyPage(self.repo, 'P21')
         self.assertEqual(prop.namespace(), 92)
@@ -1351,7 +1352,7 @@ class TestOwnClient(TestCase):
         },
     }
 
-    def test_own_client(self, key):
+    def test_own_client(self, key) -> None:
         """Test that a data repository family can be its own client."""
         site = self.get_site(key)
         page = self.get_mainpage(site)
@@ -1359,13 +1360,13 @@ class TestOwnClient(TestCase):
         self.assertEqual(page.site, site)
         self.assertEqual(item.site, site)
 
-    def test_page_from_repository(self, key):
+    def test_page_from_repository(self, key) -> None:
         """Test that page_from_repository method works for wikibase too."""
         site = self.get_site(key)
         page = site.page_from_repository('Q5296')
         self.assertEqual(page, self.get_mainpage(site))
 
-    def test_redirect_from_repository(self, key):
+    def test_redirect_from_repository(self, key) -> None:
         """Test page_from_repository method with redirects."""
         site = self.get_site(key)
         item = self.sites[key]['item']
@@ -1396,7 +1397,7 @@ class TestUnconnectedClient(TestCase):
 
     dry = True
 
-    def test_not_supported_family(self, key):
+    def test_not_supported_family(self, key) -> None:
         """Test that family without a data repository causes error."""
         site = self.get_site(key)
 
@@ -1407,12 +1408,12 @@ class TestUnconnectedClient(TestCase):
         with self.assertRaisesRegex(WikiBaseError, regex):
             self.wdp.data_item()
 
-    def test_has_data_repository(self, key):
+    def test_has_data_repository(self, key) -> None:
         """Test that site has no data repository."""
         site = self.get_site(key)
         self.assertFalse(site.has_data_repository)
 
-    def test_page_from_repository_fails(self, key):
+    def test_page_from_repository_fails(self, key) -> None:
         """Test that page_from_repository method fails."""
         site = self.get_site(key)
         dummy_item = 'Q1'
@@ -1425,7 +1426,7 @@ class TestJSON(WikidataTestCase):
 
     """Test cases to test toJSON() functions."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup test."""
         super().setUp()
         wikidata = self.get_repo()
@@ -1439,14 +1440,14 @@ class TestJSON(WikidataTestCase):
         del self.wdp._content['lastrevid']
         del self.wdp._content['pageid']
 
-    def test_itempage_json(self):
+    def test_itempage_json(self) -> None:
         """Test itempage json."""
         old = json.dumps(self.wdp._content, indent=2, sort_keys=True)
         new = json.dumps(self.wdp.toJSON(), indent=2, sort_keys=True)
 
         self.assertEqual(old, new)
 
-    def test_json_diff(self):
+    def test_json_diff(self) -> None:
         """Test json diff."""
         del self.wdp.labels['en']
         self.wdp.aliases['de'].append('New York')

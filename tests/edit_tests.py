@@ -30,17 +30,17 @@ class TestGeneralWrite(TestCase):
     login = True
     write = True
 
-    def test_createonly(self):
+    def test_createonly(self) -> None:
         """Test save with createonly enforced."""
         ts = str(time.time())
         p = pywikibot.Page(self.site, 'User:John Vandenberg/createonly/' + ts)
         p.save(createonly=True)
 
-    def test_async(self):
+    def test_async(self) -> None:
         """Test writing to a page."""
         global called_back
 
-        def callback(page, err):
+        def callback(page, err) -> None:
             global called_back
             self.assertEqual(page, p)
             self.assertIsNone(err)
@@ -59,7 +59,7 @@ class TestGeneralWrite(TestCase):
         self.assertEqual(p.text, ts)
         self.assertTrue(called_back)
 
-    def test_appendtext(self):
+    def test_appendtext(self) -> None:
         """Test writing to a page without preloading the .text."""
         ts = str(time.time())
         p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
@@ -105,7 +105,7 @@ class TestSiteMergeHistory(TestCase):
 
         return first_rev, second_rev
 
-    def test_merge_history_validation(self):
+    def test_merge_history_validation(self) -> None:
         """Test Site.merge_history validity checks."""
         site = self.get_site()
 
@@ -149,7 +149,7 @@ class TestSiteMergeHistory(TestCase):
             except Error as err:
                 self.assertEqual(str(err), error_msg)
 
-    def test_merge_history(self):
+    def test_merge_history(self) -> None:
         """Test Site.merge_history functionality."""
         site = self.get_site()
         source = pywikibot.Page(site, 'User:Sn1per/MergeTest1')

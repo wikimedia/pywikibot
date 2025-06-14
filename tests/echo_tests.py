@@ -40,7 +40,7 @@ class TestNotification(DefaultDrySiteTestCase):
         'wiki': 'dewiki',
     }
 
-    def test_from_json(self):
+    def test_from_json(self) -> None:
         """Test Notification.fromJSON class method and instance attributes."""
         notif = Notification.fromJSON(self.get_site(), self.data)
         self.assertIsInstance(notif, Notification)

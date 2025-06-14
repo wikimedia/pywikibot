@@ -131,8 +131,8 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
 
         If not called, the default is config.step.
 
-        :param value: The value of maximum number of items to be retrieved
-            per API request to set.
+        :param value: The value of maximum number of items to be
+            retrieved per API request to set.
         """
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
@@ -145,8 +145,8 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
 
-        :param value: The value of maximum number of items to be retrieved
-            in total to set. Ignores None value.
+        :param value: The value of maximum number of items to be
+            retrieved in total to set. Ignores None value.
         """
         if value is not None and int(value) > 0:
             self.limit = int(value)
@@ -394,13 +394,13 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         If not called, most queries will continue as long as there is
         more data to be retrieved from the API.
 
-        If set to -1 (or any negative value), the "limit" parameter will be
-        omitted from the request. For some request types (such as
+        If set to -1 (or any negative value), the "limit" parameter will
+        be omitted from the request. For some request types (such as
         prop=revisions), this is necessary to signal that only current
         revision is to be returned.
 
-        :param value: The value of maximum number of items to be retrieved
-            in total to set. Ignores None value.
+        :param value: The value of maximum number of items to be
+            retrieved in total to set. Ignores None value.
         """
         if value is not None:
             self.limit = int(value)
@@ -434,7 +434,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
 
-    def set_namespace(self, namespaces):
+    def set_namespace(self, namespaces) -> bool | None:
         """Set a namespace filter on this query.
 
         :param namespaces: namespace identifiers to limit query results
@@ -765,8 +765,8 @@ class PropertyGenerator(QueryGenerator):
     This generator yields one or more dict object(s) corresponding to
     each "page" item(s) from the API response; the calling module has to
     decide what to do with the contents of the dict. There will be one
-    dict for each page queried via a titles= or ids= parameter (which must
-    be supplied when instantiating this class).
+    dict for each page queried via a titles= or ids= parameter (which
+    must be supplied when instantiating this class).
     """
 
     def __init__(self, prop: str, **kwargs) -> None:
@@ -883,7 +883,7 @@ class LogEntryListGenerator(ListGenerator):
         return result.ns() in self._namespaces
 
 
-def _update_pageid(page, pagedict: dict):
+def _update_pageid(page, pagedict: dict) -> None:
     """Update pageid."""
     if 'pageid' in pagedict:
         page._pageid = int(pagedict['pageid'])
@@ -942,7 +942,7 @@ def _update_templates(page, templates) -> None:
         page._templates = templ_pages
 
 
-def _update_categories(page, categories):
+def _update_categories(page, categories) -> None:
     """Update page categories."""
     cat_pages = {pywikibot.Page(page.site, ct['title']) for ct in categories}
     if hasattr(page, '_categories'):
@@ -998,9 +998,9 @@ def update_page(page: pywikibot.Page,
     :param pagedict: the contents of a *page* element of a query
         response
     :param props: the property names which resulted in *pagedict*. If a
-        missing value in *pagedict* can indicate both 'false' and
-        'not present' the property which would make the value present
-        must be in the *props* parameter.
+        missing value in *pagedict* can indicate both 'false' and 'not
+        present' the property which would make the value present must be
+        in the *props* parameter.
     :raises InvalidTitleError: Page title is invalid
     :raises UnsupportedPageError: Page with namespace < 0 is not
         supported yet

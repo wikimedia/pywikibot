@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -514,7 +514,7 @@ extlinks = {
 }
 
 
-def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
+def pywikibot_docstring_fixups(app, what, name, obj, options, lines) -> None:
     """Remove plain 'Initializer.' or 'Allocator.' docstring.
 
     .. versionchanged:: 8.2
@@ -527,7 +527,8 @@ def pywikibot_docstring_fixups(app, what, name, obj, options, lines):
         lines[:] = lines[2:]
 
 
-def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
+def pywikibot_script_docstring_fixups(app, what, name, obj, options,
+                                      lines) -> None:
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
 
@@ -579,7 +580,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
             length = 0
 
 
-def setup(app):
+def setup(app) -> None:
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)

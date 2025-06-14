@@ -24,7 +24,7 @@ def allow_asynchronous(func):
     the first and a possible exception that occurred during saving in
     the second thread or None as the second argument.
     """
-    def handle(func, self, *args, **kwargs):
+    def handle(func, self, *args, **kwargs) -> None:
         do_async = kwargs.pop('asynchronous', False)
         callback = kwargs.pop('callback', None)
         err = None

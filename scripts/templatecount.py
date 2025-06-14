@@ -29,7 +29,6 @@ Counts how many times {{ref}} and {{note}} are transcluded in articles:
 Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
     python pwb.py templatecount -list -namespace:14 cfd cfdu
-
 """
 #
 # (C) Pywikibot team, 2006-2024
@@ -50,8 +49,8 @@ class TemplateCountRobot:
     def count_templates(cls, templates, namespaces) -> None:
         """Display number of transclusions for a list of templates.
 
-        Displays the number of transcluded page in the given 'namespaces' for
-        each template given by 'templates' list.
+        Displays the number of transcluded page in the given
+        'namespaces' for each template given by 'templates' list.
 
         :param templates: list of template names
         :type templates: list
@@ -117,9 +116,9 @@ class TemplateCountRobot:
             tuple[str, list[pywikibot.Page]], None, None]:
         """Yield transclusions of each template in 'templates'.
 
-        For each template in 'templates', yield a tuple
-        (template, transclusions), where 'transclusions' is a list of all pages
-        in 'namespaces' where the template has been transcluded.
+        For each template in 'templates', yield a tuple (template,
+        transclusions), where 'transclusions' is a list of all pages in
+        'namespaces' where the template has been transcluded.
 
         :param templates: list of template names
         :type templates: list

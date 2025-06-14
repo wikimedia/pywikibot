@@ -28,7 +28,7 @@ class SiteDetectionTestCase(TestCase):
 
     net = True
 
-    def assertSite(self, url: str):
+    def assertSite(self, url: str) -> None:
         """Assert a MediaWiki site can be loaded from the url.
 
         :param url: Url of tested site
@@ -37,7 +37,7 @@ class SiteDetectionTestCase(TestCase):
         with skipping(ServerError, requests_exceptions.Timeout):
             self.assertIsInstance(MWSite(url), MWSite)
 
-    def assertNoSite(self, url: str):
+    def assertNoSite(self, url: str) -> None:
         """Assert a url is not a MediaWiki site.
 
         :param url: Url of tested site
@@ -103,37 +103,37 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
          'http://musicbrainz.org/doc/api.php.'),
     ]
 
-    def test_standard_version_sites(self):
+    def test_standard_version_sites(self) -> None:
         """Test detection of standard MediaWiki sites."""
         for url in self.standard_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertSite(url)
 
-    def test_proofreadwiki(self):
+    def test_proofreadwiki(self) -> None:
         """Test detection of proofwiki.org site."""
         if os.getenv('GITHUB_ACTIONS'):
             self.skipTest('Skip test on github due to T331223')
         self.assertSite('http://proofwiki.org/wiki/$1')
 
-    def test_non_standard_version_sites(self):
+    def test_non_standard_version_sites(self) -> None:
         """Test detection of non standard MediaWiki sites."""
         for url in self.non_standard_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertSite(url)
 
-    def test_old_version_sites(self):
+    def test_old_version_sites(self) -> None:
         """Test detection of old MediaWiki sites."""
         for url in self.old_version_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertNoSite(url)
 
-    def test_no_sites(self):
+    def test_no_sites(self) -> None:
         """Test detection of non-MediaWiki sites."""
         for url in self.no_sites:
             with self.subTest(url=urlparse(url).netloc):
                 self.assertNoSite(url)
 
-    def test_failing_sites(self):
+    def test_failing_sites(self) -> None:
         """Test detection of failing MediaWiki sites."""
         for url, reason in self.failing_sites:
             with self.subTest(url=urlparse(url).netloc, reason=reason):
@@ -211,20 +211,19 @@ class PrivateWikiTestCase(PatchingTestCase):
             for key, value in self._siteinfo.items())
         return site
 
-    def test_T235768_failure(self):
+    def test_T235768_failure(self) -> None:
         """Test generate_family_file works for private wikis.
 
-        generate_family_file.FamilyFileGenerator.run() does:
-          w = self.Wiki(self.base_url)
-          self.wikis[w.lang] = w
+        generate_family_file.FamilyFileGenerator.run() does:   w =
+        self.Wiki(self.base_url)   self.wikis[w.lang] = w
 
-        where self.Wiki is pywikibot.site_detect.MWSite.__init__.
-        That calls MWSite._parse_post_117() which sets lang, but
-        that call's wrapped to log exceptions and then continue
-        past them.  In T235768, the code that handles private
-        wikis raises an exception that's consumed in that way.
-        The value returned to FamilyFileGenerator.run() does not
-        have lang set, causing generate_family_file to bomb.
+        where self.Wiki is pywikibot.site_detect.MWSite.__init__. That
+        calls MWSite._parse_post_117() which sets lang, but that call's
+        wrapped to log exceptions and then continue past them.  In
+        T235768, the code that handles private wikis raises an exception
+        that's consumed in that way. The value returned to
+        FamilyFileGenerator.run() does not have lang set, causing
+        generate_family_file to bomb.
         """
         site = MWSite(self._weburl)
         self.assertIsInstance(site, MWSite)

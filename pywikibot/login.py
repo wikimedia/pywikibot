@@ -1,17 +1,18 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import datetime
 import os
 import re
 import webbrowser
 from enum import IntEnum
+from pathlib import Path
+from textwrap import fill
 from typing import Any
 from warnings import warn
 
@@ -19,7 +20,12 @@ import pywikibot
 from pywikibot import __url__, config
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
-from pywikibot.tools import deprecated, file_mode_checker, normalize_username
+from pywikibot.tools import (
+    PYTHON_VERSION,
+    deprecated,
+    file_mode_checker,
+    normalize_username,
+)
 
 
 try:
@@ -84,12 +90,11 @@ class LoginManager:
         All parameters default to defaults in user-config.
 
         :param site: Site object to log into
-        :param user: username to use.
-            If user is None, the username is loaded from config.usernames.
+        :param user: username to use. If user is None, the username is
+            loaded from config.usernames.
         :param password: password to use
-
-        :raises pywikibot.exceptions.NoUsernameError: No username is configured
-            for the requested site.
+        :raises pywikibot.exceptions.NoUsernameError: No username is
+            configured for the requested site.
         """
         site = self.site = site or pywikibot.Site()
         if not user:
@@ -112,10 +117,10 @@ class LoginManager:
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return representation string for LoginManager.
 
-        ..versionadded:: 10.0
+        .. versionadded:: 10.0
         """
         return f'{type(self).__name__}(user={self.username!r})'
 
@@ -133,7 +138,7 @@ class LoginManager:
             warn('When using BotPasswords it is recommended that you store'
                  ' your login credentials in a password_file instead. See '
                  f'{__url__}/BotPasswords for instructions and more'
-                 ' information.')
+                 ' information.', stacklevel=2)
             main_username = self.username.partition('@')[0]
 
         try:
@@ -155,7 +160,8 @@ class LoginManager:
     def botAllowed(self) -> bool:
         """Check whether the bot is listed on a specific page.
 
-        This allows bots to comply with the policy on the respective wiki.
+        This allows bots to comply with the policy on the respective
+        wiki.
         """
         code, fam = self.site.code, self.site.family.name
         if code in botList.get(fam, []):
@@ -208,23 +214,42 @@ class LoginManager:
          ('wikipedia', 'my_wikipedia_user', 'my_wikipedia_pass')
          ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
          ('my_username', BotPassword('my_suffix', 'my_password'))
+
+        .. versionchanged:: 10.2
+           raises ValueError instead of AttributeError if password_file
+               is not set
+
+        :raises ValueError: `password_file` is not set in the user-config.py
+        :raises FileNotFoundError: password file does not exist
         """
+        if config.password_file is None:
+            raise ValueError('password_file is not set in the user-config.py')
+
         # Set path to password file relative to the user_config
         # but fall back on absolute path for backwards compatibility
-        assert config.base_dir is not None and config.password_file is not None
-        password_file = os.path.join(config.base_dir, config.password_file)
-        if not os.path.isfile(password_file):
-            password_file = config.password_file
+        password_path = Path(config.base_dir, config.password_file)
+
+        params = {} if PYTHON_VERSION < (3, 13) else {'follow_symlinks': False}
+        # test for symlink required for Python < 3.13
+        if not password_path.is_file(**params) or password_path.is_symlink():
+            password_path = Path(config.password_file)
+
+        # ignore this check when running tests
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0' \
+           and (not password_path.is_file(**params)
+                or password_path.is_symlink()):
+            raise FileNotFoundError(
+                f'Password file {password_path.name} does not exist in '
+                f'{password_path.parent}'
+            )
 
         # We fix password file permission first.
-        file_mode_checker(password_file, mode=config.private_files_permission)
+        file_mode_checker(password_path, mode=config.private_files_permission)
 
-        with codecs.open(password_file, encoding='utf-8') as f:
-            lines = f.readlines()
+        lines = password_path.read_text('utf-8').splitlines()
+        line_len = len(lines)
 
-        line_nr = len(lines) + 1
-        for line in reversed(lines):
-            line_nr -= 1
+        for n, line in enumerate(reversed(lines)):
             if not line.strip() or line.startswith('#'):
                 continue
 
@@ -234,17 +259,19 @@ class LoginManager:
                 entry = None
 
             if not isinstance(entry, tuple):
-                warn(f'Invalid tuple in line {line_nr}',
-                     _PasswordFileWarning)
+                warn(f'Invalid tuple in line {line_len - n}',
+                     _PasswordFileWarning, stacklevel=2)
                 continue
 
-            if not 2 <= len(entry) <= 4:
-                warn(f'The length of tuple in line {line_nr} should be 2 to 4 '
-                     f'({entry} given)', _PasswordFileWarning)
+            if not 2 <= (entry_len := len(entry)) <= 4:
+                warn(f'The length of tuple in line {line_len - n} should be 2 '
+                     f'to 4, {entry_len} given ({entry})',
+                     _PasswordFileWarning, stacklevel=2)
                 continue
 
             code, family, username, password = (
-                self.site.code, self.site.family.name)[:4 - len(entry)] + entry
+                self.site.code, self.site.family.name)[:4 - entry_len] + entry
+
             if (normalize_username(username) == self.username
                     and family == self.site.family.name
                     and code == self.site.code):
@@ -257,7 +284,8 @@ class LoginManager:
                     self.login_name = password.login_name(self.username)
                     break
 
-                warn('Invalid password format', _PasswordFileWarning)
+                warn('Invalid password format', _PasswordFileWarning,
+                     stacklevel=2)
 
     _api_error = {
         'NotExists': 'does not exist',
@@ -328,6 +356,11 @@ class ClientLoginManager(LoginManager):
     .. versionchanged:: 8.0
        2FA login was enabled. LoginManager was moved from :mod:`data.api`
        to :mod:`login` module and renamed to *ClientLoginManager*.
+    .. versionchanged:: 10.2
+       Secondary authentication via email was enabled.
+    .. seealso::
+       - https://www.mediawiki.org/wiki/Extension:OATHAuth
+       - https://www.mediawiki.org/wiki/Extension:EmailAuth
     """
 
     # API login parameters mapping
@@ -380,7 +413,13 @@ class ClientLoginManager(LoginManager):
         takes care of all the cookie stuff. Throws exception on failure.
 
         .. versionchanged:: 8.0
-           2FA login was enabled.
+           2FA login was implemented.
+        .. versionchanged:: 10.2
+           Secondary authentication via email was implemented.
+
+        :raises RuntimeError: Unexpected API login response key or
+            unexpected API login requests response
+        :raises APIError: API login error
         """
         if hasattr(self, '_waituntil') \
            and datetime.datetime.now() < self._waituntil:
@@ -437,12 +476,34 @@ class ClientLoginManager(LoginManager):
                 continue
 
             if status == 'UI':  # pragma: no cover
-                oathtoken = pywikibot.input(response['message'], password=True)
-                login_request['OATHToken'] = oathtoken
+                # find token key
+                token_key = None
+                for request in response['requests']:
+                    if 'fields' in request:
+                        fields = request['fields']
+                        keys = list(fields)
+                        if len(keys) == 1:
+                            token_key = keys[0]
+                            field = fields[token_key]
+                        break
+
+                if not token_key:
+                    raise RuntimeError('Unexpected API login requests response'
+                                       f':\n{response["requests"]}')
+
+                pywikibot.info(fill(response['message'], 77))
+                if fail := response['messagecode'].endswith(('-failure',
+                                                             '-failed')):
+                    pywikibot.info(fill(field['help'], 77))
+                token_val = pywikibot.input(field['label'], password=True)
+                login_request[token_key] = token_val
                 login_request['logincontinue'] = True
-                del login_request['username']
-                del login_request['password']
-                del login_request['rememberMe']
+
+                if not fail:
+                    del login_request['username']
+                    del login_request['password']
+                    del login_request['rememberMe']
+
                 continue
 
             login_throttled = response.get('messagecode') == 'login-throttled'
@@ -489,12 +550,11 @@ class BotPassword:
 
         :param suffix: Suffix of the login name
         :param password: bot password
-
         :raises _PasswordFileWarning: suffix improperly specified
         """
         if '@' in suffix:
             warn('The BotPassword entry should only include the suffix',
-                 _PasswordFileWarning)
+                 _PasswordFileWarning, stacklevel=2)
         self.suffix = suffix
         self.password = password
 
@@ -523,9 +583,8 @@ class OauthLoginManager(LoginManager):
         :param site: Site object to log into
         :param user: consumer key
         :param password: consumer secret
-
-        :raises pywikibot.exceptions.NoUsernameError: No username is configured
-            for the requested site.
+        :raises pywikibot.exceptions.NoUsernameError: No username is
+            configured for the requested site.
         :raises ImportError: mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
@@ -537,7 +596,7 @@ class OauthLoginManager(LoginManager):
                 f'Password exists in password file for {self.site}: '
                 f'{self.username}. Password is unnecessary and should be'
                 ' removed if OAuth enabled.',
-                _PasswordFileWarning
+                _PasswordFileWarning, stacklevel=2
             )
         self._consumer_token = (user, password)
         self._access_token: tuple[str, str] | None = None

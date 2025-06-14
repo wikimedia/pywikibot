@@ -34,7 +34,6 @@ and override its `callback` method. Here is a sample:
                 pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]')
                 return bool(pattern.search(text))
             return False
-
 """
 #
 # (C) Pywikibot team, 2008-2024
@@ -55,7 +54,8 @@ class BaseRevertBot(OptionHandler):
 
     """Base revert bot.
 
-    Subclass this bot and override callback to get it to do something useful.
+    Subclass this bot and override callback to get it to do something
+    useful.
     """
 
     available_options = {

@@ -159,7 +159,6 @@ are also in 'Pneumatics' category.
 #
 from __future__ import annotations
 
-import codecs
 import math
 import os
 import pickle
@@ -301,8 +300,8 @@ class CategoryPreprocess(BaseBot):
             return page
 
         tmpl: Sequence = []
-        with suppress(KeyError):
-            tmpl, _loc = moved_links[page.site.code]
+        with suppress(TypeError):
+            tmpl, _loc = i18n.translate(page.site.code, moved_links)
 
         if not isinstance(tmpl, list):
             tmpl = [tmpl]
@@ -369,7 +368,6 @@ class CategoryDatabase:
                 self.cat_content_db = databases['cat_content_db']
                 # like the above, but for supercategories
                 self.superclass_db = databases['superclass_db']
-                del databases
             except Exception:
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
@@ -382,8 +380,8 @@ class CategoryDatabase:
     def get_subcats(self, supercat) -> set[pywikibot.Category]:
         """Return the list of subcategories for a given supercategory.
 
-        Saves this list in a temporary database so that it won't be loaded
-        from the server next time it's required.
+        Saves this list in a temporary database so that it won't be
+        loaded from the server next time it's required.
         """
         self._load()
         # if we already know which subcategories exist here
@@ -398,8 +396,8 @@ class CategoryDatabase:
     def get_articles(self, cat) -> set[pywikibot.Page]:
         """Return the list of pages for a given category.
 
-        Saves this list in a temporary database so that it won't be loaded
-        from the server next time it's required.
+        Saves this list in a temporary database so that it won't be
+        loaded from the server next time it's required.
         """
         self._load()
         # if we already know which articles exist here.
@@ -429,7 +427,8 @@ class CategoryDatabase:
         cat_content_db if at least one is not empty. If both are empty,
         removes the file from the disk.
 
-        If the filename is None, it'll use the filename determined in __init__.
+        If the filename is None, it'll use the filename determined in
+        __init__.
         """
         if filename is None:
             filename = self.filename
@@ -801,14 +800,14 @@ class CategoryMoveRobot(CategoryPreprocess):
     def _delete(self, moved_page, moved_talk) -> None:
         """Private function to delete the category page and its talk page.
 
-        Do not use this function from outside the class. Automatically marks
-        the pages if they can't be removed due to missing permissions.
+        Do not use this function from outside the class. Automatically
+        marks the pages if they can't be removed due to missing
+        permissions.
 
         :param moved_page: Category page to delete
         :param moved_talk: Talk page to delete
         :type moved_page: pywikibot.page.BasePage
         :type moved_talk: pywikibot.page.BasePage
-
         """
         if moved_page and self.oldcat.exists():
             self.oldcat.delete(self.deletion_comment, not self.batch,
@@ -879,10 +878,10 @@ class CategoryMoveRobot(CategoryPreprocess):
     def _movecat(self) -> None:
         """Private function to move the category page by copying its contents.
 
-        Note that this method of moving category pages by copying over the raw
-        text been deprecated by the addition of true category moving (analogous
-        to page moving) in MediaWiki, and so the raw text method is no longer
-        the default.
+        Note that this method of moving category pages by copying over
+        the raw text been deprecated by the addition of true category
+        moving (analogous to page moving) in MediaWiki, and so the raw
+        text method is no longer the default.
 
         Do not use this function from outside the class.
         """
@@ -950,8 +949,8 @@ class CategoryMoveRobot(CategoryPreprocess):
     def _hist(self) -> None:
         """Private function to copy the history of the to-be-deleted category.
 
-        Do not use this function from outside the class. It adds a table with
-        the history of the old category on the new talk page.
+        Do not use this function from outside the class. It adds a table
+        with the history of the old category on the new talk page.
         """
         history = self.oldcat.getVersionHistoryTable()
         title = i18n.twtranslate(self.site, 'category-section-title',
@@ -964,9 +963,9 @@ class CategoryMoveRobot(CategoryPreprocess):
     def _makecat(self, var) -> pywikibot.Category:
         """Private helper function to get a Category object.
 
-        Checks if the instance given is a Category object and returns it.
-        Otherwise creates a new object using the value as the title (for
-        backwards compatibility).
+        Checks if the instance given is a Category object and returns
+        it. Otherwise creates a new object using the value as the title
+        (for backwards compatibility).
         :param var: Either the title as a string or a Category object.
         """
         if not isinstance(var, pywikibot.Category):
@@ -1050,21 +1049,21 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
     """Robot to move members of a category into sub- or super-categories.
 
-    Specify the category title on the command line. The robot will
-    pick up the page, look for all sub- and super-categories, and show
-    them listed as possibilities to move page into with an assigned
-    number. It will ask you to type number of the appropriate
-    replacement, and performs the change robotically. It will then
-    automatically loop over all pages in the category.
+    Specify the category title on the command line. The robot will pick
+    up the page, look for all sub- and super-categories, and show them
+    listed as possibilities to move page into with an assigned number.
+    It will ask you to type number of the appropriate replacement, and
+    performs the change robotically. It will then automatically loop
+    over all pages in the category.
 
     If you don't want to move the member to a sub- or super-category,
     but to another category, you can use the 'j' (jump) command.
 
     By typing 's' you can leave the complete page unchanged.
 
-    By typing 'm' you can show more content of the current page,
-    helping you to find out what the page is about and in which other
-    categories it currently is.
+    By typing 'm' you can show more content of the current page, helping
+    you to find out what the page is about and in which other categories
+    it currently is.
 
     :param cat_title: a title of the category to process.
     :param cat_db: a CategoryDatabase object.
@@ -1143,7 +1142,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 category titles and output category titles as enumerated
                 options.
 
-                :param cat_list: sorted iterable of category titles to output.
+                :param cat_list: sorted iterable of category titles to
+                        output.
                 :type cat_list: iterable of str
                 :param prefix: a prefix to assigned number index.
                 """
@@ -1366,7 +1366,6 @@ class CategoryTreeRobot:
             * cat - the Category of the node we're currently opening.
             * current_depth - the current level in the tree (for recursion).
             * parent - the Category of the category we're coming from.
-
         """
         result = '#' * current_depth
         if current_depth > 0:
@@ -1390,7 +1389,6 @@ class CategoryTreeRobot:
             result += ' ' + i18n.twtranslate(self.site, 'category-also-in',
                                              {'alsocat': comma.join(
                                                  supercat_names)})
-        del supercat_names
         result += '\n'
         if current_depth < self.max_depth:
             for subcat in self.cat_db.get_subcats(cat):
@@ -1404,8 +1402,8 @@ class CategoryTreeRobot:
     def run(self) -> None:
         """Handle the multi-line string generated by treeview.
 
-        After string was generated by treeview it is either printed to the
-        console or saved it to a file.
+        After string was generated by treeview it is either printed to
+        the console or saved it to a file.
         """
         cat = pywikibot.Category(self.site, self.cat_title)
         pywikibot.info('Generating tree...', newline=False)
@@ -1413,7 +1411,7 @@ class CategoryTreeRobot:
         pywikibot.info()
         if self.filename:
             pywikibot.info('Saving results in ' + self.filename)
-            with codecs.open(self.filename, 'a', 'utf-8') as f:
+            with open(self.filename, 'a', encoding='utf-8') as f:
                 f.write(tree)
         else:
             pywikibot.stdout(tree)

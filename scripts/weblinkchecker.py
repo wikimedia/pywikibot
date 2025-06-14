@@ -103,13 +103,12 @@ Loads all wiki pages where dead links were found during a prior run:
     python pwb.py weblinkchecker -repeat
 """
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import pickle
 import re
 import threading
@@ -276,9 +275,9 @@ class LinkCheckThread(threading.Thread):
     def get_delay(cls, name: str) -> float:
         """Determine delay from class attribute.
 
-        Store the last call for a given hostname with an offset of
-        6 seconds to ensure there are no more than 10 calls per minute
-        for the same host. Calculate the delay to start the run.
+        Store the last call for a given hostname with an offset of 6
+        seconds to ensure there are no more than 10 calls per minute for
+        the same host. Calculate the delay to start the run.
 
         :param name: The key for the hosts class attribute
         :return: The calculated delay to start the run
@@ -289,7 +288,7 @@ class LinkCheckThread(threading.Thread):
             cls.hosts[name] = max(now, timestamp) + 6
         return max(0, timestamp - now)
 
-    def run(self):
+    def run(self) -> None:
         """Run the bot."""
         time.sleep(self.get_delay(self.name))
         try:
@@ -378,7 +377,7 @@ class History:
             'deadlinks',
             f'results-{self.site.family.name}-{self.site.lang}.txt'
         )
-        with codecs.open(txtfilename, 'a', 'utf-8') as txtfile:
+        with open(txtfilename, 'a', encoding='utf-8') as txtfile:
             self.log_count += 1
             if self.log_count % 30 == 0:
                 # insert a caption
@@ -439,8 +438,9 @@ class DeadLinkReportThread(threading.Thread):
 
     """A Thread that is responsible for posting error reports on talk pages.
 
-    There is only one DeadLinkReportThread, and it is using a semaphore to make
-    sure that two LinkCheckerThreads cannot access the queue at the same time.
+    There is only one DeadLinkReportThread, and it is using a semaphore
+    to make sure that two LinkCheckerThreads cannot access the queue at
+    the same time.
     """
 
     def __init__(self) -> None:
@@ -533,7 +533,8 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
 
     """Bot which will search for dead weblinks.
 
-    It uses several LinkCheckThreads at once to process pages from generator.
+    It uses several LinkCheckThreads at once to process pages from
+    generator.
     """
 
     use_redirects = False

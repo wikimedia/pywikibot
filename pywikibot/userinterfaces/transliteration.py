@@ -1107,8 +1107,9 @@ class Transliterator:
     def __init__(self, encoding: str) -> None:
         """Initialize the transliteration mapping.
 
-        :param encoding: the encoding available. Any transliterated character
-            which can't be mapped, will be removed from the mapping.
+        :param encoding: the encoding available. Any transliterated
+            character which can't be mapped, will be removed from the
+            mapping.
         """
         trans = _trans.copy()
         for char, value in trans.items():

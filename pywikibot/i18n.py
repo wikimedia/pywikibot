@@ -515,7 +515,8 @@ class _PluralMappingAlias(abc.Mapping):
 
     """Aliasing class to allow non mappings in _extract_plural.
 
-    That function only uses __getitem__ so this is only implemented here.
+    That function only uses __getitem__ so this is only implemented
+    here.
     """
 
     def __init__(
@@ -558,36 +559,46 @@ def translate(code: str | pywikibot.site.BaseSite,
               fallback: bool | Iterable[str] = False) -> str | None:
     """Return the most appropriate localization from a localization dict.
 
-    Given a site code and a dictionary, returns the dictionary's value for
-    key 'code' if this key exists; otherwise tries to return a value for an
-    alternative code that is most applicable to use on the wiki in language
-    'code' except fallback is False.
+    Given a site code and a dictionary, returns the dictionary's value
+    for key *code* if this key exists; otherwise tries to return a value
+    for an alternative code that is most applicable to use on the wiki
+    in language *code* except fallback is False.
 
-    The code itself is always checked first, then these codes that have
+    The *code* itself is always checked first, then these codes that have
     been defined to be alternatives, and finally English.
 
-    If fallback is False and the code is not found in the
+    If *fallback* is False and the code is not found in the *xdict*,
+    None is returned.
 
-    For PLURAL support have a look at the twtranslate method.
+    For PLURAL support have a look at the :func:`twtranslate` function.
+
+    .. versionchanged:: 2.0
+       *parameter* other than a mapping (or None) is deprecated.
+    .. versionchanged:: 6.2
+       ValueError is raised if *parameter* is not a mapping.
+    .. versionchanged:: 10.2
+       TypeError instead of ValueError is raised if *parameter* is not a
+       mapping.
 
     :param code: The site code as string or Site object. If xdict is an
-        extended dictionary the Site object should be used in favour of the
-        code string. Otherwise localizations from a wrong family might be
-        used.
+        extended dictionary the Site object should be used in favour of
+        the code string. Otherwise localizations from a wrong family
+        might be used.
     :param xdict: dictionary with language codes as keys or extended
-        dictionary with family names as keys containing code dictionaries
-        or a single string. May contain PLURAL tags as described in
-        twtranslate
+        dictionary with family names as keys containing code
+        dictionaries or a single string. May contain PLURAL tags as
+        described in twtranslate
     :param parameters: For passing (plural) parameters
-    :param fallback: Try an alternate language code. If it's iterable it'll
-        also try those entries and choose the first match.
+    :param fallback: Try an alternate language code. If it's iterable
+        it'll also try those entries and choose the first match.
     :return: the localized string
-    :raise IndexError: If the language supports and requires more plurals
-        than defined for the given PLURAL pattern.
+    :raise IndexError: If the language supports and requires more
+        plurals than defined for the given PLURAL pattern.
     :raise KeyError: No fallback key found if fallback is not False
+    :raise TypeError: *parameter* is not a mapping
     """
     family = pywikibot.config.family
-    # If a site is given instead of a code, use its language
+    # If a site is given instead of a code, use its code
     if hasattr(code, 'code'):
         family = code.family.name
         code = code.code
@@ -635,7 +646,7 @@ def translate(code: str | pywikibot.site.BaseSite,
         return trans
 
     if not isinstance(parameters, Mapping):
-        raise ValueError(
+        raise TypeError(
             f'parameters should be a mapping, not {type(parameters).__name__}'
         )
 
@@ -823,14 +834,15 @@ def twtranslate(
 def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
     """Check if a message has a translation in the specified language code.
 
-    The translations are retrieved from i18n.<package>, based on the callers
-    import table.
+    The translations are retrieved from i18n.<package>, based on the
+    callers import table.
 
     No code fallback is made.
 
-    :param source: When it's a site it's using the lang attribute and otherwise
-        it is using the value directly.
-    :param twtitle: The TranslateWiki string title, in <package>-<key> format
+    :param source: When it's a site it's using the lang attribute and
+        otherwise it is using the value directly.
+    :param twtitle: The TranslateWiki string title, in <package>-<key>
+        format
     """
     # If a site is given instead of a code, use its language
     lang = getattr(source, 'lang', source)
@@ -841,8 +853,8 @@ def twhas_key(source: str | pywikibot.site.BaseSite, twtitle: str) -> bool:
 def twget_keys(twtitle: str) -> list[str]:
     """Return all language codes for a special message.
 
-    :param twtitle: The TranslateWiki string title, in <package>-<key> format
-
+    :param twtitle: The TranslateWiki string title, in <package>-<key>
+        format
     :raises OSError: the package i18n cannot be loaded
     """
     # obtain the directory containing all the json files for this package

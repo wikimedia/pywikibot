@@ -21,11 +21,11 @@ CLOSED_WIKI_MSG = (
 def must_be(group: str | None = None):
     """Decorator to require a certain user status when method is called.
 
-    :param group: The group the logged in user should belong to.
-                  This parameter can be overridden by
-                  keyword argument 'as_group'.
+    :param group: The group the logged in user should belong to. This
+        parameter can be overridden by keyword argument 'as_group'.
     :return: method decorator
-    :raises UserRightsError: user is not part of the required user group.
+    :raises UserRightsError: user is not part of the required user
+        group.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):

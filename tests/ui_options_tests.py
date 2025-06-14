@@ -26,24 +26,24 @@ class TestChoiceOptions(TestCase):
     SEQ_EMPTY_RE = 'The sequence is empty.'
     net = False
 
-    def test_formatted(self):
+    def test_formatted(self) -> None:
         """Test static method Option.formatted."""
         self.assertEqual(message('Question:', [], None), 'Question: ()')
 
-    def test_output(self):
+    def test_output(self) -> None:
         """Test OutputOption."""
         option = bot_choice.OutputOption()
         self.assertFalse(option.stop)
         with self.assertRaisesRegex(NotImplementedError, ''):
             message('?', [option], None)
 
-    def test_proxy_output(self):
+    def test_proxy_output(self) -> None:
         """Test OutputProxyOption."""
         option = bot_choice.OutputProxyOption('Test', 'T', None)
         self.assertFalse(option.stop)
         self.assertEqual(option.format(), '[t]est')
 
-    def test_standard(self):
+    def test_standard(self) -> None:
         """Test StandardOption."""
         option = bot.StandardOption('Test', 'T')
         self.assertTrue(option.stop)
@@ -66,7 +66,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(message('?', [option], 't'), '? ([T]est)')
         self.assertEqual(message('?', [option], default='t'), '? ([T]est)')
 
-    def test_Nested(self):
+    def test_Nested(self) -> None:
         """Test NestedOption."""
         standard = bot.StandardOption('Test', 'T')
         self.assertTrue(standard.stop)
@@ -80,7 +80,7 @@ class TestChoiceOptions(TestCase):
         self.assertIs(option.handled('x'), option)
         self.assertIs(option.handled('t'), standard)
 
-    def test_Integer(self):
+    def test_Integer(self) -> None:
         """Test IntegerOption."""
         option = bot.IntegerOption(maximum=5, prefix='r')
         self.assertTrue(option.stop)
@@ -102,7 +102,7 @@ class TestChoiceOptions(TestCase):
             self.assertEqual(option.handled(f'r{i}'), option)
             self.assertEqual(option.result(f'r{i}'), ('r', i))
 
-    def test_List(self):
+    def test_List(self) -> None:
         """Test ListOption."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -143,7 +143,7 @@ class TestChoiceOptions(TestCase):
             self.assertFalse(option.test(f'{prefix}{len(options) + 1}'))
             self.assertIsNone(option.handled(f'{prefix}{len(options) + 1}'))
 
-    def test_showing_list(self):
+    def test_showing_list(self) -> None:
         """Test ShowingListOption."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -153,7 +153,7 @@ class TestChoiceOptions(TestCase):
         option = bot.ShowingListOption(options)
         self.assertEqual(message('?', [option]), '? (<number> [1-2])')
 
-    def test_multiple_choice_list(self):
+    def test_multiple_choice_list(self) -> None:
         """Test MultipleChoiceList."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -176,7 +176,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.result('1'), ('', [options[0]]))
         self.assertEqual(option.result('1,2'), ('', [options[0], options[1]]))
 
-    def test_showing_multiple_choice_list(self):
+    def test_showing_multiple_choice_list(self) -> None:
         """Test ShowingMultipleChoiceList."""
         with self.assertRaisesRegex(
                 ValueError,
@@ -193,7 +193,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.result('2'), ('', [options[1]]))
         self.assertEqual(option.result('1,2'), ('', [options[0], options[1]]))
 
-    def test_choice_excepton(self):
+    def test_choice_excepton(self) -> None:
         """Test ChoiceException."""
         option = ChoiceException('Test', 'T')
         self.assertTrue(option.stop)
@@ -201,7 +201,7 @@ class TestChoiceOptions(TestCase):
         with self.assertRaises(ChoiceException):
             raise ChoiceException('Test', 'T')
 
-    def test_quit_keyboard_interrupt(self):
+    def test_quit_keyboard_interrupt(self) -> None:
         """Test QuitKeyboardInterrupt."""
         option = QuitKeyboardInterrupt()
         self.assertTrue(option.stop)

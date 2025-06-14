@@ -141,9 +141,9 @@ class RedirectGenerator(OptionHandler):
         """Extract redirects from dump.
 
         Load a local XML dump file, look at all pages which have the
-        redirect flag set, and find out where they're pointing at. Return
-        a dictionary where the redirect names are the keys and the redirect
-        targets are the values.
+        redirect flag set, and find out where they're pointing at.
+        Return a dictionary where the redirect names are the keys and
+        the redirect targets are the values.
         """
         xmlFilename = self.opt.xml
         redict = {}

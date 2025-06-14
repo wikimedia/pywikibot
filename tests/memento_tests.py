@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""memento client test module."""
+"""Memento client test module."""
 #
 # (C) Pywikibot team, 2015-2025
 #
@@ -45,7 +45,7 @@ class TestMementoArchive(MementoTestCase):
     timegate_uri = 'http://timetravel.mementoweb.org/timegate/'
     hostname = timegate_uri.replace('gate/', 'map/json/http://google.com')
 
-    def test_newest(self):
+    def test_newest(self) -> None:
         """Test Archive for an old https://google.com."""
         dt = '20220715'
         archivedversion = self._get_archive_url('https://google.com',
@@ -61,12 +61,12 @@ class TestMementoDefault(MementoTestCase):
     timegate_uri = None
     net = True
 
-    def test_newest(self):
+    def test_newest(self) -> None:
         """Test getting memento for newest https://google.com."""
         archivedversion = self._get_archive_url('https://google.com')
         self.assertIsNotNone(archivedversion)
 
-    def test_invalid(self):
+    def test_invalid(self) -> None:
         """Test getting memento for invalid URL."""
         # memento_client raises 'Exception', not a subclass.
         with self.assertRaisesRegex(

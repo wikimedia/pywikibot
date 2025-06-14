@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""pwb caller script to invoke the :mod:`pywikibot.scripts.wrapper` script.
+"""PWB caller script to invoke the :mod:`pywikibot.scripts.wrapper` script.
 
 .. versionadded:: 8.0
 """
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,7 +29,7 @@ if not python_is_supported():  # pragma: no cover
     sys.exit(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
 
 
-def main():
+def main() -> None:
     """Entry point for :func:`tests.utils.execute_pwb`."""
     from pathlib import Path
     path = Path(__file__).parent / 'pywikibot' / 'scripts' / 'wrapper.py'

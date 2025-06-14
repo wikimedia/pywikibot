@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,10 +31,10 @@ class UploadRobot(BaseBot):
     """Upload bot."""
 
     post_processor: Callable[[str, str | None], None] | None = None
-    """If this attribute is set to a callable, the :meth:`run` method
-    calls it after upload. The parameters passed to the callable is the
-    origin *file_url* passed to the :meth:`upload` method and the
-    *filename* returned from that method. It can be used like this:
+    """If this attribute is set to a callable, the :meth:`run` method calls it
+    after upload. The parameters passed to the callable is the origin
+    *file_url* passed to the :meth:`upload` method and the *filename* returned
+    from that method. It can be used like this:
 
     .. code-block:: python
 
@@ -205,8 +205,9 @@ class UploadRobot(BaseBot):
         """Return whether the warning cause an abort or be ignored.
 
         :param warning: The warning name
-        :return: False if this warning should cause an abort, True if it should
-            be ignored or None if this warning has no default handler.
+        :return: False if this warning should cause an abort, True if it
+            should be ignored or None if this warning has no default
+            handler.
         """
         if self.aborts is not True and warning in self.aborts:
             return False
@@ -237,6 +238,10 @@ class UploadRobot(BaseBot):
 
     def process_filename(self, file_url: str) -> str | None:
         """Return base filename portion of *file_url*.
+
+        .. versionchanged:: 10.2
+           no longer shows the description if UploadRobot's parameter
+           *verify_description* is set to False.
 
         :param file_url: either a URL or a local file path
         """
@@ -331,9 +336,8 @@ class UploadRobot(BaseBot):
                     continue
             break
 
-        # A proper description for the submission.
-        # Empty descriptions are not accepted.
-        if self.description:
+        # Show the description to verify it for the submission
+        if self.description and self.verify_description:
             pywikibot.info(
                 f'The suggested description is:\n{self.description}')
 
@@ -466,7 +470,7 @@ class UploadRobot(BaseBot):
 
         return False
 
-    def run(self):
+    def run(self) -> None:
         """Run bot.
 
         .. versionchanged:: 9.1

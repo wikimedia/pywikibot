@@ -33,12 +33,12 @@ class TestPatrolBot(DefaultDrySiteTestCase):
 
     """Test the PatrolBot class."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Create a bot dummy instance."""
         super().setUp()
         self.bot = PatrolBot(self.site)
 
-    def test_parse_page_tuples(self):
+    def test_parse_page_tuples(self) -> None:
         """Test parsing the page tuples from a dummy text."""
         tuples = self.bot.parse_page_tuples(DUMMY_PAGE_TUPLES)
         for gen_user in (1, 2):
@@ -50,7 +50,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         self.assertEqual(tuples['Prefixed'], {'Page 1', 'Page 2'})
         self.assertEqual(self.bot.parse_page_tuples('[[link]]'), {})
 
-    def test_in_list(self):
+    def test_in_list(self) -> None:
         """Test the method which returns whether a page is in the set."""
         # Return True if there is an exact match
         self.assertTrue(self.bot.in_list({'Foo', 'Foobar'}, 'Foo'))

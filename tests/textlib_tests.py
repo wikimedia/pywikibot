@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2024
+# (C) Pywikibot team, 2011-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import functools
-import os
 import re
 import unittest
 from collections import OrderedDict
 from contextlib import nullcontext, suppress
+from pathlib import Path
 from unittest import mock
 
 import pywikibot
@@ -30,87 +29,77 @@ from tests.aspects import (
 )
 
 
-files = {}
-dirname = os.path.join(os.path.dirname(__file__), 'pages')
-
-for f in ['enwiki_help_editing']:
-    with codecs.open(os.path.join(dirname, f + '.page'),
-                     'r', 'utf-8') as content:
-        files[f] = content.read()
-
-
 class TestSectionFunctions(TestCase):
 
     """Test wikitext section handling function."""
 
     net = False
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Read test content."""
+        dirname = Path(__file__).parent / 'pages'
+        file = dirname / 'enwiki_help_editing.page'
+        cls.content = file.read_text(encoding='utf-8')
+
+    def setUp(self) -> None:
         """Setup tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super().setUp()
 
-    @staticmethod
-    def contains(fn, sn):
-        """Invoke does_text_contain_section()."""
-        return textlib.does_text_contain_section(
-            files[fn], sn)
+    def assertContains(self, sn, msg=None) -> None:
+        """Test that file content contains sn."""
+        self.assertTrue(textlib.does_text_contain_section(self.content, sn),
+                        msg)
 
-    def assertContains(self, fn, sn, *args, **kwargs):
-        """Test that files[fn] contains sn."""
-        self.assertEqual(self.contains(fn, sn), True, *args, **kwargs)
+    def assertNotContains(self, sn, msg=None) -> None:
+        """Test that file content does not contain sn."""
+        self.assertFalse(textlib.does_text_contain_section(self.content, sn),
+                         msg)
 
-    def assertNotContains(self, fn, sn, *args, **kwargs):
-        """Test that files[fn] does not contain sn."""
-        self.assertEqual(self.contains(fn, sn), False, *args, **kwargs)
-
-    def testCurrentBehaviour(self):
+    def testCurrentBehaviour(self) -> None:
         """Test that 'Editing' is found."""
-        self.assertContains('enwiki_help_editing', 'Editing')
+        self.assertContains('Editing')
 
-    def testSpacesInSection(self):
+    def testSpacesInSection(self) -> None:
         """Test with spaces in section."""
-        self.assertContains('enwiki_help_editing', 'Minor_edits')
-        self.assertNotContains('enwiki_help_editing', '#Minor edits',
+        self.assertContains('Minor_edits')
+        self.assertNotContains('#Minor edits',
                                "Incorrect, '#Minor edits' does not work")
-        self.assertNotContains('enwiki_help_editing', 'Minor Edits',
+        self.assertNotContains('Minor Edits',
                                'section hashes are case-sensitive')
-        self.assertNotContains('enwiki_help_editing', 'Minor_Edits',
+        self.assertNotContains('Minor_Edits',
                                'section hashes are case-sensitive')
 
-    @unittest.expectedFailure  # TODO: T133276
-    def test_encoded_chars_in_section(self):
+    @unittest.expectedFailure  # T133276
+    def test_encoded_chars_in_section(self) -> None:
         """Test encoded chars in section."""
-        self.assertContains(
-            'enwiki_help_editing', 'Talk_.28discussion.29_pages',
-            'As used in the TOC')
+        self.assertContains('Talk_.28discussion.29_pages',
+                            'As used in the TOC')
 
-    def test_underline_characters_in_section(self):
+    def test_underline_characters_in_section(self) -> None:
         """Test with underline chars in section."""
-        self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
+        self.assertContains('Talk_(discussion)_pages',
                             'Understood by mediawiki')
 
-    def test_spaces_outside_section(self):
+    def test_spaces_outside_section(self) -> None:
         """Test with spaces around section."""
-        self.assertContains('enwiki_help_editing', 'Naming and_moving')
-        self.assertContains('enwiki_help_editing', ' Naming and_moving ')
-        self.assertContains('enwiki_help_editing', ' Naming and_moving_')
+        self.assertContains('Naming and_moving')
+        self.assertContains(' Naming and_moving ')
+        self.assertContains(' Naming and_moving_')
 
-    def test_link_in_section(self):
+    def test_link_in_section(self) -> None:
         """Test with link inside section."""
         # section is ==[[Wiki markup]]==
-        self.assertContains('enwiki_help_editing', '[[Wiki markup]]',
-                            'Link as section header')
-        self.assertContains('enwiki_help_editing', '[[:Wiki markup]]',
+        self.assertContains('[[Wiki markup]]', 'Link as section header')
+        self.assertContains('[[:Wiki markup]]',
                             'section header link with preleading colon')
-        self.assertNotContains('enwiki_help_editing', 'Wiki markup',
-                               'section header must be a link')
+        self.assertNotContains('Wiki markup', 'section header must be a link')
         # section is ===[[:Help]]ful tips===
-        self.assertContains('enwiki_help_editing', '[[Help]]ful tips',
-                            'Containing link')
-        self.assertContains('enwiki_help_editing', '[[:Help]]ful tips',
+        self.assertContains('[[Help]]ful tips', 'Containing link')
+        self.assertContains('[[:Help]]ful tips',
                             'Containing link with preleading colon')
-        self.assertNotContains('enwiki_help_editing', 'Helpful tips',
+        self.assertNotContains('Helpful tips',
                                'section header must contain a link')
 
 
@@ -123,7 +112,7 @@ class TestFormatInterwiki(TestCase):
 
     cached = True
 
-    def test_interwiki_format_Page(self):
+    def test_interwiki_format_Page(self) -> None:
         """Test formatting interwiki links using Page instances."""
         interwikis = {
             'de': pywikibot.Page(pywikibot.Link('de:German', self.site)),
@@ -132,7 +121,7 @@ class TestFormatInterwiki(TestCase):
         self.assertEqual('[[de:German]]\n[[fr:French]]\n',
                          textlib.interwikiFormat(interwikis, self.site))
 
-    def test_interwiki_format_Link(self):
+    def test_interwiki_format_Link(self) -> None:
         """Test formatting interwiki links using Page instances."""
         interwikis = {
             'de': pywikibot.Link('de:German', self.site),
@@ -148,26 +137,26 @@ class TestFormatCategory(DefaultDrySiteTestCase):
 
     catresult = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
 
-    def test_category_format_raw(self):
+    def test_category_format_raw(self) -> None:
         """Test formatting categories as strings formatted as links."""
         self.assertEqual(self.catresult,
                          textlib.categoryFormat(['[[Category:Cat1]]',
                                                  '[[Category:Cat2]]'],
                                                 self.site))
 
-    def test_category_format_bare(self):
+    def test_category_format_bare(self) -> None:
         """Test formatting categories as strings."""
         self.assertEqual(self.catresult,
                          textlib.categoryFormat(['Cat1', 'Cat2'], self.site))
 
-    def test_category_format_Category(self):
+    def test_category_format_Category(self) -> None:
         """Test formatting categories as Category instances."""
         data = [pywikibot.Category(self.site, 'Cat1'),
                 pywikibot.Category(self.site, 'Cat2')]
         self.assertEqual(self.catresult,
                          textlib.categoryFormat(data, self.site))
 
-    def test_category_format_Page(self):
+    def test_category_format_Page(self) -> None:
         """Test formatting categories as Page instances."""
         data = [pywikibot.Page(self.site, 'Category:Cat1'),
                 pywikibot.Page(self.site, 'Category:Cat2')]
@@ -179,7 +168,7 @@ class TestAddText(DefaultDrySiteTestCase):
 
     """Test add_text function."""
 
-    def test_add_text(self):
+    def test_add_text(self) -> None:
         """Test adding text."""
         self.assertEqual(
             textlib.add_text('foo\n[[Category:Foo]]', 'bar', site=self.site),
@@ -191,20 +180,20 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
 
     """Ensure that sorting keys are not being lost.
 
-    Tests .getCategoryLinks() and .replaceCategoryLinks(),
-    with both a newline and an empty string as separators.
+    Tests .getCategoryLinks() and .replaceCategoryLinks(), with both a
+    newline and an empty string as separators.
     """
 
     old = '[[Category:Cat1]]\n[[Category:Cat2|]]\n' \
           '[[Category:Cat1| ]]\n[[Category:Cat2|key]]'
 
-    def test_standard_links(self):
+    def test_standard_links(self) -> None:
         """Test getting and replacing categories."""
         cats = textlib.getCategoryLinks(self.old, site=self.site)
         new = textlib.replaceCategoryLinks(self.old, cats, site=self.site)
         self.assertEqual(self.old, new)
 
-    def test_indentation(self):
+    def test_indentation(self) -> None:
         """Test indentation from previous block."""
         # Block of text
         old = 'Some text\n\n' + self.old
@@ -218,7 +207,7 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         new_ds = textlib.replaceCategoryLinks(old_ds, cats_ds, site=self.site)
         self.assertEqual(old_ds, new_ds)
 
-    def test_in_place_replace(self):
+    def test_in_place_replace(self) -> None:
         """Test in-place category change is reversible."""
         dummy = pywikibot.Category(self.site, 'foo')
         dummy.sortKey = 'bah'
@@ -259,7 +248,7 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         new_cats = textlib.getCategoryLinks(new, site=self.site)
         self.assertEqual(cats, new_cats)
 
-    def test_in_place_retain_sort(self):
+    def test_in_place_retain_sort(self) -> None:
         """Test in-place category change does not alter the sortkey."""
         # sort key should be retained when the new cat sortKey is None
         dummy = pywikibot.Category(self.site, 'foo')
@@ -286,7 +275,7 @@ class TestTemplatesInCategory(TestCase):
 
     cached = True
 
-    def test_templates(self):
+    def test_templates(self) -> None:
         """Test normal templates inside category links."""
         self.site = self.get_site()
         self.assertEqual(textlib.getCategoryLinks(
@@ -322,7 +311,7 @@ class TestTemplateParams(TestCase):
 
     net = False
 
-    def _common_results(self, func):
+    def _common_results(self, func) -> None:
         """Common cases."""
         self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
         self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
@@ -377,7 +366,7 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a'), [])
         self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
 
-    def _unstripped(self, func):
+    def _unstripped(self, func) -> None:
         """Common cases of unstripped results."""
         self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
                          [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
@@ -411,7 +400,7 @@ class TestTemplateParams(TestCase):
                          [('a', OrderedDict((('1', ' foo '), (' 2 ', ' bar '),
                                              ('2', ' baz '))))])
 
-    def _stripped(self, func):
+    def _stripped(self, func) -> None:
         """Common cases of stripped results."""
         self.assertEqual(func('{{a|  }}'),
                          [('a', OrderedDict((('1', '  '), )))])
@@ -440,13 +429,13 @@ class TestTemplateParams(TestCase):
                          [('a', OrderedDict((('1', ' foo '),
                                              ('2', ' baz '))))])
 
-    def _etp_regex_differs(self, func):
+    def _etp_regex_differs(self, func) -> None:
         """Common cases not handled the same by ETP_REGEX."""
         # inner {} should be treated as part of the value
         self.assertEqual(func('{{a|b={} }}'),
                          [('a', OrderedDict((('b', '{} '), )))])
 
-    def _order_differs(self, func):
+    def _order_differs(self, func) -> None:
         """Common cases where the order of templates differs."""
         self.assertCountEqual(func('{{a|b={{c}}}}'),
                               [('a', OrderedDict((('b', '{{c}}'), ))),
@@ -462,7 +451,7 @@ class TestTemplateParams(TestCase):
                                                   ('2', 'd')])),
                                ('b', OrderedDict([('1', 'c')]))])
 
-    def _mwpfh_passes(self, func):
+    def _mwpfh_passes(self, func) -> None:
         """Common cases failing with wikitextparser but passes with mwpfh.
 
         Probably the behaviour of regex or mwpfh is wrong.
@@ -484,7 +473,7 @@ class TestTemplateParams(TestCase):
                     self.assertEqual(func(template),
                                      [(name, OrderedDict((('b', 'c'), )))])
 
-    def test_extract_templates_params_mwpfh(self):
+    def test_extract_templates_params_mwpfh(self) -> None:
         """Test using mwparserfromhell."""
         func = textlib.extract_templates_and_params
         self._common_results(func)
@@ -505,7 +494,7 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    def test_extract_templates_params_parser_stripped(self):
+    def test_extract_templates_params_parser_stripped(self) -> None:
         """Test using mwparserfromhell with stripping."""
         func = functools.partial(textlib.extract_templates_and_params,
                                  strip=True)
@@ -515,7 +504,7 @@ class TestTemplateParams(TestCase):
         self._stripped(func)
 
     @require_modules('wikitextparser')
-    def test_extract_templates_params_parser(self):
+    def test_extract_templates_params_parser(self) -> None:
         """Test using wikitextparser."""
         func = textlib.extract_templates_and_params
         self._common_results(func)
@@ -536,7 +525,7 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
-    def test_extract_templates_params(self):
+    def test_extract_templates_params(self) -> None:
         """Test that the normal entry point works."""
         func = functools.partial(textlib.extract_templates_and_params,
                                  remove_disabled_parts=False, strip=False)
@@ -549,7 +538,7 @@ class TestTemplateParams(TestCase):
         self._common_results(func)
         self._stripped(func)
 
-    def test_template_simple_regex(self):
+    def test_template_simple_regex(self) -> None:
         """Test using simple regex."""
         func = textlib.extract_templates_and_params_regex_simple
         self._common_results(func)
@@ -588,7 +577,7 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
                          [(None, OrderedDict())])
 
-    def test_nested_template_regex_search(self):
+    def test_nested_template_regex_search(self) -> None:
         """Test NESTED_TEMPLATE_REGEX search."""
         func = textlib.NESTED_TEMPLATE_REGEX.search
 
@@ -603,7 +592,7 @@ class TestTemplateParams(TestCase):
 
         self.assertIsNone(func('{{{1|{{2|a}} }}}'))
 
-    def test_nested_template_regex_match(self):
+    def test_nested_template_regex_match(self) -> None:
         """Test NESTED_TEMPLATE_REGEX match."""
         func = textlib.NESTED_TEMPLATE_REGEX.match
 
@@ -640,7 +629,7 @@ class TestDisabledParts(DefaultDrySiteTestCase):
 
     """Test the removeDisabledParts function in textlib."""
 
-    def test_remove_disabled_parts(self):
+    def test_remove_disabled_parts(self) -> None:
         """Test removeDisabledParts function."""
         tests = {
             'comment': '<!-- No comment yet -->',
@@ -654,13 +643,13 @@ class TestDisabledParts(DefaultDrySiteTestCase):
                 self.assertEqual(
                     textlib.removeDisabledParts(pattern, tags=[test]), '')
 
-    def test_remove_disabled_parts_include(self):
+    def test_remove_disabled_parts_include(self) -> None:
         """Test removeDisabledParts function with the include argument."""
         text = 'text <nowiki>tag</nowiki> text'
         self.assertEqual(
             textlib.removeDisabledParts(text, include=['nowiki']), text)
 
-    def test_remove_disabled_parts_order(self):
+    def test_remove_disabled_parts_order(self) -> None:
         """Test the order of the replacements in removeDisabledParts."""
         text = 'text <ref>This is a reference.</ref> text'
         regex = re.compile('</?ref>')
@@ -693,7 +682,7 @@ class TestReplaceLinks(TestCase):
             '[[bug:1337]]?')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Create a fake interwiki cache."""
         super().setUpClass()
         # make APISite.interwiki work and prevent it from doing requests
@@ -710,7 +699,7 @@ class TestReplaceLinks(TestCase):
             site['site']._interwikimap._site = None  # prevent it from loading
         cls.wp_site = cls.get_site('wp')
 
-    def test_replacements_function(self):
+    def test_replacements_function(self) -> None:
         """Test a dynamic function as the replacements."""
         def callback(link, text, groups, rng):
             self.assertEqual(link.site, self.wp_site)
@@ -725,7 +714,7 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
 
-    def test_replacements_once(self):
+    def test_replacements_once(self) -> None:
         """Test dynamic replacement."""
         def callback(link, text, groups, rng):
             if link.title.lower() == 'you':
@@ -744,16 +733,16 @@ class TestReplaceLinks(TestCase):
             '[[bug:1337]]?')
         del self._count
 
-    def test_unlink_all(self):
+    def test_unlink_all(self) -> None:
         """Test unlinking."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> bool:
             self.assertEqual(link.site, self.wp_site)
             return False
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello World, are you? Are you a [[bug:1337]]?')
 
-    def test_unlink_some(self):
+    def test_unlink_some(self) -> None:
         """Test unlinking only some links."""
         self.assertEqual(
             textlib.replace_links(self.text, ('World', False), self.wp_site),
@@ -767,7 +756,7 @@ class TestReplaceLinks(TestCase):
                                   self.wp_site),
             'Label\nLabelz\n[[Nothing]]')
 
-    def test_replace_neighbour(self):
+    def test_replace_neighbour(self) -> None:
         """Test that it replaces two neighbouring links."""
         self.assertEqual(
             textlib.replace_links('[[A]][[A]][[C]]',
@@ -775,7 +764,7 @@ class TestReplaceLinks(TestCase):
                                   self.wp_site),
             '[[B|A]][[B|A]][[C]]')
 
-    def test_replacements_simplify(self):
+    def test_replacements_simplify(self) -> None:
         """Test a tuple as replacement removing the need for a piped link."""
         self.assertEqual(
             textlib.replace_links(self.text,
@@ -784,7 +773,7 @@ class TestReplaceLinks(TestCase):
             'Hello [[World]], [[are]] [[you#section|you]]? Are [[you]] a '
             '[[bug:1337]]?')
 
-    def test_replace_file(self):
+    def test_replace_file(self) -> None:
         """Test that it respects the namespace."""
         self.assertEqual(
             textlib.replace_links(
@@ -793,20 +782,20 @@ class TestReplaceLinks(TestCase):
                 self.wp_site),
             '[[File:Fancy.png|thumb|Description of [[fancy]]]] [[Fancy]]...')
 
-    def test_replace_strings(self):
+    def test_replace_strings(self) -> None:
         """Test if strings can be used."""
         self.assertEqual(
             textlib.replace_links(self.text, ('how', 'are'), self.wp_site),
             'Hello [[World]], [[are]] [[you#section|you]]? Are [[you]] a '
             '[[bug:1337]]?')
 
-    def test_replace_invalid_link_text(self):
+    def test_replace_invalid_link_text(self) -> None:
         """Test that it doesn't pipe a link when it's an invalid link."""
         self.assertEqual(
             textlib.replace_links('[[Target|Foo:]]', ('Target', 'Foo'),
                                   self.wp_site), '[[Foo|Foo:]]')
 
-    def test_replace_modes(self):
+    def test_replace_modes(self) -> None:
         """Test replacing with or without label and section."""
         source_text = '[[Foo#bar|baz]]'
         self.assertEqual(
@@ -869,7 +858,7 @@ class TestReplaceLinks(TestCase):
                                   self.wp_site),
             '[[Bar#snafu|foo]]')
 
-    def test_replace_different_case(self):
+    def test_replace_different_case(self) -> None:
         """Test that it uses piped links when the case is different."""
         source_text = '[[Foo|Bar]] and [[Foo|bar]]'
         self.assertEqual(
@@ -885,8 +874,8 @@ class TestReplaceLinks(TestCase):
                                   self.get_site('wt')),
             '[[Bar]] and [[Bar|bar]]')
 
-    @unittest.expectedFailure
-    def test_label_diff_namespace(self):
+    @unittest.expectedFailure  # T396719
+    def test_label_diff_namespace(self) -> None:
         """Test that it uses the old label when the new doesn't match."""
         # These tests require to get the actual part which is before the title
         # (interwiki and namespace prefixes) which could be then compared
@@ -902,7 +891,7 @@ class TestReplaceLinks(TestCase):
                         link, ('File:Foobar', 'File:Foo'), self.wp_site),
                     result)
 
-    def test_linktrails(self):
+    def test_linktrails(self) -> None:
         """Test that the linktrails are used or applied."""
         self.assertEqual(
             textlib.replace_links('[[Foobar]]', ('Foobar', 'Foo'),
@@ -918,9 +907,9 @@ class TestReplaceLinks(TestCase):
                                   self.wp_site),
             '[[Project:Tests|Talk:tests]]')
 
-    def test_unicode_callback(self):
+    def test_unicode_callback(self) -> None:
         """Test returning unicode in the callback."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> str | None:
             self.assertEqual(link.site, self.wp_site)
             if link.title == 'World':
                 # This must be a unicode instance not bytes
@@ -932,9 +921,9 @@ class TestReplaceLinks(TestCase):
             'Hello homewörlder, [[how|are]] [[you#section|you]]? '
             'Are [[you]] a [[bug:1337]]?')
 
-    def test_bytes_callback(self):
+    def test_bytes_callback(self) -> None:
         """Test returning bytes in the callback."""
-        def callback(link, text, groups, rng):
+        def callback(link, text, groups, rng) -> bytes | None:
             self.assertEqual(link.site, self.wp_site)
             if link.title == 'World':
                 # This must be a bytes instance not unicode
@@ -947,7 +936,7 @@ class TestReplaceLinks(TestCase):
                                     r'The result must be str and not bytes\.'):
             textlib.replace_links(self.text, callback, self.wp_site)
 
-    def test_replace_interwiki_links(self):
+    def test_replace_interwiki_links(self) -> None:
         """Make sure interwiki links cannot be replaced."""
         link = '[[fr:how]]'
         self.assertEqual(
@@ -973,7 +962,7 @@ class TestReplaceLinksNonDry(TestCase):
 
     cached = True
 
-    def test_replace_interlanguage_links(self):
+    def test_replace_interlanguage_links(self) -> None:
         """Test replacing interlanguage links."""
         link = '[[:fr:how]]'
         self.assertEqual(
@@ -1000,7 +989,7 @@ class TestDigitsConversion(TestCase):
 
     net = False
 
-    def test_to_local(self):
+    def test_to_local(self) -> None:
         """Test converting Latin digits to local digits."""
         self.assertEqual(textlib.to_local_digits(299792458, 'en'), '299792458')
         self.assertEqual(
@@ -1011,7 +1000,7 @@ class TestDigitsConversion(TestCase):
         self.assertEqual(
             textlib.to_local_digits('299792458', 'km'), '២៩៩៧៩២៤៥៨')
 
-    def test_to_latin(self):
+    def test_to_latin(self) -> None:
         """Test converting local digits to Latin digits."""
         self.assertEqual(textlib.to_latin_digits('299792458'), '299792458')
         self.assertEqual(
@@ -1032,13 +1021,13 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
 
     """Test to verify the replacements with exceptions are done correctly."""
 
-    def test_no_replace(self):
+    def test_no_replace(self) -> None:
         """Test replacing when the old text does not match."""
         self.assertEqual(textlib.replaceExcept('12345678', 'x', 'y', [],
                                                site=self.site),
                          '12345678')
 
-    def test_simple_replace(self):
+    def test_simple_replace(self) -> None:
         """Test replacing without regex."""
         self.assertEqual(textlib.replaceExcept('AxB', 'x', 'y', [],
                                                site=self.site),
@@ -1050,7 +1039,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                site=self.site),
                          'AyyyB')
 
-    def test_regex_replace(self):
+    def test_regex_replace(self) -> None:
         """Test replacing with a regex."""
         self.assertEqual(textlib.replaceExcept('A123B', r'\d', r'x', [],
                                                site=self.site),
@@ -1110,7 +1099,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                   r'Z\g<1>', [], site=self.site),
             'AZ ahead C D')
 
-    def test_case_sensitive(self):
+    def test_case_sensitive(self) -> None:
         """Test replacing with different case sensitivity."""
         self.assertEqual(textlib.replaceExcept('AxB', 'x', 'y', [],
                                                caseInsensitive=False,
@@ -1129,7 +1118,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                site=self.site),
                          'AyB')
 
-    def test_replace_with_marker(self):
+    def test_replace_with_marker(self) -> None:
         """Test replacing with a marker."""
         self.assertEqual(textlib.replaceExcept('AxyxB', 'x', 'y', [],
                                                marker='.',
@@ -1140,7 +1129,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                site=self.site),
                          'AxyxB.')
 
-    def test_overlapping_replace(self):
+    def test_overlapping_replace(self) -> None:
         """Test replacing with and without overlap."""
         self.assertEqual(textlib.replaceExcept('1111', '11', '21', [],
                                                allowoverlap=False,
@@ -1156,7 +1145,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                site=self.site),
                          ' \n= 1 =\n\n= 1 =\n')
 
-    def test_replace_exception(self):
+    def test_replace_exception(self) -> None:
         """Test replacing not inside a specific regex."""
         self.assertEqual(textlib.replaceExcept('123x123', '123', '000', [],
                                                site=self.site),
@@ -1171,7 +1160,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 site=self.site),
             'verylongreplacement\n= 1 =\n')
 
-    def test_replace_tags(self):
+    def test_replace_tags(self) -> None:
         """Test replacing not inside various tags."""
         self.assertEqual(textlib.replaceExcept('A <!-- x --> B', 'x', 'y',
                                                ['comment'], site=self.site),
@@ -1259,7 +1248,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 '<ab> content </a>', 'content', 'text', ['a'], site=self.site),
             '<ab> text </a>')
 
-    def test_replace_with_count(self):
+    def test_replace_with_count(self) -> None:
         """Test replacing with count argument."""
         self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
                                                site=self.site),
@@ -1274,7 +1263,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
             'x [[x]] x x', 'x', 'y', ['link'], site=self.site, count=2),
             'y [[x]] y x')
 
-    def test_replace_tag_category(self):
+    def test_replace_tag_category(self) -> None:
         """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:
             self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
@@ -1282,7 +1271,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                    site=self.site),
                              f'[[{ns_name}:x]]')
 
-    def test_replace_tag_file(self):
+    def test_replace_tag_file(self) -> None:
         """Test replacing not inside file links."""
         for ns_name in self.site.namespaces[6]:
             self.assertEqual(textlib.replaceExcept(f'[[{ns_name}:x]]',
@@ -1364,7 +1353,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[bar] [[foo]] .x]][[y]]')
 
-    def test_replace_tag_file_invalid(self):
+    def test_replace_tag_file_invalid(self) -> None:
         """Test replacing not inside file links with invalid titles."""
         # Correctly handle [ and ] inside wikilinks inside file link
         # even though these are an invalid title.
@@ -1380,8 +1369,8 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-    @unittest.expectedFailure
-    def test_replace_tag_file_failure(self):
+    @unittest.expectedFailure  # T396721
+    def test_replace_tag_file_failure(self) -> None:
         """Test showing limits of the file link regex."""
         # When the double brackets are unbalanced, the regex
         # does not correctly detect the end of the file link.
@@ -1391,7 +1380,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid] ]].x]][[y]]')
 
-    def test_replace_tags_interwiki(self):
+    def test_replace_tags_interwiki(self) -> None:
         """Test replacing not inside interwiki links."""
         if ('es' not in self.site.family.langs
                 or 'ey' in self.site.family.langs):
@@ -1405,7 +1394,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                ['interwiki'], site=self.site),
                          '[[ey:y]]')  # "ex" is not a valid interwiki code
 
-    def test_replace_template(self):
+    def test_replace_template(self) -> None:
         """Test replacing not inside templates."""
         template_sample = (r'a {{templatename '
                            r'    | accessdate={{Fecha|1993}} '
@@ -1434,7 +1423,7 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                ['template'], site=self.site),
                          'X' + template_sample[1:])
 
-    def test_replace_source_reference(self):
+    def test_replace_source_reference(self) -> None:
         """Test replacing in text which contains back references."""
         # Don't use a valid reference number in the original string,
         # in case it tries to apply that as a reference.
@@ -1451,19 +1440,19 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
     """Test MultiTemplateMatchBuilder."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Cache namespace 10 (Template) case sensitivity."""
         super().setUpClass()
         cls._template_not_case_sensitive = (
             cls.get_site().namespaces.TEMPLATE.case != 'case-sensitive')
 
-    def test_no_match(self):
+    def test_no_match(self) -> None:
         """Test text without any desired templates."""
         string = 'The quick brown fox'
         builder = MultiTemplateMatchBuilder(self.site)
         self.assertIsNone(re.search(builder.pattern('quick'), string))
 
-    def test_match(self):
+    def test_match(self) -> None:
         """Test text with one match."""
         tests = (
             'The {{quick}} brown fox',  # without parameters
@@ -1479,7 +1468,7 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
                     bool(re.search(builder.pattern('Quick'), string)),
                     self._template_not_case_sensitive)
 
-    def test_match_template_prefix(self):
+    def test_match_template_prefix(self) -> None:
         """Test pages with {{template:..}}."""
         string = 'The {{%s:%s}} brown fox'
         template = 'template'
@@ -1521,12 +1510,12 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
                     '[[baden:Site]] [[fr:{{PAGENAME}}]]')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Define set of valid targets for the example text."""
         super().setUpClass()
         cls.sites_set = {cls.enwp, cls.dewp}
 
-    def test_getLanguageLinks(self, key):
+    def test_getLanguageLinks(self, key) -> None:
         """Test if the function returns the correct titles and sites."""
         with mock.patch('pywikibot.info') as m:
             lang_links = textlib.getLanguageLinks(self.example_text,
@@ -1544,7 +1533,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
     """Test the extract_sections function."""
 
     def _extract_sections_tests(self, result, header, sections, footer='',
-                                title=''):
+                                title='') -> None:
         """Test extract_sections function."""
         self.assertIsInstance(result, tuple)
         self.assertIsInstance(result.sections, list)
@@ -1559,19 +1548,19 @@ class TestExtractSections(DefaultDrySiteTestCase):
             self.assertIsInstance(section.level, int)
             self.assertEqual(section.title.count('=') // 2, section.level)
 
-    def test_no_sections_no_footer(self):
+    def test_no_sections_no_footer(self) -> None:
         """Test for text having no sections or footer."""
         text = 'text'
         result = extract_sections(text, self.site)
         self._extract_sections_tests(result, text, [], '')
 
-    def test_no_sections_with_footer(self):
+    def test_no_sections_with_footer(self) -> None:
         """Test for text having footer but no section."""
         text = 'text\n\n[[Category:A]]'
         result = extract_sections(text, self.site)
         self._extract_sections_tests(result, 'text\n\n', [], '[[Category:A]]')
 
-    def test_with_section_no_footer(self):
+    def test_with_section_no_footer(self) -> None:
         """Test for text having sections but no footer."""
         text = ('text\n\n'
                 '==title==\n'
@@ -1580,7 +1569,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
         self._extract_sections_tests(
             result, 'text\n\n', [('==title==', '\ncontent')])
 
-    def test_with_section_with_footer(self):
+    def test_with_section_with_footer(self) -> None:
         """Test for text having sections and footer."""
         text = ('text\n\n'
                 '==title==\n'
@@ -1591,7 +1580,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             result,
             'text\n\n', [('==title==', '\ncontent\n')], '[[Category:A]]\n')
 
-    def test_with_h1_and_h2_sections(self):
+    def test_with_h1_and_h2_sections(self) -> None:
         """Test for text having h1 and h2 sections."""
         text = ('text\n\n'
                 '=first level=\n'
@@ -1605,7 +1594,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [('=first level=', '\nfoo\n'), ('==title==', '\nbar')]
         )
 
-    def test_with_h4_and_h2_sections(self):
+    def test_with_h4_and_h2_sections(self) -> None:
         """Test for text having h4 and h2 sections."""
         text = ('text\n\n'
                 '====title====\n'
@@ -1618,7 +1607,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [('====title====', '\n'), ('==title 2==', '\ncontent')],
         )
 
-    def test_with_comments(self):
+    def test_with_comments(self) -> None:
         """Test section headers surrounded by comments."""
         text = ('text\n\n'
                 '<!--\n multiline comment\n-->== title ==\n'
@@ -1636,12 +1625,12 @@ class TestExtractSections(DefaultDrySiteTestCase):
              ('== title 2 ==', ' <!-- trailing comment -->\ncontent 2')]
         )
 
-    def test_long_comment(self):
+    def test_long_comment(self) -> None:
         r"""Test for text having a long expanse of white space.
 
         This is to catch certain regex issues caused by patterns like
-        r'(\s+)*$' (as found in older versions of extract_section).
-        They may not halt.
+        r'(\s+)*$' (as found in older versions of extract_section). They
+        may not halt.
 
         c.f.
         https://www.regular-expressions.info/catastrophic.html
@@ -1650,7 +1639,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
         result = extract_sections(text, self.site)
         self._extract_sections_tests(result, text, [], '')
 
-    def test_empty_header(self):
+    def test_empty_header(self) -> None:
         """Test empty section headers."""
         text = ('text\n\n'
                 '== ==\n'
@@ -1663,7 +1652,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [('== ==', '\n'), ('=====', '\n'), ('=== ===', '\n')]
         )
 
-    def test_unbalanced_headers(self):
+    def test_unbalanced_headers(self) -> None:
         """Test unbalanced section headers."""
         text = ('text\n\n'
                 '====title===\n'
@@ -1676,7 +1665,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [('====title===', '\n'), ('==title 2===', '\ncontent')],
         )
 
-    def test_title(self):
+    def test_title(self) -> None:
         """Test title."""
         text = "Test ''' Pywikibot ''' title."
         result = extract_sections(text, self.site)

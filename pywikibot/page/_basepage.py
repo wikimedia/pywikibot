@@ -12,7 +12,7 @@ from collections import Counter
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, NoReturn
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
@@ -168,8 +168,8 @@ class BasePage(ComparableMixin):
     def content_model(self):
         """Return the content model for this page.
 
-        If it cannot be reliably determined via the API,
-        None is returned.
+        If it cannot be reliably determined via the API, None is
+        returned.
         """
         if not hasattr(self, '_contentmodel'):
             self.site.loadpageinfo(self)
@@ -180,8 +180,8 @@ class BasePage(ComparableMixin):
     def depth(self) -> int:
         """Return the depth/subpage level of the page.
 
-        Check if the namespace allows subpages.
-        Not allowed subpages means depth is always 0.
+        Check if the namespace allows subpages. Not allowed subpages
+        means depth is always 0.
         """
         return self.title().count('/') if self.namespace().subpages else 0
 
@@ -306,8 +306,9 @@ class BasePage(ComparableMixin):
     def _cmpkey(self):
         """Key for comparison of Page objects.
 
-        Page objects are "equal" if and only if they are on the same site
-        and have the same normalized title, including section if any.
+        Page objects are "equal" if and only if they are on the same
+        site and have the same normalized title, including section if
+        any.
 
         Page objects are sortable by site, namespace then title.
         """
@@ -316,8 +317,8 @@ class BasePage(ComparableMixin):
     def __hash__(self):
         """A stable identifier to be used as a key in hash-tables.
 
-        This relies on the fact that the string
-        representation of an instance cannot change after the construction.
+        This relies on the fact that the string representation of an
+        instance cannot change after the construction.
         """
         return hash(self._cmpkey())
 
@@ -331,8 +332,8 @@ class BasePage(ComparableMixin):
         """Return :py:obj:`date.getAutoFormat` dictName and value, if any.
 
         Value can be a year, date, etc., and dictName is 'YearBC',
-        'Year_December', or another dictionary name. Please note that two
-        entries may have exactly the same autoFormat, but be in two
+        'Year_December', or another dictionary name. Please note that
+        two entries may have exactly the same autoFormat, but be in two
         different namespaces, as some sites have categories with the
         same names. Regular titles return (None, None).
         """
@@ -413,7 +414,7 @@ class BasePage(ComparableMixin):
             return self._revisions[self._revid]
         return None
 
-    def _getInternals(self):
+    def _getInternals(self) -> None:
         """Helper function for get().
 
         Stores latest revision in self if it doesn't contain it, doesn't think.
@@ -765,12 +766,13 @@ class BasePage(ComparableMixin):
     def lastNonBotUser(self) -> str | None:
         """Return name or IP address of last human/non-bot user to edit page.
 
-        Determine the most recent human editor out of the last revisions.
-        If it was not able to retrieve a human user, returns None.
+        Determine the most recent human editor out of the last
+        revisions. If it was not able to retrieve a human user, returns
+        None.
 
-        If the edit was done by a bot which is no longer flagged as 'bot',
-        i.e. which is not returned by Site.botusers(), it will be returned
-        as a non-bot edit.
+        If the edit was done by a bot which is no longer flagged as
+        'bot', i.e. which is not returned by Site.botusers(), it will be
+        returned as a non-bot edit.
         """
         for entry in self.revisions():
             if entry.user and (not self.site.isBot(entry.user)):
@@ -791,8 +793,8 @@ class BasePage(ComparableMixin):
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 
-        If the title includes a section, return False if this section isn't
-        found.
+        If the title includes a section, return False if this section
+        isn't found.
         """
         with suppress(AttributeError):
             return self.pageid > 0
@@ -887,8 +889,8 @@ class BasePage(ComparableMixin):
         """Return other member of the article-talk page pair for this Page.
 
         If self is a talk page, returns the associated content page;
-        otherwise, returns the associated talk page. The returned page need
-        not actually exist on the wiki.
+        otherwise, returns the associated talk page. The returned page
+        need not actually exist on the wiki.
 
         :return: Page or None if self is a special page.
         """
@@ -1023,14 +1025,14 @@ class BasePage(ComparableMixin):
                   content: bool = False) -> Iterable[pywikibot.Page]:
         """Return an iterator for pages that link to this page.
 
-        :param follow_redirects: if True, also iterate pages that link to a
-            redirect pointing to the page.
-        :param filter_redirects: if True, only iterate redirects; if False,
-            omit redirects; if None, do not filter
+        :param follow_redirects: if True, also iterate pages that link
+            to a redirect pointing to the page.
+        :param filter_redirects: if True, only iterate redirects; if
+            False, omit redirects; if None, do not filter
         :param namespaces: only iterate pages in these namespaces
         :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each referring page (default False)
+        :param content: if True, retrieve the content of the current
+            version of each referring page (default False)
         """
         return self.site.pagebacklinks(
             self,
@@ -1048,12 +1050,12 @@ class BasePage(ComparableMixin):
                    content: bool = False) -> Iterable[pywikibot.Page]:
         """Return an iterator for pages that embed this page as a template.
 
-        :param filter_redirects: if True, only iterate redirects; if False,
-            omit redirects; if None, do not filter
+        :param filter_redirects: if True, only iterate redirects; if
+            False, omit redirects; if None, do not filter
         :param namespaces: only iterate pages in these namespaces
         :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each embedding page (default False)
+        :param content: if True, retrieve the content of the current
+            version of each embedding page (default False)
         """
         return self.site.page_embeddedin(
             self,
@@ -1155,16 +1157,17 @@ class BasePage(ComparableMixin):
     def botMayEdit(self) -> bool:
         """Determine whether the active bot is allowed to edit the page.
 
-        This will be True if the page doesn't contain {{bots}} or {{nobots}}
-        or any other template from edit_restricted_templates list
-        in x_family.py file, or it contains them and the active bot is allowed
-        to edit this page. (This method is only useful on those sites that
-        recognize the bot-exclusion protocol; on other sites, it will always
-        return True.)
+        This will be True if the page doesn't contain {{bots}} or
+        {{nobots}} or any other template from edit_restricted_templates
+        list in x_family.py file, or it contains them and the active bot
+        is allowed to edit this page. (This method is only useful on
+        those sites that recognize the bot-exclusion protocol; on other
+        sites, it will always return True.)
 
-        The framework enforces this restriction by default. It is possible
-        to override this by setting ignore_bot_templates=True in
-        user cnfig file (user-config.py), or using page.put(force=True).
+        The framework enforces this restriction by default. It is
+        possible to override this by setting ignore_bot_templates=True
+        in user cnfig file (user-config.py), or using
+        page.put(force=True).
         """
         if not hasattr(self, '_bot_may_edit'):
             self._bot_may_edit = self._check_bot_may_edit()
@@ -1282,7 +1285,7 @@ class BasePage(ComparableMixin):
              callback=None,
              apply_cosmetic_changes: bool | None = None,
              quiet: bool = False,
-             **kwargs):
+             **kwargs) -> None:
         """Save the current contents of page's text to the wiki.
 
         .. versionchanged:: 7.0
@@ -1356,7 +1359,11 @@ class BasePage(ComparableMixin):
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
     @allow_asynchronous
-    def _save(self, summary=None, cc=None, quiet: bool = False, **kwargs):
+    def _save(self,
+              summary=None,
+              cc=None,
+              quiet: bool = False,
+              **kwargs) -> None:
         """Helper function for save()."""
         link = self.title(as_link=True)
         if cc or (cc is None and config.cosmetic_changes):
@@ -1378,8 +1385,8 @@ class BasePage(ComparableMixin):
         """The cosmetic changes hook.
 
         :param summary: The current edit summary.
-        :return: Modified edit summary if cosmetic changes has been done,
-            else the old edit summary.
+        :return: Modified edit summary if cosmetic changes has been
+            done, else the old edit summary.
         """
         if self.isTalkPage() or self.content_model != 'wikitext' or \
            pywikibot.calledModuleName() in config.cosmetic_changes_deny_script:
@@ -1471,21 +1478,22 @@ class BasePage(ComparableMixin):
 
         :keyword redirects: Automatically resolve redirects.
         :type redirects: bool
-        :keyword converttitles: Convert titles to other variants if necessary.
-            Only works if the wiki's content language supports variant
-            conversion.
+        :keyword converttitles: Convert titles to other variants if
+            necessary. Only works if the wiki's content language
+            supports variant conversion.
         :type converttitles: bool
         :keyword forcelinkupdate: Update the links tables.
         :type forcelinkupdate: bool
-        :keyword forcerecursivelinkupdate: Update the links table, and update
-            the links tables for any page that uses this page as a template.
+        :keyword forcerecursivelinkupdate: Update the links table, and
+            update the links tables for any page that uses this page as
+            a template.
         :type forcerecursivelinkupdate: bool
         """
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
 
     @deprecated_args(botflag='bot')  # since 9.3.0
-    def touch(self, callback=None, bot: bool = False, **kwargs):
+    def touch(self, callback=None, bot: bool = False, **kwargs) -> None:
         """Make a touch edit for this page.
 
         See Meth:`save` method docs for all parameters. The following
@@ -1555,9 +1563,9 @@ class BasePage(ComparableMixin):
     ) -> Generator[pywikibot.page.Link, None, None]:
         """Yield interwiki links in the page text, excluding language links.
 
-        :param expand: if True (default), include interwiki links found in
-            templates transcluded onto this page; if False, only iterate
-            interwiki links found in this page's own wikitext
+        :param expand: if True (default), include interwiki links found
+            in templates transcluded onto this page; if False, only
+            iterate interwiki links found in this page's own wikitext
         :return: a generator that yields Link objects
         """
         # This function does not exist in the API, so it has to be
@@ -1586,8 +1594,8 @@ class BasePage(ComparableMixin):
     ) -> list[pywikibot.Link]:
         """Return a list of all inter-language Links on this page.
 
-        :param include_obsolete: if true, return even Link objects whose site
-                                 is obsolete
+        :param include_obsolete: if true, return even Link objects whose
+            site is obsolete
         :return: list of Link objects.
         """
         # Note: We preload a list of *all* langlinks, including links to
@@ -1609,8 +1617,8 @@ class BasePage(ComparableMixin):
         """Iterate all inter-language links on this page.
 
         :param total: iterate no more than this number of pages in total
-        :param include_obsolete: if true, yield even Link object whose site
-                                 is obsolete
+        :param include_obsolete: if true, yield even Link object whose
+            site is obsolete
         :return: a generator that yields Link objects.
         """
         if hasattr(self, '_langlinks'):
@@ -1717,8 +1725,8 @@ class BasePage(ComparableMixin):
         """Iterate FilePage objects for images displayed on this Page.
 
         :param total: iterate no more than this number of pages in total
-        :param content: if True, retrieve the content of the current version
-            of each image description page (default False)
+        :param content: if True, retrieve the content of the current
+            version of each image description page (default False)
         :return: a generator that yields FilePage objects.
         """
         return self.site.pageimages(self, total=total, content=content)
@@ -1773,7 +1781,8 @@ class BasePage(ComparableMixin):
 
         Uses the MediaWiki extension GeoData.
 
-        :param primary_only: Only return the coordinate indicated to be primary
+        :param primary_only: Only return the coordinate indicated to be
+            primary
         :return: A list of Coordinate objects or a single Coordinate if
             primary_only is True
         :rtype: list of Coordinate or Coordinate or None
@@ -1907,8 +1916,8 @@ class BasePage(ComparableMixin):
         """Determine number of edits from contributors.
 
         :param contributors: contributor usernames
-        :type contributors: iterable of str or pywikibot.User,
-            a single pywikibot.User, a str or None
+        :type contributors: iterable of str or pywikibot.User, a single
+            pywikibot.User, a str or None
         :return: number of edits for all provided usernames
         """
         cnt = self.contributors()
@@ -2079,16 +2088,42 @@ class BasePage(ComparableMixin):
         timestamp,
         content: bool = False,
         **kwargs
-    ) -> list:
+    ) -> dict[str, Any] | list[NoReturn]:
         """Return a particular deleted revision by timestamp.
+
+        Gives a dictionary with `revid`, `parentid`, `user`, `timestamp`,
+        and `comment` as keys like this:
+
+        .. code:: Python
+
+           {'revid': 658621, 'parentid': 0, 'user': 'Pywikibot-test',
+           'timestamp': '2025-05-24T11:01:25Z',
+           'comment': 'Pywikibot unit test'}
+
+        If *content* is True, a `slots` key is added which holds
+        additional information of the content like:
+
+        .. code:: Python
+
+           'slots': {
+               'main': {
+                   'contentmodel': 'wikitext',
+                   'contentformat': 'text/x-wiki',
+                   '*': 'Pywikibot deletion test.'
+                }
+           }
+
+        .. caution::
+           If *timestamp* is not found, an empty **list** is given.
 
         .. seealso:: :meth:`APISite.deletedrevs()
            <pywikibot.site._generators.GeneratorsMixin.deletedrevs>`
 
-        :return: a list of [date, editor, comment, text, restoration
-            marker]. text will be None, unless content is True (or has
-            been retrieved earlier). If timestamp is not found, returns
-            empty list.
+        :param timestamp: Timestamp of the deleted revision
+        :param content: If True, give also the content of the deleted
+            revision.
+        :return: a dictionary information about the deleted revision. If
+            timestamp is not found, an empty list is given.
         """
         if hasattr(self, '_deletedRevs') \
            and timestamp in self._deletedRevs \
@@ -2102,7 +2137,7 @@ class BasePage(ComparableMixin):
                 return item['revisions'][0]
         return []
 
-    def markDeletedRevision(self, timestamp, undelete: bool = True):
+    def markDeletedRevision(self, timestamp, undelete: bool = True) -> None:
         """Mark the revision identified by timestamp for undeletion.
 
         .. seealso::
@@ -2156,7 +2191,7 @@ class BasePage(ComparableMixin):
             undelete_revs = []
         if reason is None:
             warn('Not passing a reason for undelete() is deprecated.',
-                 DeprecationWarning)
+                 DeprecationWarning, stacklevel=2)
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
             reason = pywikibot.input(
                 'Please enter a reason for the undeletion:')

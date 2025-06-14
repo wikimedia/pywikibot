@@ -28,7 +28,7 @@ class ExportDotThreeTestCase(TestCase):
 
     net = False
 
-    def test_XmlDumpAllRevs(self):
+    def test_XmlDumpAllRevs(self) -> None:
         """Test loading all revisions."""
         pages = get_entries('article-pear.xml', revisions='all')
         self.assertLength(pages, 4)
@@ -41,7 +41,7 @@ class ExportDotThreeTestCase(TestCase):
         self.assertEqual('Quercusrobur', pages[1].username)
         self.assertEqual('Pear', pages[0].title)
 
-    def test_XmlDumpFoundRev(self):
+    def test_XmlDumpFoundRev(self) -> None:
         """Test loading the first, earliest and latest revision."""
         tests = {
             'first_found': ('Automated conversion', '185185'),
@@ -62,7 +62,7 @@ class ExportDotThreeTestCase(TestCase):
                 self.assertTrue(page.text.startswith('Pears are [[tree]]s of'))
                 self.assertTrue(not page.isredirect)
 
-    def test_XmlDumpRedirect(self):
+    def test_XmlDumpRedirect(self) -> None:
         """Test XmlDump correctly parsing whether a page is a redirect."""
         get_entries('article-pyrus.xml', revisions='all')
         pages = list(xmlreader.XmlDump(
@@ -78,7 +78,7 @@ class ExportDotThreeTestCase(TestCase):
             self.assertEqual(previous, result)
         return result
 
-    def _compare_variants(self, revisions):
+    def _compare_variants(self, revisions) -> None:
         """Compare the different XML file variants."""
         previous = None
         previous = self._compare(previous, '.xml', revisions)
@@ -86,11 +86,11 @@ class ExportDotThreeTestCase(TestCase):
         previous = self._compare(previous, '.xml.bz2', revisions)
         self._compare(previous, '-utf16.xml.bz2', revisions)
 
-    def test_XmlDump_compare_all(self):
+    def test_XmlDump_compare_all(self) -> None:
         """Compare the different XML files using all revisions."""
         self._compare_variants('all')
 
-    def test_XmlDump_compare_single(self):
+    def test_XmlDump_compare_single(self) -> None:
         """Compare the different XML files using only a single revision."""
         self._compare_variants('latest')
 
@@ -101,7 +101,7 @@ class ExportDotTenTestCase(TestCase):
 
     net = False
 
-    def test_pair(self):
+    def test_pair(self) -> None:
         """Test reading the main page/user talk page pair file."""
         entries = get_entries('pair-0.10.xml', revisions='all')
         self.assertLength(entries, 4)
@@ -127,7 +127,7 @@ class ExportDotTenTestCase(TestCase):
         self.assertEqual(talks[1].text, '{{DisambigProject}}')
         self.assertEqual(talks[1].comment, 'proj')
 
-    def test_edit_summary_decoding(self):
+    def test_edit_summary_decoding(self) -> None:
         """Test edit summaries are decoded."""
         entries = get_entries('pair-0.10.xml', revisions='all')
         articles = [entry for entry in entries if entry.ns == '0']

@@ -182,8 +182,8 @@ def info(msg: Any = '', *args: Any, **kwargs: Any) -> None:
 
 
 output = info
-"""Synonym for :func:`info` for backward compatibility. The arguments
-are interpreted as for :func:`logoutput`.
+"""Synonym for :func:`info` for backward compatibility. The arguments are
+interpreted as for :func:`logoutput`.
 
 .. versionchanged:: 7.2
    was renamed to :func:`info`; `text` was renamed to `msg`; `msg`

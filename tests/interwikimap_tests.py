@@ -63,7 +63,7 @@ class TestInterwikiMap(TestCase):
         },
     }
 
-    def test_interwikimap(self, key):
+    def test_interwikimap(self, key) -> None:
         """Test interwiki map."""
         site = self.get_site(key)
         iw_map = site._interwikimap
@@ -73,7 +73,7 @@ class TestInterwikiMap(TestCase):
         iw_map.reset()
         self.assertIsNone(iw_map._map)
 
-    def test_iw_entry(self):
+    def test_iw_entry(self) -> None:
         """Test interwiki map entry."""
         site = self.get_site('dews')
         iw_map = site._interwikimap
@@ -92,7 +92,7 @@ class TestInterwikiMap(TestCase):
                     entry.url.startswith(('http', 'irc://')),
                     entry.url + ' does not start with "http" or "irc://')
 
-    def test_interwiki(self, key):
+    def test_interwiki(self, key) -> None:
         """Test site.interwiki method."""
         site = self.get_site(key)
         prefix = self.sites[key]['family']
@@ -111,12 +111,12 @@ class TestInterwikiMapPrefix(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Setup tests."""
         super().setUp()
         self.iw_map = self.site._interwikimap
 
-    def test_items(self):
+    def test_items(self) -> None:
         """Test interwikimap items."""
         prefixes = {
             'commons': 'commons',
@@ -147,7 +147,7 @@ class TestInterwikiMapPrefix(TestCase):
                 self.assertEqual(item._site, pywikibot.Site(prefix, family))
                 self.assertTrue(item.local)
 
-    def test_invalid_prefix(self):
+    def test_invalid_prefix(self) -> None:
         """Test wrong interwiki prefix."""
         for prefix in ('foo', 'mediawiki', 'test'):
             with self.subTest(prefix=prefix), self.assertRaises(KeyError):

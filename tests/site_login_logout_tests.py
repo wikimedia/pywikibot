@@ -27,7 +27,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 
     login = True
 
-    def test_login_logout(self):
+    def test_login_logout(self) -> None:
         """Validate login and logout methods by toggling the state."""
         site = self.get_site()
         loginstatus = pywikibot.login.LoginStatus
@@ -66,7 +66,7 @@ class TestClearCookies(TestCase):
     family = 'wikisource'
     code = 'zh'
 
-    def test_clear_cookies(self):
+    def test_clear_cookies(self) -> None:
         """Test cookies are cleared (:phab:`T224712`)."""
         site = self.get_site()
         site.login()
@@ -82,7 +82,7 @@ class TestClearCookies(TestCase):
         self.assertFalse(raised)
 
 
-def setUpModule():
+def setUpModule() -> None:
     """Skip tests if PYWIKIBOT_TEST_LOGOUT variable is not set."""
     if os.environ.get('PYWIKIBOT_TEST_LOGOUT', '0') != '1':
         raise unittest.SkipTest('login/logout tests are disabled')

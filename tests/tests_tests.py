@@ -23,7 +23,7 @@ class HttpServerProblemTestCase(TestCase):
         }
     }
 
-    def test_502(self):
+    def test_502(self) -> None:
         """Test that framework is skipping this test due to HTTP status 502."""
         self.fail("The test framework should skip this test but it hasn't.")
 
@@ -42,36 +42,36 @@ class TestLengthAssertion(TestCase):
     seq1 = ('foo', 'bar', 'baz')
     seq2 = 'foo'
 
-    def test_assert_is_empty(self):
+    def test_assert_is_empty(self) -> None:
         """Test assertIsEmpty method."""
         self.assertIsEmpty([])
         self.assertIsEmpty('')
 
     @unittest.expectedFailure
-    def test_assert_is_empty_fail(self):
+    def test_assert_is_empty_fail(self) -> None:
         """Test assertIsEmpty method failing."""
         self.assertIsEmpty(self.seq1)
         self.assertIsEmpty(self.seq2)
 
-    def test_assert_is_not_empty(self):
+    def test_assert_is_not_empty(self) -> None:
         """Test assertIsNotEmpty method."""
         self.assertIsNotEmpty(self.seq1)
         self.assertIsNotEmpty(self.seq2)
 
     @unittest.expectedFailure
-    def test_assert_is_not_empty_fail(self):
+    def test_assert_is_not_empty_fail(self) -> None:
         """Test that assertIsNotEmpty method may fail."""
         self.assertIsNotEmpty([])
         self.assertIsNotEmpty('')
 
-    def test_assert_length(self):
+    def test_assert_length(self) -> None:
         """Test assertLength method."""
         self.assertLength([], 0)
         self.assertLength(self.seq1, 3)
         self.assertLength(self.seq1, self.seq2)
 
     @unittest.expectedFailure
-    def test_assert_length_fail(self):
+    def test_assert_length_fail(self) -> None:
         """Test that assertLength method is failing."""
         self.assertLength([], 1)
         self.assertLength(self.seq1, 0)
@@ -85,10 +85,10 @@ class TestRequireVersionDry(DefaultSiteTestCase):
     dry = True
 
     @require_version('')
-    def method(self):
+    def method(self) -> None:
         """Test method for decorator."""
 
-    def test_require_version(self):
+    def test_require_version(self) -> None:
         """Test require_version for DrySite."""
         with self.assertRaisesRegex(
             TypeError,
@@ -101,24 +101,24 @@ class TestRequireVersion(DefaultSiteTestCase):
     """Test require_version decorator."""
 
     @require_version('')
-    def method_with_params(self, key):
+    def method_with_params(self, key) -> None:
         """Test method for decorated methods with unsupported arguments."""
 
-    def method_failing(self):
+    def method_failing(self) -> None:
         """Test method for decorator with invalid parameter."""
         self.assertTrue(False, 'should never happen')
 
     @require_version('>=1.31')
-    def method_succeed(self):
+    def method_succeed(self) -> None:
         """Test that decorator passes."""
         self.assertTrue(False, 'intentional fail for method_succeed test')
 
     @require_version('<1.31')
-    def method_fail(self):
+    def method_fail(self) -> None:
         """Test that decorator skips."""
         self.assertTrue(False, 'intentional fail for test')
 
-    def test_unsupported_methods(self):
+    def test_unsupported_methods(self) -> None:
         """Test require_version with unsupported methods."""
         with self.assertRaisesRegex(
                 TypeError, "Test method 'method_with_params' has parameters"):
@@ -130,7 +130,7 @@ class TestRequireVersion(DefaultSiteTestCase):
                                     'There is no valid operator given '):
             self.method_with_params()
 
-    def test_version_needed(self):
+    def test_version_needed(self) -> None:
         """Test for invalid decorator parameters."""
         with self.assertRaisesRegex(ValueError,
                                     'There is no valid operator given '):
@@ -149,7 +149,7 @@ class TestRequireVersion(DefaultSiteTestCase):
             require_version('<1.31',
                             'run this test')(self.method_failing)(self)
 
-    def test_decorator(self):
+    def test_decorator(self) -> None:
         """Test that decorator passes or skips."""
         with self.assertRaisesRegex(
             AssertionError,
@@ -167,23 +167,23 @@ class UtilsTests(TestCase):
     net = False
     pattern = 'Hello World'
 
-    def test_fixed_generator(self):
+    def test_fixed_generator(self) -> None:
         """Test utils.fixed_generator."""
         gen = utils.fixed_generator(self.pattern)
         self.assertEqual(list(gen(1, 'foo', bar='baz')), list(self.pattern))
 
-    def test_entered_loop(self):
+    def test_entered_loop(self) -> None:
         """Test utils.entered_loop."""
         self.assertTrue(utils.entered_loop(self.pattern))
         self.assertFalse(utils.entered_loop(''))
 
     @utils.expected_failure_if(True)
-    def test_expected_failure_true(self):
+    def test_expected_failure_true(self) -> None:
         """Test expected_failure_if decorator if condition is True."""
         self.assertTrue(False)
 
     @utils.expected_failure_if(False)
-    def test_expected_failure_false(self):
+    def test_expected_failure_false(self) -> None:
         """Test expected_failure_if decorator if condition is False."""
         self.assertTrue(True)
 

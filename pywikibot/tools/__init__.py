@@ -1,18 +1,15 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import abc
-import bz2
-import gzip
 import hashlib
 import importlib.metadata
 import ipaddress
-import lzma
 import os
 import re
 import stat
@@ -42,6 +39,14 @@ from pywikibot.tools._deprecate import (
     remove_last_args,
 )
 from pywikibot.tools._unidata import _first_upper_exception
+
+
+try:  # Python 3.14+
+    from compression import bz2, gzip, lzma
+except ModuleNotFoundError:
+    import bz2
+    import gzip
+    import lzma
 
 
 __all__ = (
@@ -87,6 +92,7 @@ def is_ip_address(value: str) -> bool:
 
     .. versionadded:: 6.1
        Was renamed from ``is_IP()``.
+    .. seealso:: :func:`is_ip_network`
 
     :param value: value to check
     """
@@ -101,6 +107,7 @@ def is_ip_network(value: str) -> bool:
     """Check if a value is a valid range of IPv4 or IPv6 addresses.
 
     .. versionadded:: 9.0
+    .. seealso:: :func:`is_ip_address`
 
     :param value: value to check
     """
@@ -131,7 +138,7 @@ def has_module(module: str, version: str | None = None) -> bool:
 
         if module_version < required_version:
             warn(f'Module version {module_version} is lower than requested '
-                 f'version {required_version}', ImportWarning)
+                 f'version {required_version}', ImportWarning, stacklevel=2)
             return False
 
     return True
@@ -500,7 +507,6 @@ class MediaWikiVersion:
         """Return version number representation, mainly used by tests.
 
         .. versionadded:: 10.0
-
         """
         return f"'{self}'"
 
@@ -652,11 +658,11 @@ def merge_unique_dicts(*args, **kwargs):
 
 
 def file_mode_checker(
-    filename: str,
+    filename: str | bytes | os.PathLike,
     mode: int = 0o600,
     quiet: bool = False,
     create: bool = False
-):
+) -> None:
     """Check file mode and update it, if needed.
 
     .. versionadded:: 3.0
@@ -680,7 +686,8 @@ def file_mode_checker(
         os.chmod(filename, mode)
         # re-read and check changes
         if os.stat(filename).st_mode != st_mode and not quiet:
-            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
+            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode),
+                 stacklevel=2)
 
 
 def compute_file_hash(filename: str | os.PathLike,

@@ -1,20 +1,18 @@
 Current Release Changes
 =======================
 
-* Use WikiHistory instead of XTools to implement :meth:`Page.authorship()
-  <page._toolforge.WikiBlameMixin.authorship>` (:phab:`T392345`)
-* Correct :class:`comms.eventstreams.EventStreams` kwarg name
-  from *last_event_id* to *latest_event_id* (:phab:`T394570`)
-* Retieve charset from accept-charset header entry in :func:`comms.http._decide_encoding` (:phab:`T392345`)
-* Skip :meth:`CosmeticChangesToolkit.removeEmptySections()
-  <cosmetic_changes.CosmeticChangesToolkit.removeEmptySections>` if section length is too less  (:phab:`T391776`)
-* Add support for nupwiki (:phab:`T390713`)
-* i18n updates
-* No longer follow redirects in :func:`bot.open_webbrowser` (:phab:`T390447`)
-* Update closed and removed wikis (:phab:`T390732`)
-* *page* parameter was added to :meth:`site.recentchanges()
-  <pywikibot.site._generators.GeneratorsMixin.recentchanges>`
-* googlesearch-python package is required for :class:`pagegenerators.GoogleSearchPageGenerator`
+* Use Lock object in :class:`comms.http.PywikibotCookieJar` for thread-safe saving (:phab:`T396309`)
+* Raise TypeError instead of ValueError in :func:`i18n.translate` if *parameter* is not a mapping
+* Recognise wildcard in :mod:`config.usernames<config>` when running
+  :mod:`login<pywikibot.scripts.login>` script (:phab:`T110411`)
+* Search for http and https by default in :meth:`Site.exturlusage()
+  <.site._generators.GeneratorsMixin.exturlusage>` (:phab:`T396280`)
+* Add login methods overview to :mod:`login` module (:phab:`T396204`)
+* Enable EmailAuth with :class:`login.ClientLoginManager` (:phab:`T395703`)
+* Move :mod:`tools.threading.RLock<tools.threading>` to :mod:`backports` module (:phab:`T395182`)
+* Only show the description passed to :class:`specialbots.UploadRobot` if it is to be verified (:phab:`T394895`)
+* Add support for Python 3.15 (:phab:`T395177`)
+
 
 Current Deprecations
 ====================

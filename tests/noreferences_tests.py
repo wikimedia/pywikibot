@@ -19,7 +19,7 @@ class TestAddingReferences(TestCase):
     family = 'wikipedia'
     code = 'cs'
 
-    def test_add(self):
+    def test_add(self) -> None:
         """Test adding references section."""
         page = pywikibot.Page(self.site, 'foo')
         bot = NoReferencesBot()
@@ -30,7 +30,7 @@ class TestAddingReferences(TestCase):
                     '\n\n* [http://www.baz.org Baz]')
         self.assertEqual(new_text, expected)
 
-    def test_add_under_templates(self):
+    def test_add_under_templates(self) -> None:
         """Test adding references section under templates in section."""
         page = pywikibot.Page(self.site, 'foo')
         bot = NoReferencesBot()

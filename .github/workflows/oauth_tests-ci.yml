@@ -23,10 +23,10 @@ jobs:
       fail-fast: false
 
       matrix:
-        python-version: [ "pypy3.8", "pypy3.10", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14-dev" ]
+        python-version: [ pypy3.8, pypy3.10, "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", 3.14-dev, 3.15-dev ]
         family: [ wikipedia ]
         code: [ test ]
-        domain: [ "test.wikipedia.org" ]
+        domain: [ test.wikipedia.org ]
         include:
           - python-version: "3.8"
             family: wpbeta
@@ -52,7 +52,7 @@ jobs:
     # use deadsnakes/action for development releases
     - name: Set up development Python ${{ matrix.python-version }}
       uses: deadsnakes/action@v3.2.0
-      if: "endsWith(matrix.python-version, '-dev')"
+      if: endsWith(matrix.python-version, '-dev')
       with:
         python-version: ${{ matrix.python-version }}
 

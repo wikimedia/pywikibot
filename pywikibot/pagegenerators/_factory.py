@@ -94,12 +94,12 @@ class GeneratorFactory:
         """Initializer.
 
         :param site: Site for generator results
-        :param positional_arg_name: generator to use for positional args,
-            which do not begin with a hyphen
-        :param enabled_options: only enable options given by this Iterable.
-            This is priorized over disabled_options
-        :param disabled_options: disable these given options and let them
-            be handled by scripts options handler
+        :param positional_arg_name: generator to use for positional
+            args, which do not begin with a hyphen
+        :param enabled_options: only enable options given by this
+            Iterable. This is priorized over disabled_options
+        :param disabled_options: disable these given options and let
+            them be handled by scripts options handler
         """
         self.gens: list[Iterable[pywikibot.page.BasePage]] = []
         self._namespaces: list[str] | frozenset[Namespace] = []
@@ -162,11 +162,12 @@ class GeneratorFactory:
         """Generator site.
 
         The generator site should not be accessed until after the global
-        arguments have been handled, otherwise the default Site may be changed
-        by global arguments, which will cause this cached value to be stale.
+        arguments have been handled, otherwise the default Site may be
+        changed by global arguments, which will cause this cached value
+        to be stale.
 
-        :return: Site given to initializer, otherwise the default Site at the
-            time this property is first accessed.
+        :return: Site given to initializer, otherwise the default Site
+            at the time this property is first accessed.
         """
         if self._site is None:
             self._site = pywikibot.Site()
@@ -348,10 +349,10 @@ class GeneratorFactory:
         :param category: category name with start parameter
         :param recurse: if not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: recurse=1 will iterate articles in first-level
-            subcats, but no deeper.)
-        :param content: if True, retrieve the content of the current version
-            of each page (default False)
+            levels. (Example: recurse=1 will iterate articles in first-
+            level subcats, but no deeper.)
+        :param content: if True, retrieve the content of the current
+            version of each page (default False)
         """
         if gen_func is None:
             raise ValueError('getCategoryGen requires a gen_func argument')

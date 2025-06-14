@@ -40,7 +40,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -260,9 +260,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     @staticmethod
     def skipPage(page) -> bool:
         """Determine if the page should be skipped."""
-        try:
-            templates_to_ignore = ignoreTemplates[page.site.code]
-        except KeyError:
+        templates_to_ignore = i18n.translate(page.site.code, ignoreTemplates)
+        if not templates_to_ignore:
             return False
 
         for template in templates_to_ignore:
@@ -282,9 +281,9 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Add CommonsCat template to page.
 
-        Take a page. Go to all the interwiki page looking for a commonscat
-        template. When all the interwiki's links are checked and a proper
-        category is found add it to the page.
+        Take a page. Go to all the interwiki page looking for a
+        commonscat template. When all the interwiki's links are checked
+        and a proper category is found add it to the page.
         """
         page = self.current_page
         # Get the right templates for this page
@@ -413,8 +412,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def find_commons_category(self, page) -> str:
         """Find CommonsCat template on Wikibase repository.
 
-        Use Wikibase property to get the category if possible.
-        Otherwise check all langlinks to find it.
+        Use Wikibase property to get the category if possible. Otherwise
+        check all langlinks to find it.
 
         :return: name of a valid commons category
         """
@@ -462,9 +461,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
     def checkCommonscatLink(self, name: str = ''):
         """Return the name of a valid commons category.
 
-        If the page is a redirect this function tries to follow it.
-        If the page doesn't exists the function will return an empty string
-
+        If the page is a redirect this function tries to follow it. If
+        the page doesn't exists the function will return an empty string
         """
         if not name:  # target name is empty
             return ''

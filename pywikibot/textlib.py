@@ -640,15 +640,16 @@ def findmarker(text: str, startwith: str = '@@',
 def expandmarker(text: str, marker: str = '', separator: str = '') -> str:
     """Return a marker expanded whitespace and the separator.
 
-    It searches for the first occurrence of the marker and gets the combination
-    of the separator and whitespace directly before it.
+    It searches for the first occurrence of the marker and gets the
+    combination of the separator and whitespace directly before it.
 
     :param text: the text which will be searched.
     :param marker: the marker to be searched.
-    :param separator: the separator string allowed before the marker. If empty
-        it won't include whitespace too.
-    :return: the marker with the separator and whitespace from the text in
-        front of it. It'll be just the marker if the separator is empty.
+    :param separator: the separator string allowed before the marker. If
+        empty it won't include whitespace too.
+    :return: the marker with the separator and whitespace from the text
+        in front of it. It'll be just the marker if the separator is
+        empty.
     """
     # set to remove any number of separator occurrences plus arbitrary
     # whitespace before, after, and between them,
@@ -728,7 +729,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             return replace_list[1]
         return None
 
-    def check_classes(replacement):
+    def check_classes(replacement) -> None:
         """Normalize the replacement into a list."""
         if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
             raise ValueError('The replacement must be None, False, a'
@@ -1214,8 +1215,8 @@ def getLanguageLinks(
 def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     """Return text with all inter-language links removed.
 
-    If a link to an unknown language is encountered, a warning
-    is printed.
+    If a link to an unknown language is encountered, a warning is
+    printed.
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
@@ -1246,16 +1247,16 @@ def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
                                     separator: str = '') -> str:
     """Return text with inter-language links and preceding separators removed.
 
-    If a link to an unknown language is encountered, a warning
-    is printed.
+    If a link to an unknown language is encountered, a warning is
+    printed.
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
     :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last language
         link, or at the end of text if there are no language links.
-    :param separator: The separator string that will be removed
-        if followed by the language links.
+    :param separator: The separator string that will be removed if
+        followed by the language links.
     :return: The modified text
     """
     if separator:
@@ -1390,13 +1391,13 @@ def interwikiFormat(links: dict, insite=None) -> str:
     """Convert interwiki link dict into a wikitext string.
 
     :param links: interwiki links to be formatted
-    :type links: dict with the Site objects as keys, and Page
-        or Link objects as values.
+    :type links: dict with the Site objects as keys, and Page or Link
+        objects as values.
     :param insite: site the interwiki links will be formatted for
         (defaulting to the current site).
     :type insite: BaseSite
-    :return: string including wiki links formatted for inclusion
-        in insite
+    :return: string including wiki links formatted for inclusion in
+        insite
     """
     if not links:
         return ''
@@ -1531,8 +1532,8 @@ def removeCategoryLinksAndSeparator(text: str, site=None, marker: str = '',
     :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last category
         link, or at the end of text if there are no category links.
-    :param separator: The separator string that will be removed
-        if followed by the category links.
+    :param separator: The separator string that will be removed if
+        followed by the category links.
     :return: The modified text
     """
     if site is None:
@@ -1552,8 +1553,8 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     :param oldtext: Content of the old category
     :param oldcat: pywikibot.Category object of the old category
     :param newcat: pywikibot.Category object of the new category
-    :param add_only: If add_only is True, the old category won't
-        be replaced and the category given will be added after it.
+    :param add_only: If add_only is True, the old category won't be
+        replaced and the category given will be added after it.
     :return: the modified text
     """
     if site is None:
@@ -1855,13 +1856,13 @@ def extract_templates_and_params(
 def extract_templates_and_params_regex_simple(text: str):
     """Extract top-level templates with params using only a simple regex.
 
-    This function uses only a single regex, and returns
-    an entry for each template called at the top-level of the wikitext.
-    Nested templates are included in the argument values of the top-level
+    This function uses only a single regex, and returns an entry for
+    each template called at the top-level of the wikitext. Nested
+    templates are included in the argument values of the top-level
     template.
 
-    This method will incorrectly split arguments when an
-    argument value contains a '|', such as {{template|a={{b|c}} }}.
+    This method will incorrectly split arguments when an argument value
+    contains a '|', such as {{template|a={{b|c}} }}.
 
     :param text: The wikitext from which templates are extracted
     :return: list of template name and params
@@ -1891,9 +1892,9 @@ def extract_templates_and_params_regex_simple(text: str):
 def glue_template_and_params(template_and_params) -> str:
     """Return wiki text of template glued from params.
 
-    You can use items from extract_templates_and_params here to get
-    an equivalent template wiki text (it may happen that the order
-    of the params changes).
+    You can use items from extract_templates_and_params here to get an
+    equivalent template wiki text (it may happen that the order of the
+    params changes).
     """
     template, params = template_and_params
     text = ''

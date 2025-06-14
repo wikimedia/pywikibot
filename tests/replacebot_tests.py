@@ -35,7 +35,7 @@ class TestReplacementsMain(TWNBotTestCase):
     code = 'test'
     cached = False
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Replace the original bot class with a fake one."""
         class FakeReplaceBot(replace.ReplaceRobot):
 
@@ -43,18 +43,18 @@ class TestReplacementsMain(TWNBotTestCase):
 
             changed_pages = -42  # show that weird number to show this was used
 
-            def __init__(inner_self, *args, **kwargs):  # noqa: N805
+            def __init__(inner_self, *args, **kwargs) -> None:  # noqa: N805
                 # Unpatch already here, as otherwise super calls will use
                 # this class' super which is the class itself
                 replace.ReplaceRobot = self._original_bot
                 super().__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
-            def run(inner_self):  # noqa: N805
+            def run(inner_self) -> None:  # noqa: N805
                 """Nothing to do here."""
                 inner_self.changed_pages = -47  # show that run was called
 
-        def patched_login():
+        def patched_login() -> None:
             """Do nothing."""
 
         def patched_site(*args, **kwargs):
@@ -75,7 +75,7 @@ class TestReplacementsMain(TWNBotTestCase):
 
         pywikibot.bot.ui.clear()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Bring back the old bot class."""
         replace.ReplaceRobot = self._original_bot
         replace.pywikibot.input = self._original_input
@@ -83,7 +83,7 @@ class TestReplacementsMain(TWNBotTestCase):
         with empty_sites():
             super().tearDown()
 
-    def _fake_input(self, message):
+    def _fake_input(self, message) -> str:
         """Cache the message and return static text "TESTRUN"."""
         self.inputs.append(message)
         return 'TESTRUN'
@@ -98,7 +98,7 @@ class TestReplacementsMain(TWNBotTestCase):
         """
         return replace.main(*args, '-site:wikipedia:test', '-page:TEST')
 
-    def test_invalid_replacements(self):
+    def test_invalid_replacements(self) -> None:
         """Test invalid command line replacement configurations."""
         # old and new no longer need to be together but pairsfile must exist
         self._run('foo', '-pairsfile:/dev/null', 'bar')
@@ -116,7 +116,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertFalse(self.bots)
 
     def _test_replacement(self, replacement, clazz=replace.Replacement,
-                          offset=0):
+                          offset=0) -> None:
         """Test a replacement from the command line."""
         self.assertIsInstance(replacement, clazz)
         self.assertEqual(replacement.old, str(offset * 2 + 1))
@@ -124,7 +124,7 @@ class TestReplacementsMain(TWNBotTestCase):
             self.assertEqual(replacement.new, str(offset * 2 + 2))
 
     def _test_fix_replacement(self, replacement,
-                              length=1, offset=0, msg=False):
+                              length=1, offset=0, msg=False) -> None:
         """Test a replacement from a fix."""
         assert length > offset
         self._test_replacement(replacement, replace.ReplacementListEntry,
@@ -157,7 +157,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertEqual(bot.changed_pages, -47)
         return bot
 
-    def _apply(self, bot, expected, missing=None, title='Test page'):
+    def _apply(self, bot, expected, missing=None, title='Test page') -> None:
         """Test applying a test change."""
         applied = set()
         if missing is True:
@@ -172,7 +172,7 @@ class TestReplacementsMain(TWNBotTestCase):
                          bot.apply_replacements('Hello 1', applied, page))
         self.assertEqual(applied, required_applied)
 
-    def test_only_cmd(self):
+    def test_only_cmd(self) -> None:
         """Test command line replacements only."""
         bot = self._get_bot(True, '1', '2')
         self.assertLength(bot.replacements, 1)
@@ -183,7 +183,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'be something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_cmd_automatic(self):
+    def test_cmd_automatic(self) -> None:
         """Test command line replacements with automatic summary."""
         bot = self._get_bot(None, '1', '2', '-automaticsummary')
         self.assertLength(bot.replacements, 1)
@@ -195,21 +195,21 @@ class TestReplacementsMain(TWNBotTestCase):
             'be something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_global_message(self):
+    def test_only_fix_global_message(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_global_message_tw(self):
+    def test_only_fix_global_message_tw(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-tw')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_no_message(self):
+    def test_only_fix_no_message(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(True, '-fix:no-msg')
         self.assertLength(bot.replacements, 1)
@@ -221,14 +221,14 @@ class TestReplacementsMain(TWNBotTestCase):
             '"no-msg" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_all_replacement_summary(self):
+    def test_only_fix_all_replacement_summary(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:all-repl-msg')
         self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0], msg=True)
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_partial_replacement_summary(self):
+    def test_only_fix_partial_replacement_summary(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(True, '-fix:partial-repl-msg')
         for offset, replacement in enumerate(bot.replacements):
@@ -241,7 +241,7 @@ class TestReplacementsMain(TWNBotTestCase):
             '"partial-repl-msg" (replacement #2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_only_fix_multiple(self):
+    def test_only_fix_multiple(self) -> None:
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-multiple')
         for offset, replacement in enumerate(bot.replacements):
@@ -249,7 +249,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertLength(bot.replacements, 3)
         self.assertEqual([], pywikibot.bot.ui.pop_output())
 
-    def test_cmd_and_fix(self):
+    def test_cmd_and_fix(self) -> None:
         """Test command line and fix replacements together."""
         bot = self._get_bot(True, '1', '2', '-fix:has-msg')
         self.assertLength(bot.replacements, 2)
@@ -261,7 +261,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'something like: Bot: Automated text replacement  (-1 +2)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_except_title(self):
+    def test_except_title(self) -> None:
         """Test excepting and requiring a title specific to fix."""
         bot = self._get_bot(True, '-fix:no-msg-title-exceptions')
         self.assertLength(bot.replacements, 1)
@@ -290,7 +290,7 @@ class TestReplacementsMain(TWNBotTestCase):
             'because the title is on the exceptions list.'
         ], pywikibot.bot.ui.pop_output())
 
-    def test_fix_callable(self):
+    def test_fix_callable(self) -> None:
         """Test fix replacements using a callable."""
         bot = self._get_bot(True, '-fix:no-msg-callable')
         self.assertLength(bot.replacements, 1)
@@ -303,7 +303,7 @@ class TestReplacementsMain(TWNBotTestCase):
             '"no-msg-callable" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
 
-    def test_pairs_file(self):
+    def test_pairs_file(self) -> None:
         """Test handle_pairsfile."""
         result = replace.handle_pairsfile('non existing file')
         self.assertIsNone(result)

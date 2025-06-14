@@ -71,20 +71,18 @@ Command line options:
 To complete a move of a page, one can use:
 
     python pwb.py solve_disambiguation -just -pos:New_Name Old_Name
-
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
-import os
 import re
 from contextlib import suppress
 from itertools import chain
+from pathlib import Path
 from typing import Generator
 
 import pywikibot
@@ -381,8 +379,8 @@ def correctcap(link, text: str) -> str:
     :param link: link page
     :type link: pywikibot.Page
     :param text: the wikitext that is supposed to refer to the link
-    :return: uncapitalized title of the link if the text links to the link
-        with an uncapitalized title, else capitalized
+    :return: uncapitalized title of the link if the text links to the
+        link with an uncapitalized title, else capitalized
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
@@ -442,10 +440,10 @@ class PrimaryIgnoreManager:
 
     """Primary ignore manager.
 
-    If run with the -primary argument, reads from a file which pages should
-    not be worked on; these are the ones where the user pressed n last time.
-    If run without the -primary argument, doesn't ignore any pages.
-
+    If run with the -primary argument, reads from a file which pages
+    should not be worked on; these are the ones where the user pressed n
+    last time. If run without the -primary argument, doesn't ignore any
+    pages.
     """
 
     def __init__(self, disamb_page, enabled: bool = False) -> None:
@@ -456,28 +454,29 @@ class PrimaryIgnoreManager:
         self.disamb_page = disamb_page
         self.enabled = enabled
         self.ignorelist = set()
+        self._read_ignorelist(config.datafilepath('disambiguations'))
 
-        folder = config.datafilepath('disambiguations')
-        if os.path.exists(folder):
-            self._read_ignorelist(folder)
-
-    def _read_ignorelist(self, folder) -> None:
+    def _read_ignorelist(self, folder: str) -> None:
         """Read pages to be ignored from file.
 
-        :type folder: str
+        The file is stored in the disambiguation/ subdir.
         """
-        filename = os.path.join(
-            folder, self.disamb_page.title(as_filename=True) + '.txt')
+        folderpath = Path(folder)
+        if not folderpath.is_dir() or folderpath.is_symlink():
+            return
+
+        filepath = folderpath / (
+            self.disamb_page.title(as_filename=True) + '.txt')
+        if not filepath.is_file() or filepath.is_symlink():
+            return
 
         # The file is stored in the disambiguation/ subdir.
         # Create if necessary.
-        with suppress(IOError), codecs.open(filename, 'r', 'utf-8') as f:
-            for line in f:
-                # remove trailing newlines and carriage returns
-                line = line.rstrip('\r\n')
-                # skip empty lines
-                if line:
-                    self.ignorelist.add(line)
+        with suppress(IOError):
+            text = filepath.read_text(encoding='utf-8')
+
+        # skip empty lines
+        self.ignorelist = {line for line in text.splitlines() if line}
 
     def isIgnored(self, ref_page) -> bool:  # noqa: N802
         """Return if ref_page is to be ignored.
@@ -495,6 +494,7 @@ class PrimaryIgnoreManager:
         # backward compatibility
         if isinstance(page_titles, pywikibot.Page):
             page_titles = [page_titles.title(as_url=True)]
+
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -502,7 +502,7 @@ class PrimaryIgnoreManager:
                 self.disamb_page.title(as_url=True) + '.txt')
 
             # Open file for appending. If none exists, create a new one.
-            with suppress(IOError), codecs.open(filename, 'a', 'utf-8') as f:
+            with suppress(IOError), open(filename, 'a', encoding='utf-8') as f:
                 f.write('\n'.join(page_titles) + '\n')
 
 
@@ -631,9 +631,9 @@ class DisambiguationRobot(SingleSiteBot):
         """Check if the text matches any of the ignore regexes.
 
         :param text: wikitext of a page
-        :return: None if none of the regular expressions
-            given in the dictionary at the top of this class matches
-            a substring of the text, otherwise the matched substring
+        :return: None if none of the regular expressions given in the
+            dictionary at the top of this class matches a substring of
+            the text, otherwise the matched substring
         """
         for ig in self.ignore_contents_regexes:
             match = ig.search(text)
@@ -680,12 +680,12 @@ class DisambiguationRobot(SingleSiteBot):
     def firstlinks(page) -> Generator[str]:
         """Return a list of first links of every line beginning with `*`.
 
-        When a disambpage is full of unnecessary links, this may be useful
-        to sort out the relevant links. E.g. from line
-        `* [[Jim Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]`
-        it returns only 'Jim Smith (smith)'
-        Lines without an asterisk at the beginning will be disregarded.
-        No check for page existence, it has already been done.
+        When a disambpage is full of unnecessary links, this may be
+        useful to sort out the relevant links. E.g. from line `* [[Jim
+        Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]` it
+        returns only 'Jim Smith (smith)' Lines without an asterisk at
+        the beginning will be disregarded. No check for page existence,
+        it has already been done.
         """
         reg = re.compile(r'\*.*?\[\[(.*?)(?:\||\]\])')
         for line in page.text.splitlines():
@@ -696,9 +696,10 @@ class DisambiguationRobot(SingleSiteBot):
     def firstize(self, page, links) -> list[pywikibot.Page]:
         """Call firstlinks and remove extra links.
 
-        This will remove a lot of silly redundant links from overdecorated
-        disambiguation pages and leave the first link of each asterisked
-        line only. This must be done if -first is used in command line.
+        This will remove a lot of silly redundant links from
+        overdecorated disambiguation pages and leave the first link of
+        each asterisked line only. This must be done if -first is used
+        in command line.
         """
         titles = {first_upper(t) for t in self.firstlinks(page)}
         links = list(links)
@@ -710,13 +711,13 @@ class DisambiguationRobot(SingleSiteBot):
     def treat_links(self, ref_page, disamb_page) -> bool:
         """Resolve the links to disamb_page or its redirects.
 
-        :param disamb_page: the disambiguation page or redirect we don't want
-            anything to link to
+        :param disamb_page: the disambiguation page or redirect we don't
+            want anything to link to
         :type disamb_page: pywikibot.Page
         :param ref_page: a page linking to disamb_page
         :type ref_page: pywikibot.Page
-        :return: Return whether continue with next page (True)
-            or next disambig (False)
+        :return: Return whether continue with next page (True) or next
+            disambig (False)
         """
         nochange = True
 
@@ -738,14 +739,14 @@ class DisambiguationRobot(SingleSiteBot):
     def treat_disamb_only(self, ref_page, disamb_page) -> str:
         """Resolve the links to disamb_page but don't look for its redirects.
 
-        :param disamb_page: the disambiguation page or redirect we don't want
-            anything to link to
+        :param disamb_page: the disambiguation page or redirect we don't
+            want anything to link to
         :type disamb_page: pywikibot.Page
         :param ref_page: a page linking to disamb_page
         :type ref_page: pywikibot.Page
         :return: "nextpage" if the user enters "n" to skip this page,
-            "nochange" if the page needs no change, and
-            "done" if the page is processed successfully
+            "nochange" if the page needs no change, and "done" if the
+            page is processed successfully
         """
         # TODO: break this function up into subroutines!
 
@@ -1028,22 +1029,25 @@ class DisambiguationRobot(SingleSiteBot):
         :return: True if everything goes fine, False otherwise
         """
         if page.isRedirectPage() and not self.opt.primary:
+            topic = None
             primary = i18n.translate(page.site,
                                      self.primary_redir_template)
             if primary:
-                primary_page = pywikibot.Page(page.site,
-                                              'Template:' + primary)
-            if primary and primary_page in page.itertemplates(
+                primary_page = pywikibot.Page(page.site, 'Template:' + primary)
+                topic = i18n.translate(self.site.code, primary_topic_format)
+
+            if topic and primary_page in page.itertemplates(
                     namespaces=Namespace.TEMPLATE):
                 baseTerm = page.title()
                 for template, params in page.templatesWithParams():
                     if params and template == primary_page:
                         baseTerm = params[1]
                         break
-                disambTitle = primary_topic_format[self.site.lang] % baseTerm
+
+                disamb_title = topic % baseTerm
                 try:
                     page2 = pywikibot.Page(
-                        pywikibot.Link(disambTitle, self.site))
+                        pywikibot.Link(disamb_title, self.site))
                     links = page2.linkedPages()
                     if self.opt.first:
                         links = self.firstize(page2, links)
@@ -1051,7 +1055,7 @@ class DisambiguationRobot(SingleSiteBot):
                              for link in links]
                 except NoPageError:
                     pywikibot.info(
-                        f'No page at {disambTitle}, using redirect target.')
+                        f'No page at {disamb_title}, using redirect target.')
                     links = page.linkedPages()[:1]
                     links = [correctcap(link,
                                         page.get(get_redirect=True))
@@ -1066,33 +1070,30 @@ class DisambiguationRobot(SingleSiteBot):
                     user_input = pywikibot.input("""\
 Please enter the name of the page where the redirect should have pointed at,
 or press enter to quit:""")
-                    if user_input == '':
-                        self.quit()
-                    else:
-                        self.opt.pos.append(user_input)
+                    if not user_input:
+                        self.quit()  # raises QuitKeyboardInterrupt
+
+                    self.opt.pos.append(user_input)
                 except IsNotRedirectPageError:
                     pywikibot.info(
                         'The specified page is not a redirect. Skipping.')
                     return False
+
         elif self.opt.just:
             # not page.isRedirectPage() or self.opt.primary
             try:
-                if self.opt.primary:
+                topic = i18n.translate(self.site.lang, primary_topic_format)
+                if topic and self.opt.primary:
                     try:
-                        page2 = pywikibot.Page(
-                            pywikibot.Link(
-                                primary_topic_format[self.site.lang]
-                                % page.title(),
-                                self.site))
+                        page2 = pywikibot.Page(self.site, topic % page.title())
                         links = page2.linkedPages()
                         if self.opt.first:
                             links = self.firstize(page2, links)
                         links = [correctcap(link, page2.get())
                                  for link in links]
                     except NoPageError:
-                        pywikibot.info(
-                            'Page does not exist; using first '
-                            f'link in page {page.title()}.')
+                        pywikibot.info('Page does not exist; using first '
+                                       f'link in page {page.title()}.')
                         links = page.linkedPages()[:1]
                         links = [correctcap(link, page.get())
                                  for link in links]
@@ -1106,10 +1107,13 @@ or press enter to quit:""")
                     except NoPageError:
                         pywikibot.info('Page does not exist, skipping.')
                         return False
+
             except IsRedirectPageError:
                 pywikibot.info('Page is a redirect, skipping.')
                 return False
+
             self.opt.pos += links
+
         return True
 
     def setSummaryMessage(

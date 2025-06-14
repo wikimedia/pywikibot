@@ -51,7 +51,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         }
     }
 
-    def test_str2localized_duration_English(self):
+    def test_str2localized_duration_English(self) -> None:
         """Test English localizations of duration."""
         site = self.get_site('enwiki')
         self.assertEqual(
@@ -61,14 +61,14 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         self.assertEqual(
             archivebot.str2localized_duration(site, '10h'), '10 hours')
 
-    def test_str2localized_duration_French(self):
+    def test_str2localized_duration_French(self) -> None:
         """Test French localizations of duration."""
         site = self.get_site('frwikt')
         self.assertEqual(
             archivebot.str2localized_duration(site, '10d'), '10 jours')
         self.assertEqual(archivebot.str2localized_duration(site, '1y'), '1 an')
 
-    def test_str2localized_duration_Japanese(self):
+    def test_str2localized_duration_Japanese(self) -> None:
         """Test Japanese localizations of duration."""
         site = self.get_site('jawiki')
         self.assertEqual(
@@ -81,7 +81,7 @@ class TestArchiveBotFunctions(TestCase):
 
     net = False
 
-    def test_str2size(self):
+    def test_str2size(self) -> None:
         """Test for parsing the shorthand notation of sizes."""
         self.assertEqual(archivebot.str2size('0'), (0, 'B'))
         self.assertEqual(archivebot.str2size('3000'), (3000, 'B'))
@@ -92,7 +92,7 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(archivebot.str2size('2 000B'), (2000, 'B'))
         self.assertEqual(archivebot.str2size('2 000 B'), (2000, 'B'))
 
-    def test_str2size_failures(self):
+    def test_str2size_failures(self) -> None:
         """Test for rejecting of invalid shorthand notation of sizes."""
         with self.assertRaises(archivebot.MalformedConfigError):
             archivebot.str2size('4 KK')
@@ -116,7 +116,7 @@ class TestArchiveBot(TestCase):
     cached = True
     expected_failures = ['ar', 'scn', 'th']
 
-    def test_archivebot(self, code=None):
+    def test_archivebot(self, code=None) -> None:
         """Test archivebot for one site."""
         site = self.get_site(code)
         page = pywikibot.Page(site, 'user talk:xqt')
@@ -175,7 +175,7 @@ class TestArchiveBotAfterDateUpdate(TestCase):
 
     cached = True
 
-    def test_archivebot(self, code=None):
+    def test_archivebot(self, code=None) -> None:
         """Test archivebot for one site."""
         site = self.get_site(code)
         page = pywikibot.Page(site, 'user talk:mpaa')
@@ -214,7 +214,7 @@ class TestDiscussionPageObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def load_page(self, title: str):
+    def load_page(self, title: str) -> None:
         """Load the given page."""
         page = pywikibot.Page(self.site, title)
         tmpl = pywikibot.Page(self.site, 'User:MiszaBot/config')
@@ -223,7 +223,7 @@ class TestDiscussionPageObject(TestCase):
         page.load_page()
         self.page = page
 
-    def testTwoThreadsWithCommentedOutThread(self):
+    def testTwoThreadsWithCommentedOutThread(self) -> None:
         """Test recognizing two threads and ignoring a commented out thread.
 
         Talk:For-pywikibot-archivebot must have::
@@ -245,7 +245,7 @@ class TestDiscussionPageObject(TestCase):
         self.load_page('Talk:For-pywikibot-archivebot')
         self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
 
-    def testThreadsWithSubsections(self):
+    def testThreadsWithSubsections(self) -> None:
         """Test recognizing threads with subsections.
 
         Talk:For-pywikibot-archivebot/subsections must have::
@@ -268,7 +268,7 @@ class TestDiscussionPageObject(TestCase):
         self.load_page('Talk:For-pywikibot-archivebot/testcase2')
         self.assertEqual([x.title for x in self.page.threads], ['A', 'B'])
 
-    def test_is_full_method(self):
+    def test_is_full_method(self) -> None:
         """Test DiscussionPage.is_full method."""
         self.load_page('Talk:For-pywikibot-archivebot')
         page = self.page
@@ -295,7 +295,7 @@ class TestPageArchiverObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    def testLoadConfigInTemplateNamespace(self):
+    def testLoadConfigInTemplateNamespace(self) -> None:
         """Test loading of config with TEMPLATE_PAGE in Template ns.
 
         Talk:For-pywikibot-archivebot-01 must have::
@@ -322,7 +322,7 @@ class TestPageArchiverObject(TestCase):
         except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
 
-    def testLoadConfigInOtherNamespace(self):
+    def testLoadConfigInOtherNamespace(self) -> None:
         """Test loading of config with TEMPLATE_PAGE not in Template ns.
 
         Talk:For-pywikibot-archivebot must have::

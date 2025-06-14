@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import calendar
-import codecs
 import io
 import re
 import typing
@@ -343,8 +342,8 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
         subcats, but no deeper.)
     :param start: if provided, only generate pages >= this title
         lexically
-    :param total: iterate no more than this number of pages in
-        total (at all levels)
+    :param total: iterate no more than this number of pages in total (at
+        all levels)
     :param content: if True, retrieve the content of the current version
         of each page (default False)
     """
@@ -371,8 +370,8 @@ def SubCategoriesPageGenerator(category: pywikibot.page.Category,
         subcats, but no deeper.)
     :param start: if provided, only generate pages >= this title
         lexically
-    :param total: iterate no more than this number of pages in
-        total (at all levels)
+    :param total: iterate no more than this number of pages in total (at
+        all levels)
     :param content: if True, retrieve the content of the current version
         of each page (default False)
     """
@@ -401,15 +400,15 @@ def LinkedPageGenerator(
     return linkingPage.linkedPages(total=total, content=content)
 
 
-def _yield_titles(f: codecs.StreamReaderWriter | io.StringIO,
+def _yield_titles(f: io.TextIOBase,
                   site: pywikibot.site.BaseSite
                   ) -> Generator[pywikibot.page.Page, None, None]:
     """Yield page titles from a text stream.
 
     :param f: text stream object
     :param site: Site for generator results.
-    :return: a generator that yields Page objects of pages with titles in text
-        stream
+    :return: a generator that yields Page objects of pages with titles
+        in text stream
     """
     linkmatch = None
     for linkmatch in pywikibot.link_regex.finditer(f.read()):
@@ -437,12 +436,12 @@ def TextIOPageGenerator(source: str | None = None,
                         ) -> Generator[pywikibot.page.Page, None, None]:
     """Iterate pages from a list in a text file or on a webpage.
 
-    The text source must contain page links between double-square-brackets or,
-    alternatively, separated by newlines. The generator will yield each
-    corresponding Page object.
+    The text source must contain page links between double-square-
+    brackets or, alternatively, separated by newlines. The generator
+    will yield each corresponding Page object.
 
-    :param source: the file path or URL that should be read. If no name is
-                     given, the generator prompts the user.
+    :param source: the file path or URL that should be read. If no name
+        is given, the generator prompts the user.
     :param site: Site for generator results.
     """
     if source is None:
@@ -451,7 +450,7 @@ def TextIOPageGenerator(source: str | None = None,
         site = pywikibot.Site()
     # If source cannot be parsed as an HTTP URL, treat as local file
     if not urlparse(source).netloc:
-        with codecs.open(source, 'r', config.textfile_encoding) as local_file:
+        with open(source, encoding=config.textfile_encoding) as local_file:
             yield from _yield_titles(local_file, site)
     # Else, fetch page (page should return text in same format as that expected
     # in filename, i.e. pages separated by newlines or pages enclosed in double
@@ -486,8 +485,8 @@ def PagesFromPageidGenerator(
     Pageids are filtered and only one page is returned in case of
     duplicate pageid.
 
-    :param pageids: an iterable that returns pageids, or a comma-separated
-                    string of pageids (e.g. '945097,1483753,956608')
+    :param pageids: an iterable that returns pageids, or a comma-
+        separated string of pageids (e.g. '945097,1483753,956608')
     :param site: Site for generator results.
     """
     if site is None:
@@ -986,7 +985,7 @@ generator GoogleSearchPageGenerator depends on package
             if page.site == site:
                 yield page
 
-    def set_maximum_items(self, value: int, /):
+    def set_maximum_items(self, value: int, /) -> None:
         """Set the maximum number of items to be retrieved from google.
 
         This method is added to be used by the
@@ -1298,8 +1297,8 @@ def WikidataSPARQLPageGenerator(query: str,
     :param item_name: name of the item in the SPARQL query
     :param endpoint: SPARQL endpoint URL
     :param entity_url: URL prefix for any entities returned in a query.
-    :param result_type: type of the iterable in which
-             SPARQL results are stored (default set)
+    :param result_type: type of the iterable in which SPARQL results are
+        stored (default set)
     """
     from pywikibot.data import sparql
 
@@ -1329,10 +1328,10 @@ def WikibaseSearchItemPageGenerator(
     """Generate pages that contain the provided text.
 
     :param text: Text to look for.
-    :param language: Code of the language to search in. If not specified,
-        value from pywikibot.config.data_lang is used.
-    :param total: Maximum number of pages to retrieve in total, or None in
-        case of no limit.
+    :param language: Code of the language to search in. If not
+        specified, value from pywikibot.config.data_lang is used.
+    :param total: Maximum number of pages to retrieve in total, or None
+        in case of no limit.
     :param site: Site for generator results.
     """
     if site is None:
@@ -1366,14 +1365,15 @@ class PetScanPageGenerator(GeneratorWrapper):
         """Initializer.
 
         :param categories: List of category names to retrieve pages from
-        :param subset_combination: Combination mode.
-            If True, returns the intersection of the results of the categories,
-            else returns the union of the results of the categories
-        :param namespaces: List of namespaces to search in
-            (default is None, meaning all namespaces)
-        :param site: Site to operate on
-            (default is the default site from the user config)
-        :param extra_options: Dictionary of extra options to use (optional)
+        :param subset_combination: Combination mode. If True, returns
+            the intersection of the results of the categories, else
+            returns the union of the results of the categories
+        :param namespaces: List of namespaces to search in (default is
+            None, meaning all namespaces)
+        :param site: Site to operate on (default is the default site
+            from the user config)
+        :param extra_options: Dictionary of extra options to use
+            (optional)
         """
         if site is None:
             site = pywikibot.Site()
@@ -1388,12 +1388,13 @@ class PetScanPageGenerator(GeneratorWrapper):
         """Get the querystring options to query PetScan.
 
         :param categories: List of categories (as strings)
-        :param subset_combination: Combination mode.
-            If True, returns the intersection of the results of the categories,
-            else returns the union of the results of the categories
+        :param subset_combination: Combination mode. If True, returns
+            the intersection of the results of the categories, else
+            returns the union of the results of the categories
         :param namespaces: List of namespaces to search in
         :param extra_options: Dictionary of extra options to use
-        :return: Dictionary of querystring parameters to use in the query
+        :return: Dictionary of querystring parameters to use in the
+            query
         """
         extra_options = extra_options or {}
 
@@ -1463,7 +1464,7 @@ class PagePilePageGenerator(GeneratorWrapper):
     .. versionadded:: 9.0
     """
 
-    def __init__(self, id: int):
+    def __init__(self, id: int) -> None:
         """Initializer.
 
         :param id: The PagePile id to query
@@ -1474,7 +1475,8 @@ class PagePilePageGenerator(GeneratorWrapper):
         """Get the querystring options to query PagePile.
 
         :param id: int
-        :return: Dictionary of querystring parameters to use in the query
+        :return: Dictionary of querystring parameters to use in the
+            query
         """
         query = {
             'id': id,

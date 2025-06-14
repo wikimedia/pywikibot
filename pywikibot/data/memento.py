@@ -89,7 +89,7 @@ class MementoClient(OldMementoClient):
     :return: A :class:`MementoClient` obj.
     """  # noqa: E501, W505
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         # To prevent documentation inclusion from inherited class
         # because it is malformed.
@@ -157,8 +157,8 @@ class MementoClient(OldMementoClient):
                                 **kwargs) -> str | None:
         """Check the original uri whether the timegate uri is provided.
 
-        Given an original URL and an accept datetime, check the original uri
-        to see if the timegate uri is provided in the Link header.
+        Given an original URL and an accept datetime, check the original
+        uri to see if the timegate uri is provided in the Link header.
 
         :param original_uri: An HTTP uri of the original resource.
         :param accept_datetime: The datetime object of the accept
@@ -248,7 +248,8 @@ class MementoClient(OldMementoClient):
 
         :param dt: A datetime object.
         :return: The date in HTTP format.
-        :raises TypeError: Expecting dt parameter to be of type datetime.
+        :raises TypeError: Expecting dt parameter to be of type
+            datetime.
         """
         if dt and not isinstance(dt, datetime):
             raise TypeError(

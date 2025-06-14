@@ -43,7 +43,7 @@ for tests to set the default site (see :phab:`T216825`)::
    enable external scripts via entry points.
 """
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,7 +64,7 @@ pwb = None
 site_package = False
 
 
-def check_pwb_versions(package: str):
+def check_pwb_versions(package: str) -> None:
     """Validate package version and scripts version.
 
     Rules:
@@ -113,7 +113,7 @@ def check_pwb_versions(package: str):
 # https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 
-def run_python_file(filename: str, args: list[str], package=None):
+def run_python_file(filename: str, args: list[str], package=None) -> None:
     """Run a python file as if it were the main program on the command line.
 
     .. versionchanged:: 7.7
@@ -208,7 +208,9 @@ def handle_args(
     return fname, list(args[index:]), local, env
 
 
-def _print_requirements(requirements, script, variant):  # pragma: no cover
+def _print_requirements(requirements,
+                        script,
+                        variant) -> None:  # pragma: no cover
     """Print pip command to install requirements."""
     if not requirements:
         return
@@ -228,7 +230,8 @@ def _print_requirements(requirements, script, variant):  # pragma: no cover
 def check_modules(script: str | None = None) -> bool:
     """Check whether mandatory modules are present.
 
-    This also checks Python version when importing dependencies from setup.py
+    This also checks Python version when importing dependencies from
+    setup.py
 
     :param script: The script name to be checked for dependencies
     :return: True if all dependencies are installed
@@ -409,7 +412,7 @@ def find_filename(filename):
         else:
             warn("'user_script_paths' must be a list,\n"
                  f'found: {type(config.user_script_paths).__name__}.'
-                 ' Ignoring this setting.')
+                 ' Ignoring this setting.', stacklevel=2)
 
     found = test_paths(user_script_paths, Path(config.base_dir))
     if found:  # pragma: no cover
@@ -459,7 +462,7 @@ def find_filename(filename):
     return find_alternates(filename, path_list)
 
 
-def execute():
+def execute() -> bool:
     """Parse arguments, extract filename and run the script.
 
     .. versionadded:: 7.0
@@ -517,7 +520,7 @@ def execute():
                 module = import_module(file_package)
             except ImportError as e:
                 warn(f'Parent module {file_package} not found: {e}',
-                     ImportWarning)
+                     ImportWarning, stacklevel=2)
 
     help_option = any(arg.startswith('-help:') or arg == '-help'
                       for arg in script_args)
@@ -526,7 +529,7 @@ def execute():
     return True
 
 
-def main():
+def main() -> None:
     """Script entry point. Print doc if necessary.
 
     .. versionchanged:: 7.0
@@ -539,7 +542,7 @@ def main():
         print(__doc__)
 
 
-def run():  # pragma: no cover
+def run() -> None:  # pragma: no cover
     """Site package entry point. Print doc if necessary.
 
     .. versionadded:: 7.0

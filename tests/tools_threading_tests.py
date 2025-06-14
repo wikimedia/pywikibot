@@ -28,7 +28,7 @@ class BasicThreadedGeneratorTestCase(TestCase):
 
     net = False
 
-    def test_run_from_iterable(self):
+    def test_run_from_iterable(self) -> None:
         """Test thread running with iterable target."""
         iterable = 'abcd'
         thd_gen = ThreadedGenerator(target=iterable)
@@ -41,7 +41,7 @@ class BasicThreadedGeneratorTestCase(TestCase):
         iterable = 'abcd'
         yield from iterable
 
-    def test_run_from_gen_function(self):
+    def test_run_from_gen_function(self) -> None:
         """Test thread running with generator as target."""
         iterable = 'abcd'
         thd_gen = ThreadedGenerator(target=self.gen_func)
@@ -55,7 +55,7 @@ class BoundedThreadPoolTests(TestCase):
 
     net = False
 
-    def test_strings(self):
+    def test_strings(self) -> None:
         """Test string and repr methods for executor strings."""
         executors = ['ThreadPoolExecutor', 'ProcessPoolExecutor']
         if PYTHON_VERSION >= (3, 14):
@@ -70,7 +70,7 @@ class BoundedThreadPoolTests(TestCase):
                 self.assertEqual(pool._bound_semaphore._initial_value,
                                  pool._max_workers)
 
-    def test_class(self):
+    def test_class(self) -> None:
         """Test string and repr methods for a executor class."""
         executors = [ThreadPoolExecutor, ProcessPoolExecutor]
         if PYTHON_VERSION >= (3, 14):
@@ -86,7 +86,7 @@ class BoundedThreadPoolTests(TestCase):
                 self.assertEqual(pool._bound_semaphore._initial_value,
                                  pool._max_workers)
 
-    def test_run(self):
+    def test_run(self) -> None:
         """Test examples for Executor during run."""
         for bound in (2, 5, 7):
             futures = []
@@ -104,7 +104,7 @@ class BoundedThreadPoolTests(TestCase):
                 self.assertTrue(future.done())
                 self.assertIsNone(future.result())
 
-    def test_exceptions(self):
+    def test_exceptions(self) -> None:
         """Test exceptions when creating a bounded executor."""
         with self.assertRaisesRegex(TypeError,
                                     r'issubclass\(\) arg 1 must be a class'):

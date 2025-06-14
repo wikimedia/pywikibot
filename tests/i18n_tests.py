@@ -23,7 +23,7 @@ class Site:
 
         """Nested class to hold the family name attribute."""
 
-    def __init__(self, code, family='wikipedia'):
+    def __init__(self, code, family='wikipedia') -> None:
         """Initializer."""
         self.code = code
         self.family = self.Family()
@@ -53,11 +53,11 @@ class TestTranslate(TestCase):
         },
     }
 
-    def test_translate_commons(self):
+    def test_translate_commons(self) -> None:
         """Test localization with xdict for commons.
 
-        Test whether the localization is found either with the Site object
-        or with the site code.
+        Test whether the localization is found either with the Site
+        object or with the site code.
         """
         site = Site('commons')
         for code in (site, 'commons'):
@@ -65,11 +65,11 @@ class TestTranslate(TestCase):
                 self.assertEqual(i18n.translate(code, self.xdict),
                                  'test-localized COMMONS')
 
-    def test_translate_de(self):
+    def test_translate_de(self) -> None:
         """Test localization fallbacks for 'de' with xdict.
 
-        'de' key is defined in a nested 'wikipedia' sub dict. This should
-        always fall back to this nested 'wikipedia' entry.
+        'de' key is defined in a nested 'wikipedia' sub dict. This
+        should always fall back to this nested 'wikipedia' entry.
         """
         site1 = Site('de', 'wikipedia')
         site2 = Site('de', 'wikibooks')
@@ -79,12 +79,12 @@ class TestTranslate(TestCase):
                 self.assertEqual(i18n.translate(code, self.xdict),
                                  'test-localized WP-DE')
 
-    def test_translate_en(self):
+    def test_translate_en(self) -> None:
         """Test localization fallbacks for 'en' with xdict.
 
-        'en' key is defined directly in xdict. This topmost key goes over
-        site specific key. Therefore 'test-localized WS-EN' is not given
-        back.
+        'en' key is defined directly in xdict. This topmost key goes
+        over site specific key. Therefore 'test-localized WS-EN' is not
+        given back.
         """
         site1 = Site('en', 'wikipedia')
         site2 = Site('en', 'wikibooks')
@@ -94,7 +94,7 @@ class TestTranslate(TestCase):
                 self.assertEqual(i18n.translate(code, self.xdict),
                                  'test-localized EN')
 
-    def test_translate_fy(self):
+    def test_translate_fy(self) -> None:
         """Test localization fallbacks for 'fy' with xdict.
 
         'fy' key is defined in 'wikipedia' and  'wikisource' sub dicts.
@@ -115,7 +115,7 @@ class TestTranslate(TestCase):
         self.assertEqual(i18n.translate(site3, self.xdict),
                          'test-localized WS-FY')
 
-    def test_translate_nl(self):
+    def test_translate_nl(self) -> None:
         """Test localization fallbacks for 'nl' with xdict.
 
         'nl' key is defined in 'wikipedia' sub dict. Therefore all
@@ -129,12 +129,12 @@ class TestTranslate(TestCase):
                 self.assertEqual(i18n.translate(code, self.xdict),
                                  'test-localized WP-NL')
 
-    def test_translate_ja(self):
+    def test_translate_ja(self) -> None:
         """Test localization fallbacks for 'ja' with xdict.
 
-        'ja' key is defined in 'wkisource' sub dict only. Therefore there
-        is no fallback to the 'wikipedia' entry and the localization result
-        is None.
+        'ja' key is defined in 'wkisource' sub dict only. Therefore
+        there is no fallback to the 'wikipedia' entry and the
+        localization result is None.
         """
         site1 = Site('ja', 'wikipedia')
         site2 = Site('ja', 'wikibooks')
@@ -160,7 +160,7 @@ class TestFallbackTranslate(TestCase):
     msg_non_localized = {'en': 'test-non-localized EN'}
     msg_no_english = {'ja': 'test-no-english JA'}
 
-    def test_localized(self):
+    def test_localized(self) -> None:
         """Test fully localized translations."""
         for code, msg in self.msg_localized.items():
             with self.subTest(code=code):
@@ -168,7 +168,7 @@ class TestFallbackTranslate(TestCase):
                                                 fallback=True),
                                  msg)
 
-    def test_semi_localized(self):
+    def test_semi_localized(self) -> None:
         """Test translate by fallback to an alternative language."""
         self.assertEqual(i18n.translate('en', self.msg_semi_localized,
                                         fallback=True),
@@ -179,7 +179,7 @@ class TestFallbackTranslate(TestCase):
                                                 fallback=True),
                                  'test-semi-localized NL')
 
-    def test_non_localized(self):
+    def test_non_localized(self) -> None:
         """Test translate with missing localisation."""
         for code in ('en', 'fy', 'nl', 'ru'):
             with self.subTest(code=code):
@@ -187,7 +187,7 @@ class TestFallbackTranslate(TestCase):
                                                 fallback=True),
                                  'test-non-localized EN')
 
-    def testNoEnglish(self):
+    def testNoEnglish(self) -> None:
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
             with self.subTest(code=code), self.assertRaises(KeyError):
@@ -198,13 +198,13 @@ class UserInterfaceLangTestCase(TestCase):
 
     """Base class for tests using config.userinterface_lang."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Change the userinterface language to the site's code."""
         super().setUp()
         self.orig_userinterface_lang = pywikibot.config.userinterface_lang
         pywikibot.config.userinterface_lang = self.get_site().code
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Reset the userinterface language."""
         pywikibot.config.userinterface_lang = self.orig_userinterface_lang
         super().tearDown()
@@ -216,13 +216,13 @@ class TWNSetMessagePackageBase(TestCase):
 
     message_package = None
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Load the test translations."""
         self.orig_messages_package_name = i18n._messages_package_name
         i18n.set_messages_package(self.message_package)
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Load the original translations back."""
         super().tearDown()
         i18n.set_messages_package(self.orig_messages_package_name)
@@ -233,7 +233,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
     """Base class for TranslateWiki tests."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, str):
             raise TypeError(  # pragma: no cover
@@ -258,7 +258,7 @@ class TestTWTranslate(TWNTestCaseBase):
     net = False
     message_package = 'tests.i18n'
 
-    def testLocalized(self):
+    def testLocalized(self) -> None:
         """Test fully localized entry."""
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
                          'test-localized EN')
@@ -267,7 +267,7 @@ class TestTWTranslate(TWNTestCaseBase):
         self.assertEqual(i18n.twtranslate('fy', 'test-localized'),
                          'test-localized FY')
 
-    def testSemiLocalized(self):
+    def testSemiLocalized(self) -> None:
         """Test translating with fallback to alternative language."""
         self.assertEqual(i18n.twtranslate('en', 'test-semi-localized'),
                          'test-semi-localized EN')
@@ -276,14 +276,14 @@ class TestTWTranslate(TWNTestCaseBase):
                 self.assertEqual(i18n.twtranslate(code, 'test-semi-localized'),
                                  'test-semi-localized NL')
 
-    def testNonLocalized(self):
+    def testNonLocalized(self) -> None:
         """Test translating non localized entries."""
         for code in ('en', 'fy', 'nl', 'ru'):
             with self.subTest(code=code):
                 self.assertEqual(i18n.twtranslate(code, 'test-non-localized'),
                                  'test-non-localized EN')
 
-    def testNoEnglish(self):
+    def testNoEnglish(self) -> None:
         """Test translating into English with missing entry."""
         with self.assertRaises(TranslationError):
             i18n.twtranslate('en', 'test-no-english')
@@ -301,7 +301,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     message = 'pywikibot-enter-category-name'
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Verify that a translation does not yet exist."""
         super().setUpClass()
 
@@ -309,7 +309,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
             raise unittest.SkipTest(
                 f'{cls.code} has a translation for {cls.message}')
 
-    def test_pagegen_i18n_input(self):
+    def test_pagegen_i18n_input(self) -> None:
         """Test i18n.input fallback via pwb."""
         expect = i18n.twtranslate(self.alt_code, self.message, fallback=False)
         result = self.execute(args=['listpages', '-cat'],
@@ -325,10 +325,10 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
 
     message_package = 'scripts.foobar.i18n'
 
-    def _capture_output(self, text, *args, **kwargs):
+    def _capture_output(self, text, *args, **kwargs) -> None:
         self.output_text = text
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch the output and input methods."""
         super().setUp()
         bot.set_interface('terminal')
@@ -339,7 +339,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.ui.stream_output = self._capture_output
         self.old_cc_setting = config.cosmetic_changes_mylang_only
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore the output and input methods."""
         config.cosmetic_changes_mylang_only = self.old_cc_setting
         bot.ui._raw_input = self.orig_raw_input
@@ -347,14 +347,14 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.set_interface('buffer')
         super().tearDown()
 
-    def test_i18n_input(self):
+    def test_i18n_input(self) -> None:
         """Test i18n.input falls back with missing message package."""
         rv = i18n.input('pywikibot-enter-category-name',
                         fallback_prompt='dummy output')
         self.assertEqual(rv, 'dummy input')
         self.assertIn('dummy output: ', self.output_text)
 
-    def test_i18n_twtranslate(self):
+    def test_i18n_twtranslate(self) -> None:
         """Test i18n.twtranslate falls back with missing message package."""
         rv = i18n.twtranslate(self.site, 'pywikibot-enter-category-name',
                               fallback_prompt='dummy message')
@@ -368,7 +368,7 @@ class PywikibotPackageTestCase(TestCase):
     family = 'wikipedia'
     code = 'de'
 
-    def test_cosmetic_changes_hook(self):
+    def test_cosmetic_changes_hook(self) -> None:
         """Test summary result of Page._cosmetic_changes_hook."""
         page = pywikibot.Page(self.site, 'Test')
         page.text = 'Some    content    with    spaces.'
@@ -394,7 +394,7 @@ class TestExtractPlural(TestCase):
 
     net = False
 
-    def test_standard(self):
+    def test_standard(self) -> None:
         """Test default usage using a dict and no specific plurals."""
         self.assertEqual(
             i18n._extract_plural('en', '{{PLURAL:foo|one|other}}',
@@ -409,7 +409,7 @@ class TestExtractPlural(TestCase):
                                  {'foo': 0}),
             'other')
 
-    def test_empty_fields(self):
+    def test_empty_fields(self) -> None:
         """Test default usage using a dict and no specific plurals."""
         self.assertEqual(
             i18n._extract_plural('en', '{{PLURAL:foo||other}}', {'foo': 42}),
@@ -426,7 +426,7 @@ class TestExtractPlural(TestCase):
             i18n._extract_plural('en', '{{PLURAL:foo|one}}', {'foo': 0}),
             'one')
 
-    def test_specific(self):
+    def test_specific(self) -> None:
         """Test using a specific plural."""
         self.assertEqual(
             i18n._extract_plural('en', '{{PLURAL:foo|one|other|12=dozen}}',
@@ -437,7 +437,7 @@ class TestExtractPlural(TestCase):
                                  {'foo': 12}),
             'dozen')
 
-    def test_more(self):
+    def test_more(self) -> None:
         """Test the number of plurals are more than expected."""
         test = [(0, 2), (1, 0), (2, 1), (3, 2), (4, 2), (7, 2), (8, 3)]
         for num, result in test:
@@ -448,7 +448,7 @@ class TestExtractPlural(TestCase):
                     {'num': num}),
                 str(result))
 
-    def test_less(self):
+    def test_less(self) -> None:
         """Test the number of plurals are less than expected."""
         test = [(0, 2), (1, 0), (2, 1), (3, 2), (4, 2), (7, 2), (8, 3)]
         for num, result in test:

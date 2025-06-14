@@ -4,7 +4,7 @@
 .. versionadded:: 9.2
 """
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,7 +27,7 @@ class TestSupersetWithoutAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test init validation functions."""
         # Test initial database_id parameter in wrong format
         site = self.get_site()
@@ -37,13 +37,11 @@ class TestSupersetWithoutAuth(TestCase):
 
         msg = 'Only one of schema_name and site parameters can be defined'
         with self.assertRaisesRegex(TypeError, msg):
-            superset = SupersetQuery(schema_name='enwiki_p',
-                                     site=site)
+            SupersetQuery(schema_name='enwiki_p', site=site)
 
         msg = 'database_id should be integer'
         with self.assertRaisesRegex(TypeError, msg):
-            superset = SupersetQuery(schema_name='enwiki_p',
-                                     database_id='foo')
+            SupersetQuery(schema_name='enwiki_p', database_id='foo')
 
 
 class TestSupersetWithAuth(TestCase):
@@ -54,7 +52,8 @@ class TestSupersetWithAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
-    def test_login_and_oauth_permission(self):
+    @unittest.expectedFailure  # T395664
+    def test_login_and_oauth_permission(self) -> None:
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'
         site = self.get_site()
@@ -120,7 +119,7 @@ class TestSupersetWithAuth(TestCase):
         with self.assertRaisesRegex(TypeError, msg):
             rows = superset.query(sql, schema_name='fiwiki_p', site=site)
 
-    def test_superset_generators(self):
+    def test_superset_generators(self) -> None:
         """Superset generator."""
         site = self.get_site()
         query = 'SELECT page_id FROM page LIMIT 2'

@@ -24,7 +24,7 @@ class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
     code = 'en'
     cached = True
 
-    def test_partially_qualified_NS0_family(self):
+    def test_partially_qualified_NS0_family(self) -> None:
         """Test that Link uses config.family for namespace 0."""
         config.mylang = 'de'
         config.family = 'wikipedia'
@@ -34,7 +34,7 @@ class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
         self.assertEqual(link.title, 'Main Page')
         self.assertEqual(link.namespace, 0)
 
-    def test_partially_qualified_NS1_family(self):
+    def test_partially_qualified_NS1_family(self) -> None:
         """Test that Link uses config.family for namespace 1."""
         config.mylang = 'de'
         config.family = 'wikipedia'
@@ -60,7 +60,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         }
     }
 
-    def test_direct_non_local(self):
+    def test_direct_non_local(self) -> None:
         """Test translatewiki:Main Page on English Wikipedia."""
         link = Link('translatewiki:Main Page', self.get_site('wp'))
         link.parse()
@@ -68,7 +68,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         self.assertEqual(link.title, 'Main Page')
         self.assertEqual(link.namespace, 0)
 
-    def test_indirect_non_local(self):
+    def test_indirect_non_local(self) -> None:
         """Test en:translatewiki:Main Page on English Wikipedia."""
         link = Link('en:translatewiki:Main Page', self.get_site('wp'))
         link.parse()
@@ -76,7 +76,7 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         self.assertEqual(link.title, 'Main Page')
         self.assertEqual(link.namespace, 0)
 
-    def test_via_local_non_local(self):
+    def test_via_local_non_local(self) -> None:
         """Test de:translatewiki:Main Page on English Wikipedia."""
         link = Link('de:translatewiki:Main Page', self.get_site('wp'))
         with self.assertRaisesRegex(

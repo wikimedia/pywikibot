@@ -79,7 +79,7 @@ class PurgeBot(MultipleSitesBot):
         'redirects': None
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
         self.pages = defaultdict(list)
@@ -97,7 +97,7 @@ class PurgeBot(MultipleSitesBot):
         self.limit.setdefault(page.site, page.site.ratelimit('purge'))
         self.purgepages()
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Purge remaining pages if no KeyboardInterrupt was made.
 
         .. versionadded:: 8.0
@@ -109,7 +109,7 @@ class PurgeBot(MultipleSitesBot):
         # show the counter even no purges were made
         self.counter['purge'] += 0
 
-    def purgepages(self, flush=False):
+    def purgepages(self, flush=False) -> None:
         """Purge a bulk of page if rate limit exceeded.
 
         .. versionadded:: 8.0

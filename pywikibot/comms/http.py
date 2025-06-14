@@ -35,6 +35,7 @@ import atexit
 import codecs
 import re
 import sys
+import threading
 import traceback
 from contextlib import suppress
 from http import HTTPStatus, cookiejar
@@ -67,7 +68,12 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
     """CookieJar which create the filename and checks file permissions.
 
     .. versionadded:: 8.0
+    .. versionchanged:: 10.2
+       use `threading.Lock` in :meth:`load` and :meth`save` to be thread
+       safe.
     """
+
+    _lock = threading.Lock()  # Class-level lock shared across all instances
 
     def load(self, user: str = '', *args, **kwargs) -> None:
         """Loads cookies from a file.
@@ -81,7 +87,8 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
         self.filename = config.datafilepath(f'pywikibot{_user}.lwp')
 
         try:
-            super().load(*args, **kwargs)
+            with self._lock:
+                super().load(*args, **kwargs)
         except (cookiejar.LoadError, FileNotFoundError):
             debug(f'Loading cookies for user {user} failed.')
         else:
@@ -96,9 +103,10 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
         :raises ValueError: a filename was not supplied; :meth:`load`
             must be called first.
         """
-        if self.filename:
-            file_mode_checker(self.filename, create=True)
-        super().save(*args, **kwargs)
+        with self._lock:
+            if self.filename:
+                file_mode_checker(self.filename, create=True)
+            super().save(*args, **kwargs)
 
 
 #: global :class:`PywikibotCookieJar` instance.
@@ -164,9 +172,10 @@ def user_agent_username(username=None):
     """Reduce username to a representation permitted in HTTP headers.
 
     To achieve that, this function:
-    1) replaces spaces (' ') with '_'
-    2) encodes the username as 'utf-8' and if the username is not ASCII
-    3) URL encodes the username if it is not ASCII, or contains '%'
+
+    - replaces spaces (' ') with '_'
+    - encodes the username as 'utf-8' and if the username is not ASCII
+    - URL encodes the username if it is not ASCII, or contains '%'
     """
     if not username:
         return ''
@@ -262,10 +271,10 @@ def request(site: pywikibot.site.BaseSite,
 
     :param site: The Site to connect to
     :param uri: the URI to retrieve
-    :keyword Optional[CodecInfo, str] charset: Either a valid charset
-        (usable for str.decode()) or None to automatically chose the
-        charset from the returned header (defaults to latin-1)
-    :keyword Optional[str] protocol: a url scheme
+    :keyword CodecInfo or str or None charset: Either a valid charset
+        (usable for `str.decode()`) or None to automatically chose the
+        charset from the returned header (defaults to latin-1).
+    :keyword str | None protocol: a url scheme
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
@@ -300,12 +309,12 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
 
             warn(f'config.authenticate[{path!r}] has invalid value.\n'
                  f'It should contain 2 or 4 items, not {length}.\n'
-                 f'See {pywikibot.__url__}/OAuth for more info.')
+                 f'See {pywikibot.__url__}/OAuth for more info.', stacklevel=2)
 
     return None
 
 
-def error_handling_callback(response):
+def error_handling_callback(response) -> None:
     """Raise exceptions and log alerts.
 
     :param response: Response returned by Session.request().

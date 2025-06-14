@@ -24,7 +24,7 @@ class TestProtectionBot(ScriptMainTestCase):
     rights = 'protect'
     write = True
 
-    def test_protect(self):
+    def test_protect(self) -> None:
         """Test ProtectionBot protect/unprotect on the test wiki."""
         site = self.get_site()
         protect.main('-page:User:Sn1per/ProtectTest1', '-always', '-unprotect',
@@ -36,7 +36,7 @@ class TestProtectionBot(ScriptMainTestCase):
         page = pywikibot.Page(site, 'User:Sn1per/ProtectTest1')
         self.assertLength(list(page.protection()), 2)
 
-    def test_summary(self):
+    def test_summary(self) -> None:
         """Test automatic (un)protection summary on the test wiki."""
         site = self.get_site()
         protect.main('-cat:Pywikibot Protect Test', '-always',

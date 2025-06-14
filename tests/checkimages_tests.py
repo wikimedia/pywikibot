@@ -22,7 +22,7 @@ class TestSettings(TestCase):
     code = 'commons'
     login = True
 
-    def test_load(self):
+    def test_load(self) -> None:
         """Test loading settings."""
         b = checkimages.CheckImagesBot(self.get_site())
         b.takesettings()
@@ -36,7 +36,7 @@ class TestMethods(DefaultSiteTestCase):
 
     """Test methods of CheckImagesBot."""
 
-    def test_important_image(self):
+    def test_important_image(self) -> None:
         """Test important_image method."""
         filenames = ('Example.jpg', 'Demo.jpg')
         images = [(0.0, FilePage(self.site, name)) for name in filenames]

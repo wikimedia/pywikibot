@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ class TestTkdialog(TestCase):
 
     net = True
 
-    def test_tk_dialog(self):
+    def test_tk_dialog(self) -> None:
         """Test Tk dialog."""
         desc = 'foo'
         filename = 'MP_sounds.png'
@@ -43,7 +43,7 @@ class TestTkinter(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_tkinter(self):
+    def test_tkinter(self) -> None:
         """Test Tkinter window."""
         root = tkinter.Tk()
         root.resizable(width=tkinter.FALSE, height=tkinter.FALSE)
@@ -58,7 +58,7 @@ class TestTkinter(TestCase):
 
 
 @require_modules('PIL')
-def setUpModule():
+def setUpModule() -> None:
     """Skip tests if tkinter or PIL is not installed.
 
     .. versionchanged:: 7.7
@@ -94,8 +94,7 @@ def setUpModule():
         dialog = tkinter.Tk()
     except RuntimeError as e:
         raise unittest.SkipTest(f'Skipping due to T380732 - {e}')
-    else:
-        dialog.destroy()
+    dialog.destroy()
 
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 

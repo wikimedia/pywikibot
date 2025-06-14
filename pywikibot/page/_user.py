@@ -1,6 +1,6 @@
 """Object representing a Wiki user."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,6 +72,8 @@ class User(Page):
         The page does not need to exist for this method to return
         True.
 
+        .. seealso:: :meth:`isAnonymous`
+
         :param force: if True, forces reloading the data from API
         """
         # T135828: the registration timestamp may be None but the key exists
@@ -79,15 +81,31 @@ class User(Page):
                 and 'registration' in self.getprops(force))
 
     def isAnonymous(self) -> bool:  # noqa: N802
-        """Determine if the user is editing as an IP address."""
+        """Determine if the user is editing as an IP address.
+
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`is_CIDR`
+           - :func:`tools.is_ip_address`
+        """
         return is_ip_address(self.username)
 
     def is_CIDR(self) -> bool:  # noqa: N802
-        """Determine if the input refers to a range of IP addresses."""
+        """Determine if the input refers to a range of IP addresses.
+
+        .. versionadded:: 9.0
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`isAnonymous`
+           - :func:`tools.is_ip_network`
+        """
         return is_ip_network(self.username)
 
     def getprops(self, force: bool = False) -> dict:
         """Return a properties about the user.
+
+        .. versionchanged:: 9.0
+           detect range blocks
 
         :param force: if True, forces reloading the data from API
         """
@@ -127,7 +145,8 @@ class User(Page):
         """Determine whether the user is currently blocked.
 
         .. versionchanged:: 7.0
-           renamed from :meth:`isBlocked` method,
+           renamed from :meth:`isBlocked` method
+        .. versionchanged:: 9.0
            can also detect range blocks.
 
         :param force: if True, forces reloading the data from API
@@ -181,8 +200,8 @@ class User(Page):
     def getUserPage(self, subpage: str = '') -> Page:  # noqa: N802
         """Return a Page object relative to this user's main page.
 
-        :param subpage: subpage part to be appended to the main
-                            page title (optional)
+        :param subpage: subpage part to be appended to the main page
+            title (optional)
         :return: Page object of user page or user subpage
         """
         if self._isAutoblock:
@@ -197,8 +216,8 @@ class User(Page):
     def getUserTalkPage(self, subpage: str = '') -> Page:  # noqa: N802
         """Return a Page object relative to this user's main talk page.
 
-        :param subpage: subpage part to be appended to the main
-                            talk page title (optional)
+        :param subpage: subpage part to be appended to the main talk
+            page title (optional)
         :return: Page object of user talk page or user talk subpage
         """
         if self._isAutoblock:
@@ -217,8 +236,10 @@ class User(Page):
         :param subject: the subject header of the mail
         :param text: mail body
         :param ccme: if True, sends a copy of this email to the bot
-        :raises NotEmailableError: the user of this User is not emailable
-        :raises UserRightsError: logged in user does not have 'sendemail' right
+        :raises NotEmailableError: the user of this User is not
+            emailable
+        :raises UserRightsError: logged in user does not have
+            'sendemail' right
         :return: operation successful indicator
         """
         if not self.isEmailable():
@@ -242,12 +263,10 @@ class User(Page):
         return ('emailuser' in maildata
                 and maildata['emailuser']['result'] == 'Success')
 
-    def block(self, *args, **kwargs):
+    def block(self, *args, **kwargs) -> None:
         """Block user.
 
         Refer :py:obj:`APISite.blockuser` method for parameters.
-
-        :return: None
         """
         try:
             self.site.blockuser(self, *args, **kwargs)
@@ -267,16 +286,18 @@ class User(Page):
     def logevents(self, **kwargs):
         """Yield user activities.
 
-        :keyword logtype: only iterate entries of this type
-            (see mediawiki api documentation for available types)
+        :keyword logtype: only iterate entries of this type (see
+            mediawiki api documentation for available types)
         :type logtype: str
         :keyword page: only iterate entries affecting this page
         :type page: Page or str
         :keyword namespace: namespace to retrieve logevents from
         :type namespace: int or Namespace
-        :keyword start: only iterate entries from and after this Timestamp
+        :keyword start: only iterate entries from and after this
+            Timestamp
         :type start: Timestamp or ISO date string
-        :keyword end: only iterate entries up to and through this Timestamp
+        :keyword end: only iterate entries up to and through this
+            Timestamp
         :type end: Timestamp or ISO date string
         :keyword reverse: if True, iterate oldest entries first
             (default: newest)
@@ -361,7 +382,8 @@ class User(Page):
         """Return first user contribution.
 
         :return: first user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp,
+            comment
         """
         return next(self.contributions(reverse=True, total=1), None)
 
@@ -372,7 +394,8 @@ class User(Page):
         """Return last user contribution.
 
         :return: last user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp,
+            comment
         """
         return next(self.contributions(total=1), None)
 
@@ -401,8 +424,8 @@ class User(Page):
     def uploadedImages(self, total: int = 10):  # noqa: N802
         """Yield tuples describing files uploaded by this user.
 
-        Each tuple is composed of a pywikibot.Page, the timestamp (str in
-        ISO8601 format), comment (str) and a bool for pageid > 0.
+        Each tuple is composed of a pywikibot.Page, the timestamp (str
+        in ISO8601 format), comment (str) and a bool for pageid > 0.
         Pages returned are not guaranteed to be unique.
 
         :param total: limit result to this number of pages

@@ -25,12 +25,12 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     cached = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Clear siteinfo cache."""
         super().setUp()
         self.site.siteinfo.clear()
 
-    def test_siteinfo(self):
+    def test_siteinfo(self) -> None:
         """Test the siteinfo property."""
         # general entries
         mysite = self.get_site()
@@ -47,7 +47,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertEqual(re.findall(r'\$1', mysite.siteinfo['articlepath']),
                          ['$1'])
 
-    def test_siteinfo_boolean(self):
+    def test_siteinfo_boolean(self) -> None:
         """Test conversion of boolean properties from empty strings."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['titleconversion'], bool)
@@ -55,7 +55,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertIsInstance(mysite.namespaces[0].subpages, bool)
         self.assertIsInstance(mysite.namespaces[0].content, bool)
 
-    def test_properties(self):
+    def test_properties(self) -> None:
         """Test the siteinfo properties."""
         # fileextensions
         self.assertIn('fileextensions', self.site.siteinfo)
@@ -68,14 +68,14 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertIsInstance(restrictions, dict)
         self.assertIn('cascadinglevels', restrictions)
 
-    def test_no_cache(self):
+    def test_no_cache(self) -> None:
         """Test siteinfo caching can be disabled."""
         if 'fileextensions' in self.site.siteinfo._cache:
             del self.site.siteinfo._cache['fileextensions']  # pragma: no cover
         self.site.siteinfo.get('fileextensions', cache=False)
         self.assertFalse(self.site.siteinfo.is_cached('fileextensions'))
 
-    def test_not_exists(self):
+    def test_not_exists(self) -> None:
         """Test accessing a property not in siteinfo."""
         not_exists = 'this-property-does-not-exist'
         mysite = self.site
@@ -90,7 +90,7 @@ class TestSiteInfo(DefaultSiteTestCase):
             entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
 
-    def test_container(self):
+    def test_container(self) -> None:
         """Test Siteinfo container methods."""
         self.assertFalse(self.site.siteinfo.is_cached('general'))
         self.assertIn('general', self.site.siteinfo)
@@ -102,7 +102,7 @@ class TestSiteinfoDry(DefaultDrySiteTestCase):
 
     """Test Siteinfo in dry mode."""
 
-    def test_siteinfo_timestamps(self):
+    def test_siteinfo_timestamps(self) -> None:
         """Test that cache has the timestamp of CachedRequest."""
         site = self.get_site()
         request_mock = MagicMock()
@@ -118,7 +118,7 @@ class TestSiteinfoAsync(DefaultSiteTestCase):
 
     """Test asynchronous siteinfo fetch."""
 
-    def test_async_request(self):
+    def test_async_request(self) -> None:
         """Test async request."""
         self.assertTrue(page_put_queue.empty())
         self.assertFalse(self.site.siteinfo.is_cached('statistics'))

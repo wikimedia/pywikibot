@@ -21,7 +21,7 @@ class TestDryHTMLComparator(TestCase):
 
     net = False
 
-    def test_added_context(self):
+    def test_added_context(self) -> None:
         """Test html_comparator's detection of added-context."""
         output = html_comparator("""
 <tr>
@@ -35,7 +35,7 @@ class TestDryHTMLComparator(TestCase):
         self.assertEqual(output['added-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
-    def test_deleted_context(self):
+    def test_deleted_context(self) -> None:
         """Test html_comparator's detection of deleted-context."""
         output = html_comparator("""
 <tr>
@@ -49,7 +49,7 @@ class TestDryHTMLComparator(TestCase):
         self.assertEqual(output['deleted-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
-    def test_run(self):
+    def test_run(self) -> None:
         """Test html_comparator using examples given in mw-api docs."""
         with open(join_html_data_path('diff.html')) as filed:
             diff_html = filed.read()
@@ -75,7 +75,7 @@ class TestHTMLComparator(TestCase):
     family = 'wikipedia'
     code = 'en'
 
-    def test_wikipedia_rev_139992(self):
+    def test_wikipedia_rev_139992(self) -> None:
         """Test html_comparator with revision 139992 in en:wikipedia."""
         site = self.get_site()
         diff_html = site.compare(139992, 139993)
@@ -91,7 +91,7 @@ class TestNoBeautifulSoup(TestCase):
 
     net = False
 
-    def test_html_comparator(self, mocked_import):
+    def test_html_comparator(self, mocked_import) -> None:
         """Test html_comparator when bs4 not installed."""
         with self.assertRaises(ImportError):
             html_comparator('')
@@ -175,7 +175,7 @@ class TestPatchManager(TestCase):
                   '+    Pywikipediabot   \n'
                   '? +\n'})]
 
-    def test_patch_manager(self):
+    def test_patch_manager(self) -> None:
         """Test PatchManager."""
         for case in self.cases:
             p = PatchManager(case[0], case[1])
@@ -184,7 +184,7 @@ class TestPatchManager(TestCase):
                     self.assertEqual(p.hunks[key].diff_plain_text,
                                      case[2][key])
 
-    def test_patch_manager_no_diff(self):
+    def test_patch_manager_no_diff(self) -> None:
         """Test PatchManager for the same strings."""
         for context in range(2):
             p = PatchManager('Pywikibot', 'Pywikibot', context=context)
@@ -215,7 +215,7 @@ class TestCherryPick(TestCase):
                               '<<lightgreen>>+ e\n<<default>>'
                               '<<lightgreen>>+ w\n<<default>>')
 
-    def check_headers(self, mock):
+    def check_headers(self, mock) -> None:
         """Check if all headers were added to output."""
         for header in self.headers:
             mock.assert_any_call(self.header_base.format(header))
@@ -223,7 +223,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
-    def test_accept(self, input, mock):
+    def test_accept(self, input, mock) -> None:
         """Check output of cherry_pick if changes accepted."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.newtext)
         self.check_headers(mock)
@@ -232,7 +232,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='n')
-    def test_reject(self, input, mock):
+    def test_reject(self, input, mock) -> None:
         """Check output of cherry_pick if changes rejected."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
         self.check_headers(mock)
@@ -242,7 +242,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
-    def test_quit(self, input, mock):
+    def test_quit(self, input, mock) -> None:
         """Check output of cherry_pick if quit."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
         self.check_headers(mock)
@@ -252,7 +252,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='y')
-    def test_by_letter_accept(self, input, mock):
+    def test_by_letter_accept(self, input, mock) -> None:
         """Check cherry_pick output.
 
         If by_letter diff is enabled and changes accepted.
@@ -265,7 +265,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.info')
     @patch('pywikibot.userinterfaces.buffer_interface.UI.input',
            return_value='q')
-    def test_by_letter_quit(self, input, mock):
+    def test_by_letter_quit(self, input, mock) -> None:
         """Check cherry_pick output.
 
         If by_letter diff is enabled and quit during review.

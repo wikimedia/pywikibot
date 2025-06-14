@@ -36,7 +36,7 @@ families_list = [
 ]
 
 
-def update_family(family, wikis):
+def update_family(family, wikis) -> None:
     """Update codes set in family file."""
     joined_wikis = "', '".join(wikis)
     pywikibot.info(f"Adding '{joined_wikis}' to {family} family...\n")

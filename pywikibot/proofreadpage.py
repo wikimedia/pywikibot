@@ -8,7 +8,6 @@ OCR support of page scans via:
   https://wikisource.org/wiki/MediaWiki:GoogleOCR.js
 
 .. seealso:: https://wikisource.org/wiki/Wikisource:Google_OCR
-
 """
 #
 # (C) Pywikibot team, 2015-2024
@@ -125,7 +124,7 @@ class TagAttr:
     .. versionadded:: 8.0
     """
 
-    def __init__(self, attr, value):
+    def __init__(self, attr, value) -> None:
         """Initializer."""
         self.attr = attr
         self._value = self._convert(value)
@@ -152,14 +151,14 @@ class TagAttr:
         return self._value
 
     @value.setter
-    def value(self, value):
+    def value(self, value) -> None:
         self._value = self._convert(value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         attr = 'from' if self.attr == 'ffrom' else self.attr
         return f'{attr}={self._orig_value}'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         attr = 'from' if self.attr == 'ffrom' else self.attr
         return f"{type(self).__name__}('{attr}', {self._orig_value!r})"
 
@@ -171,7 +170,7 @@ class TagAttrDesc:
     .. versionadded:: 8.0
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initializer."""
         self.attrs = WeakKeyDictionary()
 
@@ -182,7 +181,7 @@ class TagAttrDesc:
         attr = self.attrs.get(obj)
         return attr.value if attr is not None else None
 
-    def __set__(self, obj, value):
+    def __set__(self, obj, value) -> None:
         attr = self.attrs.get(obj)
         if attr is not None:
             attr.value = value
@@ -284,7 +283,7 @@ class PagesTagParser(collections.abc.Container):
     tosection = TagAttrDesc()
     onlysection = TagAttrDesc()
 
-    def __init__(self, text='<pages />'):
+    def __init__(self, text='<pages />') -> None:
         """Initializer."""
         m = self.pat_tag.search(text)
         if m is None:
@@ -308,17 +307,17 @@ class PagesTagParser(collections.abc.Container):
                if isinstance(v, TagAttrDesc)}
         return res
 
-    def __contains__(self, attr):
+    def __contains__(self, attr) -> bool:
         return getattr(self, attr) is not None
 
-    def __str__(self):
+    def __str__(self) -> str:
         descriptors = self.get_descriptors().items()
         attrs = [v.attrs.get(self) for k, v in descriptors
                  if v.attrs.get(self) is not None]
         attrs = ' '.join(str(attr) for attr in attrs)
         return f'<pages {attrs} />' if attrs else '<pages />'
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}('{self}')"
 
 
@@ -504,8 +503,8 @@ class ProofreadPage(pywikibot.Page):
 
         If there are many Index pages link to this ProofreadPage, and
         the ProofreadPage is titled Page:<index title>/<page number>,
-        the Index page with the same title will be returned.
-        Otherwise None is returned in the case of multiple linked Index pages.
+        the Index page with the same title will be returned. Otherwise
+        None is returned in the case of multiple linked Index pages.
 
         To force reload, delete index and call it again.
 
@@ -563,12 +562,13 @@ class ProofreadPage(pywikibot.Page):
         This is only applicable if contentmodel equals 'proofread-page'.
         None is returned otherwise.
 
-        This property is read-only and is applicable only when page is loaded.
-        If quality level is overwritten during page processing, this property
-        is no longer necessarily aligned with the new value.
+        This property is read-only and is applicable only when page is
+        loaded. If quality level is overwritten during page processing,
+        this property is no longer necessarily aligned with the new
+        value.
 
-        In this way, no text parsing is necessary to check quality level when
-        fetching a page.
+        In this way, no text parsing is necessary to check quality level
+        when fetching a page.
         """
         # TODO: align this value with ProofreadPage.ql
 
@@ -684,8 +684,8 @@ class ProofreadPage(pywikibot.Page):
     def text(self) -> str:
         """Override text property.
 
-        Preload text returned by EditFormPreloadText to preload non-existing
-        pages.
+        Preload text returned by EditFormPreloadText to preload non-
+        existing pages.
         """
         # Text is already cached.
         if getattr(self, '_text', None) is not None:
@@ -704,13 +704,12 @@ class ProofreadPage(pywikibot.Page):
     def text(self, value: str) -> None:
         """Update current text.
 
-        Mainly for use within the class, called by other methods.
-        Use self.header, self.body and self.footer to set page content,
+        Mainly for use within the class, called by other methods. Use
+        self.header, self.body and self.footer to set page content,
 
         :param value: New value or None
-
-        :raise Error: the page is not formatted according to ProofreadPage
-            extension.
+        :raise Error: the page is not formatted according to
+            ProofreadPage extension.
         """
         self._text = value
         if self._text:
@@ -726,8 +725,8 @@ class ProofreadPage(pywikibot.Page):
     def _decompose_page(self) -> None:
         """Split Proofread Page text in header, body and footer.
 
-        :raise Error: the page is not formatted according to ProofreadPage
-            extension.
+        :raise Error: the page is not formatted according to
+            ProofreadPage extension.
         """
         def _assert_len(len_oq: int, len_cq: int, title: str) -> None:
             if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
@@ -768,10 +767,10 @@ class ProofreadPage(pywikibot.Page):
         """Convert page text to json format.
 
         This is the format accepted by action=edit specifying
-        contentformat=application/json. This format is recommended to save the
-        page, as it is not subject to possible errors done in composing the
-        wikitext header and footer of the page or changes in the ProofreadPage
-        extension format.
+        contentformat=application/json. This format is recommended to
+        save the page, as it is not subject to possible errors done in
+        composing the wikitext header and footer of the page or changes
+        in the ProofreadPage extension format.
         """
         page_dict = {'header': self.header,
                      'body': self.body,
@@ -856,12 +855,13 @@ class ProofreadPage(pywikibot.Page):
     def url_image(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        :return: file url of the scan of ProofreadPage or None.
-
-        For MW version < 1.40:
+        :return: file url of the scan of ProofreadPage or None. For MW
+            version < 1.40:
         :raises Exception: in case of http errors
-        :raises ImportError: if bs4 is not installed, _bs4_soup() will raise
-        :raises ValueError: in case of no prp_page_image src found for scan
+        :raises ImportError: if bs4 is not installed, _bs4_soup() will
+            raise
+        :raises ValueError: in case of no prp_page_image src found for
+            scan
         """
         if self.site.version() < MediaWikiVersion('1.40'):
             return self._url_image_lt_140()
@@ -876,7 +876,8 @@ class ProofreadPage(pywikibot.Page):
     ) -> tuple[bool, str | Exception]:
         """OCR callback function.
 
-        :return: tuple (error, text [error description in case of error]).
+        :return: tuple (error, text [error description in case of
+            error]).
         """
         def identity(x: Any) -> Any:
             return x
@@ -1098,8 +1099,8 @@ class IndexPage(pywikibot.Page):
     def save(self, *args: Any, **kwargs: Any) -> None:  # See Page.save().
         """Save page after validating the content.
 
-        Trying to save any other content fails silently with a parameterless
-        INDEX_TEMPLATE being saved.
+        Trying to save any other content fails silently with a
+        parameterless INDEX_TEMPLATE being saved.
         """
         if not self.has_valid_content():
             raise OtherPageSaveError(
@@ -1132,8 +1133,8 @@ class IndexPage(pywikibot.Page):
     def purge(self) -> None:  # type: ignore[override]
         """Overwrite purge method.
 
-        Instead of a proper purge action, use PurgeRequest, which
-        skips the check on write rights.
+        Instead of a proper purge action, use PurgeRequest, which skips
+        the check on write rights.
         """
         # TODO: This is a workaround for T128994. Remove once bug is fixed.
 
@@ -1336,7 +1337,8 @@ class IndexPage(pywikibot.Page):
         There is a 1-to-many correspondence (a label can be the same for
         several pages).
 
-        :return: set containing page numbers corresponding to page label.
+        :return: set containing page numbers corresponding to page
+            label.
         """
         return self._get_from_label(self._page_numbers_from_label, label)
 

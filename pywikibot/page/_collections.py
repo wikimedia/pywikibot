@@ -27,8 +27,8 @@ class BaseDataDict(MutableMapping):
 
     """Base structure holding data for a Wikibase entity.
 
-    Data are mappings from a language to a value. It will be
-    specialised in subclasses.
+    Data are mappings from a language to a value. It will be specialised
+    in subclasses.
     """
 
     def __init__(self, data=None) -> None:
@@ -112,8 +112,8 @@ class LanguageDict(BaseDataDict):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -175,8 +175,8 @@ class AliasesDict(BaseDataDict):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -256,8 +256,8 @@ class ClaimCollection(MutableMapping):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -423,7 +423,6 @@ class SiteLinkCollection(MutableMapping):
 
         :param data: Data to normalize
         :type data: list or dict
-
         :return: The dict with normalized data
         """
         norm_data = {}
@@ -452,8 +451,8 @@ class SiteLinkCollection(MutableMapping):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """
@@ -493,7 +492,7 @@ class SubEntityCollection(MutableSequence):
 
     """Ordered collection of sub-entities indexed by their ids."""
 
-    def __init__(self, repo, data=None):
+    def __init__(self, repo, data=None) -> None:
         """Initializer.
 
         :param repo: Wikibase site
@@ -508,7 +507,7 @@ class SubEntityCollection(MutableSequence):
         if data:
             self.extend(data)
 
-    def _validate_isinstance(self, obj):
+    def _validate_isinstance(self, obj) -> None:
         if not isinstance(obj, self.type_class):
             raise TypeError(
                 f'{type(self).__name__} should only hold instances of '
@@ -524,10 +523,10 @@ class SubEntityCollection(MutableSequence):
                 raise ValueError(f'No entity with id {index} was found') from e
         return self._data[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index, value) -> None:
         raise NotImplementedError
 
-    def __delitem__(self, index):
+    def __delitem__(self, index) -> None:
         if isinstance(index, str):
             try:
                 index = self._by_key[index]
@@ -537,10 +536,10 @@ class SubEntityCollection(MutableSequence):
         del self._data[index]
         del self._by_key[obj.id]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._data)
 
-    def insert(self, index, obj):
+    def insert(self, index, obj) -> None:
         """Insert a sub-entity to the collection."""
         self._validate_isinstance(obj)
         self._data.insert(index, obj)
@@ -565,7 +564,6 @@ class SubEntityCollection(MutableSequence):
 
         :param data: Data to normalize
         :type data: list
-
         :return: the altered dict from parameter data.
         """
         raise NotImplementedError  # TODO
@@ -573,8 +571,8 @@ class SubEntityCollection(MutableSequence):
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
-        When diffto is provided, JSON representing differences
-        to the provided data is created.
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
 
         :param diffto: JSON containing entity data
         """

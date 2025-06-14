@@ -1,6 +1,6 @@
 """Object representing a MediaWiki category page."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -249,18 +249,20 @@ class Category(Page):
                 if total == 0:
                     return
 
-        if recurse:
-            if not isinstance(recurse, bool):
-                recurse -= 1
+        if not recurse:
+            return
 
-            for subcat in self.subcategories():
-                for member in subcat.members(
-                        recurse=recurse, total=total, **kwargs):
-                    yield member
-                    if total is not None:
-                        total -= 1
-                        if total == 0:
-                            return
+        if not isinstance(recurse, bool):
+            recurse -= 1
+
+        for subcat in self.subcategories():
+            for member in subcat.members(
+                    recurse=recurse, total=total, **kwargs):
+                yield member
+                if total is not None:
+                    total -= 1
+                    if total == 0:
+                        return
 
     def isEmptyCategory(self) -> bool:  # noqa: N802
         """Return True if category has no members (including subcategories)."""

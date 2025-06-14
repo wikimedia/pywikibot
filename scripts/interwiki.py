@@ -343,18 +343,18 @@ To run the script on all pages on a language, run it with option
 ``-continue`` next time.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import os
 import re
 import sys
 from collections import Counter, defaultdict
 from contextlib import suppress
+from pathlib import Path
 from textwrap import fill
 
 import pywikibot
@@ -408,7 +408,8 @@ class LinkMustBeRemoved(SaveError):
     """An interwiki link has to be removed manually.
 
     An interwiki link has to be removed, but this can't be done because
-    of user preferences or because the user chose not to change the page.
+    of user preferences or because the user chose not to change the
+    page.
     """
 
 
@@ -507,8 +508,8 @@ class InterwikiBotConfig:
                 'Please enter the hint filename:')
             # hint or title ends either before | or before ]]
             R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
-            with codecs.open(hintfilename, 'r', config.textfile_encoding) as f:
-                self.hints += R.findall(f.read())
+            txt = Path(hintfilename).read_text(config.textfile_encoding)
+            self.hints += R.findall(txt)
         elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True
@@ -531,7 +532,6 @@ class InterwikiBotConfig:
         elif arg == 'skipfile':
             skip_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.skip.update(skip_page_gen)
-            del skip_page_gen
         elif arg == 'neverlink':
             self.neverlink += value.split(',')
         elif arg == 'ignore':
@@ -540,7 +540,6 @@ class InterwikiBotConfig:
         elif arg == 'ignorefile':
             ignore_page_gen = pagegenerators.TextIOPageGenerator(value)
             self.ignore.update(ignore_page_gen)
-            del ignore_page_gen
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':
@@ -643,8 +642,8 @@ class Subject(interwiki_graph.Subject):
     def __init__(self, origin=None, hints=None, conf=None) -> None:
         """Initializer.
 
-        Takes as arguments the Page on the home wiki
-        plus optionally a list of hints for translation
+        Takes as arguments the Page on the home wiki plus optionally a
+        list of hints for translation
         """
         self.conf = conf
 
@@ -676,10 +675,10 @@ class Subject(interwiki_graph.Subject):
     def getFoundDisambig(self, site):
         """Return the first disambiguation found.
 
-        If we found a disambiguation on the given site while working on the
-        subject, this method returns it. If several ones have been found, the
-        first one will be returned.
-        Otherwise, None will be returned.
+        If we found a disambiguation on the given site while working on
+        the subject, this method returns it. If several ones have been
+        found, the first one will be returned. Otherwise, None will be
+        returned.
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
@@ -690,10 +689,10 @@ class Subject(interwiki_graph.Subject):
     def getFoundNonDisambig(self, site):
         """Return the first non-disambiguation found.
 
-        If we found a non-disambiguation on the given site while working on the
-        subject, this method returns it. If several ones have been found, the
-        first one will be returned.
-        Otherwise, None will be returned.
+        If we found a non-disambiguation on the given site while working
+        on the subject, this method returns it. If several ones have
+        been found, the first one will be returned. Otherwise, None will
+        be returned.
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
@@ -707,9 +706,9 @@ class Subject(interwiki_graph.Subject):
     def getFoundInCorrectNamespace(self, site):
         """Return the first page in the extended namespace.
 
-        If we found a page that has the expected namespace on the given site
-        while working on the subject, this method returns it. If several ones
-        have been found, the first one will be returned.
+        If we found a page that has the expected namespace on the given
+        site while working on the subject, this method returns it. If
+        several ones have been found, the first one will be returned.
         Otherwise, None will be returned.
         """
         for tree in [self.done, self.pending, self.todo]:
@@ -797,8 +796,8 @@ class Subject(interwiki_graph.Subject):
 
         If it is added, update the counter accordingly.
 
-        Also remembers where we found the page, regardless of whether it had
-        already been found before or not.
+        Also remembers where we found the page, regardless of whether it
+        had already been found before or not.
 
         Returns True if the page is new.
         """
@@ -844,8 +843,8 @@ class Subject(interwiki_graph.Subject):
     def namespaceMismatch(self, linkingPage, linkedPage, counter) -> bool:
         """Check whether or not the given page has a different namespace.
 
-        Returns True if the namespaces are different and the user
-        has selected not to follow the linked page.
+        Returns True if the namespaces are different and the user has
+        selected not to follow the linked page.
         """
         if linkedPage in self.found_in:
             # We have seen this page before, don't ask again.
@@ -1009,9 +1008,8 @@ class Subject(interwiki_graph.Subject):
         """Report interwikiless page."""
         self.conf.note(f'{self.origin} does not have any interwiki links')
         if config.without_interwiki:
-            with codecs.open(
-                    pywikibot.config.datafilepath('without_interwiki.txt'),
-                    'a', 'utf-8') as f:
+            with open(pywikibot.config.datafilepath('without_interwiki.txt'),
+                      'a', encoding='utf-8') as f:
                 f.write(f'# {page} \n')
 
     def askForHints(self, counter) -> None:
@@ -1058,8 +1056,11 @@ class Subject(interwiki_graph.Subject):
                     if self.conf.hintsareright:
                         self.hintedsites.add(page.site)
 
-    def redir_checked(self, page, counter):
-        """Check and handle redirect. Return True if check is done."""
+    def redir_checked(self, page, counter) -> bool:
+        """Check and handle redirect.
+
+        Return True if check is done.
+        """
         if page.isRedirectPage():
             redirect_target = page.getRedirectTarget()
             redir = ''
@@ -1189,9 +1190,9 @@ class Subject(interwiki_graph.Subject):
                            f'pages {duplicate} and {page} are found')
             self.makeForcedStop(counter)
             try:
-                with codecs.open(
+                with open(
                     pywikibot.config.datafilepath('autonomous_problems.dat'),
-                        'a', 'utf-8') as f:
+                        'a', encoding='utf-8') as f:
                     f.write(
                         f'* {self.origin} '
                         f'{{Found more than one link for {page.site}}}')
@@ -1244,13 +1245,12 @@ class Subject(interwiki_graph.Subject):
         """Notify that the promised batch of pages was loaded.
 
         This is called by a worker to tell us that the promised batch of
-        pages was loaded.
-        In other words, all the pages in self.pending have already
-        been preloaded.
+        pages was loaded. In other words, all the pages in self.pending
+        have already been preloaded.
 
-        The only argument is an instance of a counter class, that has methods
-        minus() and plus() to keep counts of the total work todo.
-
+        The only argument is an instance of a counter class, that has
+        methods minus() and plus() to keep counts of the total work
+        todo.
         """
         # Loop over all the pages that should have been taken care of
         for page in self.pending:
@@ -1285,7 +1285,7 @@ class Subject(interwiki_graph.Subject):
             self.reportInterwikilessPage(page)
         self.askForHints(counter)
 
-    def isDone(self):
+    def isDone(self) -> bool:
         """Return True if all the work for this subject has completed."""
         return not self.todo
 
@@ -1407,7 +1407,7 @@ class Subject(interwiki_graph.Subject):
 
         return result
 
-    def finish(self):
+    def finish(self) -> None:
         """Round up the subject, making any necessary changes.
 
         This should be called exactly once after the todo collection has
@@ -1431,7 +1431,7 @@ class Subject(interwiki_graph.Subject):
 
         self.post_processing()
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Some finishing processes to be done."""
         pywikibot.info(f'======Post-processing {self.origin}======')
         # Assemble list of accepted interwiki links
@@ -1461,7 +1461,7 @@ class Subject(interwiki_graph.Subject):
         if config.interwiki_backlink:
             self.reportBacklinks(new, updatedSites)
 
-    def process_limit_two(self, new, updated):
+    def process_limit_two(self, new, updated) -> None:
         """Post process limittwo."""
         lclSite = self.origin.site
         lclSiteDone = False
@@ -1511,7 +1511,7 @@ class Subject(interwiki_graph.Subject):
                     except GiveUpOnPage:
                         break
 
-    def process_unlimited(self, new, updated):
+    def process_unlimited(self, new, updated) -> None:
         """Post process unlimited."""
         for (site, page) in new.items():
             # if we have an account for this site
@@ -1821,8 +1821,8 @@ class InterwikiBot:
     def setPageGenerator(self, pageGenerator, number=None, until=None) -> None:
         """Add a generator of subjects.
 
-        Once the list of subjects gets too small,
-        this generator is called to produce more Pages.
+        Once the list of subjects gets too small, this generator is
+        called to produce more Pages.
         """
         self.pageGenerator = pageGenerator
         self.generateNumber = number
@@ -1836,9 +1836,8 @@ class InterwikiBot:
     def generateMore(self, number) -> None:
         """Generate more subjects.
 
-        This is called internally when the
-        list of subjects becomes too small, but only if there is a
-        PageGenerator
+        This is called internally when the list of subjects becomes too
+        small, but only if there is a PageGenerator
         """
         fs = self.firstSubject()
         if fs:
@@ -1864,9 +1863,8 @@ class InterwikiBot:
                     continue
                 if page.namespace() == 10:
                     loc = None
-                    with suppress(KeyError):
-                        tmpl, loc = moved_links[page.site.code]
-                        del tmpl
+                    with suppress(TypeError):
+                        _tpl, loc = i18n.translate(page.site.code, moved_links)
                     if loc is not None and loc in page.title():
                         pywikibot.info(
                             f'Skipping: {page.title()} is a templates subpage')
@@ -1900,8 +1898,8 @@ class InterwikiBot:
     def maxOpenSite(self):
         """Return the site that has the most open queries plus the number.
 
-        If there is nothing left, return None.
-        Only sites that are todo for the first Subject are returned.
+        If there is nothing left, return None. Only sites that are todo
+        for the first Subject are returned.
         """
         if not self.firstSubject():
             return None
@@ -1954,8 +1952,7 @@ class InterwikiBot:
     def oneQuery(self) -> bool:
         """Perform one step in the solution process.
 
-        Returns True if pages could be preloaded, or false
-        otherwise.
+        Returns True if pages could be preloaded, or false otherwise.
         """
         # First find the best language to work on
         site = self.selectQuerySite()
@@ -2084,17 +2081,18 @@ def compareLanguages(old, new, insite, summary):
 def botMayEdit(page) -> bool:
     """Test for allowed edits."""
     tmpl = []
-    with suppress(KeyError):
-        tmpl, _ = moved_links[page.site.code]
+    with suppress(TypeError):
+        tmpl, _ = i18n.translate(page.site.code, moved_links)
 
     if not isinstance(tmpl, list):
         tmpl = [tmpl]
 
-    with suppress(KeyError):
-        tmpl += ignoreTemplates[page.site.code]
+    with suppress(TypeError):
+        tmpl += i18n.translate(page.site.code, ignoreTemplates)
 
-    tmpl += ignoreTemplates['_default']
-    if tmpl != []:
+    tmpl += i18n.translate('_default', ignoreTemplates)
+
+    if tmpl:
         templates = page.templatesWithParams()
         for template in templates:
             if template[0].title(with_ns=False).lower() in tmpl:
@@ -2105,10 +2103,10 @@ def botMayEdit(page) -> bool:
 def page_empty_check(page) -> bool:
     """Return True if page should be skipped as it is almost empty.
 
-    Pages in content namespaces are considered empty if they contain less than
-    50 characters, and other pages are considered empty if they are not
-    category pages and contain less than 4 characters excluding interlanguage
-    links and categories.
+    Pages in content namespaces are considered empty if they contain
+    less than 50 characters, and other pages are considered empty if
+    they are not category pages and contain less than 4 characters
+    excluding interlanguage links and categories.
     """
     txt = page.text
     # Check if the page is in content namespace
@@ -2138,8 +2136,8 @@ class InterwikiDumps(OptionHandler):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword do_continue: If true, continue alphabetically starting at the
-            last of the dumped pages.
+        :keyword do_continue: If true, continue alphabetically starting
+            at the last of the dumped pages.
         """
         try:
             self.site = kwargs.pop('site')
@@ -2221,13 +2219,13 @@ class InterwikiDumps(OptionHandler):
         """Write dump file.
 
         :param iterable: an iterable of page titles to be dumped.
-        :param append: if a dump already exits, append the page titles to it
-            if True else overwrite it.
+        :param append: if a dump already exits, append the page titles
+            to it if True else overwrite it.
         """
         filename = os.path.join(self.path,
                                 self.FILE_PATTERN.format(site=self.site))
         mode = 'appended' if append else 'written'
-        with codecs.open(filename, mode[0], 'utf-8') as f:
+        with open(filename, mode[0], encoding='utf-8') as f:
             f.write('\r\n'.join(iterable))
             f.write('\r\n')
         pywikibot.info(

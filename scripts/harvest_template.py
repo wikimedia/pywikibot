@@ -188,18 +188,19 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         :type template_title: str
         :param fields: A dictionary of fields that are of use to us
         :type fields: dict
-        :keyword islink: Whether non-linked values should be treated as links
+        :keyword islink: Whether non-linked values should be treated as
+            links
         :type islink: bool
         :keyword create: Whether to create a new item if it's missing
         :type create: bool
-        :keyword exists: pattern for merging existing claims with harvested
-            values
+        :keyword exists: pattern for merging existing claims with
+            harvested values
         :type exists: str
-        :keyword multi: Whether multiple values should be extracted from a
-            single parameter
+        :keyword multi: Whether multiple values should be extracted from
+            a single parameter
         :type multi: bool
-        :keyword inverse: a property to populate on the target, pointing to
-            the page item
+        :keyword inverse: a property to populate on the target, pointing
+            to the page item
         :type inverse: str
         """
         super().__init__(**kwargs)
@@ -213,7 +214,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.opt.create
 
-    def setup(self):
+    def setup(self) -> None:
         """Cache some static data from wikis."""
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.template_title)

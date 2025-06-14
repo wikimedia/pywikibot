@@ -1,7 +1,7 @@
 """Test aspects to allow fine grained control over what tests are executed.
 
-Several parts of the test infrastructure are implemented as mixins,
-such as API result caching and excessive test durations.
+Several parts of the test infrastructure are implemented as mixins, such
+as API result caching and excessive test durations.
 """
 #
 # (C) Pywikibot team, 2014-2025
@@ -57,6 +57,9 @@ from tests.utils import (
 
 
 OSWIN32 = (sys.platform == 'win32')
+SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
+
+
 pywikibot.bot.set_interface('buffer')
 
 
@@ -68,12 +71,12 @@ class TestTimerMixin(unittest.TestCase):
     # before a note is added after the test.
     test_duration_warning_interval = 10
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         self.test_start = time.time()
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test."""
         super().tearDown()
         self.test_completed = time.time()
@@ -87,27 +90,27 @@ class TestCaseBase(TestTimerMixin):
 
     """Base class for all tests."""
 
-    def assertIsEmpty(self, seq, msg=None):
+    def assertIsEmpty(self, seq, msg=None) -> None:
         """Check that the sequence is empty."""
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         if seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
 
-    def assertIsNotEmpty(self, seq, msg=None):
+    def assertIsNotEmpty(self, seq, msg=None) -> None:
         """Check that the sequence is not empty."""
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         if not seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
 
-    def assertLength(self, seq, other, msg=None):
+    def assertLength(self, seq, other, msg=None) -> None:
         """Verify that a sequence seq has the length of other."""
         # the other parameter may be given as a sequence too
         self.assertIsInstance(
-            seq, Sized, 'seq argument is not a Sized class containing __len__')
+            seq, Sized, SIZED_ERROR)
         first_len = len(seq)
         try:
             second_len = len(other)
@@ -132,9 +135,11 @@ class TestCaseBase(TestTimerMixin):
         self.assertIn(page.namespace(), namespaces,
                       f'{page} not in namespace {namespaces!r}')
 
-    def _get_gen_pages(self,
-                       gen: Iterable[pywikibot.Page],
-                       site: pywikibot.site.APISite = None) -> None:
+    def _get_gen_pages(
+        self,
+        gen: Iterable[pywikibot.Page],
+        site: pywikibot.site.APISite | None = None
+    ) -> list[pywikibot.Page]:
         """Get pages from gen, asserting they are Page from site.
 
         .. versionchanged:: 9.3
@@ -154,7 +159,9 @@ class TestCaseBase(TestTimerMixin):
 
         return gen_pages
 
-    def _get_gen_titles(self, gen, site=None) -> list[str]:
+    def _get_gen_titles(self,
+                        gen: list[pywikibot.Page],
+                        site=None) -> list[str]:
         """Return a list of page titles of given iterable."""
         return [page.title() for page in self._get_gen_pages(gen, site)]
 
@@ -363,7 +370,7 @@ class DisableSiteMixin(TestCaseBase):
     $ pytest -a 'not site'
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         self.old_Site_lookup_method = pywikibot.Site
         pywikibot.Site = lambda *args: self.fail(
@@ -371,7 +378,7 @@ class DisableSiteMixin(TestCaseBase):
 
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test."""
         super().tearDown()
 
@@ -382,16 +389,15 @@ class ForceCacheMixin(TestCaseBase):
 
     """Aggressively cached API test cases.
 
-    Patches pywikibot.data.api to aggressively cache
-    API responses.
+    Patches pywikibot.data.api to aggressively cache API responses.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         patch_request()
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test."""
         super().tearDown()
         unpatch_request()
@@ -401,7 +407,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
 
     """Site interface to prevent sites being loaded."""
 
-    def __init__(self, code, fam=None, user=None):
+    def __init__(self, code, fam=None, user=None) -> None:
         """Initializer."""
         raise SiteDefinitionError(  # pragma: no cover
             f'Loading site {fam}:{code} during dry test not permitted')
@@ -418,7 +424,7 @@ class DisconnectedSiteMixin(TestCaseBase):
     $ pytest -a 'not site'
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test."""
         self.old_config_interface = config.site_interface
         # TODO: put a dummy subclass into config.site_interface
@@ -434,7 +440,7 @@ class DisconnectedSiteMixin(TestCaseBase):
 
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down test."""
         super().tearDown()
 
@@ -450,7 +456,7 @@ class CheckHostnameMixin(TestCaseBase):
     _checked_hostnames = {}
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
         Prevent tests running if the host is down.
@@ -552,21 +558,19 @@ class RequireLoginMixin(TestCaseBase):
 
     """Run tests against a specific site, with a login."""
 
-    login = True
-
     @classmethod
-    def require_site_user(cls, family, code):
+    def require_site_user(cls, family, code) -> None:
         """Check the user config has a valid login to the site."""
         if not cls.has_site_user(family, code):
             raise unittest.SkipTest(
                 f'{cls.__name__}: No username for {family}:{code}')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Skip the test class if the user config does not have
-        a valid login to the site.
+        Skip the test class if the user config does not have a valid
+        login to the site.
         """
         super().setUpClass()
 
@@ -590,7 +594,7 @@ class RequireLoginMixin(TestCaseBase):
                 raise unittest.SkipTest(
                     f'{cls.__name__}: Not able to login to {site}')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test case.
 
         Login to the site if it is not logged in.
@@ -598,12 +602,12 @@ class RequireLoginMixin(TestCaseBase):
         super().setUp()
         self._reset_login(True)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Log back into the site."""
         super().tearDown()
         self._reset_login()
 
-    def _reset_login(self, skip_if_login_fails: bool = False):
+    def _reset_login(self, skip_if_login_fails: bool = False) -> None:
         """Login to all sites.
 
         There may be many sites, and setUp doesn't know which site is to
@@ -648,7 +652,7 @@ class NeedRightsMixin(TestCaseBase):
     """Require specific rights."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
         Skip the test class if the user does not have required rights.
@@ -691,7 +695,7 @@ class MetaTestCaseClass(type):
         """
         def wrap_method(key, sitedata, func):
 
-            def wrapped_method(self):
+            def wrapped_method(self) -> None:
                 sitedata = self.sites[key]
                 self.site_key = key
                 self.family = sitedata['family']
@@ -875,7 +879,7 @@ class MetaTestCaseClass(type):
         return bases
 
     @staticmethod
-    def add_method(dct, test_name, method, doc=None, doc_suffix=None):
+    def add_method(dct, test_name, method, doc=None, doc_suffix=None) -> None:
         """Set method's __name__ and __doc__ and add it to dct.
 
         .. versionchanged:: 9.3
@@ -902,11 +906,11 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
     """Run tests on pre-defined sites."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Prefetch the Site object for each of the sites the test
-        class has declared are needed.
+        Prefetch the Site object for each of the sites the test class
+        has declared are needed.
         """
         super().setUpClass()
 
@@ -999,7 +1003,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         return (code in usernames[family] or '*' in usernames[family]
                 or code in usernames['*'] or '*' in usernames['*'])
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
 
@@ -1067,7 +1071,7 @@ class PatchingTestCase(TestCase):
             return decorated
         return add_patch
 
-    def patch(self, obj, attr_name, replacement):
+    def patch(self, obj, attr_name, replacement) -> None:
         """Patch the obj's attribute with the replacement.
 
         It will be reset after each ``tearDown``.
@@ -1075,7 +1079,7 @@ class PatchingTestCase(TestCase):
         self._patched_instances += [(obj, attr_name, getattr(obj, attr_name))]
         setattr(obj, attr_name, replacement)
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test by initializing the patched list."""
         super().setUp()
         self._patched_instances = []
@@ -1085,7 +1089,7 @@ class PatchingTestCase(TestCase):
                 self.patch(attribute._patching[0], attribute._patching[1],
                            attribute)
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down the test by unpatching the patched."""
         for patched in self._patched_instances:
             setattr(*patched)
@@ -1097,7 +1101,7 @@ class SiteAttributeTestCase(TestCase):
     """Add the sites as attributes to the instances."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Add each initialized site as an attribute to cls."""
         super().setUpClass()
         for site in cls.sites:
@@ -1113,7 +1117,7 @@ class DefaultSiteTestCase(TestCase):
     code = config.mylang
 
     @classmethod
-    def override_default_site(cls, site):
+    def override_default_site(cls, site) -> None:
         """Override the default site.
 
         :param site: site tests should use
@@ -1139,13 +1143,13 @@ class AlteredDefaultSiteTestCase(TestCase):
 
     """Save and restore the config.mylang and config.family."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Prepare the environment for running main() in a script."""
         self.original_family = pywikibot.config.family
         self.original_code = pywikibot.config.mylang
         super().setUp()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore the environment."""
         pywikibot.config.family = self.original_family
         pywikibot.config.mylang = self.original_code
@@ -1156,7 +1160,7 @@ class ScriptMainTestCase(AlteredDefaultSiteTestCase):
 
     """Tests that depend on the default site being set to the test site."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Prepare the environment for running main() in a script."""
         super().setUp()
         site = self.get_site()
@@ -1176,7 +1180,7 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
     """Test class to run against a WMF site, preferring the default site."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
         Check that the default site is a Wikimedia site.
@@ -1207,7 +1211,7 @@ class WikibaseTestCase(TestCase):
     wikibase = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
         Checks that all sites are configured with a Wikibase repository,
@@ -1239,7 +1243,7 @@ class WikibaseTestCase(TestCase):
         """Return the prefetched DataSite object."""
         return cls.repo
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
 
@@ -1255,11 +1259,11 @@ class WikibaseClientTestCase(WikibaseTestCase):
     """Run tests against a specific site connected to a wikibase."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
-        Checks that all sites are configured as a Wikibase client,
-        with Site.has_data_repository returning True.
+        Checks that all sites are configured as a Wikibase client, with
+        Site.has_data_repository returning True.
         """
         super().setUpClass()
 
@@ -1290,7 +1294,7 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
     """Run tests against any site connected to Wikidata."""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up the test class.
 
         Require the data repository is wikidata.org.
@@ -1323,7 +1327,7 @@ class PwbTestCase(TestCase):
 
     pwb = True
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Prepare the environment for running the pwb.py script."""
         super().setUp()
         self.orig_pywikibot_dir = None
@@ -1332,7 +1336,7 @@ class PwbTestCase(TestCase):
         base_dir = pywikibot.config.base_dir
         os.environ['PYWIKIBOT_DIR'] = base_dir
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Restore the environment after running the pwb.py script."""
         super().tearDown()
         del os.environ['PYWIKIBOT_DIR']
@@ -1364,7 +1368,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
     length = 3
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Set up test class."""
         if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
             raise unittest.SkipTest(
@@ -1399,7 +1403,7 @@ class DeprecationTestCase(TestCase):
     if hasattr(unittest.case, '_AssertRaisesBaseContext'):
         source_adjustment_skips.append(unittest.case._AssertRaisesBaseContext)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
         super().__init__(*args, **kwargs)
         self.warning_log = []
@@ -1414,7 +1418,7 @@ class DeprecationTestCase(TestCase):
         self.context_manager = WarningSourceSkipContextManager(
             self.source_adjustment_skips)
 
-    def _reset_messages(self):
+    def _reset_messages(self) -> None:
         """Reset captured deprecation warnings."""
         self._do_test_warning_filename = True
         del self.warning_log[:]
@@ -1450,7 +1454,7 @@ class DeprecationTestCase(TestCase):
                 f'instead argument must not be a {type(instead).__name__!r}')
         return msg
 
-    def assertDeprecationParts(self, deprecated=None, instead=None):
+    def assertDeprecationParts(self, deprecated=None, instead=None) -> None:
         """Assert that a deprecation warning happened.
 
         To simplify deprecation tests it just requires the to separated parts
@@ -1468,7 +1472,7 @@ class DeprecationTestCase(TestCase):
         """
         self.assertDeprecation(self._build_message(deprecated, instead))
 
-    def assertDeprecation(self, msg=None):
+    def assertDeprecation(self, msg=None) -> None:
         """Assert that a deprecation warning happened.
 
         :param msg: Either the specific message or None to allow any generic
@@ -1499,7 +1503,7 @@ class DeprecationTestCase(TestCase):
             self.assertDeprecationFile(self.expect_warning_filename)
 
     def assertOneDeprecationParts(self, deprecated=None, instead=None,
-                                  count=1):
+                                  count=1) -> None:
         """Assert that exactly one deprecation message happened and reset.
 
         It uses the same arguments as :py:obj:`assertDeprecationParts`.
@@ -1507,7 +1511,7 @@ class DeprecationTestCase(TestCase):
         self.assertOneDeprecation(self._build_message(deprecated, instead),
                                   count)
 
-    def assertOneDeprecation(self, msg=None, count=1):
+    def assertOneDeprecation(self, msg=None, count=1) -> None:
         """Assert that exactly one deprecation message happened and reset."""
         self.assertDeprecation(msg)
         # This is doing such a weird structure, so that it shows any other
@@ -1517,19 +1521,19 @@ class DeprecationTestCase(TestCase):
         self.assertLength(self.deprecation_messages, count)
         self._reset_messages()
 
-    def assertNoDeprecation(self, msg=None):
+    def assertNoDeprecation(self, msg=None) -> None:
         """Assert that no deprecation warning happened."""
         if msg:  # pragma: no cover
             self.assertNotIn(msg, self.deprecation_messages)
         else:
             self.assertIsEmpty(self.deprecation_messages)
 
-    def assertDeprecationClass(self, cls):
+    def assertDeprecationClass(self, cls) -> None:
         """Assert that all deprecation warning are of one class."""
         for item in self.warning_log:
             self.assertIsInstance(item.message, cls)
 
-    def assertDeprecationFile(self, filename):
+    def assertDeprecationFile(self, filename) -> None:
         """Assert that all deprecation warning are of one filename."""
         for item in self.warning_log:
             if (self._ignore_unknown_warning_packages
@@ -1541,14 +1545,14 @@ class DeprecationTestCase(TestCase):
                           f'item: {item}')
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Only operate in debug mode."""
         if not __debug__:
             raise unittest.SkipTest(
                 f'{cls.__name__} is disabled when __debug__ is disabled.')
         super().setUpClass()
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up unit test."""
         super().setUp()
 
@@ -1557,7 +1561,7 @@ class DeprecationTestCase(TestCase):
 
         self._reset_messages()
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """Tear down unit test."""
         self.context_manager.__exit__()
 
@@ -1581,7 +1585,7 @@ class HttpbinTestCase(TestCase):
         """Return url of httpbin."""
         return 'http://httpbin.org' + path
 
-    def get_httpbin_hostname(self):
+    def get_httpbin_hostname(self) -> str:
         """Return httpbin hostname."""
         return 'httpbin.org'
 

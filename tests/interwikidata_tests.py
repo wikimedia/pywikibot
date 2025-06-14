@@ -21,15 +21,15 @@ class DummyBot(interwikidata.IWBot):
 
     """A dummy bot to prevent editing in production wikis."""
 
-    def put_current(self):
+    def put_current(self) -> bool:
         """Prevent editing."""
         return False
 
-    def create_item(self):
+    def create_item(self) -> bool:
         """Prevent creating items."""
         return False
 
-    def try_to_add(self):
+    def try_to_add(self) -> None:
         """Prevent adding sitelinks to items."""
         return
 
@@ -53,7 +53,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
         },
     }
 
-    def test_main(self, key):
+    def test_main(self, key) -> None:
         """Test main function interwikidata.py."""
         site = self.get_site(key)
         pywikibot.config.family = site.family
@@ -70,7 +70,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
                     r'interwiki\.py instead\.'):
                 interwikidata.main()
 
-    def test_iw_bot(self):
+    def test_iw_bot(self) -> None:
         """Test IWBot class."""
         page = pywikibot.Page(self.en, 'User:Ladsgroup')
         text = page.get()
@@ -99,7 +99,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
 
         self.assertFalse(bot.handle_complicated())
 
-    def test_without_repo(self):
+    def test_without_repo(self) -> None:
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
         with self.assertRaises(ValueError):

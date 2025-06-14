@@ -264,10 +264,11 @@ class UploadError(APIError):
                  offset: int | bool = 0) -> None:
         """Create a new UploadError instance.
 
-        :param file_key: The file_key of the uploaded file to reuse it later.
-            If no key is known or it is an incomplete file it may be None.
-        :param offset: The starting offset for a chunked upload. Is False when
-            there is no offset.
+        :param file_key: The file_key of the uploaded file to reuse it
+            later. If no key is known or it is an incomplete file it may
+            be None.
+        :param offset: The starting offset for a chunked upload. Is
+            False when there is no offset.
         """
         super().__init__(code, message)
         self.file_key = file_key
@@ -396,7 +397,6 @@ class InconsistentTitleError(PageLoadRelatedError):
 
         :param page: Page that caused the exception
         :param actual: title obtained by query
-
         """
         self.message = f"Query on {{}} returned data on '{actual}'"
         super().__init__(page)
@@ -416,7 +416,6 @@ class NoSiteLinkError(PageLoadRelatedError, NoPageError):
 
         :param page: ItemPage that caused the exception
         :param dbname: site identifier of the queried sitelink
-
         """
         self.message = f'Item {{}} has no sitelink to {dbname!r}'
         super().__init__(page)
@@ -465,10 +464,9 @@ class CircularRedirectError(PageRelatedError):
 
     """Page is a circular redirect.
 
-    Exception argument is the redirect target; this may be the same title
-    as this page or a different title (in which case the target page directly
-    or indirectly redirects back to this one)
-
+    Exception argument is the redirect target; this may be the same
+    title as this page or a different title (in which case the target
+    page directly or indirectly redirects back to this one)
     """
 
     message = 'Page {} is a circular redirect.'
@@ -479,7 +477,6 @@ class InterwikiRedirectPageError(PageRelatedError):
     """Page is a redirect to another site.
 
     This is considered invalid in Pywikibot. See bug :phab:`T75184`.
-
     """
 
     message = ('Page redirects to a page on another Site.\n'
@@ -648,8 +645,8 @@ class AutoblockUserError(Error):
     """Requested action on a virtual autoblock user not valid.
 
     The class AutoblockUserError is an exception that is raised whenever
-    an action is requested on a virtual autoblock user that's not available
-    for him (i.e. roughly everything except unblock).
+    an action is requested on a virtual autoblock user that's not
+    available for him (i.e. roughly everything except unblock).
     """
 
 
@@ -657,9 +654,9 @@ class TranslationError(Error, ImportError):
 
     """Raised when no correct translation could be found.
 
-    Inherits from ImportError, as this exception is now used
-    where previously an ImportError would have been raised,
-    and may have been caught by scripts as such.
+    Inherits from ImportError, as this exception is now used where
+    previously an ImportError would have been raised, and may have been
+    caught by scripts as such.
     """
 
 

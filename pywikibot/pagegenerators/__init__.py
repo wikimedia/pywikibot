@@ -567,8 +567,8 @@ def PageClassGenerator(generator: Iterable[pywikibot.page.Page]
                        ) -> Generator[pywikibot.page.Page, None, None]:
     """Yield pages from another generator as Page subclass objects.
 
-    The page class type depends on the page namespace.
-    Objects may be Category, FilePage, Userpage or Page.
+    The page class type depends on the page namespace. Objects may be
+    Category, FilePage, Userpage or Page.
     """
     for page in generator:
         if page.namespace() == page.site.namespaces.USER:
@@ -587,9 +587,8 @@ def PageWithTalkPageGenerator(
 ) -> Generator[pywikibot.page.BasePage, None, None]:
     """Yield pages and associated talk pages from another generator.
 
-    Only yields talk pages if the original generator yields a non-talk page,
-    and does not check if the talk page in fact exists.
-
+    Only yields talk pages if the original generator yields a non-talk
+    page, and does not check if the talk page in fact exists.
     """
     for page in generator:
         if not return_talk_only or page.isTalkPage():

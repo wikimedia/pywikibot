@@ -1,6 +1,26 @@
 Release History
 ===============
 
+10.1.0
+------
+*18 May 2025*
+
+* Use WikiHistory instead of XTools to implement :meth:`Page.authorship()
+  <page._toolforge.WikiBlameMixin.authorship>` (:phab:`T392345`)
+* Correct :class:`comms.eventstreams.EventStreams` kwarg name
+  from *last_event_id* to *latest_event_id* (:phab:`T394570`)
+* Retieve charset from accept-charset header entry in :func:`comms.http._decide_encoding` (:phab:`T392345`)
+* Skip :meth:`CosmeticChangesToolkit.removeEmptySections()
+  <cosmetic_changes.CosmeticChangesToolkit.removeEmptySections>` if section length is too less  (:phab:`T391776`)
+* Add support for nupwiki (:phab:`T390713`)
+* i18n updates
+* No longer follow redirects in :func:`bot.open_webbrowser` (:phab:`T390447`)
+* Update closed and removed wikis (:phab:`T390732`)
+* *page* parameter was added to :meth:`site.recentchanges()
+  <pywikibot.site._generators.GeneratorsMixin.recentchanges>`
+* googlesearch-python package is required for :class:`pagegenerators.GoogleSearchPageGenerator`
+
+
 10.0.0
 ------
 *01 March 2025*
@@ -309,6 +329,8 @@ Release History
   only available for :class:`family.WikimediaFamily` families. The ``wikimedia_sites.py`` maintenance script was
   removed.
 * Add :func:`config.base_dir<config.get_base_dir>` to scripts search path with :mod:`pwb` wrapper (:phab:`T324287`)
+* Detect range blocks with :meth:`pywikibot.User.is_blocked` and :meth:`pywikibot.User.getprops` (:phab:`T301282`)
+* Add :func:`tools.is_ip_network` and :meth:`pywikibot.User.is_CIDR` (:phab:`T301282`)
 * :meth:`pywikibot.WbTime.equal_instant` was added (:phab:`T325248`)
 * ``revisions`` parameter of :class:`xmlreader.XmlDump` was introduced to specify parsing method
   (:phab:`T340804`)

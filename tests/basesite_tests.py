@@ -68,7 +68,7 @@ class TestBaseSiteProperties(TestCase):
 
     dry = True
 
-    def test_properties(self, key):
+    def test_properties(self, key) -> None:
         """Test cases for BaseSite properties."""
         mysite = self.get_site(key)
         self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
@@ -80,7 +80,7 @@ class TestSiteObject(DefaultSiteTestCase):
 
     cached = True
 
-    def test_base_methods(self):
+    def test_base_methods(self) -> None:
         """Test cases for BaseSite methods."""
         mysite = self.get_site()
         code = self.site.family.obsolete.get(self.code) or self.code
@@ -129,7 +129,7 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertTrue(mysite.sametitle('MediaWiki:Always',
                                          'MediaWiki:always'))
 
-    def test_site_with_url(self):
+    def test_site_with_url(self) -> None:
         """Test site constructor with url."""
         for fam in ('commons', 'meta'):
             with self.subTest(family=fam):

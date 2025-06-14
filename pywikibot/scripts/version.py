@@ -12,15 +12,15 @@ The following option is supported:
    the *-nouser* option.
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import codecs
 import os
 import sys
+from pathlib import Path
 
 import pywikibot
 from pywikibot.version import getversion
@@ -75,17 +75,20 @@ def main(*args: str) -> None:
             or not hasattr(requests.certs, 'where')
             or not callable(requests.certs.where)):
         pywikibot.info('  cacerts: not defined')
-    elif not os.path.isfile(requests.certs.where()):
-        pywikibot.info(f'  cacerts: {requests.certs.where()} (missing)')
     else:
-        pywikibot.info('  cacerts: ' + requests.certs.where())
-
-        with codecs.open(requests.certs.where(), 'r', 'utf-8') as cert_file:
-            text = cert_file.read()
+        cert = Path(requests.certs.where())
+        # is_symlink() required for Python 3.12 and below.
+        # Otherwise follow_symlinks=True could be used in is_file().
+        if not cert.is_file() or cert.is_symlink():
+            pywikibot.info(f'  cacerts: {cert.name} (missing)')
+        else:
+            pywikibot.info(f'  cacerts: {cert}')
+            text = cert.read_text(encoding='utf-8')
             if WMF_CACERT in text:
                 has_wikimedia_cert = True
-        pywikibot.info('    certificate test: {}'
-                       .format('ok' if has_wikimedia_cert else 'not ok'))
+            pywikibot.info('    certificate test: {}'
+                           .format('ok' if has_wikimedia_cert else 'not ok'))
+
     if not has_wikimedia_cert:
         pywikibot.info('  Please reinstall requests!')
 

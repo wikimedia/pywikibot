@@ -12,7 +12,7 @@ from pywikibot.backports import batched
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
-def main():
+def main() -> None:
     """Main function."""
     fg_colors = [col for col in colors if col != 'default']
     bg_colors = fg_colors[:]

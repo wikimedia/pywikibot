@@ -71,7 +71,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
             return True
         return super().skip_page(page)
 
-    def treat(self, file_page):
+    def treat(self, file_page) -> None:
         """Set page to current page and delink that page."""
         # use image_regex from image.py
         namespace = file_page.site.namespaces[6]
@@ -92,7 +92,7 @@ class CommonsDelinker(SingleSiteBot, ConfigParserBot, AutomaticTWSummaryBot):
                 shown = True
             super().treat(page)
 
-    def treat_page(self):
+    def treat_page(self) -> None:
         """Delink a single page."""
         new = re.sub(self.image_regex, '', self.current_page.text)
         self.put_current(new)
@@ -205,7 +205,7 @@ class DelinkerFromLog(CommonsDelinker):
         self.summary_parameters = dict(item)
         return pywikibot.FilePage(item.page(), ignore_extension=True)
 
-    def teardown(self):
+    def teardown(self) -> None:
         """Save the last used logevent timestamp."""
         if not hasattr(self, 'last_ts'):
             return

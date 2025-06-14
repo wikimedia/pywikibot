@@ -187,12 +187,13 @@ class ItemClaimFilter:
         """Yield all ItemPages which contain certain claim in a property.
 
         :param prop: property id to check
-        :param claim: value of the property to check. Can be exact value (for
-            instance, ItemPage instance) or a string (e.g. 'Q37470').
-        :param qualifiers: dict of qualifiers that must be present, or None if
-            qualifiers are irrelevant
-        :param negate: true if pages that do *not* contain specified claim
-            should be yielded, false otherwise
+        :param claim: value of the property to check. Can be exact value
+            (for instance, ItemPage instance) or a string (e.g.
+            'Q37470').
+        :param qualifiers: dict of qualifiers that must be present, or
+            None if qualifiers are irrelevant
+        :param negate: true if pages that do *not* contain specified
+            claim should be yielded, false otherwise
         """
         qualifiers = qualifiers or {}
         for page in generator:
@@ -210,8 +211,9 @@ def SubpageFilterGenerator(generator: Iterable[pywikibot.page.BasePage],
                            ) -> Generator[pywikibot.page.BasePage, None, None]:
     """Generator which filters out subpages based on depth.
 
-    It looks at the namespace of each page and checks if that namespace has
-    subpages enabled. If so, pages with forward slashes ('/') are excluded.
+    It looks at the namespace of each page and checks if that namespace
+    has subpages enabled. If so, pages with forward slashes ('/') are
+    excluded.
 
     :param generator: A generator object
     :param max_depth: Max depth of subpages to yield, at least zero
@@ -305,7 +307,8 @@ class RegexFilter:
                       ) -> Generator[pywikibot.page.BasePage, None, None]:
         """Yield pages from another generator whose body matches regex.
 
-        Uses regex option re.IGNORECASE depending on the quantifier parameter.
+        Uses regex option re.IGNORECASE depending on the quantifier
+        parameter.
 
         For parameters see titlefilter above.
         """
@@ -373,8 +376,10 @@ def EdittimeFilterPageGenerator(
     :param generator: A generator object
     :param last_edit_start: Only yield pages last edited after this time
     :param last_edit_end: Only yield pages last edited before this time
-    :param first_edit_start: Only yield pages first edited after this time
-    :param first_edit_end: Only yield pages first edited before this time
+    :param first_edit_start: Only yield pages first edited after this
+        time
+    :param first_edit_end: Only yield pages first edited before this
+        time
     :param show_filtered: Output a message for each page not yielded
     """
     def to_be_yielded(edit: _Edit,
@@ -427,18 +432,17 @@ def UserEditFilterGenerator(
 ) -> Generator[pywikibot.page.BasePage, None, None]:
     """Generator which will yield Pages modified by username.
 
-    It only looks at the last editors given by max_revision_depth.
-    If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
-    ignored.
-    If skip is set, pages edited by the given user are ignored otherwise only
-    pages edited by this user are given back.
+    It only looks at the last editors given by max_revision_depth. If
+    timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
+    ignored. If skip is set, pages edited by the given user are ignored
+    otherwise only pages edited by this user are given back.
 
     :param generator: A generator object
     :param username: user name which edited the page
     :param timestamp: ignore edits which are older than this timestamp
     :param skip: Ignore pages edited by the given user
-    :param max_revision_depth: It only looks at the last editors given by
-        max_revision_depth
+    :param max_revision_depth: It only looks at the last editors given
+        by max_revision_depth
     :param show_filtered: Output a message for each page not yielded
     """
     if timestamp is None:

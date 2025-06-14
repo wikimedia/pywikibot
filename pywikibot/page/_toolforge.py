@@ -28,7 +28,7 @@ class WikiBlameMixin:
     #: Supported wikipedia site codes
     WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
 
-    def _check_wh_supported(self):
+    def _check_wh_supported(self) -> None:
         """Check if WikiHistory is supported."""
         if self.site.family.name != 'wikipedia':
             raise NotImplementedError(
@@ -156,13 +156,6 @@ class WikiBlameMixin:
             percentage edits.
         :param max_pct_sum: Only return authors until the prcentage sum
             reached *max_pct_sum*.
-        :param revid: The revision id for the authors should be found.
-            If ``None`` or ``0``, the latest revision is be used. Cannot
-            be used together with *date*.
-        :param date: The revision date for the authors should be found.
-            If ``None``, it will be ignored. Cannot be used together
-            with *revid*. If the parameter is a string it must be given
-            in the form ``YYYY-MM-DD``
         :return: Character count and percentage of edits for each
             username.
 
@@ -172,7 +165,7 @@ class WikiBlameMixin:
         :raise TimeoutError: WikiHistory timeout
         """
         if n and n > 5:
-            warn('Only the first 5 authors can be given.')
+            warn('Only the first 5 authors can be given.', stacklevel=2)
 
         baseurl = 'https://wikihistory.toolforge.org'
         pattern = (r'><bdi>(?P<author>.+?)</bdi></a>\s'

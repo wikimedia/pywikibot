@@ -23,7 +23,7 @@ class DecoratorTestsBase(TestCase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self.code = 'test'
         self.family = lambda: None
@@ -43,12 +43,12 @@ class TestMustBe(DecoratorTestsBase):
 
     """Test cases for the must_be decorator."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self._userinfo = []
         super().setUp()
 
-    def login(self, group):
+    def login(self, group) -> None:
         """Fake the log in as required user group."""
         self._logged_in_as = group
         self._userinfo = [group]
@@ -57,7 +57,7 @@ class TestMustBe(DecoratorTestsBase):
         """Fake the groups user belongs to."""
         return group in self._userinfo
 
-    def test_mock_in_test(self):
+    def test_mock_in_test(self) -> None:
         """Test that setUp and login work."""
         self.assertIsNone(self._logged_in_as)
         self.login('user')
@@ -81,7 +81,7 @@ class TestMustBe(DecoratorTestsBase):
         """Require a user to function."""
         return args, kwargs
 
-    def test_must_be_steward(self):
+    def test_must_be_steward(self) -> None:
         """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -90,7 +90,7 @@ class TestMustBe(DecoratorTestsBase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
 
-    def test_must_be_sysop(self):
+    def test_must_be_sysop(self) -> None:
         """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -101,7 +101,7 @@ class TestMustBe(DecoratorTestsBase):
         with self.assertRaises(UserRightsError):
             self.call_this_steward_req_function(args, kwargs)
 
-    def test_must_be_user(self):
+    def test_must_be_user(self) -> None:
         """Test a function which requires a user."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -112,7 +112,7 @@ class TestMustBe(DecoratorTestsBase):
         with self.assertRaises(UserRightsError):
             self.call_this_sysop_req_function(args, kwargs)
 
-    def test_override_usertype(self):
+    def test_override_usertype(self) -> None:
         """Test overriding the required group."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -122,7 +122,7 @@ class TestMustBe(DecoratorTestsBase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
 
-    def test_obsolete_site(self):
+    def test_obsolete_site(self) -> None:
         """Test when the site is obsolete and shouldn't be edited."""
         self.obsolete = True
         args = (1, 2, 'a', 'b')
@@ -142,12 +142,12 @@ class TestNeedRight(DecoratorTestsBase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Creating fake variables to appear as a site."""
         self.userinfo = {'rights': []}
         super().setUp()
 
-    def login(self, group, right):
+    def login(self, group, right) -> None:
         """Fake the log in as required user group."""
         self._logged_in_as = group
         self.userinfo['rights'] = [right]
@@ -166,7 +166,7 @@ class TestNeedRight(DecoratorTestsBase):
         """Require a sysop to function."""
         return args, kwargs
 
-    def test_need_right_edit(self):
+    def test_need_right_edit(self) -> None:
         """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -175,7 +175,7 @@ class TestNeedRight(DecoratorTestsBase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
 
-    def test_need_right_move(self):
+    def test_need_right_move(self) -> None:
         """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -195,58 +195,58 @@ class TestNeedVersion(DeprecationTestCase):
 
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test method."""
         super().setUp()
         self.version = lambda: '1.23'
 
     @need_version('1.24')
-    def too_new(self):
+    def too_new(self) -> bool:
         """Method which is to new."""
         return True
 
     @need_version('1.23')
-    def old_enough(self):
+    def old_enough(self) -> bool:
         """Method which is as new as the server."""
         return True
 
     @need_version('1.22')
-    def older(self):
+    def older(self) -> bool:
         """Method which is old enough."""
         return True
 
     @need_version('1.24')
     @deprecated
-    def deprecated_unavailable_method(self):
+    def deprecated_unavailable_method(self) -> bool:
         """Method which is to new and then deprecated."""
         return True
 
     @deprecated
     @need_version('1.24')
-    def deprecated_unavailable_method2(self):
+    def deprecated_unavailable_method2(self) -> bool:
         """Method which is deprecated first and then to new."""
         return True
 
     @need_version('1.22')
     @deprecated
-    def deprecated_available_method(self):
+    def deprecated_available_method(self) -> bool:
         """Method which is old enough and then deprecated."""
         return True
 
     @deprecated
     @need_version('1.22')
-    def deprecated_available_method2(self):
+    def deprecated_available_method2(self) -> bool:
         """Method which is deprecated first and then old enough."""
         return True
 
-    def test_need_version(self):
+    def test_need_version(self) -> None:
         """Test need_version when the version is new, exact or old enough."""
         with self.assertRaises(NotImplementedError):
             self.too_new()
         self.assertTrue(self.old_enough())
         self.assertTrue(self.older())
 
-    def test_need_version_fail_with_deprecated(self):
+    def test_need_version_fail_with_deprecated(self) -> None:
         """Test order of combined version check and deprecation warning."""
         # FIXME: The deprecation message should be:
         #   __name__ + '.TestNeedVersion.deprecated_unavailable_method
@@ -268,7 +268,7 @@ class TestNeedVersion(DeprecationTestCase):
         self.assertOneDeprecationParts(
             __name__ + '.TestNeedVersion.deprecated_unavailable_method2')
 
-    def test_need_version_success_with_deprecated(self):
+    def test_need_version_success_with_deprecated(self) -> None:
         """Test order of combined version check and deprecation warning."""
         self.deprecated_available_method()
         self.assertOneDeprecationParts(

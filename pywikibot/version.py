@@ -105,7 +105,7 @@ def getversiondict() -> dict[str, str]:
         tag, rev, date, hsh = (
             '', '-1 (unknown)', '0 (unknown)', '(unknown)')
         warn(f'Unable to detect version; exceptions raised:\n{exceptions!r}',
-             UserWarning)
+             UserWarning, stacklevel=2)
         exceptions = None
 
     # Git and SVN can silently fail, as it may be a nightly.
@@ -117,7 +117,7 @@ def getversiondict() -> dict[str, str]:
     elif isinstance(date, time.struct_time):
         datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)
     else:  # pragma: no cover
-        warn('Unable to detect package date', UserWarning)
+        warn('Unable to detect package date', UserWarning, stacklevel=2)
         datestring = '-2 (unknown)'
 
     return {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
@@ -244,9 +244,9 @@ def getversion_onlinerepo(path: str = 'branches/master') -> str:
 def get_module_filename(module) -> str | None:
     """Retrieve filename from an imported pywikibot module.
 
-    It uses the __file__ attribute of the module. If it's file extension ends
-    with py and another character the last character is discarded when the py
-    file exist.
+    It uses the __file__ attribute of the module. If it's file extension
+    ends with py and another character the last character is discarded
+    when the py file exist.
 
     :param module: The module instance.
     :type module: module
@@ -268,7 +268,8 @@ def get_module_mtime(module):
 
     :param module: The module instance.
     :type module: module
-    :return: The modification time if it's a pywikibot module otherwise None.
+    :return: The modification time if it's a pywikibot module otherwise
+        None.
     :rtype: datetime or None
     """
     filename = get_module_filename(module)
