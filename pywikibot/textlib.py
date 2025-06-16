@@ -1,6 +1,6 @@
 """Functions for manipulating wiki-text."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1323,7 +1323,7 @@ def replaceLanguageLinks(oldtext: str,
                 s = separator + s
             newtext = (s2[:firstafter].replace(marker, '')
                        + s + s2[firstafter:])
-        elif site.code in site.family.categories_last:
+        elif site.has_extension('CategorySelect'):
             cats = getCategoryLinks(s2, site=site)
             s2 = removeCategoryLinksAndSeparator(
                 s2.replace(marker, cseparatorstripped).strip(), site) \
@@ -1650,7 +1650,7 @@ def replaceCategoryLinks(oldtext: str,
                 new_cats = separator + new_cats
             newtext = (cats_removed_text[:firstafter].replace(marker, '')
                        + new_cats + cats_removed_text[firstafter:])
-        elif site.code in site.family.categories_last:
+        elif site.has_extension('CategorySelect'):
             newtext = (cats_removed_text.replace(marker, '').strip()
                        + separator + new_cats)
         else:

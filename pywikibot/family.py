@@ -181,14 +181,6 @@ class Family:
     #: String used as separator between category links and the text
     category_text_separator = '\n\n'
 
-    categories_last: list[str] = []
-    """When both at the bottom should categories come after interwikilinks?
-
-    TODO: :phab:`T86284` Needed on Wikia sites, as it uses the
-    CategorySelect extension which puts categories last on all sites.
-    TO BE DEPRECATED!
-    """
-
     interwiki_putfirst: dict[str, str] = {}
     """Which languages have a special order for putting interlanguage links,
     and what order is it?
@@ -328,6 +320,17 @@ class Family:
     """
 
     _families: dict[str, Family] = {}
+
+    @classproperty
+    @deprecated('site.has_extension("CategorySelect")', since='10.3.0')
+    def categories_last(cls) -> list[str]:
+        """Categories come after interwiki links for the given site codes.
+
+        .. deprecated:: 10.3
+           use :meth:`site.has_extension('CategorySelect')
+           <pywikibot.site._apisite.APISite.has_extension>` instead
+        """
+        return []
 
     @staticmethod
     def load(fam: str | None = None):
