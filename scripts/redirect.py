@@ -96,6 +96,7 @@ from pywikibot.exceptions import (
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 
 
+BROKEN_REDIRECT_TEMPLATE = 'Q11838699', 'Q4847311', 'Q21528265'
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
@@ -403,40 +404,29 @@ class RedirectRobot(ExistingPageBot):
         else:
             raise NotImplementedError(f'No valid action "{action}" found.')
 
-    def get_sd_template(
-        self, site: pywikibot.site.BaseSite | None = None
-    ) -> str | None:
-        """Look for speedy deletion template and return it.
-
-        :param site: site for which the template has to be given
-        :return: A valid speedy deletion template.
-        """
-        title = None
-        if site:
-            sd = self.opt.sdtemplate
-            if not sd and i18n.twhas_key(site,
-                                         'redirect-broken-redirect-template'):
-                sd = i18n.twtranslate(site,
-                                      'redirect-broken-redirect-template')
-
+    @property
+    def sdtemplate(self) -> str:
+        """Gives the speedy deletion template for the current_page."""
+        title = ''
+        site = self.current_page.site
+        if sd := self.opt.sdtemplate:
             # check whether template exists for this site
-            if sd:
-                template = extract_templates_and_params_regex_simple(sd)
-                if template:
-                    title = template[0][0]
-                    page = pywikibot.Page(site, title, ns=10)
-                    if page.exists():
-                        return sd
+            template = extract_templates_and_params_regex_simple(sd)
+            if template:
+                title = template[0][0]
+                page = pywikibot.Page(site, title, ns=10)
+                if page.exists():
+                    return sd
+        else:
+            for item in BROKEN_REDIRECT_TEMPLATE:
+                tpl = site.page_from_repository(item)
+                if tpl:
+                    return f'{{{{{tpl.title(with_ns=False)}}}}}'
 
         pywikibot.warning(
             'No speedy deletion template {}available.'
             .format(f'"{title}" ' if title else ''))
-        return None
-
-    @property
-    def sdtemplate(self):
-        """Gives the speedy deletion template for the current_page."""
-        return self.get_sd_template(self.current_page.site)
+        return ''
 
     def init_page(self, item) -> pywikibot.Page:
         """Ensure that we process page objects."""
