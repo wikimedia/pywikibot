@@ -187,6 +187,9 @@ from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.threading import BoundedPoolExecutor
 
 
+ARCHIVE_HEADER = 'Q6068612', 'Q6723402'
+
+
 class ArchiveBotSiteConfigError(Error):
 
     """There is an error originated by archivebot's on-site configuration."""
@@ -391,6 +394,21 @@ class DiscussionPage(pywikibot.Page):
             return ts1
         return max(ts1, ts2)
 
+    def get_header_template(self) -> str:
+        """Get localized archive header template.
+
+        .. versionadded:: 10.2
+
+        :raises NotImplementedError: Archive header is not localized
+        """
+        for item in ARCHIVE_HEADER:
+            tpl = self.site.page_from_repository(item)
+            if tpl:
+                return f'{{{{{tpl.title(with_ns=False)}}}}}'
+
+        raise NotImplementedError(
+            'Archive header is not localized on your site')
+
     def load_page(self) -> None:
         """Load the page to be archived and break it up into threads.
 
@@ -403,13 +421,11 @@ class DiscussionPage(pywikibot.Page):
         self.header = ''
         self.threads = []
         self.archives = {}
-
         try:
             text = self.get()
         except NoPageError:
-            self.header = self.archiver.get_attr(
-                'archiveheader',
-                i18n.twtranslate(self.site.code, 'archivebot-archiveheader'))
+            self.header = self.archiver.get_attr('archiveheader',
+                                                 self.get_header_template())
             if self.params:
                 self.header = self.header % self.params
             return
