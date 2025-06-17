@@ -434,10 +434,15 @@ class APISite(
                     self._loginstatus = login.LoginStatus.AS_USER
                     return
 
-                pywikibot.error(
+                pywikibot.error(fill(
                     f"{self.userinfo['name']} != {self.username()} after "
                     f'{type(self).__name__}.login() and successful '
-                    f'{type(login_manager).__name__}.login()')
+                    f'{type(login_manager).__name__}.login(). You should'
+                    ' probably delete the cookie file "pywikibot-'
+                    f'{self.username()}.lwp" and re-login. You may use the'
+                    ' login script.',
+                    77
+                ))
 
         self._loginstatus = login.LoginStatus.NOT_LOGGED_IN  # failure
 
