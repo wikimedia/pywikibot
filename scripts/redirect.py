@@ -497,9 +497,11 @@ class RedirectRobot(ExistingPageBot):
 
         if movedTarget:
             if not movedTarget.exists():
-                # FIXME: Test to another move
-                pywikibot.info(f'Target page {movedTarget} does not exist')
-            elif redir_page.namespace() != movedTarget.namespace():
+                self.fix_moved_broken_redirects(movedTarget)
+                # process other cases within recursive loop
+                return
+
+            if redir_page.namespace() != movedTarget.namespace():
                 pywikibot.info(f'Namespace of {redir_page} is different'
                                f'from target page {movedTarget}')
             elif redir_page == movedTarget:
