@@ -1638,8 +1638,10 @@ class GeneratorsMixin:
                                parameters=parameters)
 
     @deprecated_args(top_only='top')  # since 11.6.0
+    @deprecated_signature(since='10.7.0')
     def usercontribs(
         self,
+        *,
         user: str | None = None,
         userprefix: str | None = None,
         start: pywikibot.time.Timestamp | datetime | str | None = None,
@@ -1649,7 +1651,10 @@ class GeneratorsMixin:
         minor: bool | None = None,
         total: int | None = None,
         top: bool | None = None,
-        *,
+        # old kw args below
+        new: bool | None = None,
+        patrolled: bool | None = None,
+        autopatrolled: bool | None = None,
         prop: Iterable[str] | str | None = None,
         formatversion: int = 1
     ) -> Iterable[dict[str, Any]]:
@@ -1659,32 +1664,51 @@ class GeneratorsMixin:
 
         .. seealso::
            - :api:`Usercontribs`
+           - :meth:`pywikibot.User.contribs`
            - :meth:`pywikibot.User.contributions`
 
         .. version-changed:: 3.0.20200609
            The *showMinor* parameter was renamed to *minor*.
+
         .. version-changed:: 11.6
-           The *prop* and *formatversion* parameter were added. The
+           The *prop* and *formatversion* parameters were added. The
            *top_only* was renamed to *top*. This parameter now accepts
            ``None`` to iterate both latest and non-latest contributions.
            ``False`` now iterates only non-latest contributions. Default
            is ``None``. The ``size`` property is included by default.
 
-        :param user: Iterate contributions by this user (name or IP)
+        .. version-changed:: 11.7
+           All parameters are keyword-only now. The *new*, *patrolled*,
+           and *autopatrolled* parameters were added.
+
+        :param user: Iterate contributions by this user (name or IP).
         :param userprefix: Iterate contributions by all users whose
-            names or IPs start with this substring
-        :param start: Iterate contributions starting at this Timestamp
-        :param end: Iterate contributions ending at this Timestamp
+            names or IPs start with this substring.
+        :param start: Iterate contributions starting at this Timestamp.
+        :param end: Iterate contributions ending at this Timestamp.
         :param reverse: Iterate oldest contributions first (default:
-            newest)
-        :param namespaces: Only iterate pages in these namespaces
+            newest).
+        :param namespaces: Only iterate pages in these namespaces.
         :param minor: If ``True``, iterate only minor edits; if ``False``
             and not ``None``, iterate only non-minor edits (default:
-            iterate both)
-        :param total: Limit result to this number of pages
+            iterate both).
+        :param total: Limit result to this number of pages.
         :param top: if ``True``, iterate only edits which are the latest
             revision; if ``False``, do not iterate last revision edits;
-            ``None`` to iterate both (default: ``None``)
+            ``None`` to iterate both (default: ``None``).
+        :param new: If ``True``, iterate only edits creating new pages;
+            if ``False``, iterate only edits to existing pages; if
+            ``None``, iterate both.
+        :param patrolled: If ``True``, iterate only edits that have been
+            patrolled (either manually or automatically; use the
+            *autopatrolled* parameter to control how); if ``False``,
+            iterate only edits that haven't been patrolled yet; if
+            ``None``, iterate both; both ``True`` or ``False`` exclude
+            edits older than ``$wgRCMaxAge``.
+        :param autopatrolled: If ``True``, iterate only autopatrolled
+            edits; if ``False``, iterate only edits that weren't
+            autopatrolled; if ``None``, iterate both; both ``True`` or
+            ``False`` exclude edits older than ``$wgRCMaxAge``.
         :param prop: Include additional pieces of information. Refer
             :api:`Usercontribs` for the elements and the default setting.
         :param formatversion: The API format version to use for the
@@ -1718,9 +1742,15 @@ class GeneratorsMixin:
             ucgen.request['ucuserprefix'] = userprefix
         if reverse:
             ucgen.request['ucdir'] = 'newer'
-        option_set = api.OptionSet(self, 'usercontribs', 'show')
-        option_set['minor'] = minor
-        option_set['top'] = top
+
+        filters = {
+            'minor': minor,
+            'top': top,
+            'new': new,
+            'patrolled': patrolled,
+            'autopatrolled': autopatrolled,
+        }
+        option_set = api.OptionSet(self, 'usercontribs', 'show', filters)
         ucgen.request['ucshow'] = option_set
         return ucgen
 

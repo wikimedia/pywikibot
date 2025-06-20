@@ -536,6 +536,10 @@ class User(Page):
            now accepts ``None`` to iterate both latest and non-latest
            contributions. ``False`` now iterates only non-latest
            contributions. Default is ``None``.
+        .. version-changed:: 11.7
+           The *new*, *patrolled*, *autopatrolled*, *prop* and
+           *formatversion* parameter were added. The ``size`` property
+           is included by default.
         .. seealso::
            - :meth:`contribs`
            - :meth:`Site.usercontribs()
@@ -545,16 +549,31 @@ class User(Page):
         :param total: Limit result to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
         :keyword end: Iterate contributions ending at this Timestamp
-        :keyword reverse: Iterate oldest contributions first (default: newest)
+        :keyword bool reverse: Iterate oldest contributions first
+            (default: newest)
         :keyword namespaces: Only iterate pages in these namespaces
         :type namespaces: Iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :keyword minor: If True, iterate only minor edits; if False and
-            not None, iterate only non-minor edits (default: iterate both)
-        :param top: if ``True``, iterate only edits which are the latest
-            revision; if ``False``, do not iterate last revision edits;
-            ``None`` to iterate both (default: ``None``)
+        :keyword bool | None minor: If ``True``, iterate only minor
+            edits; if ``False`` and not ``None``, iterate only non-minor
+            edits (default: iterate both)
+        :keyword bool | None top: if ``True``, iterate only edits which
+            are the latest revision; if ``False``, do not iterate last
+            revision edits; ``None`` to iterate both (default: ``None``)
+        :keyword bool | None new: If ``True``, iterate only edits
+            creating new pages; if ``False``, iterate only edits to
+            existing pages; if ``None``, iterate both.
+        :keyword bool | None patrolled: If ``True``, iterate only edits
+            that have been patrolled (either manually or automatically;
+            use the *autopatrolled* parameter to control how); if
+            ``False``, iterate only edits that haven't been patrolled
+            yet; if ``None``, iterate both; both ``True`` or ``False``
+            exclude edits older than ``$wgRCMaxAge``.
+        :keyword bool | None autopatrolled: If ``True``, iterate only
+            autopatrolled edits; if ``False``, iterate only edits that
+            weren't autopatrolled; if ``None``, iterate both; both
+            ``True`` or ``False`` exclude edits older than ``$wgRCMaxAge``.
         :return: Tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         """
         prop = ('comment', 'ids', 'timestamp', 'title')
@@ -598,20 +617,37 @@ class User(Page):
              <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
            - :api:`Usercontribs`
 
+        :keyword int | None total: Limit result to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
         :keyword end: Iterate contributions ending at this Timestamp
-        :keyword reverse: Iterate oldest contributions first (default:
-            newest)
+        :keyword bool reverse: Iterate oldest contributions first
+            (default: newest)
         :keyword namespaces: Only iterate pages in these namespaces
-        :keyword minor: If ``True``, iterate only minor edits; if ``False``
-            and not ``None``, iterate only non-minor edits (default:
-            iterate both)
-        :keyword total: Limit result to this number of pages
-        :keyword top: if ``True``, iterate only edits which are the latest
-            revision; if ``False``, do not iterate last revision edits;
-            ``None`` to iterate both (default: ``None``)
-        :keyword prop: Include additional pieces of information. Refer
-            :api:`Usercontribs` for the elements and the default setting.
+        :type namespaces: Iterable of str or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+        :keyword bool | None minor: If ``True``, iterate only minor
+            edits; if ``False`` and not ``None``, iterate only non-minor
+            edits (default: iterate both)
+        :keyword bool | None top: if ``True``, iterate only edits which
+            are the latest revision; if ``False``, do not iterate last
+            revision edits; ``None`` to iterate both (default: ``None``)
+        :keyword bool | None new: If ``True``, iterate only edits
+            creating new pages; if ``False``, iterate only edits to
+            existing pages; if ``None``, iterate both.
+        :keyword bool | None patrolled: If ``True``, iterate only edits
+            that have been patrolled (either manually or automatically;
+            use the *autopatrolled* parameter to control how); if
+            ``False``, iterate only edits that haven't been patrolled
+            yet; if ``None``, iterate both; both ``True`` or ``False``
+            exclude edits older than ``$wgRCMaxAge``.
+        :keyword bool | None autopatrolled: If ``True``, iterate only
+            autopatrolled edits; if ``False``, iterate only edits that
+            weren't autopatrolled; if ``None``, iterate both; both
+            ``True`` or ``False`` exclude edits older than ``$wgRCMaxAge``.
+        :keyword Iterable[str] | str | None prop: Include additional
+            pieces of information. Refer :api:`Usercontribs` for the
+            elements and the default setting.
         :return: For each entry return a tuple of Page, Revision
         """
         for contrib in self.site.usercontribs(

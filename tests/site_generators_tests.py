@@ -1177,6 +1177,32 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
             self.assertIsInstance(contrib, dict)
             self.assertNotIn('minor', contrib)
 
+    def test_show_new(self) -> None:
+        """Test the site.usercontribs() method using showMinor."""
+        mysite = self.get_site()
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           new=True, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertIn('new', contrib)
+
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           new=False, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertNotIn('new', contrib)
+
+    def test_show_top(self) -> None:
+        """Test the site.usercontribs() method using showMinor."""
+        mysite = self.get_site()
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           top=True, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertIn('top', contrib)
+
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           top=False, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertNotIn('top', contrib)
+
 
 class TestUserContribsWithoutUser(DefaultSiteTestCase):
 
