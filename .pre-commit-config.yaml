@@ -58,7 +58,7 @@ repos:
       - id: rst-inline-touching-normal
       - id: text-unicode-replacement-char
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+    rev: v0.12.0
     hooks:
       - id: ruff-check
         alias: ruff
@@ -87,12 +87,12 @@ repos:
       - id: isort
         exclude: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.69.3
+    rev: v0.69.4
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.2.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         args:
