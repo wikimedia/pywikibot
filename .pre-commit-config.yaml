@@ -37,11 +37,8 @@ repos:
       - id: forbid-new-submodules
       - id: mixed-line-ending
       - id: pretty-format-json
-        args:
-          - --autofix
-          - --indent=4
-          - --no-ensure-ascii
-        exclude: pywikibot/scripts/i18n/pywikibot/
+        # list required for tab
+        args: ["--autofix", "--indent", "\t", "--no-ensure-ascii"]
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=rst
