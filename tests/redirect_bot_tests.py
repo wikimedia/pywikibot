@@ -47,7 +47,7 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         """Test with delete and wikibase template."""
         with patch.object(
             pywikibot.site.APISite, 'page_from_repository',
-            new=Mock(return_value=pywikibot.Page(self.site, 'sd_title'))
+            new=Mock(return_value=pywikibot.Page(self.site, 'Sd_title'))
         ):
             bot = RedirectTestRobot('broken', delete=True)
             self.assertEqual(bot.sdtemplate, '{{Sd title}}')
