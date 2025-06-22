@@ -12,3 +12,11 @@
 .. versionremoved:: 9.0
    ``wikimedia_sites`` script was removed (:phab:`T78396`).
 """
+from __future__ import annotations
+
+
+#
+# (C) Pywikibot team, 2014-2025
+#
+# Distributed under the terms of the MIT license.
+#

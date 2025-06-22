@@ -54,6 +54,13 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
       - id: text-unicode-replacement-char
+  - repo: local
+    hooks:
+      - id: copyright
+        name: check and fix copyright notice
+        entry: tests/hooks/copyright_fixer.py
+        files: .+\.py$
+        language: python
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.0
     hooks:

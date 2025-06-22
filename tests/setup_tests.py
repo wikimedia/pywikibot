@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test setup.py."""
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,7 +50,7 @@ class TestSetup(TestCase):
         packages = setup.get_packages(name)
         self.assertEqual(packages[0], name)
         self.assertIn(name + '.data', packages)
-        self.assertLength(packages, 10)
+        self.assertLength(packages, 11)
 
     def test_get_scripts_packages(self) -> None:
         """Test :func:`setup.get_packages` function for scripts."""
