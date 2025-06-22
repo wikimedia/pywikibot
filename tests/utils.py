@@ -535,7 +535,11 @@ def execute_pwb(args: list[str], *,
 
 @contextmanager
 def empty_sites():
-    """Empty pywikibot _sites and _code_fam_from_url cache on entry point."""
+    """Empty pywikibot site caches.
+
+    Empty _sites and :func:`pywikibot._code_fam_from_url` cache on entry
+    point.
+    """
     pywikibot._sites = {}
     pywikibot._code_fam_from_url.cache_clear()
     yield

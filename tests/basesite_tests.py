@@ -138,10 +138,15 @@ class TestSiteObject(DefaultSiteTestCase):
                 self.assertEqual(site.family.name, fam)
                 self.assertEqual(site.code, fam)
 
-        site = pywikibot.Site(url='https://fr.wikipedia.org')
-        self.assertEqual(site, pywikibot.Site('wikipedia:fr'))
-        self.assertEqual(site.family.name, 'wikipedia')
-        self.assertEqual(site.code, 'fr')
+    def test_site_with_url_and_path(self) -> None:
+        """Test site constructor with trailing slash."""
+        for path in ('', '/'):
+            url = f'https://fr.wikipedia.org{path}'
+            with self.subTest(url=url):
+                site = pywikibot.Site(url=url)
+                self.assertEqual(site, pywikibot.Site('wikipedia:fr'))
+                self.assertEqual(site.family.name, 'wikipedia')
+                self.assertEqual(site.code, 'fr')
 
 
 if __name__ == '__main__':
