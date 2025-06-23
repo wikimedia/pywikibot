@@ -22,10 +22,21 @@ PATTERN = re.compile(
 
 def get_patched_files():
     """Return the PatchSet for the latest commit."""
-    out = subprocess.run(['git', 'diff', '--unified=0'],
-                         stdout=subprocess.PIPE,
-                         check=True, encoding='utf-8', text=True).stdout
-    return {Path(path) for path in re.findall(r'(?m)^\+\+\+ b/(.+)$', out)
+    cmd_opts = ' --name-only --diff-filter=AMR'
+    diff_cmd = f'git diff {cmd_opts}'.split()
+    show_cmd = f'git show --format= {cmd_opts}'.split()
+
+    captures = []
+    captures.append(
+        subprocess.check_output(diff_cmd, encoding='utf-8')
+    )
+    captures.append(
+        subprocess.check_output(diff_cmd + ['--staged'], encoding='utf-8')
+    )
+    captures.append(
+        subprocess.check_output(show_cmd + ['HEAD'], encoding='utf-8')
+    )
+    return {Path(path) for capture in captures for path in capture.splitlines()
             if path.endswith('.py')}
 
 

@@ -63,6 +63,7 @@ repos:
         entry: tests/hooks/copyright_fixer.py
         files: .+\.py$
         language: python
+        require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.2
     hooks:
