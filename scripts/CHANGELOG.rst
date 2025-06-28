@@ -1,6 +1,23 @@
 Scripts Changelog
 =================
 
+10.3.0
+------
+
+* i18n updates
+
+archivebot
+^^^^^^^^^^
+
+* Use wikidata items for archive header templates (:phab:`T396399`)
+
+redirect
+^^^^^^^^
+
+* Try one more move to fix redirect targets (:phab:`T396473`)
+* Don't fix broken redirects if namespace of source and target are different (:phab:`T396456`)
+
+
 10.2.0
 ------
 

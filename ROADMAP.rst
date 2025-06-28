@@ -1,7 +1,12 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Add -cookies option to :mod:`login<pywikibot.scripts.login>` script to login with cookies files only
+* Create a Site using :func:`pywikibot.Site` constructor with a given url even if the url ends with
+  a slash  (:phab:`T396592`)
+* Remove hard-coded error messages from :meth:`login.LoginManager.login` and use API response instead
+* Add additional informations to :meth:`Site.login()<pywikibot.site._apisite.APISite.login>` error message (:phab:`T395670`)
+* i18n updates
 
 Current Deprecations
 ====================
@@ -16,8 +21,8 @@ Current Deprecations
   'millennium' must be used instead.
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
   :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
-* 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in favour of
-  :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
+* 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in
+  favour of :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
 * 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
   in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
@@ -25,16 +30,16 @@ Current Deprecations
 * 9.2.0: Imports of :mod:`logging` functions from :mod:`bot` module is deprecated and will be desupported
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
-* 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be ignored
-  (:phab:`T358635`)
+* 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be
+  ignored (:phab:`T358635`)
 * 9.0.0: ``userinterfaces.transliteration.transliterator`` was renamed to :class:`Transliterator
   <userinterfaces.transliteration.Transliterator>`
-* 9.0.0: ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was renamed to
-  ``succ``
+* 9.0.0: ``next`` parameter of :meth:`userinterfaces.transliteration.transliterator.transliterate` was
+  renamed to ``succ``
 * 9.0.0: ``type`` parameter of :meth:`site.APISite.protectedpages()
   <pywikibot.site._generators.GeneratorsMixin.protectedpages>` was renamed to ``protect_type``
-* 9.0.0: ``all`` parameter of :meth:`site.APISite.namespace()<pywikibot.site._apisite.APISite.namespace>` was renamed to
-  ``all_ns``
+* 9.0.0: ``all`` parameter of :meth:`site.APISite.namespace()<pywikibot.site._apisite.APISite.namespace>`
+  was renamed to ``all_ns``
 * 9.0.0: ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``
 * 9.0.0: ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
 * 9.0.0: ``pywikibot.version.get_toolforge_hostname()`` is deprecated without replacement
@@ -69,7 +74,7 @@ Pending removal in Pywikibot 11
 * 8.0.0: :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` was
   replaced by ``login.ClientLoginManager.site.tokens['login']``
 * 8.0.0: ``data.api.LoginManager()`` is deprecated in favour of :class:`login.ClientLoginManager`
-* 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in favour of
-  :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
+* 8.0.0: :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is deprecated in
+  favour of :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
 * 8.0.0: :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be replaced by
   :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>`
