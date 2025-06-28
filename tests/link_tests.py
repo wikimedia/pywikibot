@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -123,30 +123,25 @@ class TestLink(DefaultDrySiteTestCase):
         """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
-            exc_regex = (rf'^(u|)\'{re.escape(text)}\' contains illegal char'
-                         rf'\(s\) (u|)\'{re.escape(text[2])}\'$')
-            return exc_regex
+            return (rf'^(u|)\'{re.escape(text)}\' contains illegal char'
+                    rf'\(s\) (u|)\'{re.escape(text[2])}\'$')
 
         # Directory navigation
         def generate_contains_dot_combinations_exc_regex(text):
-            exc_regex = (rf'^\(contains \. / combinations\): (u|)'
-                         rf'\'{re.escape(text)}\'$')
-            return exc_regex
+            return (rf'^\(contains \. / combinations\): (u|)'
+                    rf'\'{re.escape(text)}\'$')
 
         # Tilde
         def generate_contains_tilde_exc_regex(text):
-            exc_regex = rf'^\(contains ~~~\): (u|)\'{re.escape(text)}\'$'
-            return exc_regex
+            return rf'^\(contains ~~~\): (u|)\'{re.escape(text)}\'$'
 
         # Overlength
         def generate_overlength_exc_regex(text):
-            exc_regex = rf'^\(over 255 bytes\): (u|)\'{re.escape(text)}\'$'
-            return exc_regex
+            return rf'^\(over 255 bytes\): (u|)\'{re.escape(text)}\'$'
 
         # Namespace prefix without actual title
         def generate_has_no_title_exc_regex(text):
-            exc_regex = rf'^(u|)\'{re.escape(text.strip())}\' has no title\.$'
-            return exc_regex
+            return rf'^(u|)\'{re.escape(text.strip())}\' has no title\.$'
 
         title_tests = [
             # Empty title

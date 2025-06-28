@@ -1,6 +1,6 @@
 """Objects representing API interface to Wikibase site."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -827,11 +827,10 @@ class DataSite(APISite):
             del kwargs['site']
 
         parameters = dict(search=search, language=language, **kwargs)
-        gen = self._generator(api.APIGenerator,
-                              type_arg='wbsearchentities',
-                              data_name='search',
-                              total=total, parameters=parameters)
-        return gen
+        return self._generator(api.APIGenerator,
+                               type_arg='wbsearchentities',
+                               data_name='search',
+                               total=total, parameters=parameters)
 
     def parsevalue(self, datatype: str, values: list[str],
                    options: dict[str, Any] | None = None,

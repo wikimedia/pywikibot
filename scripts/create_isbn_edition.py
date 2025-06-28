@@ -764,8 +764,7 @@ def get_canon_name(baselabel: str) -> str:
         baselabel = baselabel.replace(',', ' ')  # Remove remaining ","
 
     # Remove redundant spaces
-    baselabel = ' '.join(baselabel.split())
-    return baselabel
+    return ' '.join(baselabel.split())
 
 
 def get_item_list(item_name: str,

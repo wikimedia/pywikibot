@@ -43,7 +43,7 @@ Extended example with style settings:
 .. versionadded:: 8.0
 """
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -126,28 +126,26 @@ class CategoryGraphBot(SingleSiteBot):
         def node():
             subs = ', '.join([c.title(with_ns=False).replace(' ', '&nbsp;')
                               for c in subcats])
-            n = pydot.Node(title,
-                           label=rf'"{title}\n{len(subcats)} C"',
-                           tooltip=title + '\n\n' + subs,
-                           URL=cat.full_url(),
-                           fontsize=int(10 * size))
-            return n
+            return pydot.Node(title,
+                              label=f'"{title}\n{len(subcats)} C"',
+                              tooltip=f'{title}\n\n{subs}',
+                              URL=cat.full_url(),
+                              fontsize=int(10 * size))
 
         def edge(n, h):
             minlen = n % columns + 1 if level != self.args.depth else 1
-            e = pydot.Edge(title,
-                           subcat.title(with_ns=False),
-                           tooltip=title + '  ⟶  '
-                           + subcat.title(with_ns=False),
-                           headlabel=title,
-                           # distribute the graph to depth
-                           minlen=minlen,
-                           penwidth=round(size / 2, 2),
-                           arrowsize=round(size / 4, 2),
-                           color=str(round(h, 2)) + ' 1 0.7',
-                           labelfontsize=int(3 * size),
-                           labelfontcolor=str(round(h, 2)) + ' 1 0.5')
-            return e
+            return pydot.Edge(title,
+                              subcat.title(with_ns=False),
+                              tooltip=title + '  ⟶  '
+                              + subcat.title(with_ns=False),
+                              headlabel=title,
+                              # distribute the graph to depth
+                              minlen=minlen,
+                              penwidth=round(size / 2, 2),
+                              arrowsize=round(size / 4, 2),
+                              color=str(round(h, 2)) + ' 1 0.7',
+                              labelfontsize=int(3 * size),
+                              labelfontcolor=str(round(h, 2)) + ' 1 0.5')
 
         if config.verbose_output:
             pywikibot.info('Adding ' + cat.title(with_ns=False))

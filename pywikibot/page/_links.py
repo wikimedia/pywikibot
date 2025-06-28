@@ -736,12 +736,11 @@ class SiteLink(BaseLink):
 
         :return: Wikibase JSON
         """
-        json = {
+        return {
             'site': self._sitekey,
             'title': self._rawtitle,
             'badges': [badge.title() for badge in self.badges]
         }
-        return json
 
 
 # Utility functions for parsing page titles

@@ -1608,11 +1608,11 @@ class GeneratorsMixin:
             sort = 'none'
         if sort != 'relevance':
             parameters['gsrsort'] = sort
-        srgen = self._generator(api.PageGenerator, type_arg='search',
-                                namespaces=namespaces,
-                                total=total, g_content=content,
-                                parameters=parameters)
-        return srgen
+
+        return self._generator(api.PageGenerator, type_arg='search',
+                               namespaces=namespaces,
+                               total=total, g_content=content,
+                               parameters=parameters)
 
     def usercontribs(
         self,
@@ -1892,10 +1892,10 @@ class GeneratorsMixin:
         """
         usprop = ['blockinfo', 'gender', 'groups', 'editcount', 'registration',
                   'rights', 'emailable']
-        usgen = api.ListGenerator(
-            'users', site=self, parameters={
-                'ususers': usernames, 'usprop': usprop})
-        return usgen
+        return api.ListGenerator(
+            'users', site=self,
+            parameters={'ususers': usernames, 'usprop': usprop}
+        )
 
     def randompages(
         self,

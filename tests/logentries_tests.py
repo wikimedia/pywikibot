@@ -68,8 +68,7 @@ class TestLogentriesBase(TestCase):
 
         with skipping(StopIteration,
                       msg=f'No entry found for {logtype!r}'):
-            le = next(self.site.logevents(logtype=logtype, total=1))
-        return le
+            return next(self.site.logevents(logtype=logtype, total=1))
 
     def _test_logevent(self, logtype) -> None:
         """Test a single logtype entry."""

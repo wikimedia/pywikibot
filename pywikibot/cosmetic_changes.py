@@ -673,10 +673,9 @@ class CosmeticChangesToolkit:
             r'(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>'
             + self.site.linktrail() + ')')
 
-        text = textlib.replaceExcept(text, linkR, handleOneLink,
+        return textlib.replaceExcept(text, linkR, handleOneLink,
                                      ['comment', 'math', 'nowiki', 'pre',
                                       'startspace'])
-        return text
 
     def resolveHtmlEntities(self, text: str) -> str:
         """Replace HTML entities with string."""
@@ -702,9 +701,8 @@ class CosmeticChangesToolkit:
             ignore.append(58)  # Colon (:)
         # TODO: T254350 - what other extension tags should be avoided?
         # (graph, math, score, timeline, etc.)
-        text = pywikibot.html2unicode(
+        return pywikibot.html2unicode(
             text, ignore=ignore, exceptions=['comment', 'syntaxhighlight'])
-        return text
 
     def removeEmptySections(self, text: str) -> str:
         """Cleanup empty sections."""
@@ -759,9 +757,9 @@ class CosmeticChangesToolkit:
                       'startspace', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
-        text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1',
+
+        return textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1',
                                      exceptions, site=self.site)
-        return text
 
     def removeNonBreakingSpaceBeforePercent(self, text: str) -> str:
         """Remove a non-breaking space between number and percent sign.
@@ -770,9 +768,8 @@ class CosmeticChangesToolkit:
         space in front of a percent sign, so it is no longer required to
         place it manually.
         """
-        text = textlib.replaceExcept(
+        return textlib.replaceExcept(
             text, r'(\d)&(?:nbsp|#160|#x[Aa]0);%', r'\1 %', ['timeline'])
-        return text
 
     def cleanUpSectionHeaders(self, text: str) -> str:
         """Add a space between the equal signs and the section title.
@@ -917,12 +914,13 @@ class CosmeticChangesToolkit:
         # this will cause mistakes.
         extensions = [fr'\.{ext}'
                       for ext in ['pdf', 'html?', 'php', 'aspx?', 'jsp']]
-        text = textlib.replaceExcept(
+
+        return textlib.replaceExcept(
             text,
             r'\[(?P<url>https?://[^\|\] ]+?(' + '|'.join(extensions) + r')) *'
             r'\| *(?P<label>[^\|\]]+?)\]',
-            r'[\g<url> \g<label>]', exceptions)
-        return text
+            r'[\g<url> \g<label>]', exceptions
+        )
 
     def fixHtml(self, text: str) -> str:
         """Replace html markups with wikitext markups."""

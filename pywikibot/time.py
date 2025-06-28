@@ -3,7 +3,7 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -197,9 +197,8 @@ class Timestamp(datetime.datetime):
             sec -= 1
             usec = 1_000_000 - usec
 
-        ts = cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
-                                                  microseconds=usec)
-        return ts
+        return cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
+                                                    microseconds=usec)
 
     @classmethod
     def _from_string(cls, timestr: str) -> Timestamp:

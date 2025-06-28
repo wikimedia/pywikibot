@@ -211,8 +211,7 @@ class MultiTemplateMatchBuilder:
             r'((({{{[^{}]+?}}}|{{[^{}]+?}}|{[^{}]*?})[^{]*?)*?)?'
             r'|)\s*}}'
         ) % {'namespace': ':|'.join(namespaces), 'pattern': pattern}
-        templateRegex = re.compile(templateRegexP, flags)
-        return templateRegex
+        return re.compile(templateRegexP, flags)
 
     def search_any_predicate(self, templates):
         """Return a predicate that matches any template."""

@@ -10,7 +10,7 @@ OCR support of page scans via:
 .. seealso:: https://wikisource.org/wiki/Wikisource:Google_OCR
 """
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -303,9 +303,8 @@ class PagesTagParser(collections.abc.Container):
     @classmethod
     def get_descriptors(cls):
         """Get TagAttrDesc descriptors."""
-        res = {k: v for k, v in cls.__dict__.items()
-               if isinstance(v, TagAttrDesc)}
-        return res
+        return {k: v for k, v in cls.__dict__.items()
+                if isinstance(v, TagAttrDesc)}
 
     def __contains__(self, attr) -> bool:
         return getattr(self, attr) is not None

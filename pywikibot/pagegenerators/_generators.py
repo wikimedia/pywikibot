@@ -1478,14 +1478,12 @@ class PagePilePageGenerator(GeneratorWrapper):
         :return: Dictionary of querystring parameters to use in the
             query
         """
-        query = {
+        return {
             'id': id,
             'action': 'get_data',
             'format': 'json',
             'doit': ''
         }
-
-        return query
 
     def query(self) -> Generator[str, None, None]:
         """Query PagePile.

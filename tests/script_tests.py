@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,11 +53,12 @@ unrunnable_script_set = set()
 
 def list_scripts(path, exclude=None):
     """Return list of scripts in given path."""
-    scripts = [name[0:-3] for name in os.listdir(path)  # strip '.py'
-               if name.endswith('.py')
-               and not name.startswith('_')  # skip __init__.py and _*
-               and name != exclude]
-    return scripts
+    return [
+        name[0:-3] for name in os.listdir(path)  # strip '.py'
+        if name.endswith('.py')
+        and not name.startswith('_')  # skip __init__.py and _*
+        and name != exclude
+    ]
 
 
 script_list = framework_scripts + list_scripts(scripts_path)

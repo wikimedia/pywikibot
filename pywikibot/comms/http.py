@@ -237,11 +237,10 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     values['script_comments'] = '; '.join(script_comments)
 
     format_string = format_string or config.user_agent_format
-
     formatted = _USER_AGENT_FORMATTER.format(format_string, **values)
+
     # clean up after any blank components
-    formatted = formatted.replace('()', '').replace('  ', ' ').strip()
-    return formatted
+    return formatted.replace('()', '').replace('  ', ' ').strip()
 
 
 def fake_user_agent() -> str:
@@ -576,7 +575,5 @@ def _decide_encoding(response: requests.Response,
             ' in the response header.'
         )
 
-    _encoding = _try_decode(response.content, header_encoding) \
+    return _try_decode(response.content, header_encoding) \
         or _try_decode(response.content, charset)
-
-    return _encoding
