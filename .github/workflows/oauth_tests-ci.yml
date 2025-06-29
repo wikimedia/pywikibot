@@ -46,7 +46,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-    # use deadsnakes/action for development releases
+      # use deadsnakes/action for development releases
       - name: Set up development Python ${{ matrix.python-version }}
         uses: deadsnakes/action@v3.2.0
         if: endsWith(matrix.python-version, '-dev')
