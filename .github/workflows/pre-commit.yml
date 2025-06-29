@@ -1,15 +1,20 @@
+---
 name: pre-commit
+
 on:
   push:
     branches:
       - master
       - stable
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_NO_USER_CONFIG: 2
+
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
@@ -17,9 +22,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - "3.13"
-          - "3.14-dev"
-          - "3.15-dev"
+          - '3.13'
+          - 3.14-dev
+          - 3.15-dev
     steps:
       - name: set up python ${{ matrix.python-version }}
         if: "!endsWith(matrix.python-version, '-dev')"
@@ -27,7 +32,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: set up development python ${{ matrix.python-version }}
-        if: "endsWith(matrix.python-version, '-dev')"
+        if: endsWith(matrix.python-version, '-dev')
         uses: deadsnakes/action@v3.2.0
         with:
           python-version: ${{ matrix.python-version }}

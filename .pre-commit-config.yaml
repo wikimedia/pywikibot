@@ -1,6 +1,8 @@
+---
 default_install_hook_types:
   - commit-msg
   - pre-commit
+
 repos:
   - repo: meta
     hooks:
@@ -33,12 +35,12 @@ repos:
       - id: double-quote-string-fixer
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
-        exclude: '^tests/data/'
+        exclude: ^tests/data/
       - id: forbid-new-submodules
       - id: mixed-line-ending
       - id: pretty-format-json
         # list required for tab
-        args: ["--autofix", "--indent", "\t", "--no-ensure-ascii"]
+        args: [--autofix, --indent, "\t", --no-ensure-ascii]
       - id: trailing-whitespace
         args:
           - --markdown-linebreak-ext=rst
@@ -62,12 +64,12 @@ repos:
         files: .+\.py$
         language: python
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.0
+    rev: v0.12.1
     hooks:
       - id: ruff-check
         alias: ruff
         args:
-        - --fix
+          - --fix
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.20.0
     hooks:

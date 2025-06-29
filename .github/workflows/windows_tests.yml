@@ -1,9 +1,10 @@
-name: Windows Tests
+---
 # Successor for Appveyor Tests
+name: Windows Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,77 +19,67 @@ jobs:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
-
     strategy:
       fail-fast: false
-
       matrix:
-        python-version: [ 3.8.0, "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
-        python-arch: [ x64, x86 ]
-        site: [ "wikipedia:en" ]
-
+        python-version: [3.8.0, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python-arch: [x64, x86]
+        site: ['wikipedia:en']
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: ${{ matrix.python-arch }}
-
-    - name: Install dependencies
-      shell: powershell
-      run: |
-        git submodule update --init
-        python --version
-        python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
-        python -m pip install --upgrade pip
-        pip --version
-        if ('${{ matrix.python-version }}' -ge '3.12') {
-          pip install -U setuptools;
-        }
-        pip install -r dev-requirements.txt
-        pip install -r requirements.txt
-        pip install wikitextparser
-
-    - name: Generate user files
-      run: |
-        python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "noisysleep = float('inf')" >> user-config.py
-        echo "maximum_GET_length = 5000" >> user-config.py
-        echo "transliteration_target = None"  >> user-config.py
-        echo "console_encoding = 'utf8'" >> user-config.py
-        echo "import os" >> user-config.py
-        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
-        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
-
-    - name: Test with unittest
-      id: ci_test
-      continue-on-error: true
-      timeout-minutes: 90
-      env:
-        PYTHONIOENCODING: utf-8
-      run: |
-        python pwb.py version
-        coverage run -m unittest discover -vv -p \"*_tests.py\";
-
-    - name: Show coverage statistics
-      run: |
-        coverage report
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Check on failure
-      if: steps.ci_test.outcome == 'failure'
-      run: exit 1
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.python-arch }}
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          git submodule update --init
+          python --version
+          python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
+          python -m pip install --upgrade pip
+          pip --version
+          if ('${{ matrix.python-version }}' -ge '3.12') {
+            pip install -U setuptools;
+          }
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
+          pip install wikitextparser
+      - name: Generate user files
+        run: |
+          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+          echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "noisysleep = float('inf')" >> user-config.py
+          echo "maximum_GET_length = 5000" >> user-config.py
+          echo "transliteration_target = None"  >> user-config.py
+          echo "console_encoding = 'utf8'" >> user-config.py
+          echo "import os" >> user-config.py
+          echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
+          echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
+      - name: Test with unittest
+        id: ci_test
+        continue-on-error: true
+        timeout-minutes: 90
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          python pwb.py version
+          coverage run -m unittest discover -vv -p \"*_tests.py\";
+      - name: Show coverage statistics
+        run: |
+          coverage report
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Check on failure
+        if: steps.ci_test.outcome == 'failure'
+        run: exit 1
