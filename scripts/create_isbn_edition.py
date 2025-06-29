@@ -1596,10 +1596,9 @@ def main(*args: str) -> None:
         mainlang = bib_source[booklib][2]
     else:
         # Unknown bib reference - show implemented codes
-        for seq in bib_source:
+        for seq, ref in bib_source.items():
             pywikibot.info(
-                f'{seq.ljust(10)}{bib_source[seq][2].ljust(4)}'
-                f'{bib_source[seq][3].ljust(20)}{bib_source[seq][1]}'
+                f'{seq.ljust(10)}{ref[2].ljust(4)}{ref[3].ljust(20)}{ref[1]}'
             )
         fatal_error(3, f'Unknown Digital library ({REFPROP}) {booklib}')
 
