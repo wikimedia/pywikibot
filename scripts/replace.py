@@ -161,7 +161,7 @@ talk about HTTP, where the typo has become part of the standard:
    the top of the help.
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -910,7 +910,7 @@ LIMIT 200"""
     return pagegenerators.MySQLPageGenerator(sql)
 
 
-def main(*args: str) -> None:  # noqa: C901
+def main(*args: str) -> None:
     """Process command line arguments and invoke bot.
 
     If args is an empty list, sys.argv is used.
