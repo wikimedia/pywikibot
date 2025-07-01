@@ -25,8 +25,8 @@ from pywikibot.backports import (
     Sequence,
 )
 from pywikibot.site import BaseSite
-from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
+from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
 if TYPE_CHECKING:

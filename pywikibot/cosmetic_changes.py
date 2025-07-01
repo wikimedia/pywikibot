@@ -66,13 +66,9 @@ import pywikibot
 from pywikibot import exceptions, i18n, textlib
 from pywikibot.backports import Callable, Match, Pattern
 from pywikibot.site import Namespace
-from pywikibot.textlib import (
-    FILE_LINK_REGEX,
-    MultiTemplateMatchBuilder,
-    get_regexes,
-)
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
+from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
 
 
 try:
@@ -525,7 +521,7 @@ class CosmeticChangesToolkit:
         cache: dict[bool | str, Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
         regex = re.compile(
-            FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
+            textlib.FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
             flags=re.VERBOSE)
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
@@ -711,7 +707,7 @@ class CosmeticChangesToolkit:
             return text
 
         skippings = ['comment', 'category']
-        skip_regexes = get_regexes(skippings, self.site)
+        skip_regexes = textlib.get_regexes(skippings, self.site)
         # site defined templates
         skip_templates = {
             'cs': ('Pahýl[ _]část',),  # stub section
@@ -819,7 +815,7 @@ class CosmeticChangesToolkit:
     def replaceDeprecatedTemplates(self, text: str) -> str:
         """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
-        builder = MultiTemplateMatchBuilder(self.site)
+        builder = textlib.MultiTemplateMatchBuilder(self.site)
 
         if self.site.family.name in deprecatedTemplates \
            and self.site.code in deprecatedTemplates[self.site.family.name]:
@@ -1035,8 +1031,8 @@ class CosmeticChangesToolkit:
             'syntaxhighlight',
         ]
 
-        digits = textlib.NON_LATIN_DIGITS
-        faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
+        digits = NON_LATIN_DIGITS['fa']
+        faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits
 
         # not to let bot edits in latin content
         exceptions.append(re.compile(f'[^{faChrs}] *?"*? *?, *?[^{faChrs}]'))
