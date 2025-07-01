@@ -68,7 +68,7 @@ from pywikibot.backports import Callable, Match, Pattern
 from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
-from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
+from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
 try:
@@ -1031,10 +1031,10 @@ class CosmeticChangesToolkit:
             'syntaxhighlight',
         ]
 
-        digits = NON_LATIN_DIGITS['fa']
+        digits = NON_ASCII_DIGITS['fa']
         faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits
 
-        # not to let bot edits in latin content
+        # not to let bot edits in ascii numerals content
         exceptions.append(re.compile(f'[^{faChrs}] *?"*? *?, *?[^{faChrs}]'))
         text = textlib.replaceExcept(text, ',', '،', exceptions,
                                      site=self.site)

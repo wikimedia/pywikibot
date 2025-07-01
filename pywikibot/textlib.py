@@ -24,12 +24,13 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
 from pywikibot.tools import (
+    ModuleDeprecationWrapper,
     deprecated,
     deprecated_args,
     first_lower,
     first_upper,
 )
-from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
+from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
 try:
@@ -111,10 +112,11 @@ TIMESTAMP_GAP_LIMIT = 10
 
 
 def to_local_digits(phrase: str | int, lang: str) -> str:
-    """Change Latin digits based on language to localized version.
+    """Change ASCII digits based on language to localized version.
 
-    Be aware that this function only works for several languages, and that it
-    returns an unchanged string if an unsupported language is given.
+    .. attention:: Be aware that this function only works for several
+       languages, and that it returns an unchanged string if an
+       unsupported language is given.
 
     .. versionchanged:: 7.5
        always return a string even `phrase` is an int.
@@ -123,7 +125,7 @@ def to_local_digits(phrase: str | int, lang: str) -> str:
     :param lang: language code
     :return: The localized version
     """
-    digits = NON_LATIN_DIGITS.get(lang)
+    digits = NON_ASCII_DIGITS.get(lang)
     phrase = str(phrase)
     if digits:
         trans = str.maketrans('0123456789', digits)
@@ -131,24 +133,26 @@ def to_local_digits(phrase: str | int, lang: str) -> str:
     return phrase
 
 
-def to_latin_digits(phrase: str,
+def to_ascii_digits(phrase: str,
                     langs: SequenceType[str] | str | None = None) -> str:
-    """Change non-latin digits to latin digits.
+    """Change non-ascii digits to ascii digits.
 
     .. versionadded:: 7.0
+    .. versionchanged:: 10.3
+       this function was renamed from to_latin_digits.
 
-    :param phrase: The phrase to convert to latin numerical.
+    :param phrase: The phrase to convert to ascii numerical.
     :param langs: Language codes. If langs parameter is None, use all
         known languages to convert.
-    :return: The string with latin digits
+    :return: The string with ascii digits
     """
     if langs is None:
-        langs = NON_LATIN_DIGITS.keys()
+        langs = NON_ASCII_DIGITS.keys()
     elif isinstance(langs, str):
         langs = [langs]
 
-    digits = [NON_LATIN_DIGITS[key] for key in langs
-              if key in NON_LATIN_DIGITS]
+    digits = [NON_ASCII_DIGITS[key] for key in langs
+              if key in NON_ASCII_DIGITS]
     if digits:
         trans = str.maketrans(''.join(digits), '0123456789' * len(digits))
         phrase = phrase.translate(trans)
@@ -2214,7 +2218,7 @@ class TimeStripper:
         line = removeDisabledParts(line)
         line = removeHTMLParts(line)
 
-        line = to_latin_digits(line)
+        line = to_ascii_digits(line)
         for pat in self.patterns:
             line, match_obj = self._last_match_and_replace(line, pat)
             if match_obj:
@@ -2269,3 +2273,7 @@ class TimeStripper:
             timestamp = None
 
         return timestamp
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr('to_latin_digits', to_ascii_digits, since='10.3.0')

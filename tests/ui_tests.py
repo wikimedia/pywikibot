@@ -31,7 +31,7 @@ from pywikibot.userinterfaces import (
     terminal_interface_unix,
     terminal_interface_win32,
 )
-from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS, _trans
+from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS, _trans
 from tests.aspects import TestCase, TestCaseBase
 
 
@@ -359,11 +359,13 @@ class TestTransliterationTable(TestCase):
 
     net = False
 
-    def test_latin_digits(self) -> None:
-        """Test that non latin digits are in transliteration table."""
-        for lang, digits in NON_LATIN_DIGITS.items():
+    def test_ascii_digits(self) -> None:
+        """Test that non ascii digits are in transliteration table."""
+        for lang, digits in NON_ASCII_DIGITS.items():
             with self.subTest(lang=lang):
                 for char in digits:
+                    self.assertTrue(char.isdigit())
+                    self.assertFalse(char.isascii())
                     self.assertIn(char, _trans,
                                   f'{char!r} not in transliteration table')
 

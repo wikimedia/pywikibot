@@ -90,7 +90,7 @@ Release History
 * ``APISite.article_path`` was removed. :attr:`APISite.articlepath
   <pywikibot.site._apisite.APISite.articlepath>` can be used instead.
 * ``fix_digits`` method of :class:`textlib.TimeStripper` was removed;
-  :func:`textlib.to_latin_digits` can be used instead.
+  :func:`textlib.to_ascii_digits` can be used instead.
 * :mod:`textlib`.tzoneFixedOffset class was removed in favour of
   :class:`time.TZoneFixedOffse<pywikibot.time.TZoneFixedOffset>`.
 * A boolean *watch* parameter in :meth:`page.BasePage.save` is desupported.
@@ -929,9 +929,9 @@ Release History
 **Improvements**
 
 * i18n updates for date.py
-* Add number transliteration of 'lo', 'ml', 'pa', 'te' to NON_LATIN_DIGITS
+* Add number transliteration of 'lo', 'ml', 'pa', 'te' to NON_ASCII_DIGITS
 * Detect range blocks with Page.is_blocked() method (:phab:`T301282`)
-* to_latin_digits() function was added to textlib as counterpart of to_local_digits() function
+* to_ascii_digits() function was added to textlib as counterpart of to_local_digits() function
 * api.Request.submit now handles search-title-disabled and search-text-disabled API Errors
 * A show_diff parameter  was added to Page.put() and Page.change_category()
 * Allow categories when saving IndexPage (:phab:`T299806`)

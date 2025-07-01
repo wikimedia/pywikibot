@@ -61,16 +61,16 @@ key
     the page being archived.
 
 Variables below can be used in the value for "archive" in the template
-above; numbers are **latin** digits. Alternatively you may use
+above; numbers are **ascii** digits. Alternatively you may use
 **localized** digits. This is only available for a few site languages.
-Refer :attr:`NON_LATIN_DIGITS
-<userinterfaces.transliteration.NON_LATIN_DIGITS>` whether there is a
+Refer :attr:`NON_ASCII_DIGITS
+<userinterfaces.transliteration.NON_ASCII_DIGITS>` whether there is a
 localized one.
 
 .. list-table::
    :header-rows: 1
 
-   * - latin
+   * - ascii
      - localized
      - Description
    * - %(counter)d

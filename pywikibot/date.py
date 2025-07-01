@@ -26,7 +26,7 @@ from pywikibot.backports import (
 )
 from pywikibot.site import BaseSite
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
-from pywikibot.userinterfaces.transliteration import NON_LATIN_DIGITS
+from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
 if TYPE_CHECKING:
@@ -288,27 +288,27 @@ def monthName(lang: str, ind: int) -> str:
 
 
 # Helper for KN: digits representation
-_knDigits = NON_LATIN_DIGITS['kn']
+_knDigits = NON_ASCII_DIGITS['kn']
 _knDigitsToLocal = {ord(str(i)): _knDigits[i] for i in range(10)}
 _knLocalToDigits = {ord(_knDigits[i]): str(i) for i in range(10)}
 
 # Helper for Urdu/Persian languages
-_faDigits = NON_LATIN_DIGITS['fa']
+_faDigits = NON_ASCII_DIGITS['fa']
 _faDigitsToLocal = {ord(str(i)): _faDigits[i] for i in range(10)}
 _faLocalToDigits = {ord(_faDigits[i]): str(i) for i in range(10)}
 
 # Helper for HI:, MR:
-_hiDigits = NON_LATIN_DIGITS['hi']
+_hiDigits = NON_ASCII_DIGITS['hi']
 _hiDigitsToLocal = {ord(str(i)): _hiDigits[i] for i in range(10)}
 _hiLocalToDigits = {ord(_hiDigits[i]): str(i) for i in range(10)}
 
 # Helper for BN:
-_bnDigits = NON_LATIN_DIGITS['bn']
+_bnDigits = NON_ASCII_DIGITS['bn']
 _bnDigitsToLocal = {ord(str(i)): _bnDigits[i] for i in range(10)}
 _bnLocalToDigits = {ord(_bnDigits[i]): str(i) for i in range(10)}
 
 # Helper for GU:
-_guDigits = NON_LATIN_DIGITS['gu']
+_guDigits = NON_ASCII_DIGITS['gu']
 _guDigitsToLocal = {ord(str(i)): _guDigits[i] for i in range(10)}
 _guLocalToDigits = {ord(_guDigits[i]): str(i) for i in range(10)}
 
