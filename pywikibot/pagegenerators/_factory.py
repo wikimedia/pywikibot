@@ -51,6 +51,7 @@ from pywikibot.pagegenerators._generators import (
     UserContributionsGenerator,
     WikibaseSearchItemPageGenerator,
     WikidataSPARQLPageGenerator,
+    LPDBGenerator,
 )
 from pywikibot.tools import issue_deprecation_warning, strtobool
 from pywikibot.tools.collections import DequeGenerator
@@ -945,6 +946,15 @@ class GeneratorFactory:
             raise ValueError(
                 f'PagePile id must be an int. It was given "{value}"')
         return PagePilePageGenerator(int(value))
+    
+    def _handle_lpdbtable(self, value: str) -> Literal[True]:
+        """Handle `-lpdbtable` argument."""
+        self.lpdbtable = value
+        return True
+
+    def _handle_lpdbconditions(self, value: str) -> HANDLER_GEN_TYPE:
+        """Handle `-lpdbconditions` argument."""
+        return LPDBGenerator(table=self.lpdbtable, conditions=value, site=self.site)
 
     def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.

@@ -443,6 +443,12 @@ GENERATOR OPTIONS
                     the -file argument, e.g. page titles separated by newlines
                     or enclosed in brackets.
 
+-lpdbtable          Select a specific LPDB table to fetch pagenames from.
+                    Requires a valid LPDB API key set in environment variable
+                    ``LPDB_API_KEY``.
+
+-lpdbconditions     Conditions used when fetching the ``-lpdbtable``.
+
 .. tip::
    use ``-limit:n`` filter option to fetch only n pages.
 
