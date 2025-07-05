@@ -64,7 +64,7 @@ repos:
         files: .+\.py$
         language: python
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.1
+    rev: v0.12.2
     hooks:
       - id: ruff-check
         alias: ruff
@@ -93,7 +93,7 @@ repos:
       - id: isort
         exclude: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.69.4
+    rev: v0.70.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
