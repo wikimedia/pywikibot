@@ -1584,15 +1584,6 @@ class SiteRandomTestCase(DefaultSiteTestCase):
 
     """Test random methods of a site."""
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        """Skip test on beta due to T282602."""
-        super().setUpClass()
-        site = cls.get_site()
-        if site.family.name in ('wpbeta', 'wsbeta'):
-            cls.skipTest(cls,
-                         f'Skipping test on {site} due to T282602')
-
     def test_unlimited_small_step(self) -> None:
         """Test site.randompages() continuation.
 
