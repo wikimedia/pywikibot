@@ -122,25 +122,25 @@ class TestLink(DefaultDrySiteTestCase):
     def test_invalid(self) -> None:
         """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars
-        def generate_contains_illegal_chars_exc_regex(text):
+        def generate_contains_illegal_chars_exc_regex(text) -> str:
             return (rf'^(u|)\'{re.escape(text)}\' contains illegal char'
                     rf'\(s\) (u|)\'{re.escape(text[2])}\'$')
 
         # Directory navigation
-        def generate_contains_dot_combinations_exc_regex(text):
+        def generate_contains_dot_combinations_exc_regex(text) -> str:
             return (rf'^\(contains \. / combinations\): (u|)'
                     rf'\'{re.escape(text)}\'$')
 
         # Tilde
-        def generate_contains_tilde_exc_regex(text):
+        def generate_contains_tilde_exc_regex(text) -> str:
             return rf'^\(contains ~~~\): (u|)\'{re.escape(text)}\'$'
 
         # Overlength
-        def generate_overlength_exc_regex(text):
+        def generate_overlength_exc_regex(text) -> str:
             return rf'^\(over 255 bytes\): (u|)\'{re.escape(text)}\'$'
 
         # Namespace prefix without actual title
-        def generate_has_no_title_exc_regex(text):
+        def generate_has_no_title_exc_regex(text) -> str:
             return rf'^(u|)\'{re.escape(text.strip())}\' has no title\.$'
 
         title_tests = [
