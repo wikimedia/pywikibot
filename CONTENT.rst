@@ -24,6 +24,8 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | ROADMAP.rst               | PyPI version roadmap file                                 |
     +---------------------------+-----------------------------------------------------------+
+    | conftest.py               | Local per-directory plugin for pytest-mypy                |
+    +---------------------------+-----------------------------------------------------------+
     | dev-requirements.txt      | PIP requirements file for development dependencies        |
     +---------------------------+-----------------------------------------------------------+
     | make_dist.py              | Script to create a Pywikibot distribution                 |

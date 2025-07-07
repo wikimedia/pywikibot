@@ -104,6 +104,7 @@ repos:
       - id: flake8
         args:
           - --doctests
+          - --config=tox.ini
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
           - flake8-bugbear>=24.12.12
@@ -111,3 +112,21 @@ repos:
           - flake8-print>=5.0.0
           - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.16.1
+    hooks:
+      - id: mypy
+        args:
+          - --config-file=pyproject.toml
+          - --follow-imports=silent
+        # Test for files which already passed in past.
+        # They should be also used in conftest.py to exclude them from non-voting mypy test.
+        files: >
+          ^pywikibot/(__metadata__|exceptions|fixes|time)\.py$|
+          ^pywikibot/(comms|data|families|specialbots)/__init__\.py$|
+          ^pywikibot/families/[a-z]+_family\.py$|
+          ^pywikibot/page/(__init__|_decorators|_revision)\.py$|
+          ^pywikibot/scripts/(?:i18n/)?__init__\.py$|
+          ^pywikibot/site/(__init__|_basesite|_decorators|_interwikimap|_upload)\.py$|
+          ^pywikibot/tools/(_logging|_unidata|formatter)\.py$|
+          ^pywikibot/userinterfaces/(__init__|_interface_base|terminal_interface)\.py$

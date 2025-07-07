@@ -177,7 +177,7 @@ use_parentheses = true
 
 
 [tool.mypy]
-python_version = 3.8
+python_version = 3.9
 enable_error_code = [
     "ignore-without-code",
 ]
