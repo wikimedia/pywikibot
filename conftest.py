@@ -1,4 +1,7 @@
-"""Configuration file for pytest."""
+"""Configuration file for pytest.
+
+.. versionadded:: 10.3
+"""
 #
 # (C) Pywikibot team, 2025
 #
@@ -27,10 +30,7 @@ EXCLUDE_PATTERN = re.compile(
 
 def pytest_ignore_collect(collection_path: Path,
                           config) -> Literal[True] | None:
-    """Ignore files matching EXCLUDE_PATTERN when pytest-mypy is loaded.
-
-    .. versionadded:: 10.3
-    """
+    """Ignore files matching EXCLUDE_PATTERN when pytest-mypy is loaded."""
     # Check if any plugin name includes 'mypy'
     plugin_names = {p.__class__.__name__.lower()
                     for p in config.pluginmanager.get_plugins()}

@@ -1,9 +1,11 @@
 Current Release Changes
 =======================
 
+* ``textlib.to_latin_digits()`` was renamed to :func:`textlib.to_ascii_digits` (:phab:`T398146#10958283`),
+  ``NON_LATIN_DIGITS`` of :mod:`userinterfaces.transliteration` was renamed to ``NON_ASCII_DIGITS``.
 * Add -cookies option to :mod:`login<pywikibot.scripts.login>` script to login with cookies files only
 * Create a Site using :func:`pywikibot.Site` constructor with a given url even if the url ends with
-  a slash  (:phab:`T396592`)
+  a slash (:phab:`T396592`)
 * Remove hard-coded error messages from :meth:`login.LoginManager.login` and use API response instead
 * Add additional informations to :meth:`Site.login()<pywikibot.site._apisite.APISite.login>` error message (:phab:`T395670`)
 * i18n updates
@@ -11,6 +13,8 @@ Current Release Changes
 Current Deprecations
 ====================
 
+* 10.3.0: ``textlib.to_latin_digits()`` will be removed in favour of :func:`textlib.to_ascii_digits`,
+  ``NON_LATIN_DIGITS`` of :mod:`userinterfaces.transliteration` will be removed in favour of ``NON_ASCII_DIGITS``.
 * 10.2.0: :mod:`tools.threading.RLock<tools.threading>` is deprecated and moved to :mod:`backports`
   module. The :meth:`backports.RLock.count` method is also deprecated. For Python 3.14+ use ``RLock``
   from Python library ``threading`` instead. (:phab:`T395182`)
