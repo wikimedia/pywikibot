@@ -384,6 +384,7 @@ from pywikibot.exceptions import (
     NoPageError,
     NoUsernameError,
     PageSaveRelatedError,
+    SectionError,
     ServerError,
     SiteDefinitionError,
     SpamblacklistError,
@@ -1129,7 +1130,7 @@ class Subject(interwiki_graph.Subject):
 
         # must be behind the page.isRedirectPage() part
         # otherwise a redirect error would be raised
-        if page_empty_check(page):
+        if self.page_empty_check(page):
             self.conf.remove.append(str(page))
             self.conf.note(f'{page} is empty. Skipping.')
             if page == self.origin:
@@ -1568,7 +1569,7 @@ class Subject(interwiki_graph.Subject):
             pywikibot.info(f'Not editing {page}: page does not exist')
             raise SaveError("Page doesn't exist")
 
-        if page_empty_check(page):
+        if self.page_empty_check(page):
             pywikibot.info(f'Not editing {page}: page is empty')
             raise SaveError('Page is empty.')
 
@@ -1815,6 +1816,34 @@ class Subject(interwiki_graph.Subject):
                 if linkedPage.site not in expectedSites:
                     pywikibot.warning(f'{page.site.family.name}: {page} links '
                                       f'to incorrect {linkedPage}')
+
+    @staticmethod
+    def page_empty_check(page: pywikibot.Page) -> bool:
+        """Return True if page should be skipped as it is almost empty.
+
+        Pages in content namespaces are considered empty if they contain
+        fewer than 50 characters, and other pages are considered empty if
+        they are not category pages and contain fewer than 4 characters
+        excluding interlanguage links and categories.
+        """
+        try:
+            txt = page.text
+        except SectionError:
+            # Section doesn't exist — treat page as empty
+            return True
+
+        # Check if the page is in content namespace
+        if page.namespace().content:
+            # Check if the page contains at least 50 characters
+            return len(txt) < 50
+
+        if not page.is_categorypage():
+            site = page.site
+            txt = textlib.removeLanguageLinks(txt, site=site)
+            txt = textlib.removeCategoryLinks(txt, site=site)
+            return len(txt.strip()) < 4
+
+        return False
 
 
 class InterwikiBot:
@@ -2126,28 +2155,6 @@ def botMayEdit(page) -> bool:
             if template[0].title(with_ns=False).lower() in tmpl:
                 return False
     return True
-
-
-def page_empty_check(page) -> bool:
-    """Return True if page should be skipped as it is almost empty.
-
-    Pages in content namespaces are considered empty if they contain
-    less than 50 characters, and other pages are considered empty if
-    they are not category pages and contain less than 4 characters
-    excluding interlanguage links and categories.
-    """
-    txt = page.text
-    # Check if the page is in content namespace
-    if page.namespace().content:
-        # Check if the page contains at least 50 characters
-        return len(txt) < 50
-
-    if not page.is_categorypage():
-        txt = textlib.removeLanguageLinks(txt, site=page.site)
-        txt = textlib.removeCategoryLinks(txt, site=page.site)
-        return len(txt) < 4
-
-    return False
 
 
 class InterwikiDumps(OptionHandler):
