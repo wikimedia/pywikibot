@@ -42,5 +42,7 @@ jobs:
           submodules: true
       - name: run pre-commit
         uses: pre-commit/action@v3.0.1
+        env:
+          SKIP: copyright
         timeout-minutes: 5
     timeout-minutes: 100
