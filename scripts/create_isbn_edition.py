@@ -967,11 +967,6 @@ def add_claims(isbn_data: dict[str, Any]) -> int:  # noqa: C901
         # Redundant "subtitles" are ignored
         subtitle = first_upper(titles[1].strip())
 
-    # Get formatted ISBN number
-    isbn_number = isbn_data['ISBN-13']  # Numeric format
-    isbn_fmtd = isbnlib.mask(isbn_number)  # Canonical format (with "-")
-    pywikibot.log(isbn_fmtd)
-
     # Search the ISBN number both in canonical and numeric format
     qnumber_list = get_item_with_prop_value(ISBNPROP, isbn_fmtd)
     qnumber_list.update(get_item_with_prop_value(ISBNPROP, isbn_number))
