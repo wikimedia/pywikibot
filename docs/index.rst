@@ -55,7 +55,7 @@ Contents
    global_options
    faq
    getting_help
-
+   SECURITY
 
 .. toctree::
    :maxdepth: 1
@@ -75,6 +75,7 @@ Contents
    scripts_ref/index
    utilities/install
    tests_ref/index
+   codeofconduct
 
 .. toctree::
    :maxdepth: 1
