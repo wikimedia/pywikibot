@@ -4,13 +4,7 @@ name: Login CI
 
 on:
   workflow_run:
-    workflows:
-      - Doctest CI
-      - Oauth CI
-      - pre-commit
-      - Pywikibot CI
-      - Sysop write test CI
-      - Windows Tests
+    workflows: [Pywikibot CI]
     branches: [master]
     types: [completed]
 
@@ -24,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for all workflows to complete
-        uses: ahmadnassri/action-workflow-run-wait@v1.4.4
+        uses: kachick/wait-other-jobs@v3.8.1
         with:
-          delay: 60000
-          timeout: 3600000
+          warmup-delay: PT1M
+          minimum-interval: PT5M
       - name: Proceed with tests
         run: echo "All workflows have completed. Proceeding with Login CI tests."
   run_tests:
