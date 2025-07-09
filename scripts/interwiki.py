@@ -1512,21 +1512,32 @@ class Subject(interwiki_graph.Subject):
                         break
 
     def process_unlimited(self, new, updated) -> None:
-        """Post process unlimited."""
-        for (site, page) in new.items():
-            # if we have an account for this site
-            if site.family.name in config.usernames \
-               and site.code in config.usernames[site.family.name] \
-               and not site.has_data_repository:
-                # Try to do the changes
-                try:
-                    if self.replaceLinks(page, new):
-                        # Page was changed
-                        updated.append(site)
-                except SaveError:
-                    pass
-                except GiveUpOnPage:
-                    break
+        """"Post-process pages: replace links and track updated sites."""
+        for site, page in new.items():
+            if site.has_data_repository:
+                self.conf.note(
+                    f'{site} has a data repository, skipping {page}'
+                )
+                continue
+
+            # Check if a username is configured for this site
+            codes = config.usernames.get(site.family.name, [])
+            if site.code not in codes:
+                pywikibot.warning(
+                    f'username for {site} is not given in your user-config.py'
+                )
+                continue
+
+            # Try to do the changes
+            try:
+                changed = self.replaceLinks(page, new)
+            except SaveError:
+                continue
+            except GiveUpOnPage:
+                break
+
+            if changed:
+                updated.append(site)
 
     def _fetch_text(self, page: pywikibot.Page) -> str:
         """Validate page and load it's content for editing.
