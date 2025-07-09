@@ -1528,16 +1528,27 @@ class Subject(interwiki_graph.Subject):
                 except GiveUpOnPage:
                     break
 
-    def replaceLinks(self, page, newPages) -> bool:
-        """Return True if saving was successful."""
+    def _fetch_text(self, page: pywikibot.Page) -> str:
+        """Validate page and load it's content for editing.
+
+        This includes checking for:
+        - `-localonly` flag and whether the page is the origin
+        - Section-only pages (pages with `#section`)
+        - Non-existent pages
+        - Empty pages
+
+        :param page: The page to check.
+        :return: The text content of the page if it passes all checks.
+        :raises SaveError: If the page is not eligible for editing.
+        """
         # In this case only continue on the Page we started with
         if self.conf.localonly and page != self.origin:
             raise SaveError('-localonly and page != origin')
 
         if page.section():
             # This is not a page, but a subpage. Do not edit it.
-            pywikibot.info(
-                f'Not editing {page}: not doing interwiki on subpages')
+            pywikibot.info(f'Not editing {page}: interwiki not done on'
+                           ' subpages (#section)')
             raise SaveError('Link has a #section')
 
         try:
@@ -1549,6 +1560,12 @@ class Subject(interwiki_graph.Subject):
         if page_empty_check(page):
             pywikibot.info(f'Not editing {page}: page is empty')
             raise SaveError('Page is empty.')
+
+        return pagetext
+
+    def replaceLinks(self, page, newPages) -> bool:
+        """Return True if saving was successful."""
+        pagetext = self._fetch_text(page)
 
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
