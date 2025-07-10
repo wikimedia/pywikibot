@@ -28,6 +28,10 @@ where action can be one of these
 :both:         Both of the above. Retrieves redirect pages from live wiki,
                not from a special page.
 
+:deleteuser:   Tries to delete redirects into user space.
+               If the user does not have admin rights it adds `[[Category:Redirects into user space]]` to the pages.
+               Please only use with namespace parameter, e.g. `-ns:0` for main space.
+
 and arguments can be:
 
 -xml           Retrieve information from a local XML dump
@@ -136,6 +140,8 @@ class RedirectGenerator(OptionHandler):
         cls = self.__class__
         if action == 'double':
             cls.__iter__ = lambda slf: slf.retrieve_double_redirects()
+        elif action == 'deleteuser':
+            cls.__iter__ = lambda slf: slf.retrieve_redirects_into_user_space()
         elif action == 'broken':
             cls.__iter__ = lambda slf: slf.retrieve_broken_redirects()
         elif action == 'both':
@@ -233,7 +239,8 @@ class RedirectGenerator(OptionHandler):
 
     def get_redirects_via_api(
         self,
-        maxlen: int = 8
+        maxlen: int = 8,
+        getall: bool = False
     ) -> Generator[tuple[str, int | None, str, str | None]]:
         r"""Return a generator that yields tuples of data about redirect Pages.
 
@@ -293,7 +300,7 @@ class RedirectGenerator(OptionHandler):
                             final = redirects[final]
 
                 # only yield multiple or broken redirects
-                if result != 1:
+                if getall or (result != 1):
                     yield redirect, result, target, final
 
     def retrieve_broken_redirects(self) -> Generator[
@@ -319,6 +326,23 @@ class RedirectGenerator(OptionHandler):
         else:
             pywikibot.info('Retrieving broken redirect special page...')
             yield from self.site.preloadpages(self.site.broken_redirects())
+
+    def retrieve_redirects_into_user_space(self) -> Generator[
+            str | pywikibot.Page]:
+        """Retrieve redirects into user space."""
+        count = 0
+        for pagetitle, type_, target, final in self.get_redirects_via_api(getall=True):
+            pywikibot.info(f'\ntarget: {target}...')
+            x = target.startswith('User:')
+            if self.opt.namespaces and pywikibot.Page(
+                    self.site,
+                    pagetitle).namespace() not in self.opt.namespaces:
+                continue
+            elif (x == True):
+                yield pagetitle
+                count += 1
+                if self.opt.limit and count >= self.opt.limit:
+                    break
 
     def retrieve_double_redirects(self) -> Generator[
             str | pywikibot.Page]:
@@ -405,6 +429,8 @@ class RedirectRobot(ExistingPageBot):
             self.treat_page = self.fix_1_double_redirect
         elif action == 'broken':
             self.treat_page = self.delete_1_broken_redirect
+        elif action == 'deleteuser':
+            self.treat_page = self.delete_1_user_redirect
         elif action == 'both':
             self.treat_page = self.fix_double_or_delete_broken_redirect
         else:
@@ -448,7 +474,7 @@ class RedirectRobot(ExistingPageBot):
         self.is_repo = self.repo if self.repo == page.site else None
         return page
 
-    def delete_redirect(self, page, summary_key: str) -> None:
+    def delete_redirect(self, page, summary_key: str, touserspace: bool=False) -> None:
         """Delete the redirect page.
 
         :param page: The page to delete
@@ -457,19 +483,32 @@ class RedirectRobot(ExistingPageBot):
         """
         assert page.site == self.current_page.site, (
             f'target page is on different site {page.site}')
-        reason = i18n.twtranslate(page.site, summary_key, bot_prefix=True)
+
+        if touserspace:
+            reason = f'bot: {summary_key}'
+        else:
+            reason = i18n.twtranslate(page.site, summary_key, bot_prefix=True)
+
         if page.site.has_right('delete'):
             page.delete(reason, prompt=False)
-        elif self.sdtemplate:
-            pywikibot.info('User does not have delete right, '
-                           'put page to speedy deletion.')
+        elif touserspace or self.sdtemplate:
+            if touserspace:
+                infoaction = 'add category instead.'
+                contentaddition = '[[Category:Redirects into user space]]\n'
+            else:
+                infoaction = 'put page to speedy deletion.'
+                contentaddition = self.sdtemplate + '\n'
+
+            pywikibot.info('User does not have delete right, ' + infoaction)
+
             try:
                 content = page.get(get_redirect=True)
             except SectionError:
                 content_page = pywikibot.Page(page.site,
                                               page.title(with_section=False))
                 content = content_page.get(get_redirect=True)
-            content = self.sdtemplate + '\n' + content
+
+            content = contentaddition + content
             self.userPut(page, page.text, content, summary=reason,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
@@ -531,6 +570,11 @@ class RedirectRobot(ExistingPageBot):
             self.delete_redirect(redir_page, 'redirect-remove-broken')
         elif not (self.opt.delete or movedTarget):
             pywikibot.info('Cannot fix or delete the broken redirect')
+
+    def delete_1_user_redirect(self) -> None:
+        """Delete one user redirect."""
+        redir_page = self.current_page
+        self.delete_redirect(redir_page, 'deleting redirects into user space', touserspace=True)
 
     def delete_1_broken_redirect(self) -> None:
         """Treat one broken redirect."""
@@ -720,7 +764,7 @@ def main(*args: str) -> None:
         # bot options
         if arg in shorts:
             action = shorts[arg]
-        elif arg in ('both', 'broken', 'double'):
+        elif arg in ('both', 'broken', 'double', 'deleteuser'):
             action = arg
         elif option in ('always', 'delete'):
             options[option] = True
