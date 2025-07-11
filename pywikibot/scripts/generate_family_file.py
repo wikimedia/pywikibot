@@ -253,7 +253,7 @@ class FamilyFileGenerator:
         for lang in remove:
             self.langs.remove(lang)
 
-    def writefile(self, verify) -> None:
+    def writefile(self, verify) -> None:  # pragma: no cover
         """Write the family file."""
         fp = Path(self.base_dir, 'families', f'{self.name}_family.py')
         print(f'Writing {fp}... ')

@@ -123,9 +123,8 @@ Tracker = "https://phabricator.wikimedia.org/tag/pywikibot/"
 ignore_errors = true
 skip_empty = true
 
-exclude_lines = [
+exclude_other = [
     # Have to re-enable the standard pragma
-    "pragma: no cover",
     "except ImportError",
     "except KeyboardInterrupt",
     "except OSError",
@@ -135,13 +134,13 @@ exclude_lines = [
     "raise NotImplementedError",
     "raise unittest\\.SkipTest",
     "self\\.skipTest",
-    "if __name__ == '__main__':",
+    "if __name__ == .__main__.:",
     "if .+PYWIKIBOT_TEST_\\w+.+:",
     "if self\\.mw_version < .+:",
-    "if TYPE_CHECKING:",
     "@(abc\\.)?abstractmethod",
     "@deprecated\\([^\\)]+\\)",
     "@unittest\\.skip",
+    "no cover: start(?s:.)*?no cover: stop",
 ]
 
 exclude_also = [

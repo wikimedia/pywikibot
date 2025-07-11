@@ -37,6 +37,7 @@ def pytest_ignore_collect(collection_path: Path,
     if not any('mypy' in name for name in plugin_names):
         return None
 
+    # no cover: start
     project_root = Path(__file__).parent / 'pywikibot'
     try:
         rel_path = collection_path.relative_to(project_root)
@@ -50,3 +51,4 @@ def pytest_ignore_collect(collection_path: Path,
         return True
 
     return None
+    # no cover: stop
