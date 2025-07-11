@@ -1,6 +1,16 @@
-"""Mechanics to slow down wiki read and/or write rate."""
+"""Mechanisms to regulate the read and write rate to wiki servers.
+
+This module defines the :class:`Throttle` class, which ensures that
+automated access to wiki servers adheres to responsible rate limits. It
+avoids overloading the servers by introducing configurable delays
+between requests, and coordinates these limits across processes using a
+shared control file ``throttle.ctrl``.
+
+It supports both read and write throttling, automatic adjustment based
+on the number of concurrent bot instances, and optional lag-aware delays.
+"""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
