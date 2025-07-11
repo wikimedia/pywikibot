@@ -1131,7 +1131,7 @@ class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
 
         site2 = pywikibot.Site('beta')
         self.assertEqual(site2.hostname(),
-                         'commons.wikimedia.beta.wmflabs.org')
+                         'commons.wikimedia.beta.wmcloud.org')
         self.assertEqual(site2.code, 'beta')
         self.assertFalse(site2.obsolete)
 

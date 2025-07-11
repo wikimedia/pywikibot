@@ -1,6 +1,6 @@
 """Family module for Wikimedia Commons."""
 #
-# (C) Pywikibot team, 2005-2023
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,7 +24,7 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
     langs = {
         'commons': 'commons.wikimedia.org',
         'test': 'test-commons.wikimedia.org',
-        'beta': 'commons.wikimedia.beta.wmflabs.org'
+        'beta': 'commons.wikimedia.beta.wmcloud.org'
     }
 
     # Sites we want to edit but not count as real languages

@@ -1,6 +1,6 @@
 """Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2023
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
     langs = {
         'wikidata': 'www.wikidata.org',
         'test': 'test.wikidata.org',
-        'beta': 'wikidata.beta.wmflabs.org',
+        'beta': 'wikidata.beta.wmcloud.org',
     }
 
     # Sites we want to edit but not count as real languages

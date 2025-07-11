@@ -457,7 +457,7 @@ class TestMediaInfoEditing(TestCase):
     login = True
     write = True
 
-    # commons.wikimedia.beta.wmflabs.org
+    # commons.wikimedia.beta.wmcloud.org
     family = 'commons'
     code = 'beta'
 

@@ -387,7 +387,7 @@ class DrySite(pywikibot.site.APISite):
 
     def data_repository(self):
         """Return Site object for data repository e.g. Wikidata."""
-        if self.hostname().endswith('.beta.wmflabs.org'):
+        if self.hostname().endswith('.beta.wmcloud.org'):
             # TODO: Use definition for beta cluster's wikidata
             code, fam = None, None
             fam_name = self.hostname().split('.')[-4]
