@@ -54,8 +54,7 @@ class TestSiteObject(DefaultSiteTestCase):
         code = self.site.family.obsolete.get(self.code) or self.code
         expect = f"Site('{code}', '{self.family}')"
         reprs = repr(self.site)
-        self.assertTrue(reprs.endswith(expect),
-                        f'\n{reprs} does not end with {expect}')
+        self.assertEndsWith(reprs, expect)
 
     def test_constructors(self) -> None:
         """Test cases for site constructors."""
@@ -715,7 +714,7 @@ class TestSiteSysopWrite(TestCase):
         site.loadimageinfo(fp1, history=True)
         for v in fp1._file_revisions.values():
             if v['timestamp'] == ts1:
-                self.assertTrue(hasattr(v, 'userhidden'))
+                self.assertHasAttr(v, 'userhidden')
 
         # Multiple revisions
         site.deleterevs('oldimage', '20210314184415|20210314184430',
@@ -726,7 +725,7 @@ class TestSiteSysopWrite(TestCase):
         site.loadimageinfo(fp2, history=True)
         for v in fp2._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
-                self.assertTrue(hasattr(v, 'commenthidden'))
+                self.assertHasAttr(v, 'commenthidden')
 
         # Concurrently show and hide
         site.deleterevs('oldimage', ['20210314184415', '20210314184430'],
@@ -738,9 +737,9 @@ class TestSiteSysopWrite(TestCase):
         site.loadimageinfo(fp3, history=True)
         for v in fp3._file_revisions.values():
             if v['timestamp'] in (ts1, ts2):
-                self.assertFalse(hasattr(v, 'commenthidden'))
-                self.assertFalse(hasattr(v, 'userhidden'))
-                self.assertFalse(hasattr(v, 'filehidden'))
+                self.assertNotHasAttr(v, 'commenthidden')
+                self.assertNotHasAttr(v, 'userhidden')
+                self.assertNotHasAttr(v, 'filehidden')
 
         # Cleanup
         site.deleterevs('oldimage', [20210314184415, 20210314184430],

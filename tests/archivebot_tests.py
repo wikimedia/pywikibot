@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -123,7 +123,7 @@ class TestArchiveBot(TestCase):
         talk = archivebot.DiscussionPage(page, None)
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
-        self.assertTrue(talk.archiver is None)
+        self.assertIsNone(talk.archiver)
         self.assertIsInstance(talk.header, str)
         self.assertIsInstance(talk.timestripper, TimeStripper)
 
@@ -182,7 +182,7 @@ class TestArchiveBotAfterDateUpdate(TestCase):
         talk = archivebot.DiscussionPage(page, None)
         self.assertIsInstance(talk.archives, dict)
         self.assertIsInstance(talk.archived_threads, int)
-        self.assertTrue(talk.archiver is None)
+        self.assertIsNone(talk.archiver)
         self.assertIsInstance(talk.header, str)
         self.assertIsInstance(talk.timestripper, TimeStripper)
 

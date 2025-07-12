@@ -185,10 +185,7 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
         self.assertEqual(stderrlines[3],
                          "    raise ExceptionTestError('Testing Exception')")
-
-        end_str = ': Testing Exception'
-        self.assertTrue(stderrlines[-1].endswith(end_str),
-                        f'\n{stderrlines[-1]!r} does not end with {end_str!r}')
+        self.assertEndsWith(stderrlines[-1], ': Testing Exception')
 
 
 class TestTerminalInput(UITestCase):

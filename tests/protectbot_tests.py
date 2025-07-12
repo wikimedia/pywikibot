@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for scripts/protect.py."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,10 +54,11 @@ class TestProtectionBot(ScriptMainTestCase):
 
         self.maxDiff = None
         comment = rev[0].comment
-        self.assertTrue(comment.startswith(
+        self.assertStartsWith(
+            comment,
             'Protected "[[User:Sn1per/ProtectTest2]]": Bot: '
             'Protecting all pages from category Pywikibot Protect Test'
-        ))
+        )
         # the order may change, see T367259
         for ptype in ('Edit', 'Move'):
             self.assertIn(f'[{ptype}=Allow only administrators] (indefinite)',

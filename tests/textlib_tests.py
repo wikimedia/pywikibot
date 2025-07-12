@@ -622,7 +622,7 @@ class TestTemplateParams(TestCase):
             self.assertIsNone(m['params'])
             self.assertIsNone(m[2])
             self.assertIsNotNone(m['unhandled_depth'])
-            self.assertTrue(m[0].endswith('foo {{bar}}'))
+            self.assertEndsWith(m[0], 'foo {{bar}}')
 
 
 class TestDisabledParts(DefaultDrySiteTestCase):

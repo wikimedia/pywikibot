@@ -570,14 +570,14 @@ class TestPageObject(DefaultSiteTestCase):
         else:
             self.skipTest(f'No redirect pages on site {site!r}')
         # This page is already initialised
-        self.assertTrue(hasattr(page, '_isredir'))
+        self.assertHasAttr(page, '_isredir')
         # call api.update_page without prop=info
         del page._isredir
         page.isDisambig()
         self.assertTrue(page.isRedirectPage())
 
         page_copy = pywikibot.Page(site, page.title())
-        self.assertFalse(hasattr(page_copy, '_isredir'))
+        self.assertNotHasAttr(page_copy, '_isredir')
         page_copy.isDisambig()
         self.assertTrue(page_copy.isRedirectPage())
 

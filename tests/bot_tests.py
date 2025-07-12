@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,8 +56,8 @@ class TestBotTreatExit:
         def treat(page) -> None:
             self.assertEqual(page, next(self._page_iter))
             if self._treat_site is None:
-                self.assertFalse(hasattr(self.bot, 'site'))
-                self.assertFalse(hasattr(self.bot, '_site'))
+                self.assertNotHasAttr(self.bot, 'site')
+                self.assertNotHasAttr(self.bot, '_site')
             elif not isinstance(self.bot, pywikibot.bot.MultipleSitesBot):
                 self.assertIsNotNone(self.bot._site)
                 self.assertEqual(self.bot.site, self.bot._site)

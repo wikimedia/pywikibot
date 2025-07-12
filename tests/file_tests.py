@@ -358,8 +358,8 @@ class TestFilePageDataItem(TestCase):
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         item = page.data_item()
         self.assertIsInstance(item, pywikibot.MediaInfo)
-        self.assertTrue(page._item is item)
-        self.assertTrue(item.file is page)
+        self.assertIs(page._item, item)
+        self.assertIs(item.file, page)
         self.assertEqual('-1', item.id)
         item.get()
         self.assertEqual('M14634781', item.id)
@@ -368,7 +368,7 @@ class TestFilePageDataItem(TestCase):
             item.labels, pywikibot.page._collections.LanguageDict)
         self.assertIsInstance(
             item.statements, pywikibot.page._collections.ClaimCollection)
-        self.assertTrue(item.claims is item.statements)
+        self.assertIs(item.claims, item.statements)
 
         all_claims = list(chain.from_iterable(item.statements.values()))
         self.assertEqual({claim.on_item for claim in all_claims}, {item})

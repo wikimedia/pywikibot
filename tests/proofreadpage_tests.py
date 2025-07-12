@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -343,7 +343,7 @@ class TestProofreadPageValidSite(TestCase):
     def test_div_in_footer(self) -> None:
         """Test ProofreadPage page parsing functions."""
         page = ProofreadPage(self.site, self.div_in_footer['title'])
-        self.assertTrue(page.footer.endswith('</div>'))
+        self.assertEndsWith(page.footer, '</div>')
 
     def test_decompose_recompose_text(self) -> None:
         """Test ProofreadPage page decomposing/composing text."""
@@ -543,7 +543,7 @@ class TestProofreadPageIndexProperty(BS4TestCase):
 
         # Test deleter
         del page.index
-        self.assertFalse(hasattr(page, '_index'))
+        self.assertNotHasAttr(page, '_index')
         # Test setter with wrong type.
         with self.assertRaises(TypeError):
             page.index = 'invalid index'

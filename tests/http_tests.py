@@ -230,8 +230,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     def test_default_user_agent(self) -> None:
         """Config defined format string test."""
-        self.assertTrue(http.user_agent().startswith(
-            pywikibot.calledModuleName()))
+        self.assertStartsWith(http.user_agent(), pywikibot.calledModuleName())
         self.assertIn('Pywikibot/' + pywikibot.__version__, http.user_agent())
         self.assertNotIn('  ', http.user_agent())
         self.assertNotIn('()', http.user_agent())

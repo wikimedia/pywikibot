@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 from __future__ import annotations
@@ -1024,11 +1024,11 @@ class TestTinyCache(TestCase):
         """Test for cached decorator."""
         self.assertEqual(self.foo.foo(), 'foo')  # check computed value
         self.assertEqual(self.foo.read, 1)
-        self.assertTrue(hasattr(self.foo, '_foo'))
+        self.assertHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check cached value
         self.assertEqual(self.foo.read, 1)  # bar() was called only once
         del self.foo._foo
-        self.assertFalse(hasattr(self.foo, '_foo'))
+        self.assertNotHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check computed value
         self.assertEqual(self.foo.__doc__,
                          'Test class to verify cached decorator.')
@@ -1038,7 +1038,7 @@ class TestTinyCache(TestCase):
         """Test for cached property decorator."""
         self.assertEqual(self.foo.bar, 'bar')
         self.assertEqual(self.foo.read, 1)
-        self.assertTrue(hasattr(self.foo, '_bar'))
+        self.assertHasAttr(self.foo, '_bar')
         self.assertEqual(self.foo.bar, 'bar')
         self.assertEqual(self.foo.read, 1)
 
@@ -1054,7 +1054,7 @@ class TestTinyCache(TestCase):
         """Test for cached decorator with force enabled."""
         self.assertEqual(self.foo.quux(), 'quux')
         self.assertEqual(self.foo.read, 1)
-        self.assertTrue(hasattr(self.foo, '_quux'))
+        self.assertHasAttr(self.foo, '_quux')
         self.assertEqual(self.foo.quux(force=True), 'quux')
         self.assertEqual(self.foo.read, 2)
 
@@ -1063,7 +1063,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.method_with_args(force=False),
                          'method_with_args')
         self.assertEqual(self.foo.read, 1)
-        self.assertTrue(hasattr(self.foo, '_method_with_args'))
+        self.assertHasAttr(self.foo, '_method_with_args')
         with self.assertRaises(TypeError):
             self.foo.method_with_args(True)
         with self.assertRaises(TypeError):
