@@ -124,7 +124,7 @@ repos:
         files: >
           ^pywikibot/(__metadata__|exceptions|fixes|time)\.py$|
           ^pywikibot/(comms|data|families|specialbots)/__init__\.py$|
-          ^pywikibot/families/[a-z]+_family\.py$|
+          ^pywikibot/families/[a-z][a-z\d]+_family\.py$|
           ^pywikibot/page/(__init__|_decorators|_revision)\.py$|
           ^pywikibot/scripts/(?:i18n/)?__init__\.py$|
           ^pywikibot/site/(__init__|_basesite|_decorators|_interwikimap|_upload)\.py$|

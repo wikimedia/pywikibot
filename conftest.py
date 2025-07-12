@@ -18,7 +18,7 @@ EXCLUDE_PATTERN = re.compile(
     r'(?:'
     r'(__metadata__|exceptions|fixes|time)|'
     r'(comms|data|families|specialbots)/__init__|'
-    r'families/[a-z]+_family|'
+    r'families/[a-z][a-z\d]+_family|'
     r'page/(__init__|_decorators|_revision)|'
     r'scripts/(i18n/)?__init__|'
     r'site/(__init__|_basesite|_decorators|_interwikimap|_upload)|'
