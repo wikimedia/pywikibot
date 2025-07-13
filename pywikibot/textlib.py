@@ -11,6 +11,7 @@ import re
 from collections import OrderedDict
 from collections.abc import Sequence
 from contextlib import closing, suppress
+from dataclasses import dataclass
 from html.parser import HTMLParser
 from typing import NamedTuple
 
@@ -539,82 +540,208 @@ def removeDisabledParts(text: str,
     return text
 
 
-def removeHTMLParts(text: str, keeptags: list[str] | None = None) -> str:
-    """Return text without portions where HTML markup is disabled.
+def removeHTMLParts(text: str,
+                    keeptags: list[str] | None = None,
+                    *,
+                    removetags: list[str] | None = None) -> str:
+    """Remove selected HTML tags, their content, and comments from text.
 
-    Parts that can/will be removed are HTML tags and all wiki tags. The
-    exact set of parts which should NOT be removed can be passed as the
-    *keeptags* parameter, which defaults to
-    ``['tt', 'nowiki', 'small', 'sup']``.
+    This function removes HTML tags and their contents for tags listed
+    in ``removetags``. Tags specified in ``keeptags`` are preserved
+    along with their content and markup. This is a wrapper around the
+    :class:`GetDataHTML` parser class.
 
     **Example:**
 
-    >>> removeHTMLParts('<div><b><ref><tt>Hi all!</tt></ref></b></div>')
+    >>> remove = removeHTMLParts
+    >>> remove('<div><b><ref><tt>Hi all!</tt></ref></b></div>')
     '<tt>Hi all!</tt>'
+    >>> remove('<style><b>This is stylish</b></style>', keeptags=['style'])
+    '<style></style>'
+    >>> remove('<a>Note:</a> <b>This is important!<!-- really? --></b>')
+    'Note: This is important!'
+    >>> remove('<a>Note:</a> <b>This is important!</b>', removetags=['a'])
+    ' This is important!'
 
-    .. seealso:: :class:`_GetDataHTML`
+    .. caution:: Tag names must be given in lowercase.
+
+    .. versionchanged:: 10.3
+       The *removetags* parameter was added. Refactored to use
+       :class:`GetDataHTML` and its ``__call__`` method. tag attributes
+       will be kept.
+
+    :param text: The input HTML text to clean.
+    :param keeptags: List of tag names to keep, including their content
+        and markup. Defaults to :code:`['tt', 'nowiki', 'small', 'sup']`
+        if None.
+    :param removetags: List of tag names whose tags and content should
+        be removed. The tags ca be preserved if listed in *keeptags*.
+        Defaults to :code:`['style', 'script']` if None.
+    :return: The cleaned text with specified HTML parts removed.
     """
-    # TODO: try to merge with 'removeDisabledParts()' above into one generic
-    # function
-    parser = _GetDataHTML()
-    if keeptags is None:
-        keeptags = ['tt', 'nowiki', 'small', 'sup']
-    with closing(parser):
-        parser.keeptags = keeptags
-        parser.feed(text)
-    return parser.textdata
+    return GetDataHTML(keeptags=keeptags, removetags=removetags)(text)
 
 
-class _GetDataHTML(HTMLParser):
+@dataclass(init=False, eq=False)
+class GetDataHTML(HTMLParser):
 
-    """HTML parser which removes html tags except they are listed in keeptags.
+    """HTML parser that removes unwanted HTML elements and optionally comments.
 
-    The parser is used by :func:`removeHTMLParts` similar to this:
+    Tags listed in *keeptags* are preserved. Tags listed in *removetags*
+    are removed entirely along with their content. Optionally strips HTML
+    comments. Use via the callable interface or in a :code:`with closing(...)`
+    block.
 
-    .. code-block:: python
+    .. note::
+       The callable interface is preferred because it is simpler and
+       ensures proper resource management automatically. If using the
+       context manager, be sure to access :attr:`textdata` before calling
+       :meth:`close`.
 
-       from contextlib import closing
-       from pywikibot.textlib import _GetDataHTML
-       with closing(_GetDataHTML()) as parser:
-           parser.keeptags = ['html']
-           parser.feed('<html><head><title>Test</title></head>'
-                       '<body><h1><!-- Parse --> me!</h1></body></html>')
-           print(parser.textdata)
+    .. tabs::
 
-    The result is:
+       .. tab:: callable interface
 
-    .. code-block:: html
+          .. code-block:: python
 
-       <html>Test me!</html>
+             text = ('<html><head><title>Test</title></head>'
+                     '<body><h1><!-- Parse --> me!</h1></body></html>')
+
+             parser = GetDataHTML(keeptags = ['html'])
+             clean_text = parser(text)
+
+       .. tab:: closing block
+
+          .. code-block:: python
+
+             from contextlib import closing
+             text = ('<html><head><title>Test</title></head>'
+                     '<body><h1><!-- Parse --> me!</h1></body></html>')
+
+             parser = GetDataHTML(keeptags = ['html'])
+             with closing(parser):
+                 parser.feed(text)
+                 clean_text = parser.textdata
+
+          .. warning:: Save the :attr:`textdata` **before** :meth:`close`
+             is called; otherwise the cleaned text is empty.
+
+    **Usage:**
+
+    >>> text = ('<html><head><title>Test</title></head>'
+    ...         '<body><h1><!-- Parse --> me!</h1></body></html>')
+    >>> GetDataHTML()(text)
+    'Test me!'
+    >>> GetDataHTML(keeptags=['title'])(text)
+    '<title>Test</title> me!'
+    >>> GetDataHTML(removetags=['body'])(text)
+    'Test'
+
+    .. caution:: Tag names must be given in lowercase.
 
     .. versionchanged:: 9.2
-       This class is no longer a context manager;
-       :pylib:`contextlib.closing()<contextlib#contextlib.closing>`
-       should be used instead.
+       No longer a context manager
+
+    .. versionchanged:: 10.3
+       Public class now. Added support for removals of tag contents.
 
     .. seealso::
+       - :func:`removeHTMLParts`
        - :pylib:`html.parser`
-       - :pylib:`contextlib#contextlib.closing`
 
-    :meta public:
+    :param keeptags: List of tag names to keep, including their content
+        and markup. Defaults to :code:`['tt', 'nowiki', 'small', 'sup']`
+        if None.
+    :param removetags: List of tag names whose tags and content should
+        be removed. The tags can be preserved if listed in *keeptags*.
+        Defaults to :code:`['style', 'script']` if None.
+    :param removecomments: Whether to remove HTML comments. Defaults to
+        True.
     """
 
-    textdata = ''
-    keeptags: list[str] = []
+    def __init__(self, *,
+                 keeptags: list[str] | None = None,
+                 removetags: list[str] | None = None) -> None:
+        """Initialize default tags and internal state."""
+        super().__init__()
+        self.keeptags: list[str] = (keeptags if keeptags is not None
+                                    else ['tt', 'nowiki', 'small', 'sup'])
+        self.removetags: list[str] = (removetags if removetags is not None
+                                      else ['style', 'script'])
 
-    def handle_data(self, data) -> None:
-        """Add data to text."""
-        self.textdata += data
+        #: The cleaned output text collected during parsing.
+        self.textdata = ''
 
-    def handle_starttag(self, tag, attrs) -> None:
-        """Add start tag to text if tag should be kept."""
+        self._skiptag: str | None = None
+
+    def __call__(self, text: str) -> str:
+        """Feed the parser with *text* and return cleaned :attr:`textdata`.
+
+        :param text: The HTML text to parse and clean.
+        :return: The cleaned text with unwanted tags/content removed.
+        """
+        with closing(self):
+            self.feed(text)
+            return self.textdata
+
+    def close(self) -> None:
+        """Clean current processing and clear :attr:`textdata`."""
+        self.textdata = ''
+        self._skiptag = None
+        super().close()
+
+    def handle_data(self, data: str) -> None:
+        """Handle plain text content found between tags.
+
+        Text is added to the output unless it is located inside a tag
+        marked for removal.
+
+        :param data: The text data between HTML tags.
+        """
+        if not self._skiptag:
+            self.textdata += data
+
+    def handle_starttag(self,
+                        tag: str,
+                        attrs: list[tuple[str, str | None]]) -> None:
+        """Handle an opening HTML tag.
+
+        Tags listed in *keeptags* are preserved in the output. Tags
+        listed in *removetags* begin a skip block, and their content
+        will be excluded from the output.
+
+        .. versionchanged:: 10.3
+           Keep tag attributes.
+
+        :param tag: The tag name (e.g., "div", "script") converted to
+            lowercase.
+        :param attrs: A list of (name, value) pairs with tag attributes.
+        """
         if tag in self.keeptags:
-            self.textdata += f'<{tag}>'
 
-    def handle_endtag(self, tag) -> None:
-        """Add end tag to text if tag should be kept."""
+            # Reconstruct attributes for preserved tags
+            attr_text = ''.join(
+                f' {name}' if value is None else f' {name}="{value}"'
+                for name, value in attrs
+            )
+            self.textdata += f'<{tag}{attr_text}>'
+
+        if tag in self.removetags:
+            self._skiptag = tag
+
+    def handle_endtag(self, tag: str) -> None:
+        """Handle a closing HTML tag.
+
+        Tags listed in *keeptags* are preserved in the output. A closing
+        tag that matches the currently skipped tag will end the skip
+        block.
+
+        :param tag: The name of the closing tag.
+        """
         if tag in self.keeptags:
             self.textdata += f'</{tag}>'
+        if tag in self.removetags and tag == self._skiptag:
+            self._skiptag = None
 
 
 def isDisabled(text: str, index: int, tags=None) -> bool:
