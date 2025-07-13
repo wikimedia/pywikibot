@@ -79,6 +79,9 @@ jobs:
           pip install mwoauth
           pip install packaging
           pip install requests
+      - name: Print public IP of runner
+        run: |
+          python -c "import urllib.request; print('Public IP:', urllib.request.urlopen('https://api.ipify.org').read().decode('utf-8'))"
       - name: Generate family files
         if: ${{ matrix.family == 'wpbeta' }}
         run: |
