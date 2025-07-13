@@ -961,8 +961,9 @@ class WikimediaFamily(Family):
         'dk': 'da',
         'jp': 'ja',
 
-        # Language aliases, see T86924
-        'nb': 'no',
+        # Language aliases
+        'nb': 'no',  # T86924
+        'gsw': 'als',  # T399411
 
         # Closed wiki redirection aliases
         'mo': 'ro',
