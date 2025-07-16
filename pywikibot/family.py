@@ -965,6 +965,7 @@ class WikimediaFamily(Family):
         'gsw': 'als',  # T399411
         'nb': 'no',  # T86924
         'sgs': 'bat-smg',  # T399438
+        'vro': 'fiu-vro',  # T399444
 
         # Closed wiki redirection aliases
         'mo': 'ro',
