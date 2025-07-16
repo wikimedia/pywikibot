@@ -963,6 +963,7 @@ class WikimediaFamily(Family):
 
         # Language aliases
         'gsw': 'als',  # T399411
+        'lzh': 'zh-classical',  # T399697
         'nb': 'no',  # T86924
         'rup': 'roa-rup',  # T399693
         'sgs': 'bat-smg',  # T399438
