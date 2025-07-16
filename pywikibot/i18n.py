@@ -884,7 +884,7 @@ def bundles(stem: bool = False) -> Generator[Path | str, None, None]:
     >>> from pywikibot import i18n
     >>> bundles = sorted(i18n.bundles(stem=True))
     >>> len(bundles)
-    39
+    40
     >>> bundles[:4]
     ['add_text', 'archivebot', 'basic', 'blockpageschecker']
     >>> bundles[-5:]
