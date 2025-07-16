@@ -93,7 +93,7 @@ jobs:
             python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
           fi
           if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
-            python pwb.py generate_family_file http://en.wikisource.beta.wmcloud.org/ wsbeta y
+            python pwb.py generate_family_file http://en.wikisource.beta.wmcloud.org/ wsbeta n
           fi
       - name: Generate user files
         run: |
