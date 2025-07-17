@@ -5,6 +5,12 @@ Pywikibot script to get ISBN data from a digital library, and create or
 amend the related Wikidata item for edition (with the
 :samp:`P212, {ISBN number}` as unique external ID).
 
+.. deprecated:: 10.3
+   This script is deprecated and will be removed in Pywikibot 11.0.
+   An external version of this script can be found in the
+   `geertivp/Pywikibot <https://github.com/geertivp/Pywikibot>`_ script
+   collection. See :phab:`T398140` for details.
+
 Use digital libraries to get ISBN data in JSON format, and integrate the
 results into Wikidata.
 
