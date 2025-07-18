@@ -95,7 +95,7 @@ class Throttle:
         self.modules: CounterType[str] = Counter()
 
         self.checkMultiplicity()
-        self.setDelays()
+        self.set_delays()
 
     @property
     @deprecated(since='10.3.0')
