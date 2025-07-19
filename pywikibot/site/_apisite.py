@@ -828,13 +828,23 @@ class APISite(
 
     @property
     def articlepath(self) -> str:
-        """Get the nice article path with ``{}``placeholder.
+        """Return article path with a ``{}`` placeholder.
+
+        Replaces the ``$1`` placeholder from MediaWiki with a
+        Python-compatible ``{}``.
 
         .. versionadded:: 7.0
+
+        .. versionchanged:: 10.3
+           raises ValueError instead of AttributeError if "$1"
+           placeholder is missing.
+
+        :raises ValueError: missing "$1" placeholder
         """
         path = self.siteinfo['general']['articlepath']
-        # Assert $1 placeholder is present
-        assert '$1' in path, 'articlepath must contain "$1" placeholder'
+        if '$1' not in path:
+            raise ValueError(
+                f'Invalid article path "{path}": missing "$1" placeholder')
         return path.replace('$1', '{}')
 
     @cached
