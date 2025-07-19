@@ -443,16 +443,16 @@ def require_modules(*required_modules):
 
 
 def require_version(version_needed: str, /, reason: str = ''):
-    """Require minimum MediaWiki version to be queried.
+    """Skip test unless a minimum MediaWiki version is available.
 
-    The version needed for the test; must be given with a preleading rich
-    comparisons operator like ``<1.31wmf4`` or ``>=1.43``. If the
-    comparison does not match the test will be skipped.
+    The required version must include a comparison operator (e.g.
+    :code:`<1.31wmf4` or :code:`>=1.43`). If the site's version does not
+    satisfy the condition, the test is skipped.
 
-    This decorator can only be used for TestCase having a single site.
-    It cannot be used for DrySite tests. In addition version comparison
-    for other than the current site e.g. for the related data or image
-    repositoy of the current site is ot possible.
+    This decorator can only be used for :class:`TestCase` having a
+    single site. It cannot be used for DrySite tests. Version checks are
+    only supported for the current site — not for related sites like
+    data or image repositories.
 
     .. versionadded:: 8.0
 
@@ -486,6 +486,8 @@ def require_version(version_needed: str, /, reason: str = ''):
                 )
 
             try:
+                # Split version string into operator and version
+                # (e.g. '>=1.39' → '', '>=', '1.39')
                 site_vers, op, version = re.split('([<>]=?)', version_needed)
             except ValueError:
                 raise ValueError(f'There is no valid operator given with '
