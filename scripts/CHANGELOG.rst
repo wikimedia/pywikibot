@@ -9,13 +9,20 @@ Scripts Changelog
 archivebot
 ^^^^^^^^^^
 
-* Use wikidata items for archive header templates (:phab:`T396399`)
+* Use Wikidata items for archive header templates (:phab:`T396399`)
+
+interwiki
+^^^^^^^^^
+
+* Ignore :exc:`exceptions.SectionError` in :meth:`interwiki.Subject.page_empty_check` and treat it
+  as an empty page (:phab:`T398983`)
+* Show a warning if no username is configured for a site (:phab:`T135228`)
 
 redirect
 ^^^^^^^^
 
-* Try one more move to fix redirect targets (:phab:`T396473`)
-* Don't fix broken redirects if namespace of source and target are different (:phab:`T396456`)
+* Attempt an additional move to fix redirect targets (:phab:`T396473`)
+* Do not fix broken redirects if the source and target namespaces differ (:phab:`T396456`)
 
 
 10.2.0
