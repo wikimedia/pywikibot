@@ -173,6 +173,7 @@ include_trailing_comma = true
 lines_after_imports = 2
 multi_line_output = 3
 use_parentheses = true
+extra_standard_library = ["tomllib"]
 
 
 [tool.mypy]

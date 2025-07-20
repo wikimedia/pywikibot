@@ -24,14 +24,10 @@ from __future__ import annotations
 import os
 import re
 import sys
+import tomllib
 import warnings
+from itertools import pairwise
 from pathlib import Path
-
-
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
 
 
 # Deprecated classes will generate warnings as Sphinx processes them.
@@ -529,55 +525,75 @@ def pywikibot_docstring_fixups(app, what, name, obj, options, lines) -> None:
 
 def pywikibot_script_docstring_fixups(app, what, name, obj, options,
                                       lines) -> None:
-    """Pywikibot specific conversions."""
+    """Pywikibot-specific docstring conversions for scripts."""
     from scripts.cosmetic_changes import warning
 
     if what != 'module' or 'scripts.' not in name:
         return
 
-    length = 0
-    desc = ''
-    for index, line in enumerate(lines):
-        # highlight the first line
-        if index == 0:  # highlight the first line
-            lines[0] = f"**{line.strip('.')}**"
+    if not lines:
+        return
 
+    nextline = None
+
+    # highlight the first line
+    newlines = [f"**{lines[0].strip('.')}**"]
+
+    for previous, line in pairwise(lines):
         # add link for pagegenerators options
-        elif line == '&params;':
-            lines[index] = ('This script supports use of '
-                            ':py:mod:`pagegenerators` arguments.')
+        if line == '&params;':
+            newlines.append(
+                'This script supports use of :mod:`pagegenerators` arguments.')
+            continue
 
         # add link for fixes
-        elif name == 'scripts.replace' and line == '&fixes-help;':
-            lines[index] = ('                  The available fixes are listed '
-                            'in :py:mod:`pywikibot.fixes`.')
+        if name == 'scripts.replace' and line == '&fixes-help;':
+            newlines.append('                  The available fixes are '
+                            'listed in :mod:`pywikibot.fixes`.')
+            continue
 
         # replace cosmetic changes warning
-        elif name == 'scripts.cosmetic_changes' and line == '&warning;':
-            lines[index] = warning
+        if name == 'scripts.cosmetic_changes' and line == '&warning;':
+            newlines.append(warning)
+            continue
 
         # adjust options: if the option contains a colon, convert it to a
         # definition list and mark the option with a :kbd: role. Also convert
         # option types enclosed in square brackets to italic style.
         if line.startswith('-'):
             # extract term and wrap it with :kbd: role
-            match = re.fullmatch(r'(-\w.+?[^ ])( {2,})(.+)', line)
+            match = re.fullmatch(r'(-\w\S+)(?:( {2,})(.+))?', line)
             if match:
                 opt, sp, desc = match.groups()
-                desc = re.sub(r'\[(float|int|str)\]', r'*(\1)*', desc)
-                if ':' in opt or ' ' in opt and ', ' not in opt:
+                sp = sp or ''
+                desc = desc or ''
+                # make [type] italic
+                types = '(?:float|int|str)'
+                desc = re.sub(rf'\[({types}(?:\|{types})*)\]', r'*(\1)*', desc)
+                show_as_kbd = ':' in opt or (' ' in opt and ', ' not in opt)
+                if show_as_kbd:
+                    # extract term and wrap it with :kbd: role
+                    if previous:
+                        # add an empty line if previous is not empty
+                        newlines.append('')
                     length = len(opt + sp)
-                    lines[index] = f':kbd:`{opt}`'
+                    newlines.append(f':kbd:`{opt}`')
+                    # add the description to a new line later
+                    if desc:
+                        nextline = length, desc
                 else:
-                    lines[index] = f'{opt}{sp}{desc}'
+                    newlines.append(f'{opt}{sp}{desc}')
+                continue
 
-        elif length and (not line or line.startswith(' ' * length)):
-            # Add descriptions to the next line
-            lines[index] = ' ' * length + f'{desc} {line.strip()}'
-            length = 0
-        elif line:
-            # Reset length
-            length = 0
+        if nextline:
+            spaces = len(line) - len(line.lstrip()) or nextline[0]
+            newlines.append(' ' * spaces + nextline[1])
+            nextline = None
+
+        newlines.append(line)
+
+    # Overwrite original lines in-place for autodoc
+    lines[:] = newlines
 
 
 def setup(app) -> None:

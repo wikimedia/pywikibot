@@ -673,7 +673,7 @@ def get_language_preferences() -> list[str]:
     always appended.
 
     .. seealso::
-       - :wiki:`List_of_ISO_639-1_codes
+       - :wiki:`List_of_ISO_639-1_codes`
 
     :Return: List of ISO 639-1 language codes with strings delimited by
         ':'.

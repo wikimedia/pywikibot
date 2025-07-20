@@ -1,43 +1,41 @@
 #!/usr/bin/env python3
-"""This bot uploads text from djvu files onto pages in the "Page" namespace.
+"""This bot uploads text from DjVu files onto pages in the "Page" namespace.
 
-.. note:: It is intended to be used for Wikisource.
+.. note:: This script is intended to be used for Wikisource.
 
-The following parameters are supported:
+The following command-line parameters are supported:
 
--index:    name of the index page (without the Index: prefix)
+-index:     Name of the index page (without the "Index:" prefix).
 
--djvu:     path to the djvu file, it shall be:
+-djvu:      Path to the DjVu file. It can be one of the following:
 
-           .. hlist::
+            * A path to a file
+            * A directory containing a DjVu file with the same name as
+              the index page (optional; defaults to current directory ".")
 
-              * path to a file name
-              * dir where a djvu file name as index is located optional,
-                by default is current dir '.'
+-pages:<start>-<end>,...<start>-<end>,<start>-<end>
+            Page range(s) to upload (optional). Default: :samp:`start=1`,
+            :samp:`end={DjVu file number of images}`. Page ranges can be
+            specified as::
 
--pages:<start>-<end>,...<start>-<end>,<start>-<end>  Page range to
-           upload; optional, :samp:`start=1`,
-           :samp:`end={djvu file number of images}`. Page ranges can be
-           specified as::
+                A-B -> pages A through B
+                A-  -> pages A through the end
+                A   -> only page A
+                -B  -> pages 1 through B
 
-               A-B -> pages A until B
-               A-  -> pages A until number of images
-               A   -> just page A
-               -B  -> pages 1 until B
+This script is a subclass of :class:`ConfigParserBot<bot.ConfigParserBot>`.
+The following options can be set in a settings file (default:
+``scripts.ini``):
 
-This script is a :class:`ConfigParserBot <bot.ConfigParserBot>`. The
-following options can be set within a settings file which is scripts.ini
-by default:
+-summary:   [str] Custom edit summary. Use quotes if the summary
+            contains spaces.
 
--summary:  [str] Custom edit summary. Use quotes if edit summary
-           contains spaces.
+-force      Overwrite existing text. Optional. Default: False.
 
--force     Overwrites existing text optional, default False.
-
--always    Do not bother asking to confirm any of the changes.
+-always     Do not prompt for confirmation before making changes.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
