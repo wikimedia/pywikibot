@@ -58,6 +58,11 @@ Pending removal in Pywikibot 12
   in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
 * 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
   ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
+* 9.3.0: *botflag* parameter of :meth:`Page.save()<page.BasePage.save>`, :meth:`Page.put()
+  <page.BasePage.put>`, :meth:`Page.touch()<page.BasePage.touch>` and
+  :meth:`Page.set_redirect_target()<page.Page.set_redirect_target>` was renamed to *bot*
+* 9.2.0: All parameters of :meth:`Page.templates<page.BasePage.templates>` and
+  :meth:`Page.itertemplates()<page.BasePage.itertemplates>` must be given as keyworded arguments
 * 9.2.0: Imports of :mod:`logging` functions from the :mod:`bot` module are deprecated and will be desupported
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
@@ -84,14 +89,16 @@ Pending removal in Pywikibot 12
 Pending removal in Pywikibot 11
 -------------------------------
 
+* 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
+  :attr:`data.api.QueryGenerator.modules`
 * 8.4.0: The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
   *paraminfo_keys* class attribute, and its ``preloaded_modules`` property will be removed
 * 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
   removed in favour of the *expiry* class attribute
 * 8.2.0: The :func:`tools.itertools.itergroup` function will be removed in favour of the
   :func:`backports.batched` function
-* 8.2.0: The *normalize* parameter in the :meth:`WbTime.toTimestr` and :meth:`WbTime.toWikibase`
-  methods will be removed
+* 8.2.0: The *normalize* parameter in the :meth:`pywikibot.WbTime.toTimestr` and
+  :meth:`pywikibot.WbTime.toWikibase` methods will be removed
 * 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
   :exc:`exceptions.NoPageError` will be removed
 * 8.1.0: The ``exceptions.Server414Error`` exception is deprecated in favour of the

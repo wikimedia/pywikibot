@@ -314,7 +314,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         self._add_slots()
 
     @property
-    @deprecated(since='8.4.0')
+    @deprecated('modules', since='8.4.0')
     def continuekey(self) -> list[str]:
         """Return deprecated continuekey which is self.modules."""
         return self.modules
