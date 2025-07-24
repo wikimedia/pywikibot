@@ -275,6 +275,9 @@ extra_headers: Mapping[str, str] = {}
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
 
+# LiquipediaDB API key
+lpdb_api_key: str | None = None
+
 # #############################################
 
 

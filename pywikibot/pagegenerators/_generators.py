@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import calendar
 import io
+import os
 import re
 import typing
 from collections import abc
@@ -1509,3 +1510,96 @@ class PagePilePageGenerator(GeneratorWrapper):
         for raw_page in self.query():
             page = pywikibot.Page(self.site, raw_page)
             yield page
+
+class LPDBGenerator(GeneratorWrapper):
+
+    """Queries LPDB to generate pages.
+
+       subclassed from :class:`tools.collections.GeneratorWrapper`
+    """
+
+    def __init__(
+        self,
+        table: str,
+        conditions: str,
+        site: BaseSite | None = None,
+    ) -> None:
+        """Initializer.
+
+        :param table: An LPDB table to query
+        :param conditions: Conditions to select entries from the LPDB table
+        :param site: Site to operate on
+            (default is the default site from the user config)
+        """
+        if site is None:
+            site = pywikibot.Site()
+
+        self.site = site
+        self.lpdb_table = table
+        self.opts = self.buildQuery(conditions)
+
+    def buildQuery(self, conditions: str) -> dict[str, Any]:
+        """Get the querystring options to query LPDB.
+
+        :param conditions: Conditions to select entries from the LPDB table
+        :return: Dictionary of querystring parameters to use in the query
+        """
+
+        pywikibot.info(f"Querying LPDB {self.lpdb_table} on {self.site.code} with")
+        pywikibot.info(conditions)
+
+        query = {
+            'wiki': self.site.code,
+            'conditions': conditions,
+            'query': 'pagename, namespace',
+            'groupby': 'pagename ASC',
+            'limit': 500,
+            'offset': 0
+        }
+
+        return query
+
+    def query(self) -> Generator[dict[str, Any], None, None]:
+        """Query LPDB.
+
+        :raises ServerError: Either ReadTimeout or server status error
+        :raises APIError: error response from LPDB
+        """
+        url = f'https://api.liquipedia.net/api/v3/{self.lpdb_table}'
+        apikey = os.environ.get('LPDB_API_KEY', config.lpdb_api_key)
+        assert apikey, "LPDB API key is required. Set 'lpdb_api_key' in your config or LPDB_API_KEY in your environment."
+        headers = {
+            'Authorization': f"Apikey {apikey}"
+        }
+
+        while True:
+            try:
+                req = http.fetch(url, params=self.opts, headers=headers)
+            except ReadTimeout:
+                raise ServerError(f'received ReadTimeout from {url}')
+
+            server_err = HTTPStatus.INTERNAL_SERVER_ERROR
+            if server_err <= req.status_code < server_err + 100:
+                raise ServerError(
+                    f'received {req.status_code} status from {req.url}')
+
+            data = req.json()
+            if 'error' in data:
+                raise APIError('LPDB', data['error'], **self.opts)
+
+            raw_pages = data['result']
+            yield from raw_pages
+
+            if len(raw_pages) < self.opts['limit']:
+                break
+            else:
+                self.opts['offset'] += self.opts['limit']
+
+
+    @property
+    def generator(self) -> Generator[pywikibot.page.Page, None, None]:
+        """Yield results from :meth:`query`.
+        """
+        for raw_page in self.query():
+            yield pywikibot.Page(self.site, raw_page['pagename'],
+                                 int(raw_page['namespace']))
