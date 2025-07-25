@@ -16,6 +16,9 @@ Furthermore, the following command line parameters are supported:
 -undelete      Actually undelete pages instead of deleting. Obviously
                makes sense only with -page and -file.
 
+-ignoreusage   By default deletion will skip pages that have global usage.
+               Setting this param will ignore that check and delete them anyways.
+
 -isorphan      Alert if there are pages that link to page to be deleted
                (check 'What links here'). By default it is active and
                only the summary per namespace is be given. If given as
@@ -131,6 +134,7 @@ class DeletionRobot(CurrentPageBot):
         'undelete': False,
         'isorphan': 0,
         'orphansonly': [],
+        'ignoreusage': False,
     }
 
     def __init__(self, summary: str, **kwargs) -> None:
@@ -178,6 +182,12 @@ class DeletionRobot(CurrentPageBot):
 
     def skip_page(self, page) -> bool:
         """Skip the page under some conditions."""
+        """Skip files with global usage"""
+        if not self.opt.undelete and page.exists() and not self.opt.ignoreusage:
+            global_usage = page.site.simple_request(action='query', prop='globalusage', titles=page.title()).submit()
+            if len(global_usage['query']['pages'][str(page.pageid)]['globalusage']) > 0:
+                pywikibot.info(f'Skipping: {page} has global usage.')
+                return True
         if self.opt.undelete and page.exists():
             pywikibot.info(f'Skipping: {page} already exists.')
             return True
@@ -240,7 +250,7 @@ def main(*args: str) -> None:
 
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        if opt in ('-always', '-undelete'):
+        if opt in ('-always', '-undelete', '-ignoreusage'):
             options[opt[1:]] = True
         elif opt == '-summary':
             summary = value or pywikibot.input(
