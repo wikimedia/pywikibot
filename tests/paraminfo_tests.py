@@ -119,6 +119,7 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
             'text/css',
             'text/plain',
         ]
+
         if self.site.mw_version >= '1.36.0-wmf.2':
             base.extend([
                 'application/octet-stream',
@@ -127,6 +128,10 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
                 'text/unknown',
                 'unknown/unknown',
             ])
+
+        if self.site.mw_version >= '1.45.0-wmf.11':
+            base.append('application/vue+xml')  # T400537
+
         if isinstance(self.site, DataSite):
             # It is not clear when this format has been added, see T129281.
             base.append('application/vnd.php.serialized')
