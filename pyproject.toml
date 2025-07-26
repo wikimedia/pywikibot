@@ -123,7 +123,7 @@ Tracker = "https://phabricator.wikimedia.org/tag/pywikibot/"
 ignore_errors = true
 skip_empty = true
 
-exclude_other = [
+exclude_also = [
     # Have to re-enable the standard pragma
     "except ImportError",
     "except KeyboardInterrupt",
@@ -140,10 +140,6 @@ exclude_other = [
     "@(abc\\.)?abstractmethod",
     "@deprecated\\([^\\)]+\\)",
     "@unittest\\.skip",
-    "no cover: start(?s:.)*?no cover: stop",
-]
-
-exclude_also = [
     # Comments to turn coverage on and off:
     "no cover: start(?s:.)*?no cover: stop",
 ]
