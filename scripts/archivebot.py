@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
-"""archivebot.py - discussion page archiving bot.
+"""archivebot.py - Discussion page archiving bot.
 
 usage:
 
     python pwb.py archivebot [OPTIONS] [TEMPLATE_PAGE]
 
-Several TEMPLATE_PAGE templates can be given at once. Default is
-`User:MiszaBot/config`. Bot examines backlinks (Special:WhatLinksHere)
-to all TEMPLATE_PAGE templates. Then goes through all pages (unless a
-specific page specified using options) and archives old discussions.
-This is done by breaking a page into threads, then scanning each thread
-for timestamps. Threads older than a specified threshold are then moved
-to another page (the archive), which can be named either basing on the
-thread's name or then name can contain a counter which will be
-incremented when the archive reaches a certain size.
+Multiple TEMPLATE_PAGE templates can be given in a single command. The
+default is ``User:MiszaBot/config``. The bot examines backlinks (i.e.
+Special:WhatLinksHere) to all given TEMPLATE_PAGE templates. It then
+processes those pages (unless a specific page is specified via options)
+and archives old discussions.
 
-Transcluded template may contain the following parameters:
+This is done by splitting each page into threads and scanning them for
+timestamps. Threads older than a configured threshold are moved to an
+archive page. The archive page name can be based on the thread's title,
+or include a counter that increments when the archive reaches a
+configured size.
+
+The transcluded configuration template may include the following
+parameters:
 
 .. code:: wikitext
 
@@ -30,42 +33,59 @@ Transcluded template may contain the following parameters:
    |key =
    }}
 
-Meanings of parameters are:
+**Parameters meanings:**
 
 archive
-    Name of the page to which archived threads will be put. Must be a
-    subpage of the current page. Variables are supported.
-algo
-    Specifies the maximum age of a thread. Must be in the form
-    :code:`old(<delay>)` where ``<delay>`` specifies the age in
-    seconds (s), hours (h), days (d), weeks (w), or years (y) like ``24h``
-    or ``5d``. Default is :code:`old(24h)`.
-counter
-    The current value of a counter which could be assigned as variable.
-    Will be updated by bot. Initial value is 1.
-maxarchivesize
-    The maximum archive size before incrementing the counter. Value can
-    be given with appending letter like ``K`` or ``M`` which indicates
-    KByte or MByte. Default value is ``200K``.
-minthreadsleft
-    Minimum number of threads that should be left on a page. Default
-    value is 5.
-minthreadstoarchive
-    The minimum number of threads to archive at once. Default value is 2.
-archiveheader
-    Content that will be put on new archive pages as the header. This
-    parameter supports the use of variables. Default value is
-    ``{{talkarchive}}``.
-key
-    A secret key that (if valid) allows archives not to be subpages of
-    the page being archived.
+    Name of the archive page where threads will be moved. Must be a
+    subpage of the current page, unless a valid ``key`` is provided.
+    Supports variables.
 
-Variables below can be used in the value for "archive" in the template
-above; numbers are **ascii** digits. Alternatively you may use
-**localized** digits. This is only available for a few site languages.
-Refer :attr:`NON_ASCII_DIGITS
-<userinterfaces.transliteration.NON_ASCII_DIGITS>` whether there is a
-localized one.
+algo
+    Specifies the maximum age of a thread using the syntax:
+    :code:`old(<delay>)`, where ``<delay>`` can be in seconds (s), hours (h),
+    days (d), weeks (w), or years (y). For example: ``24h`` or ``5d``.
+    Default: :code:`old(24h)`.
+
+counter
+    The current value of the archive counter used in archive page naming.
+    Will be updated automatically by the bot. Default: 1.
+
+maxarchivesize
+    The maximum size of an archive page before incrementing the counter.
+    A suffix of ``K`` or ``M`` may be used for kilobytes or megabytes.
+    Default: ``200K``.
+
+minthreadsleft
+    Minimum number of threads that must remain on the main page after
+    archiving. Default: 5.
+
+minthreadstoarchive
+    Minimum number of threads that must be eligible for archiving before
+    any are moved. Default: 2.
+
+archiveheader
+    Content placed at the top of each newly created archive page.
+    Supports variables. If not set explicitly, a localized default will
+    be retrieved from Wikidata using known archive header templates. If
+    no localized template is found, the fallback ``{{talkarchive}}`` is
+    used.
+
+    .. note::
+       If no ``archiveheader`` is set and no localized template can be
+       retrieved from Wikidata, the fallback ``{{talkarchive}}`` is used.
+       This generic fallback may not be appropriate for all wikis, so it
+       is recommended to set ``archiveheader`` explicitly in such cases.
+
+key
+    A secret key that, if valid, allows archive pages to exist outside
+    of the subpage structure of the current page.
+
+Variables below can be used in the value of the "archive" parameter in
+the template above. Numbers are represented as **ASCII** digits by
+default; alternatively, **localized** digits may be used. Localized
+digits are only available for a few site languages. Please refer to
+:attr:`NON_ASCII_DIGITS <userinterfaces.transliteration.NON_ASCII_DIGITS>`
+to check if a localized version is available.
 
 .. list-table::
    :header-rows: 1
@@ -104,13 +124,17 @@ localized one.
      - %(localweek)s
      - week number of the thread being archived
 
-The ISO calendar starts with the Monday of the week which has at least
-four days in the new Gregorian calendar. If January 1st is between
-Monday and Thursday (including), the first week of that year started the
-Monday of that week, which is in the year before if January 1st is not a
-Monday. If it's between Friday or Sunday (including) the following week
-is then the first week of the year. So up to three days are still
-counted as the year before.
+The ISO calendar defines the first week of the year as the week
+containing the first Thursday of the Gregorian calendar year. This means:
+
+- If January 1st falls on a Monday, Tuesday, Wednesday, or Thursday, then
+  the week containing January 1st is considered the first week of the year.
+
+- If January 1st falls on a Friday, Saturday, or Sunday, then the first ISO
+  week starts on the following Monday.
+
+Because of this, up to three days at the start of January can belong to the
+last week of the previous year according to the ISO calendar.
 
 .. seealso:: Python :python:`datetime.date.isocalendar
    <library/datetime.html#datetime.date.isocalendar>`,
@@ -118,36 +142,47 @@ counted as the year before.
 
 Options (may be omitted):
 
--help           show this help message and exit
+-help           Show this help message and exit.
 
--calc:PAGE      calculate key for PAGE and exit
+-calc:PAGE      Calculate key for PAGE and exit.
 
--file:FILE      load list of pages from FILE
+-file:FILE      Load list of pages from FILE.
 
--force          override security options
+-force          Override security options.
 
--locale:LOCALE  switch to locale LOCALE
+-locale:LOCALE  Switch to locale LOCALE.
 
--namespace:NS   only archive pages from a given namespace
+-namespace:NS   Only archive pages from the given namespace.
 
--page:PAGE      archive a single PAGE, default ns is a user talk page
+-page:PAGE      Archive a single PAGE. Default namespace is a user talk
+                page.
 
--salt:SALT      specify salt
+-salt:SALT      Specify salt.
 
 -keep           Preserve thread order in archive even if threads are
-                archived later
--sort           Sort archive by timestamp; should not be used with `keep`
+                archived later.
+
+-sort           Sort archive by timestamp; should not be used with `keep`.
 
 -async          Run the bot in parallel tasks.
 
+Version historty:
+
 .. versionchanged:: 7.6
-   Localized variables for "archive" template parameter are supported.
-   `User:MiszaBot/config` is the default template. `-keep` option was
-   added.
+   Localized variables for the ``archive`` parameter are supported.
+   ``User:MiszaBot/config`` is the default template. The ``-keep`` option
+   was added.
+
 .. versionchanged:: 7.7
    ``-sort`` and ``-async`` options were added.
+
 .. versionchanged:: 8.2
-   KeyboardInterrupt was enabled with ``-async`` option.
+   KeyboardInterrupt support added when using the ``-async`` option.
+
+.. versionchanged:: 10.3
+   If ``archiveheader`` is not set, the bot now attempts to retrieve a
+   localized template from Wikidata (based on known item IDs). If none is
+   found, ``{{talkarchive}}`` is used as fallback.
 """
 #
 # (C) Pywikibot team, 2006-2025
@@ -395,19 +430,34 @@ class DiscussionPage(pywikibot.Page):
         return max(ts1, ts2)
 
     def get_header_template(self) -> str:
-        """Get localized archive header template.
+        """Return a localized archive header template from Wikibase.
+
+        This method looks up a localized archive header template by
+        checking a predefined list of Wikidata item IDs that correspond
+        to commonly used archive header templates. It returns the first
+        matching template found on the local wiki via the site’s
+        Wikibase repository.
+
+        If no such localized template is found, it falls back to the
+        default ``{{talkarchive}}`` template.
 
         .. versionadded:: 10.2
 
-        :raises NotImplementedError: Archive header is not localized
+        .. versionchanged:: 10.3
+           Returns ``{{talkarchive}}`` by default if no localized
+           template is found.
+
+        .. caution::
+           The default should be avoided where possible. It is
+           recommended to explicitly set the ``archiveheader`` parameter
+           in the bot's configuration template instead.
         """
         for item in ARCHIVE_HEADER:
             tpl = self.site.page_from_repository(item)
             if tpl:
                 return f'{{{{{tpl.title(with_ns=False)}}}}}'
 
-        raise NotImplementedError(
-            'Archive header is not localized on your site')
+        return '{{talkarchive}}'
 
     def load_page(self) -> None:
         """Load the page to be archived and break it up into threads.
