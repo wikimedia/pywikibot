@@ -40,7 +40,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         super().setUp()
         assert self.cached is False, 'Tests do not support caching'
 
-    def _test_page_text(self, get_text=True) -> None:
+    def _test_page_text(self) -> None:
         """Test site.loadrevisions() with .text."""
         page = self._page
 
@@ -84,23 +84,16 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         loadrevisions = self.site.loadrevisions
         try:
             self.site.loadrevisions = None
-            if get_text:
-                loaded_text = page.text
-            else:  # T107537
-                with self.assertRaises(NotImplementedError):
-                    page.text
-                loaded_text = ''
+            loaded_text = page.text
             self.assertIsNotNone(loaded_text)
             self.assertNotHasAttr(page, '_text')
             page.text = custom_text
-            if get_text:
-                self.assertEqual(page.get(), loaded_text)
+            self.assertEqual(page.get(), loaded_text)
             self.assertEqual(page._text, custom_text)
             self.assertEqual(page.text, page._text)
             del page.text
             self.assertNotHasAttr(page, '_text')
-            if get_text:
-                self.assertEqual(page.text, loaded_text)
+            self.assertEqual(page.text, loaded_text)
         finally:
             self.site.loadrevisions = loadrevisions
 
