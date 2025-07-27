@@ -12,7 +12,7 @@ from collections import Counter
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import TYPE_CHECKING
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
@@ -46,7 +46,7 @@ from pywikibot.tools import (
 
 
 if TYPE_CHECKING:
-    from typing_extensions import Literal
+    from typing import Any, Literal, NoReturn
 
     from pywikibot.page import Revision
 
