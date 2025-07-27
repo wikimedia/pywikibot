@@ -65,7 +65,7 @@ SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
 pywikibot.bot.set_interface('buffer')
 
 
-class Python314AssertionsMixin:
+class Python314AssertionsMixin:  # pragma: no cover
 
     """Mixin providing assertion methods added in Python 3.14 for unittest.
 
@@ -779,7 +779,7 @@ class RequireLoginMixin(TestCaseBase):
                 continue
 
             if not site.logged_in():
-                site.login()
+                site.login()  # pragma: no cover
 
             if skip_if_login_fails and not site.user():  # during setUp() only
                 self.skipTest(
