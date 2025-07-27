@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pickle
 import re
+import time
 from contextlib import suppress
 from datetime import timedelta
 from unittest import mock
@@ -1082,13 +1083,22 @@ class TestPageUserAction(DefaultSiteTestCase):
 
         # Note: this test uses the userpage, so that it is unwatched and
         # therefore is not listed by script_tests test_watchlist_simulate.
+
         userpage = self.get_userpage()
+        # watched_pages parameters
+        wp_params = {'force': True, 'with_talkpage': False}
         rv = userpage.watch()
-        self.assertIsInstance(rv, bool)
         self.assertTrue(rv)
-        rv = userpage.watch(unwatch=True)
-        self.assertIsInstance(rv, bool)
+        self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
+        with self.assertWarnsRegex(UserWarning,
+                                   r"expiry parameter \('.+'\) is ignored"):
+            rv = userpage.watch(unwatch=True, expiry='indefinite')
         self.assertTrue(rv)
+        rv = userpage.watch(expiry='5 seconds')
+        self.assertTrue(rv)
+        self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
+        time.sleep(10)
+        self.assertNotIn(userpage, userpage.site.watched_pages(**wp_params))
 
 
 class TestPageDelete(TestCase):

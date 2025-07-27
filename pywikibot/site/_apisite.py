@@ -14,7 +14,7 @@ import webbrowser
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from textwrap import fill
-from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
 from warnings import warn
 
 import pywikibot
@@ -74,6 +74,7 @@ from pywikibot.tools import (
     MediaWikiVersion,
     cached,
     deprecate_arg,
+    deprecate_positionals,
     deprecated,
     issue_deprecation_warning,
     merge_unique_dicts,
@@ -2917,27 +2918,56 @@ class APISite(
         return req.submit()
 
     @need_right('editmywatchlist')
+    @deprecate_positionals(since='10.4.0')
     def watch(
         self,
         pages: BasePage | str | list[BasePage | str],
-        unwatch: bool = False
+        *,
+        unwatch: bool = False,
+        expiry: pywikibot.Timestamp | str | Literal[
+            'infinite', 'indefinite', 'infinity', 'never'] | None = None
     ) -> bool:
         """Add or remove pages from watchlist.
 
-        .. seealso:: :api:`Watch`
+        .. versionchanged:: 10.4.0
+           Added the *expiry* parameter to specify watch expiry time.
+           Passing *unwatch* as a positional parameter is deprecated;
+           it must be passed as keyword argument.
+
+        .. seealso::
+           - :api:`Watch`
+           - :meth:`BasePage.watch`
+           - :meth:`Site.watched_pages()
+             <pywikibot.site._generators.GeneratorsMixin.watched_pages>`
 
         :param pages: A single page or a sequence of pages.
         :param unwatch: If True, remove pages from watchlist;
             if False add them (default).
+        :param expiry: Expiry timestamp to apply to the watch. Passing
+            None or omitting this parameter leaves any existing expiry
+            unchanged. Expiry values may be relative (e.g. ``5 months``
+            or ``2 weeks``) or absolute (e.g. ``2014-09-18T12:34:56Z``).
+            For no expiry, use ``infinite``, ``indefinite``, ``infinity``
+            or `never`. For absolute timestamps the :class:`Timestamp`
+            class can be used.
         :return: True if API returned expected response; False otherwise
+        :raises APIError: badexpiry: Invalid value for expiry parameter
         :raises KeyError: 'watch' isn't in API response
+        :raises TypeError: unexpected keyword argument
         """
         parameters = {
             'action': 'watch',
             'titles': pages,
             'token': self.tokens['watch'],
             'unwatch': unwatch,
+            'expiry': expiry or None,
         }
+        if not unwatch:
+            parameters['expiry'] = expiry or None
+        elif expiry:
+            msg = (f'\nexpiry parameter ({expiry!r}) is ignored when '
+                   f"unwatch=True.\nPlease omit 'expiry' when unwatching.")
+            warn(msg, category=UserWarning, stacklevel=2)
         req = self.simple_request(**parameters)
         results = req.submit()
         unwatch_s = 'unwatched' if unwatch else 'watched'
