@@ -244,6 +244,11 @@ touch script
 
 .. automodule:: scripts.touch
 
+tracking param remover script
+=============================
+
+.. automodule:: scripts.tracking_param_remover
+
 transferbot script
 ==================
 

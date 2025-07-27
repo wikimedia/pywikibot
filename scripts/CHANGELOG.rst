@@ -22,7 +22,12 @@ redirect
 ^^^^^^^^
 
 * Attempt an additional move to fix redirect targets (:phab:`T396473`)
-* Do not fix broken redirects if the source and target namespaces differ (:phab:`T396456`)
+* Do not fix broken redirects if source and target namespaces differ (:phab:`T396456`)
+
+tracking_param_remover
+^^^^^^^^^^^^^^^^^^^^^^
+
+* Script was added (:phab:`T399698`)
 
 
 10.2.0

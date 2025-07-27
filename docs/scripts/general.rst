@@ -22,3 +22,10 @@ pagefromfile script
 .. automodule:: scripts.pagefromfile
    :no-members:
    :noindex:
+
+tracking param remover script
+=============================
+
+.. automodule:: scripts.tracking_param_remover
+   :no-members:
+   :noindex:
