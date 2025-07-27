@@ -6,11 +6,21 @@
 #
 from __future__ import annotations
 
+from abc import ABCMeta, abstractmethod
+
 from pywikibot.page import BasePage
 from tests.aspects import TestCase
 
 
-class BasePageTestBase(TestCase):
+class ABCTestCaseMeta(ABCMeta, type(TestCase)):
+
+    """Enable abstract methods in TestCase-based base classes.
+
+    .. versionadded:: 10.3
+    """
+
+
+class BasePageTestBase(TestCase, metaclass=ABCTestCaseMeta):
 
     """Base of BasePage test classes."""
 
@@ -19,8 +29,17 @@ class BasePageTestBase(TestCase):
     def setUp(self) -> None:
         """Set up test."""
         super().setUp()
-        assert self._page, 'setUp() must create an empty BasePage in _page'
-        assert isinstance(self._page, BasePage)
+        self.setup_page()
+        self.assertIsInstance(self._page, BasePage,
+                              'setUp() must assign a BasePage to _page, not '
+                              f'{type(self._page).__name__}')
+
+    @abstractmethod
+    def setup_page(self) -> None:
+        """Subclasses must implement this to assign self._page.
+
+        .. versionadded:: 10.3
+        """
 
 
 class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
@@ -38,7 +57,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
     def setUp(self) -> None:
         """Set up test."""
         super().setUp()
-        assert self.cached is False, 'Tests do not support caching'
+        self.assertFalse(self.cached, 'Tests do not support caching')
 
     def _test_page_text(self) -> None:
         """Test site.loadrevisions() with .text."""
@@ -61,9 +80,9 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         self.assertHasAttr(page, '_revisions')
         self.assertLength(page._revisions, 1)
         self.assertIn(page._revid, page._revisions)
-
         self.assertEqual(page._text, custom_text)
         self.assertEqual(page.text, page._text)
+
         del page.text
 
         self.assertNotHasAttr(page, '_text')
@@ -71,13 +90,14 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         self.assertIsNone(page._latest_cached_revision())
 
         page.text = custom_text
-
         self.site.loadrevisions(page, total=1, content=True)
 
         self.assertIsNotNone(page._latest_cached_revision())
         self.assertEqual(page._text, custom_text)
         self.assertEqual(page.text, page._text)
+
         del page.text
+
         self.assertNotHasAttr(page, '_text')
 
         # Verify that calling .text doesn't call loadrevisions again

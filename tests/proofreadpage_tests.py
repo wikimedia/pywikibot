@@ -142,11 +142,11 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = ProofreadPage(
-            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super().setUp()
+            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12'
+        )
 
     def test_basepage_methods(self) -> None:
         """Test ProofreadPage methods inherited from superclass BasePage."""
@@ -162,11 +162,10 @@ class TestLoadRevisionsCachingProofreadPage(
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super().setUp()
 
     def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
@@ -637,11 +636,10 @@ class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super().setUp()
 
     def test_basepage_methods(self) -> None:
         """Test IndexPage methods inherited from superclass BasePage."""
@@ -657,11 +655,10 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super().setUp()
 
     def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""

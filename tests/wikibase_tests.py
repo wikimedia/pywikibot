@@ -50,10 +50,9 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
 
     """Test site.loadrevisions() caching."""
 
-    def setUp(self) -> None:
-        """Setup test."""
+    def setup_page(self) -> None:
+        """Setup test page."""
         self._page = ItemPage(self.get_repo(), 'Q15169668')
-        super().setUp()
 
     def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
@@ -1013,10 +1012,9 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of ItemPage methods inherited from BasePage."""
 
-    def setUp(self) -> None:
-        """Setup tests."""
+    def setup_page(self) -> None:
+        """Setup test page."""
         self._page = ItemPage(self.get_repo(), 'Q60')
-        super().setUp()
 
     def test_basepage_methods(self) -> None:
         """Test ItemPage methods inherited from superclass BasePage."""
@@ -1033,10 +1031,9 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
 
     """Test behavior of Page methods for wikibase item."""
 
-    def setUp(self) -> None:
+    def setup_page(self) -> None:
         """Setup tests."""
         self._page = pywikibot.Page(self.site, 'Q60')
-        super().setUp()
 
     def test_basepage_methods(self) -> None:
         """Test Page methods inherited from superclass BasePage with Q60."""
