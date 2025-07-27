@@ -1513,7 +1513,7 @@ class Subject(interwiki_graph.Subject):
                         break
 
     def process_unlimited(self, new, updated) -> None:
-        """"Post-process pages: replace links and track updated sites."""
+        """Post-process pages: replace links and track updated sites."""
         for site, page in new.items():
             if site.has_data_repository:
                 self.conf.note(
