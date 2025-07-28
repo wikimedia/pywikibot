@@ -1497,6 +1497,19 @@ class TestJSON(WikidataTestCase):
         self.assertEqual(diff, expected)
 
 
+class TestHighLevelApi(WikidataTestCase):
+
+    """Test high-level API for Wikidata."""
+
+    def test_get_best_claim(self) -> None:
+        """Test getting the best claim for a property."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q90')
+        item.get()
+        self.assertEqual(item.get_best_claim('P17').getTarget(),
+                         pywikibot.ItemPage(wikidata, 'Q142'))
+
+
 if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

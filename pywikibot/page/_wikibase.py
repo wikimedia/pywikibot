@@ -1341,6 +1341,35 @@ class ItemPage(WikibasePage):
             return self._isredir
         return super().isRedirectPage()
 
+    def get_best_claim(self, prop: str):
+        """Return the first best Claim for this page.
+
+        Return the first 'preferred' ranked Claim specified by Wikibase
+        property or the first 'normal' one otherwise.
+
+        :param prop: property id, "P###"
+        :return: Claim object given by Wikibase property number
+            for this page object.
+        :rtype: pywikibot.Claim or None
+
+        :raises UnknownExtensionError: site has no Wikibase extension
+        """
+        def find_best_claim(claims):
+            """Find the first best ranked claim."""
+            index = None
+            for i, claim in enumerate(claims):
+                if claim.rank == 'preferred':
+                    return claim
+                if index is None and claim.rank == 'normal':
+                    index = i
+            if index is None:
+                index = 0
+            return claims[index]
+
+        if prop in self.claims:
+            return find_best_claim(self.claims[prop])
+        return None
+
 
 class Property:
 
