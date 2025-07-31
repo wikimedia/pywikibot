@@ -1509,6 +1509,34 @@ class TestHighLevelApi(WikidataTestCase):
         self.assertEqual(item.get_best_claim('P17').getTarget(),
                          pywikibot.ItemPage(wikidata, 'Q142'))
 
+    def test_get_value_at_timestamp(self) -> None:
+        """Test getting the value of a claim at a specific timestamp."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q90')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P17', wbtime)
+        self.assertEqual(claim, pywikibot.ItemPage(wikidata, 'Q142'))
+
+    def test_with_monolingual_good_language(self) -> None:
+        """Test getting a monolingual text claim with a good language."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q183')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P1448', wbtime, 'ru')
+        self.assertIsInstance(claim, pywikibot.WbMonolingualText)
+        self.assertEqual(claim.language, 'ru')
+
+    def test_with_monolingual_wrong_language(self) -> None:
+        """Test getting a monolingual text claim with a good language."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q183')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P1448', wbtime, 'en')
+        self.assertIsNone(claim, None)
+
 
 if __name__ == '__main__':
     with suppress(SystemExit):
