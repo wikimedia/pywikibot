@@ -759,7 +759,7 @@ The text message is:
 {text}
 """
             if TEST_RUNNING:
-                if response.status_code == 402 \
+                if response.status_code == 403 \
                    and 'Requests from your IP have been blocked' in text:
                     raise unittest.SkipTest(msg)  # T399367
 
