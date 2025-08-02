@@ -147,4 +147,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure
         if: steps.ci_test.outcome == 'failure'
-        run: exit 1
+        run: |
+          # Print public IP of runner
+          python -c "import urllib.request; print('Public IP:', urllib.request.urlopen('https://api.ipify.org').read().decode('utf-8'))"
+          exit 1
