@@ -65,7 +65,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.5
+    rev: v0.12.7
     hooks:
       - id: ruff-check
         alias: ruff
@@ -113,7 +113,7 @@ repos:
           - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.0
+    rev: v1.17.1
     hooks:
       - id: mypy
         args:
