@@ -1,27 +1,7 @@
 Current Release Changes
 =======================
 
-* :attr:`Site.articlepath<pywikibot.site._apisite.APISite.articlepath>` may raise a ValueError
-  instead of AttributeError if ``$1`` placeholder is missing from API
-* Refactor the :class:`throttle.Throttle` class (:phab:`T289318`)
-* L10N-Updates: add language aliases for ``gsw``, ``sgs``, ``vro``, ``rup`` and ``lzh``
-  to :class:`family.WikimediaFamily` family class
-  (:phab:`T399411`, :phab:`T399438`, :phab:`T399444`, :phab:`T399693`, :phab:`T399697` )
-* Refactor HTML removal logic in :func:`textlib.removeHTMLParts` using :class:`textlib.GetDataHTML`
-  parser; *removetags* parameter was introduced to remove specified tag blocks (:phab:`T399378`)
-* Refactor :class:`echo.Notification` and fix :meth:`mark_as_read()<echo.Notification.mark_as_read>`
-  method (:phab:`T398770`)
-* Update beta domains in family files from beta.wmflabs.org to beta.wmcloud.org (:phab:`T289318`)
-* ``textlib.to_latin_digits()`` was renamed to :func:`textlib.to_ascii_digits` (:phab:`T398146#10958283`),
-  ``NON_LATIN_DIGITS`` of :mod:`userinterfaces.transliteration` was renamed to ``NON_ASCII_DIGITS``
-* Add -cookies option to the :mod:`login<pywikibot.scripts.login>` script to log in with cookies
-  files only
-* Create a Site using the :func:`pywikibot.Site` constructor with a given url even if the URL, even
-  if it ends with a slash (:phab:`T396592`)
-* Remove hard-coded error messages from :meth:`login.LoginManager.login` and use API response instead
-* Add additional information to :meth:`Site.login()<pywikibot.site._apisite.APISite.login>`
-  error message (:phab:`T395670`)
-* i18n updates
+* (no changes yet)
 
 Deprecations
 ============
