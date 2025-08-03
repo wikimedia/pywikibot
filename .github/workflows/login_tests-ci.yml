@@ -14,8 +14,22 @@ env:
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
+  wait_for_all:
+    name: Wait for other workflows to finish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for all workflows to complete excluding this one
+        uses: kachick/wait-other-jobs@v3.8.1
+        with:
+          skip_same_workflow: true
+          warmup-delay: PT1M
+          minimum-interval: PT5M
+          fail-on-error: false
+
   run_tests:
+    name: Run Login/Logout Tests
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    needs: wait_for_all
     timeout-minutes: 30
     strategy:
       fail-fast: false
