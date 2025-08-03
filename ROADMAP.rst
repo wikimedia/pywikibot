@@ -1,7 +1,9 @@
 Current Release Changes
 =======================
 
-* Refactor the :class:`throttle.Trottle` class (:phab:`T289318`)
+* :attr:`Site.articlepath<pywikibot.site._apisite.APISite.articlepath>` may raise a ValueError
+  instead of AttributeError if ``$1`` placeholder is missing from API
+* Refactor the :class:`throttle.Throttle` class (:phab:`T289318`)
 * L10N-Updates: add language aliases for ``gsw``, ``sgs``, ``vro``, ``rup`` and ``lzh``
   to :class:`family.WikimediaFamily` family class
   (:phab:`T399411`, :phab:`T399438`, :phab:`T399444`, :phab:`T399693`, :phab:`T399697` )

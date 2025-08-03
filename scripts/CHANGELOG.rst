@@ -9,7 +9,13 @@ Scripts Changelog
 archivebot
 ^^^^^^^^^^
 
+* Use {{talkarchive}} template by default (:phab:`T400543`)
 * Use Wikidata items for archive header templates (:phab:`T396399`)
+
+create_isbn_edition
+^^^^^^^^^^^^^^^^^^^
+
+* This script will be removed from repository in Pywikibot 11
 
 interwiki
 ^^^^^^^^^
@@ -27,7 +33,7 @@ redirect
 tracking_param_remover
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* Script was added (:phab:`T399698`)
+* Script for removing tracking URL parameters was added (:phab:`T399698`)
 
 
 10.2.0
