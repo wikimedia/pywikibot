@@ -1,7 +1,10 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
+* Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
+  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>` (:phab:`T330839`)
+
 
 Deprecations
 ============
