@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,10 +55,10 @@ class TestGetAuthenticationConfig(TestCase):
         super().setUp()
         self._authenticate = config.authenticate
         config.authenticate = {
-            'zh.wikipedia.beta.wmflabs.org': ('1', '2'),
-            '*.wikipedia.beta.wmflabs.org': ('3', '4', '3', '4'),
-            '*.beta.wmflabs.org': ('5', '6'),
-            '*.wmflabs.org': ('7', '8', '8'),
+            'zh.wikipedia.beta.wmcloud.org': ('1', '2'),
+            '*.wikipedia.beta.wmcloud.org': ('3', '4', '3', '4'),
+            '*.beta.wmcloud.org': ('5', '6'),
+            '*.wmcloud.org': ('7', '8', '8'),
         }
 
     def tearDown(self) -> None:
@@ -69,15 +69,15 @@ class TestGetAuthenticationConfig(TestCase):
     def test_url_based_authentication(self) -> None:
         """Test url-based authentication info."""
         pairs = {
-            'https://zh.wikipedia.beta.wmflabs.org': ('1', '2'),
-            'https://en.wikipedia.beta.wmflabs.org': ('3', '4', '3', '4'),
-            'https://wiki.beta.wmflabs.org': ('5', '6'),
-            'https://beta.wmflabs.org': None,
-            'https://wmflabs.org': None,
+            'https://zh.wikipedia.beta.wmcloud.org': ('1', '2'),
+            'https://en.wikipedia.beta.wmcloud.org': ('3', '4', '3', '4'),
+            'https://wiki.beta.wmcloud.org': ('5', '6'),
+            'https://beta.wmcloud.org': None,
+            'https://wmcloud.org': None,
             'https://www.wikiquote.org/': None,
         }
         with suppress_warnings(
-            r"config.authenticate\['\*.wmflabs.org'] has invalid value.",
+            r"config.authenticate\['\*.wmcloud.org'] has invalid value.",
             UserWarning,
         ):
             for url, auth in pairs.items():
@@ -230,8 +230,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     def test_default_user_agent(self) -> None:
         """Config defined format string test."""
-        self.assertTrue(http.user_agent().startswith(
-            pywikibot.calledModuleName()))
+        self.assertStartsWith(http.user_agent(), pywikibot.calledModuleName())
         self.assertIn('Pywikibot/' + pywikibot.__version__, http.user_agent())
         self.assertNotIn('  ', http.user_agent())
         self.assertNotIn('()', http.user_agent())

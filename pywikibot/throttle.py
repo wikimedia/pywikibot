@@ -1,13 +1,22 @@
-"""Mechanics to slow down wiki read and/or write rate."""
+"""Mechanisms to regulate the read and write rate to wiki servers.
+
+This module defines the :class:`Throttle` class, which ensures that
+automated access to wiki servers adheres to responsible rate limits. It
+avoids overloading the servers by introducing configurable delays
+between requests, and coordinates these limits across processes using a
+shared control file ``throttle.ctrl``.
+
+It supports both read and write throttling, automatic adjustment based
+on the number of concurrent bot instances, and optional lag-aware delays.
+"""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import itertools
-import math
 import threading
 import time
 from collections import Counter
@@ -18,7 +27,7 @@ from typing import NamedTuple
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Counter as CounterType
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecate_positionals, deprecated, deprecated_args
 
 
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
@@ -79,7 +88,6 @@ class Throttle:
         self.writedelay = writedelay or config.put_throttle
         self.last_read = 0.0
         self.last_write = 0.0
-        self.next_multiplicity = 1.0
 
         self.retry_after = 0  # set by http.request
         self.delay = 0
@@ -87,7 +95,26 @@ class Throttle:
         self.modules: CounterType[str] = Counter()
 
         self.checkMultiplicity()
-        self.setDelays()
+        self.set_delays()
+
+    @property
+    @deprecated(since='10.3.0')
+    def next_multiplicity(self) -> float:
+        """Factor to scale delay time based on upcoming request size.
+
+        .. deprecated:: 10.3.0
+        """
+        return 1.0
+
+    @next_multiplicity.setter
+    @deprecated(since='10.3.0')
+    def next_multiplicity(self, value: float) -> None:
+        """Setter for delay scaling factor for the next request.
+
+        .. deprecated:: 10.3.0
+           This property has no effect and is retained for backward
+           compatibility.
+        """
 
     @property
     @deprecated('expiry', since='8.4.0')
@@ -199,6 +226,7 @@ class Throttle:
             pywikibot.log(f'Found {count} {mysite} processes running,'
                           ' including this one.')
 
+    @deprecated('set_delays', since='10.3.0')
     def setDelays(
         self,
         delay=None,
@@ -207,7 +235,23 @@ class Throttle:
     ) -> None:
         """Set the nominal delays in seconds.
 
+        .. deprecated:: 10.3.0
+           Use :meth:`set_delays` instead.
+        """
+        self.set_delays(delay=delay, writedelay=writedelay, absolute=absolute)
+
+    def set_delays(
+        self, *,
+        delay=None,
+        writedelay=None,
+        absolute: bool = False
+    ) -> None:
+        """Set the nominal delays in seconds.
+
         Defaults to config values.
+
+        .. versionadded:: 10.3.0
+           Renamed from :meth:`setDelays`.
         """
         with self.lock:
             delay = delay or self.mindelay
@@ -221,24 +265,38 @@ class Throttle:
             # Start the delay count now, not at the next check
             self.last_read = self.last_write = time.time()
 
-    def getDelay(self, write: bool = False):
-        """Return the actual delay, accounting for multiple processes.
+    @deprecated('get_delay', since='10.3.0')
+    def getDelay(self, write: bool = False) -> float:
+        """Return the current delay, adjusted for active processes.
 
-        This value is the maximum wait between reads/writes, not taking
-        into account of how much time has elapsed since the last access.
+        .. deprecated:: 10.3.0
+           Use :meth:`get_delay` instead.
         """
-        thisdelay = self.writedelay if write else self.delay
+        return self.get_delay(write=write)
 
-        # We're checking for multiple processes
+    def get_delay(self, *, write: bool = False) -> float:
+        """Return the current delay, adjusted for active processes.
+
+        Compute the delay for a read or write operation, factoring in
+        process concurrency. This method does not account for how much
+        time has already passed since the last access — use
+        :meth:`waittime` for that.
+
+        .. versionadded:: 10.3.0
+           Renamed from :meth:`getDelay`.
+
+        :param write: Whether the operation is a write (uses writedelay).
+        :return: The delay in seconds before the next operation should
+            occur.
+        """
+        current_delay = self.writedelay if write else self.delay
+
+        # Refresh process count if the check interval has elapsed
         if time.time() > self.checktime + self.checkdelay:
             self.checkMultiplicity()
-        multiplied_delay = self.mindelay * self.next_multiplicity
-        if thisdelay < multiplied_delay:
-            thisdelay = multiplied_delay
-        elif thisdelay > self.maxdelay:
-            thisdelay = self.maxdelay
-        thisdelay *= self.process_multiplicity
-        return thisdelay
+
+        current_delay = max(self.mindelay, min(current_delay, self.maxdelay))
+        return current_delay * self.process_multiplicity
 
     def waittime(self, write: bool = False):
         """Return waiting time in seconds.
@@ -247,7 +305,7 @@ class Throttle:
         """
         # Take the previous requestsize in account calculating the desired
         # delay this time
-        thisdelay = self.getDelay(write=write)
+        thisdelay = self.get_delay(write=write)
         now = time.time()
         ago = now - (self.last_write if write else self.last_read)
         return max(0.0, thisdelay - ago)
@@ -284,31 +342,36 @@ class Throttle:
 
         time.sleep(seconds)
 
-    def __call__(self, requestsize: int = 1, write: bool = False) -> None:
-        """Block the calling program if the throttle time has not expired.
+    @deprecated_args(requestsize=None)  # since: 10.3.0
+    @deprecate_positionals(since='10.3.0')
+    def __call__(self, *, requestsize: int = 1, write: bool = False) -> None:
+        """Apply throttling based on delay rules and request type.
 
-        Parameter requestsize is the number of Pages to be read/written;
-        multiply delay time by an appropriate factor.
+        This method blocks the calling thread if the minimum delay has
+        not yet elapsed since the last read or write operation.
 
-        Because this seizes the throttle lock, it will prevent any other
-        thread from writing to the same site until the wait expires.
+        .. versionchanged:: 10.3.0
+           The *write* parameter is now keyword-only.
+
+        .. deprecated:: 10.3.0
+           The *requestsize* parameter has no effect and will be removed
+           in a future release.
+
+        :param requestsize: Number of pages to be read or written.
+            Deprecated since 10.3.0. No longer affects throttling.
+        :param write: Whether the operation involves writing to the site.
+            Write operations use a separate delay timer and lock.
         """
         lock = self.lock_write if write else self.lock_read
         with lock:
             wait = self.waittime(write=write)
-            # Calculate the multiplicity of the next delay based on how
-            # big the request is that is being posted now.
-            # We want to add "one delay" for each factor of two in the
-            # size of the request. Getting 64 pages at once allows 6 times
-            # the delay time for the server.
-            self.next_multiplicity = math.log(1 + requestsize) / math.log(2.0)
-
             self.wait(wait)
 
+            now = time.time()
             if write:
-                self.last_write = time.time()
+                self.last_write = now
             else:
-                self.last_read = time.time()
+                self.last_read = now
 
     def lag(self, lagtime: float | None = None) -> None:
         """Seize the throttle lock due to server lag.

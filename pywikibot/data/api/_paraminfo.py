@@ -1,6 +1,6 @@
 """Object representing API parameter information."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,12 +45,10 @@ class ParamInfo(Sized, Container):
         self.site = site
 
         # Keys are module names, values are the raw responses from the server.
-        self._paraminfo = {}
+        self._paraminfo: dict[str, Any] = {}
 
         # Cached data.
-        self._prefixes = {}
         self._prefix_map = {}
-        self._with_limits = None
 
         self._action_modules = frozenset()  # top level modules
         self._modules = {}  # filled in _init() (and enlarged in fetch)

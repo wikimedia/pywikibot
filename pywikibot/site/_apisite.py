@@ -434,10 +434,15 @@ class APISite(
                     self._loginstatus = login.LoginStatus.AS_USER
                     return
 
-                pywikibot.error(
+                pywikibot.error(fill(
                     f"{self.userinfo['name']} != {self.username()} after "
                     f'{type(self).__name__}.login() and successful '
-                    f'{type(login_manager).__name__}.login()')
+                    f'{type(login_manager).__name__}.login(). You should'
+                    ' probably delete the cookie file "pywikibot-'
+                    f'{self.username()}.lwp" and re-login. You may use the'
+                    ' login script.',
+                    77
+                ))
 
         self._loginstatus = login.LoginStatus.NOT_LOGGED_IN  # failure
 
@@ -823,13 +828,23 @@ class APISite(
 
     @property
     def articlepath(self) -> str:
-        """Get the nice article path with ``{}``placeholder.
+        """Return article path with a ``{}`` placeholder.
+
+        Replaces the ``$1`` placeholder from MediaWiki with a
+        Python-compatible ``{}``.
 
         .. versionadded:: 7.0
+
+        .. versionchanged:: 10.3
+           raises ValueError instead of AttributeError if "$1"
+           placeholder is missing.
+
+        :raises ValueError: missing "$1" placeholder
         """
         path = self.siteinfo['general']['articlepath']
-        # Assert $1 placeholder is present
-        assert '$1' in path, 'articlepath must contain "$1" placeholder'
+        if '$1' not in path:
+            raise ValueError(
+                f'Invalid article path "{path}": missing "$1" placeholder')
         return path.replace('$1', '{}')
 
     @cached

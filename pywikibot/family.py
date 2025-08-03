@@ -181,14 +181,6 @@ class Family:
     #: String used as separator between category links and the text
     category_text_separator = '\n\n'
 
-    categories_last: list[str] = []
-    """When both at the bottom should categories come after interwikilinks?
-
-    TODO: :phab:`T86284` Needed on Wikia sites, as it uses the
-    CategorySelect extension which puts categories last on all sites.
-    TO BE DEPRECATED!
-    """
-
     interwiki_putfirst: dict[str, str] = {}
     """Which languages have a special order for putting interlanguage links,
     and what order is it?
@@ -328,6 +320,17 @@ class Family:
     """
 
     _families: dict[str, Family] = {}
+
+    @classproperty
+    @deprecated('site.has_extension("CategorySelect")', since='10.3.0')
+    def categories_last(cls) -> list[str]:
+        """Categories come after interwiki links for the given site codes.
+
+        .. deprecated:: 10.3
+           use :meth:`site.has_extension('CategorySelect')
+           <pywikibot.site._apisite.APISite.has_extension>` instead
+        """
+        return []
 
     @staticmethod
     def load(fam: str | None = None):
@@ -592,6 +595,8 @@ class Family:
         .. versionchanged:: 10.0
            *url* parameter does not have to contain a api/query/script
            path
+        .. versionchanged:: 10.3
+           accept a trailing slash in *url* after domain.
 
         :param url: the URL which may contain a ``$1``. If it's missing
             it is assumed to be at the end.
@@ -628,7 +633,7 @@ class Family:
                 site = pywikibot.Site(code, self.name)
                 pywikibot.log(f'Found candidate {site}')
 
-                if not path:
+                if path in ('', '/'):  # accept trailing slash
                     return site.code
 
                 for iw_url in site._interwiki_urls():
@@ -956,8 +961,13 @@ class WikimediaFamily(Family):
         'dk': 'da',
         'jp': 'ja',
 
-        # Language aliases, see T86924
-        'nb': 'no',
+        # Language aliases
+        'gsw': 'als',  # T399411
+        'lzh': 'zh-classical',  # T399697
+        'nb': 'no',  # T86924
+        'rup': 'roa-rup',  # T399693
+        'sgs': 'bat-smg',  # T399438
+        'vro': 'fiu-vro',  # T399444
 
         # Closed wiki redirection aliases
         'mo': 'ro',

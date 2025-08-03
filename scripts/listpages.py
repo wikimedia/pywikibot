@@ -6,64 +6,66 @@ in the current directory.
 
 These parameters are supported to specify which pages titles to print:
 
--format     Defines the output format.
+-format     [int|str] Defines the output format.
 
             Can be a custom string according to python string.format()
-            notation or can be selected by a number from following list
-            (1 is default format):
+            notation or can be selected by a number from the following
+            list (1 is default format):
 
-            1 - '{num:4d} {page.title}'
-                --> 10 PageTitle
+            ``1 - '{num:4d} {page.title}'``
+                → 10 PageTitle
 
-            2 - '{num:4d} [[{page.title}]]'
-                --> 10 [[PageTitle]]
+            ``2 - '{num:4d} [[{page.title}]]'``
+                → 10 [[PageTitle]]
 
-            3 - '{page.title}'
-                --> PageTitle
+            ``3 - '{page.title}'``
+                → PageTitle
 
-            4 - '[[{page.title}]]'
-                --> [[PageTitle]]
+            ``4 - '[[{page.title}]]'``
+                → [[PageTitle]]
 
-            5 - '{num:4d} <<lightred>>{page.loc_title:<40}<<default>>'
-                --> 10 localised_Namespace:PageTitle (colorised in lightred)
+            ``5 - '{num:4d} <<lightred>>{page.loc_title:<40}<<default>>'``
+                → 10 localised_Namespace:PageTitle (colorised in lightred)
 
-            6 - '{num:4d} {page.loc_title:<40} {page.can_title:<40}'
-                --> 10 localised_Namespace:PageTitle
-                       canonical_Namespace:PageTitle
+            ``6 - '{num:4d} {page.loc_title:<40} {page.can_title:<40}'``
+                → 10 localised_Namespace:PageTitle
+                canonical_Namespace:PageTitle
 
-            7 - '{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
-                --> 10 localised_Namespace:PageTitle
-                       outputlang_Namespace:PageTitle
-                (*) requires "outputlang:lang" set.
+            ``7 - '{num:4d} {page.loc_title:<40} {page.trs_title:<40}'``
+                → 10 localised_Namespace:PageTitle
+                outputlang_Namespace:PageTitle
 
-            num is the sequential number of the listed page.
+                .. important:: Requires ``outputlang:lang`` set, see
+                   below.
 
-            An empty format is equal to ``-notitle`` and just shows the
-            total amount of pages.
+            ``num`` is the sequential number of the listed page.
+
+            .. hint:: An empty format is equal to ``-notitle`` and just
+               shows the total number of pages.
 
 -outputlang
-            Language for translation of namespaces.
+            [str] Language for translation of namespaces.
 
 -notitle    Page title is not printed.
 
 -get        Page content is printed.
 
--tofile     Save Page titles to a single file. File name can be set
-            with -tofile:filename or -tofile:dir_name/filename.
+-tofile     [str] Save Page titles to a single file. File name can be
+            set with ``-tofile:filename`` or ``-tofile:dir_name/filename``.
 
 -save       Save Page content to a file named as
             :code:`page.title(as_filename=True)`. Directory can be set
             with ``-save:dir_name``. If no dir is specified, current
             directory will be used.
 
--encode     File encoding can be specified with '-encode:name' (name
-            must be a valid python encoding: utf-8, etc.). If not
+-encode     [str] File encoding can be specified with ``-encode:name``
+            (name must be a valid python encoding: utf-8, etc.). If not
             specified, it defaults to :code:`config.textfile_encoding`.
 
 -put:       [str] Save the list to the defined page of the wiki. By
             default it does not overwrite an existing page.
 
--overwrite  Overwrite the page if it exists. Can only by applied with
+-overwrite  Overwrite the page if it exists. Can only be applied with
             -put.
 
 -summary:   [str] The summary text when the page is written. If it's one
@@ -99,7 +101,7 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #

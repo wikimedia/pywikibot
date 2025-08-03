@@ -156,8 +156,7 @@ docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 def api_query(site, params: dict[str, str]):
     """Request data from given site."""
     query = api.Request(site, parameters=params)
-    datas = query.submit()
-    return datas
+    return query.submit()
 
 
 def main(*args: str) -> None:

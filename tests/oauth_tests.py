@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test OAuth functionality."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -87,7 +87,7 @@ class OAuthEditTest(OAuthSiteTestCase):
             p = pywikibot.Page(self.site, title)
             t = p.text
             if revision_id == p.latest_revision_id:
-                self.assertTrue(p.text.endswith(ts))
+                self.assertEndsWith(p.text, ts)
             else:
                 self.assertIn(ts, t)
 

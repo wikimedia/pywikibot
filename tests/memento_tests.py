@@ -34,8 +34,7 @@ class MementoTestCase(TestCase):
                 if date_string else None)
         with skipping(ReadTimeout, RequestsConnectionError,
                       MementoClientException):
-            result = get_closest_memento_url(url, when, self.timegate_uri)
-        return result
+            return get_closest_memento_url(url, when, self.timegate_uri)
 
 
 class TestMementoArchive(MementoTestCase):

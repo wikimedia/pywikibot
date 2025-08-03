@@ -1,11 +1,12 @@
-name: Pywikibot CI
+---
 # Run Pywikibot tests with a variety of Python versions
+name: Pywikibot CI
 
 on:
   push:
-    branches: [ master, stable ]
+    branches: [master, stable]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,37 +21,35 @@ jobs:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
     timeout-minutes: 100
-
     strategy:
       fail-fast: false
       max-parallel: 19
-
       matrix:
-        python-version: [ pypy3.10, "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
-        site: [ "wikipedia:en", "wikisource:zh" ]
+        python-version: [pypy3.10, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        site: ['wikipedia:en', 'wikisource:zh']
         include:
-          - python-version: "3.8"
+          - python-version: '3.8'
             site: wikipedia:test
-          - python-version: "3.8"
-            site: False
+          - python-version: '3.8'
+            site: false
             family: wpbeta
             code: en
-          - python-version: "3.8"
-            site: False
+          - python-version: '3.8'
+            site: false
             family: wpbeta
             code: zh
-          - python-version: "3.9"
+          - python-version: '3.9'
             site: wsbeta:en
-          - python-version: "3.8"
+          - python-version: '3.8'
             site: wikidata:test
-          - python-version: "3.10"
+          - python-version: '3.10'
             site: wiktionary:ar
             test_no_rc: true
-          - python-version: "3.8"
+          - python-version: '3.8'
             site: wikidata:wikidata
-          - python-version: "3.9"
+          - python-version: '3.9'
             site: wowwiki:uk
-          - python-version: "3"
+          - python-version: '3'
             site: wikipedia:de
             os: macOS-latest
           # ubuntu-22.04 required for pypy3.8 and 3.14-dev due to T382214
@@ -73,89 +72,80 @@ jobs:
             site: wikisource:zh
             os: ubuntu-22.04
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        submodules: true
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        if: "!endsWith(matrix.python-version, '-dev')"
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      if: "!endsWith(matrix.python-version, '-dev')"
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    # use deadsnakes/action for development releases
-    - name: Set up development Python ${{ matrix.python-version }}
-      uses: deadsnakes/action@v3.2.0
-      if: endsWith(matrix.python-version, '-dev')
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip --version
-        if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip install wikitextparser
-
-    - name: Install setuptools
-      if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
-      run: pip install setuptools
-
-    - name: Generate family files
-      run: |
+      # use deadsnakes/action for development releases
+      - name: Set up development Python ${{ matrix.python-version }}
+        uses: deadsnakes/action@v3.2.0
+        if: endsWith(matrix.python-version, '-dev')
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+          if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install wikitextparser
+      - name: Install setuptools
+        if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
+        run: pip install setuptools
+      - name: Generate family files
+        run: |
           if  [ ${{matrix.family || 0}} == wpbeta ]; then
-            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmflabs.org/ wpbeta y
+            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
           fi
           if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
-            python pwb.py generate_family_file http://en.wikisource.beta.wmflabs.org/ wsbeta y
+            python pwb.py generate_family_file http://en.wikisource.beta.wmcloud.org/ wsbeta n
           fi
-
-    - name: Generate user files
-      run: |
-        if [ ${{matrix.site}} != false ]; then
-          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        else
-          python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-        fi
-        echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-        echo "noisysleep = float('inf')" >> user-config.py
-        echo "maximum_GET_length = 5000" >> user-config.py
-        echo "console_encoding = 'utf8'" >> user-config.py
-        echo "import os" >> user-config.py
-        echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
-        echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
-
-    - name: Test with unittest or pytest
-      id: ci_test
-      continue-on-error: true
-      timeout-minutes: 90
-      env:
-        PYWIKIBOT_TEST_NO_RC:
-          ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
-      run: |
-        python pwb.py version
-        if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then
-          coverage run -m unittest discover -vv -p \"*_tests.py\";
-        else
-          coverage run -m pytest
-        fi
-
-    - name: Show coverage statistics
-      run: |
-        coverage report
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Check on failure
-      if: steps.ci_test.outcome == 'failure'
-      run: exit 1
+      - name: Generate user files
+        run: |
+          if [ ${{matrix.site}} != false ]; then
+            python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+          else
+            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+          fi
+          echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['wikidata']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "noisysleep = float('inf')" >> user-config.py
+          echo "maximum_GET_length = 5000" >> user-config.py
+          echo "console_encoding = 'utf8'" >> user-config.py
+          echo "import os" >> user-config.py
+          echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
+          echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
+      - name: Test with unittest or pytest
+        id: ci_test
+        continue-on-error: true
+        timeout-minutes: 90
+        env:
+          PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+        run: |
+          python pwb.py version
+          if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then
+            coverage run -m unittest discover -vv -p \"*_tests.py\";
+          else
+            coverage run -m pytest
+          fi
+      - name: Show coverage statistics
+        run: |
+          coverage report
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Check on failure
+        if: steps.ci_test.outcome == 'failure'
+        run: |
+          exit 1

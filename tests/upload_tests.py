@@ -4,7 +4,7 @@
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,13 +64,13 @@ class TestUpload(TestCase):
 
         # First upload the warning with warnings enabled
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
-        self.assertFalse(hasattr(self, '_file_key'))
+        self.assertNotHasAttr(self, '_file_key')
         self.site.upload(page, source_filename=self.sounds_png,
                          comment='pywikibot test', chunk_size=chunk_size,
                          ignore_warnings=warn_callback)
 
         # Check that the warning happened and it's cached
-        self.assertTrue(hasattr(self, '_file_key'))
+        self.assertHasAttr(self, '_file_key')
         self.assertIs(self._offset, True)
         self.assertRegex(self._file_key, r'[0-9a-z]+.[0-9a-z]+.\d+.png')
         self._verify_stash()
@@ -100,9 +100,7 @@ class TestUpload(TestCase):
         # Check if it's still cached
         with self.assertAPIError('siiinvalidsessiondata') as cm:
             self.site.stash_info(self._file_key)
-        self.assertTrue(cm.exception.info.startswith('File not found'),
-                        f'info ({cm.exception.info}) did not start with '
-                        '"File not found"')
+        self.assertStartsWith(cm.exception.info, 'File not found')
 
     @unittest.expectedFailure  # T367314
     def test_continue_filekey_once(self) -> None:

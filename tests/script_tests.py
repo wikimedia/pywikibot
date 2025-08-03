@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,7 @@ import sys
 import unittest
 from contextlib import suppress
 from importlib import import_module
+from pathlib import Path
 
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
@@ -28,7 +29,6 @@ framework_scripts = ['login', 'shell']
 # These dependencies are not always the package name which is in setup.py.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
-    'create_isbn_edition': ['isbnlib', 'unidecode'],
     'weblinkchecker': ['memento_client'],
 }
 
@@ -51,19 +51,30 @@ failed_dep_script_set = {name for name in script_deps
 unrunnable_script_set = set()
 
 
-def list_scripts(path, exclude=None):
-    """Return list of scripts in given path."""
-    scripts = [name[0:-3] for name in os.listdir(path)  # strip '.py'
-               if name.endswith('.py')
-               and not name.startswith('_')  # skip __init__.py and _*
-               and name != exclude]
-    return scripts
+def list_scripts(path: str, exclude: str = '') -> list[str]:
+    """List script names (without '.py') in a directory.
+
+    :param path: Directory path to search for Python scripts.
+    :param exclude: Filename (without '.py' extension) to exclude from
+        the result. Defaults to empty string, meaning no exclusion.
+    :return: List of script names without the '.py' extension, excluding
+        the specified file. Files starting with '_' (e.g. __init__.py)
+        are always excluded.
+    """
+    p = Path(path)
+    return [
+        f.stem for f in p.iterdir()
+        if f.is_file()
+        and f.suffix == '.py'
+        and not f.name.startswith('_')
+        and f.stem != exclude
+    ]
 
 
-script_list = framework_scripts + list_scripts(scripts_path)
+script_list = framework_scripts + list_scripts(scripts_path,
+                                               'create_isbn_edition')
 
 script_input = {
-    'create_isbn_edition': '\n',
     'category_redirect': 'q\nn\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
@@ -86,7 +97,6 @@ auto_run_script_set = {
     'checkimages',
     'clean_sandbox',
     'commons_information',
-    'create_isbn_edition',
     'delinker',
     'login',
     'misspelling',
@@ -408,7 +418,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'claimit',
         'clean_sandbox',
         'commonscat',
-        'create_isbn_edition',
         'data_ingestion',
         'delinker',
         'djvutext',

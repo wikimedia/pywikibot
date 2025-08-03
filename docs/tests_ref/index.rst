@@ -15,3 +15,5 @@ Test utilities
    aspects
    basepage
    utils
+   precommit
+   pytest

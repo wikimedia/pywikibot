@@ -287,14 +287,6 @@ class LoginManager:
                 warn('Invalid password format', _PasswordFileWarning,
                      stacklevel=2)
 
-    _api_error = {
-        'NotExists': 'does not exist',
-        'Illegal': 'is invalid',
-        'readapidenied': 'does not have read permissions',
-        'Failed': 'does not have read permissions',
-        'FAIL': 'does not have read permissions',
-    }
-
     def login(self, retry: bool = False, autocreate: bool = False) -> bool:
         """Attempt to log into the server.
 
@@ -328,12 +320,9 @@ class LoginManager:
         except APIError as e:
             error_code = e.code
 
-            # TODO: investigate other unhandled API codes
-            if error_code in self._api_error:
-                error_msg = (f'Username {self.login_name!r} '
-                             f'{self._api_error[error_code]} on {self.site}')
-                if error_code in ('Failed', 'FAIL'):
-                    error_msg += f'.\n{e.info}'
+            if error_code in ('NotExists', 'Illegal', 'readapidenied',
+                              'Failed', 'Aborted', 'FAIL'):
+                error_msg = f'{e.code}: {e.info}'
                 raise NoUsernameError(error_msg)
 
             pywikibot.error(f'Login failed ({error_code}).')

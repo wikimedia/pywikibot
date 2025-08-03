@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -196,7 +196,7 @@ class PrivateWikiTestCase(PatchingTestCase):
     @PatchingTestCase.patched(pywikibot, 'input')
     def input(self, question, *args, **kwargs):
         """Patched version of pywikibot.input."""
-        self.assertTrue(question.endswith('username?'))
+        self.assertEndsWith(question, 'username?')
         return self.USERNAME
 
     @PatchingTestCase.patched(pywikibot, 'Site')
@@ -227,7 +227,7 @@ class PrivateWikiTestCase(PatchingTestCase):
         """
         site = MWSite(self._weburl)
         self.assertIsInstance(site, MWSite)
-        self.assertTrue(hasattr(site, 'lang'))
+        self.assertHasAttr(site, 'lang')
         self.assertEqual(site.lang, self.LANG)
 
 

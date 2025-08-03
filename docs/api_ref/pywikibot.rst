@@ -71,3 +71,5 @@
       but can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Timestamp<time.Timestamp>`
+
+.. autofunction:: _code_fam_from_url

@@ -1,6 +1,6 @@
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -778,14 +778,14 @@ class WbTime(WbRepresentation):
 
         :return: Wikibase JSON
         """
-        json = {'time': self.toTimestr(),
-                'precision': self.precision,
-                'after': self.after,
-                'before': self.before,
-                'timezone': self.timezone,
-                'calendarmodel': self.calendarmodel
-                }
-        return json
+        return {
+            'time': self.toTimestr(),
+            'precision': self.precision,
+            'after': self.after,
+            'before': self.before,
+            'timezone': self.timezone,
+            'calendarmodel': self.calendarmodel,
+        }
 
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
@@ -908,12 +908,12 @@ class WbQuantity(WbRepresentation):
 
         :return: Wikibase JSON
         """
-        json = {'amount': self._fromdecimal(self.amount),
-                'upperBound': self._fromdecimal(self.upperBound),
-                'lowerBound': self._fromdecimal(self.lowerBound),
-                'unit': self.unit
-                }
-        return json
+        return {
+            'amount': self._fromdecimal(self.amount),
+            'upperBound': self._fromdecimal(self.upperBound),
+            'lowerBound': self._fromdecimal(self.lowerBound),
+            'unit': self.unit,
+        }
 
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
@@ -956,10 +956,10 @@ class WbMonolingualText(WbRepresentation):
 
         :return: Wikibase JSON
         """
-        json = {'text': self.text,
-                'language': self.language
-                }
-        return json
+        return {
+            'text': self.text,
+            'language': self.language,
+        }
 
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
@@ -1109,12 +1109,11 @@ class WbGeoShape(WbDataPage):
 
         :param site: The Wikibase site
         """
-        specifics = {
+        return {
             'ending': '.map',
             'label': 'geo-shape',
-            'data_site': cls._get_data_site(site)
+            'data_site': cls._get_data_site(site),
         }
-        return specifics
 
 
 class WbTabularData(WbDataPage):
@@ -1135,12 +1134,11 @@ class WbTabularData(WbDataPage):
 
         :param site: The Wikibase site
         """
-        specifics = {
+        return {
             'ending': '.tab',
             'label': 'tabular-data',
-            'data_site': cls._get_data_site(site)
+            'data_site': cls._get_data_site(site),
         }
-        return specifics
 
 
 class WbUnknown(WbRepresentation):

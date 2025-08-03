@@ -670,12 +670,12 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                         templates_or_comments = re.compile(
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
                             flags=re.DOTALL)
-                        new_text = (
+                        return (
                             oldText[:match.end() - 1]
                             + templates_or_comments.sub(
                                 fr'\1\n{self.referencesText}\n',
-                                oldText[match.end() - 1:]))
-                        return new_text
+                                oldText[match.end() - 1:])
+                        )
                 else:
                     break
 

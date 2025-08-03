@@ -166,8 +166,7 @@ class Hunk:
 
         if line_ref is None:
             if color in self.colors:
-                colored_line = f'<<{self.colors[color]}>>{line}<<default>>'
-                return colored_line
+                return f'<<{self.colors[color]}>>{line}<<default>>'
             return line
 
         colored_line = ''

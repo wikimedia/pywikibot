@@ -56,7 +56,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def langs(cls):
         cls.langs = super().langs
         cls.langs['mul'] = cls.domain
-        cls.langs['beta'] = 'en.wikisource.beta.wmflabs.org'
+        cls.langs['beta'] = 'en.wikisource.beta.wmcloud.org'
         return cls.langs
 
     # Need to explicitly inject the beta domain

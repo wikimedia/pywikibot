@@ -15,6 +15,7 @@ import os
 import re
 import sys
 import time
+import types
 import unittest
 import warnings
 from collections.abc import Sized
@@ -37,6 +38,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import WikimediaFamily
 from pywikibot.site import BaseSite
 from pywikibot.tools import (  # noqa: F401 (used by eval())
+    PYTHON_VERSION,
     MediaWikiVersion,
     suppress_warnings,
 )
@@ -63,6 +65,151 @@ SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
 pywikibot.bot.set_interface('buffer')
 
 
+class Python314AssertionsMixin:  # pragma: no cover
+
+    """Mixin providing assertion methods added in Python 3.14 for unittest.
+
+    This mixin ensures TestCase compatibility on older Python versions.
+
+    The mixin will be removed without deprecation period once Python 3.14
+    becomes the minimum requirement for Pywikibot, likely with Pywikibot 16.
+
+    .. versionadded:: 10.3
+    """
+
+    def assertStartsWith(self, s: str, prefix: str,
+                         msg: str | None = None) -> None:
+        """Fail if the string *s* does not start with *prefix*.
+
+        :param s: The string to check.
+        :param prefix: The expected prefix.
+        :param msg: Optional custom failure message.
+        """
+        if s.startswith(prefix):
+            return
+
+        variant = 'any of ' if isinstance(prefix, tuple) else ''
+        default_msg = f'{s!r} does not start with {variant}{prefix!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertNotStartsWith(self, s: str, prefix: str,
+                            msg: str | None = None) -> None:
+        """Fail if the string *s* starts with *prefix*.
+
+        :param s: The string to check.
+        :param prefix: The unwanted prefix.
+        :param msg: Optional custom failure message.
+        """
+        if not s.startswith(prefix):
+            return
+
+        default_msg = f'{s!r} starts with {prefix!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertEndsWith(self, s: str, suffix: str,
+                       msg: str | None = None) -> None:
+        """Fail if the string *s* does not end with *suffix*.
+
+        :param s: The string to check.
+        :param suffix: The expected suffix.
+        :param msg: Optional custom failure message.
+        """
+        if s.endswith(suffix):
+            return
+
+        variant = 'any of ' if isinstance(suffix, tuple) else ''
+        default_msg = f'{s!r} does not end with {variant}{suffix!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertNotEndsWith(self, s: str, suffix: str,
+                          msg: str | None = None) -> None:
+        """Fail if the string *s* ends with *suffix*.
+
+        :param s: The string to check.
+        :param suffix: The unwanted suffix.
+        :param msg: Optional custom failure message.
+        """
+        if not s.endswith(suffix):
+            return
+
+        default_msg = f'{s!r} ends with {suffix!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertHasAttr(self, obj: object, name: str,
+                      msg: str | None = None) -> None:
+        """Fail if the object *obj* does not have an attribute *name*.
+
+        :param obj: The object to check.
+        :param name: The expected attribute name.
+        :param msg: Optional custom failure message.
+        """
+        if hasattr(obj, name):
+            return
+
+        if isinstance(obj, types.ModuleType):
+            obj_name = f'module {obj.__name__!r}'
+        elif isinstance(obj, type):
+            obj_name = f'type object {obj.__name__!r}'
+        else:
+            obj_name = f'{type(obj).__name__!r}'
+
+        default_msg = f'{obj_name} does not have attribute {name!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertNotHasAttr(self, obj: object, name: str,
+                         msg: str | None = None) -> None:
+        """Fail if the object *obj* has an attribute *name*.
+
+        :param obj: The object to check.
+        :param name: The unwanted attribute name.
+        :param msg: Optional custom failure message.
+        """
+        if not hasattr(obj, name):
+            return
+
+        if isinstance(obj, types.ModuleType):
+            obj_name = f'module {obj.__name__!r}'
+        elif isinstance(obj, type):
+            obj_name = f'type object {obj.__name__!r}'
+        else:
+            obj_name = f'{type(obj).__name__!r}'
+
+        default_msg = f'{obj_name} has attribute {name!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertIsSubclass(self, cls: type, superclass: type | tuple[type, ...],
+                         msg: str | None = None) -> None:
+        """Fail if *cls* is not a subclass of *superclass*.
+
+        :param cls: The class to test.
+        :param superclass: The expected superclass or tuple of superclasses.
+        :param msg: Optional custom failure message.
+        """
+        if issubclass(cls, superclass):
+            return
+
+        default_msg = f'{cls!r} is not a subclass of {superclass!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+    def assertNotIsSubclass(
+        self,
+        cls: type,
+        superclass: type | tuple[type, ...],
+        msg: str | None = None
+    ) -> None:
+        """Fail if *cls* is a subclass of *superclass*.
+
+        :param cls: The class to test.
+        :param superclass: The superclass or tuple of superclasses to reject.
+        :param msg: Optional custom failure message.
+        """
+        if not issubclass(cls, superclass):
+            return
+
+        default_msg = f'{cls!r} is a subclass of {superclass!r}'
+        self.fail(self._formatMessage(msg, default_msg))
+
+
 class TestTimerMixin(unittest.TestCase):
 
     """Time each test and report excessive durations."""
@@ -86,22 +233,27 @@ class TestTimerMixin(unittest.TestCase):
             sys.stdout.flush()
 
 
-class TestCaseBase(TestTimerMixin):
+# Add Python314AssertionsMixin on Python < 3.14
+if PYTHON_VERSION < (3, 14):
+    bases = (TestTimerMixin, Python314AssertionsMixin)
+else:
+    bases = (TestTimerMixin, )
+
+
+class TestCaseBase(*bases):
 
     """Base class for all tests."""
 
     def assertIsEmpty(self, seq, msg=None) -> None:
         """Check that the sequence is empty."""
-        self.assertIsInstance(
-            seq, Sized, SIZED_ERROR)
+        self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None) -> None:
         """Check that the sequence is not empty."""
-        self.assertIsInstance(
-            seq, Sized, SIZED_ERROR)
+        self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if not seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
@@ -109,8 +261,7 @@ class TestCaseBase(TestTimerMixin):
     def assertLength(self, seq, other, msg=None) -> None:
         """Verify that a sequence seq has the length of other."""
         # the other parameter may be given as a sequence too
-        self.assertIsInstance(
-            seq, Sized, SIZED_ERROR)
+        self.assertIsInstance(seq, Sized, SIZED_ERROR)
         first_len = len(seq)
         try:
             second_len = len(other)
@@ -292,16 +443,16 @@ def require_modules(*required_modules):
 
 
 def require_version(version_needed: str, /, reason: str = ''):
-    """Require minimum MediaWiki version to be queried.
+    """Skip test unless a minimum MediaWiki version is available.
 
-    The version needed for the test; must be given with a preleading rich
-    comparisons operator like ``<1.31wmf4`` or ``>=1.43``. If the
-    comparison does not match the test will be skipped.
+    The required version must include a comparison operator (e.g.
+    :code:`<1.31wmf4` or :code:`>=1.43`). If the site's version does not
+    satisfy the condition, the test is skipped.
 
-    This decorator can only be used for TestCase having a single site.
-    It cannot be used for DrySite tests. In addition version comparison
-    for other than the current site e.g. for the related data or image
-    repositoy of the current site is ot possible.
+    This decorator can only be used for :class:`TestCase` having a
+    single site. It cannot be used for DrySite tests. Version checks are
+    only supported for the current site — not for related sites like
+    data or image repositories.
 
     .. versionadded:: 8.0
 
@@ -335,6 +486,8 @@ def require_version(version_needed: str, /, reason: str = ''):
                 )
 
             try:
+                # Split version string into operator and version
+                # (e.g. '>=1.39' → '', '>=', '1.39')
                 site_vers, op, version = re.split('([<>]=?)', version_needed)
             except ValueError:
                 raise ValueError(f'There is no valid operator given with '
@@ -626,7 +779,7 @@ class RequireLoginMixin(TestCaseBase):
                 continue
 
             if not site.logged_in():
-                site.login()
+                site.login()  # pragma: no cover
 
             if skip_if_login_fails and not site.user():  # during setUp() only
                 self.skipTest(

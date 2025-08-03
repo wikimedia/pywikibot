@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,11 +63,11 @@ class TestGeneralWrite(TestCase):
         """Test writing to a page without preloading the .text."""
         ts = str(time.time())
         p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
-        self.assertFalse(hasattr(p, '_text'))
+        self.assertNotHasAttr(p, '_text')
         p.site.editpage(p, appendtext=ts)
-        self.assertFalse(hasattr(p, '_text'))
+        self.assertNotHasAttr(p, '_text')
         p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
-        self.assertTrue(p.text.endswith(ts))
+        self.assertEndsWith(p.text, ts)
         self.assertNotEqual(p.text, ts)
 
 

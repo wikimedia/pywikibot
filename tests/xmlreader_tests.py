@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for xmlreader module."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,7 @@ class ExportDotThreeTestCase(TestCase):
         self.assertEqual('24278', pages[0].id)
         self.assertEqual('185185', pages[0].revisionid)
         self.assertEqual('188924', pages[3].revisionid)
-        self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
+        self.assertStartsWith(pages[0].text, 'Pears are [[tree]]s of')
         self.assertEqual('Quercusrobur', pages[1].username)
         self.assertEqual('Pear', pages[0].title)
 

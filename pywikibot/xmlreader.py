@@ -11,7 +11,7 @@ XmlEntry objects which can be used by other bots.
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -290,7 +290,7 @@ class XmlDump:
             elem.findtext(f'{uri}restrictions')
         )
 
-        headers = Headers(
+        return Headers(
             title=elem.findtext(f'{uri}title'),
             ns=elem.findtext(f'{uri}ns'),
             pageid=elem.findtext(f'{uri}id'),
@@ -298,8 +298,6 @@ class XmlDump:
             edit_restriction=edit_restriction,
             move_restriction=move_restriction,
         )
-
-        return headers
 
     def _create_revision(
             self, headers: Headers, revision: Element
@@ -311,7 +309,7 @@ class XmlDump:
         username = ip_editor or contributor.findtext(f'{uri}username')
         username = username or ''  # username might be deleted
 
-        xml_entry = XmlEntry(
+        return XmlEntry(
             title=headers.title,
             ns=headers.ns,
             id=headers.pageid,
@@ -326,8 +324,6 @@ class XmlDump:
             comment=revision.findtext(f'{uri}comment'),
             # could get comment, minor as well
         )
-
-        return xml_entry
 
 
 wrapper = ModuleDeprecationWrapper(__name__)

@@ -1,6 +1,6 @@
 """Options and Choices for :py:meth:`pywikibot.input_choice`."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from abc import ABC, abstractmethod
 from textwrap import fill
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot.backports import Iterable, Mapping, Sequence
@@ -39,7 +39,7 @@ __all__ = (
 
 
 if TYPE_CHECKING:
-    from typing_extensions import Literal
+    from typing import Any, Literal
 
     from pywikibot.page import BaseLink, Link, Page
 

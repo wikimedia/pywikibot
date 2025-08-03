@@ -123,10 +123,11 @@ class TestDeletionBot(DefaultSiteTestCase):
 
     def test_dry(self) -> None:
         """Test dry run of bot."""
+        main = self.get_mainpage().title()
         with empty_sites():
-            delete.main('-page:Main Page', '-always', '-summary:foo')
+            delete.main(f'-page:{main}', '-always', '-summary:foo')
             self.assertEqual(self.delete_args,
-                             ['[[Main Page]]', 'foo', False, True, True])
+                             [f'[[{main}]]', 'foo', False, True, True])
         with empty_sites():
             delete.main(
                 '-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')

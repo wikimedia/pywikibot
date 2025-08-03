@@ -6,6 +6,8 @@
 #
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Protocol
+
 import pywikibot
 from pywikibot.data import api
 from pywikibot.echo import Notification
@@ -18,6 +20,34 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_extension
 from pywikibot.tools import merge_unique_dicts
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import NamespacesDict
+
+
+class BaseSiteProtocol(Protocol):
+    _proofread_levels: dict[int, str]
+    tokens: dict[str, str]
+
+    def _generator(self, *args, **kwargs) -> api.Request:
+        ...
+
+    def _request(self, **kwargs) -> api.Request:
+        ...
+
+    def _update_page(self, *args, **kwargs) -> None:
+        ...
+
+    def encoding(self) -> str:
+        ...
+
+    @property
+    def namespaces(self, **kwargs) -> NamespacesDict:
+        ...
+
+    def simple_request(self, **kwargs) -> api.Request:
+        ...
 
 
 class EchoMixin:
@@ -50,15 +80,13 @@ class EchoMixin:
                 for notification in notifications)
 
     @need_extension('Echo')
-    def notifications_mark_read(self, **kwargs) -> bool:
+    def notifications_mark_read(self: BaseSiteProtocol, **kwargs) -> bool:
         """Mark selected notifications as read.
 
         .. seealso:: :api:`echomarkread`
 
         :return: whether the action was successful
         """
-        # TODO: ensure that the 'echomarkread' action
-        # is supported by the site
         kwargs = merge_unique_dicts(kwargs, action='echomarkread',
                                     token=self.tokens['csrf'])
         req = self.simple_request(**kwargs)
@@ -74,7 +102,7 @@ class ProofreadPageMixin:
     """APISite mixin for ProofreadPage extension."""
 
     @need_extension('ProofreadPage')
-    def _cache_proofreadinfo(self, expiry=False) -> None:
+    def _cache_proofreadinfo(self: BaseSiteProtocol, expiry=False) -> None:
         """Retrieve proofreadinfo from site and cache response.
 
         Applicable only to sites with ProofreadPage extension installed.
@@ -142,7 +170,8 @@ class ProofreadPageMixin:
         return self._proofread_levels
 
     @need_extension('ProofreadPage')
-    def loadpageurls(self, page: pywikibot.page.BasePage) -> None:
+    def loadpageurls(self: BaseSiteProtocol,
+                     page: pywikibot.page.BasePage) -> None:
         """Load URLs from api and store in page attributes.
 
         Load URLs to images for a given page in the "Page:" namespace.
@@ -169,7 +198,7 @@ class GeoDataMixin:
     """APISite mixin for GeoData extension."""
 
     @need_extension('GeoData')
-    def loadcoordinfo(self, page) -> None:
+    def loadcoordinfo(self: BaseSiteProtocol, page) -> None:
         """Load [[mw:Extension:GeoData]] info."""
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
@@ -187,7 +216,7 @@ class PageImagesMixin:
     """APISite mixin for PageImages extension."""
 
     @need_extension('PageImages')
-    def loadpageimage(self, page) -> None:
+    def loadpageimage(self: BaseSiteProtocol, page) -> None:
         """Load [[mw:Extension:PageImages]] info.
 
         :param page: The page for which to obtain the image
@@ -374,7 +403,8 @@ class TextExtractsMixin:
     """
 
     @need_extension('TextExtracts')
-    def extract(self, page: pywikibot.Page, *,
+    def extract(self: BaseSiteProtocol,
+                page: pywikibot.Page, *,
                 chars: int | None = None,
                 sentences: int | None = None,
                 intro: bool = True,

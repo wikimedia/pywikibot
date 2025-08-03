@@ -7,7 +7,7 @@ package-dir = {"pywikibot_scripts" = "scripts"}
 
 [project]
 name = "pywikibot-scripts"
-version = "10.2.0"
+version = "10.3.0"
 
 authors = [
     {name = "xqt", email = "info@gno.de"},
@@ -19,7 +19,7 @@ description = "Pywikibot Scripts Collection"
 readme = "scripts/README.rst"
 requires-python = ">=3.8.0"
 dependencies = [
-    "pywikibot >= 10.0.0",
+    "pywikibot >= 10.2.0",
     "isbnlib",
     "langdetect",
     "mwparserfromhell",

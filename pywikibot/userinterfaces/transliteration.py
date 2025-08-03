@@ -1,6 +1,6 @@
 """Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,8 +9,8 @@ from __future__ import annotations
 from pywikibot.tools import ModuleDeprecationWrapper, deprecate_arg
 
 
-#: Non latin digits used by the framework
-NON_LATIN_DIGITS = {
+#: Non ascii digits used by the framework
+NON_ASCII_DIGITS = {
     'bn': '০১২৩৪৫৬৭৮৯',
     'ckb': '٠١٢٣٤٥٦٧٨٩',
     'fa': '۰۱۲۳۴۵۶۷۸۹',
@@ -1096,7 +1096,7 @@ _trans = {
     '𐬳': 'shye', '𐬴': 'sshe', '𐬵': 'he',
 }
 
-for digits in NON_LATIN_DIGITS.values():
+for digits in NON_ASCII_DIGITS.values():
     _trans.update({char: str(i) for i, char in enumerate(digits)})
 
 
@@ -1154,3 +1154,6 @@ class Transliterator:
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper.add_deprecated_attr('transliterator', Transliterator, since='9.0.0')
+wrapper.add_deprecated_attr('NON_LATIN_DIGITS', NON_ASCII_DIGITS,
+                            replacement_name='NON_ASCII_DIGITS',
+                            since='10.3.0')

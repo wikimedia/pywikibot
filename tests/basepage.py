@@ -1,16 +1,26 @@
 """BasePage tests subclasses."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+from abc import ABCMeta, abstractmethod
+
 from pywikibot.page import BasePage
 from tests.aspects import TestCase
 
 
-class BasePageTestBase(TestCase):
+class ABCTestCaseMeta(ABCMeta, type(TestCase)):
+
+    """Enable abstract methods in TestCase-based base classes.
+
+    .. versionadded:: 10.3
+    """
+
+
+class BasePageTestBase(TestCase, metaclass=ABCTestCaseMeta):
 
     """Base of BasePage test classes."""
 
@@ -19,8 +29,17 @@ class BasePageTestBase(TestCase):
     def setUp(self) -> None:
         """Set up test."""
         super().setUp()
-        assert self._page, 'setUp() must create an empty BasePage in _page'
-        assert isinstance(self._page, BasePage)
+        self.setup_page()
+        self.assertIsInstance(self._page, BasePage,
+                              'setUp() must assign a BasePage to _page, not '
+                              f'{type(self._page).__name__}')
+
+    @abstractmethod
+    def setup_page(self) -> None:
+        """Subclasses must implement this to assign self._page.
+
+        .. versionadded:: 10.3
+        """
 
 
 class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
@@ -38,15 +57,15 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
     def setUp(self) -> None:
         """Set up test."""
         super().setUp()
-        assert self.cached is False, 'Tests do not support caching'
+        self.assertFalse(self.cached, 'Tests do not support caching')
 
-    def _test_page_text(self, get_text=True) -> None:
+    def _test_page_text(self) -> None:
         """Test site.loadrevisions() with .text."""
         page = self._page
 
-        self.assertFalse(hasattr(page, '_revid'))
-        self.assertFalse(hasattr(page, '_text'))
-        self.assertTrue(hasattr(page, '_revisions'))
+        self.assertNotHasAttr(page, '_revid')
+        self.assertNotHasAttr(page, '_text')
+        self.assertHasAttr(page, '_revisions')
         self.assertFalse(page._revisions)
 
         # verify that initializing the page content
@@ -57,50 +76,44 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         page._revisions = {}
         self.site.loadrevisions(page, total=1)
 
-        self.assertTrue(hasattr(page, '_revid'))
-        self.assertTrue(hasattr(page, '_revisions'))
+        self.assertHasAttr(page, '_revid')
+        self.assertHasAttr(page, '_revisions')
         self.assertLength(page._revisions, 1)
         self.assertIn(page._revid, page._revisions)
-
         self.assertEqual(page._text, custom_text)
         self.assertEqual(page.text, page._text)
+
         del page.text
 
-        self.assertFalse(hasattr(page, '_text'))
+        self.assertNotHasAttr(page, '_text')
         self.assertIsNone(page._revisions[page._revid].text)
         self.assertIsNone(page._latest_cached_revision())
 
         page.text = custom_text
-
         self.site.loadrevisions(page, total=1, content=True)
 
         self.assertIsNotNone(page._latest_cached_revision())
         self.assertEqual(page._text, custom_text)
         self.assertEqual(page.text, page._text)
+
         del page.text
-        self.assertFalse(hasattr(page, '_text'))
+
+        self.assertNotHasAttr(page, '_text')
 
         # Verify that calling .text doesn't call loadrevisions again
         loadrevisions = self.site.loadrevisions
         try:
             self.site.loadrevisions = None
-            if get_text:
-                loaded_text = page.text
-            else:  # T107537
-                with self.assertRaises(NotImplementedError):
-                    page.text
-                loaded_text = ''
+            loaded_text = page.text
             self.assertIsNotNone(loaded_text)
-            self.assertFalse(hasattr(page, '_text'))
+            self.assertNotHasAttr(page, '_text')
             page.text = custom_text
-            if get_text:
-                self.assertEqual(page.get(), loaded_text)
+            self.assertEqual(page.get(), loaded_text)
             self.assertEqual(page._text, custom_text)
             self.assertEqual(page.text, page._text)
             del page.text
-            self.assertFalse(hasattr(page, '_text'))
-            if get_text:
-                self.assertEqual(page.text, loaded_text)
+            self.assertNotHasAttr(page, '_text')
+            self.assertEqual(page.text, loaded_text)
         finally:
             self.site.loadrevisions = loadrevisions
 

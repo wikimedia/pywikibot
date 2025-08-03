@@ -1,6 +1,6 @@
 """Module to daemonize the current process on Unix."""
 #
-# (C) Pywikibot team, 2007-2022
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,17 @@ from __future__ import annotations
 import os
 import stat
 import sys
+from enum import IntEnum
 from pathlib import Path
+
+
+class StandardFD(IntEnum):
+
+    """File descriptors for standard input, output and error."""
+
+    STDIN = 0
+    STDOUT = 1
+    STDERR = 2
 
 
 is_daemon = False
@@ -35,15 +45,16 @@ def daemonize(close_fd: bool = True,
         # Fork again to prevent the process from acquiring a
         # controlling terminal
         pid = os.fork()
+
         if not pid:
             global is_daemon
             is_daemon = True
 
             if close_fd:
-                os.close(0)
-                os.close(1)
-                os.close(2)
+                for fd in StandardFD:
+                    os.close(fd)
                 os.open('/dev/null', os.O_RDWR)
+
                 if redirect_std:
                     # R/W mode without execute flags
                     mode = (stat.S_IRUSR | stat.S_IWUSR
@@ -53,15 +64,16 @@ def daemonize(close_fd: bool = True,
                             os.O_WRONLY | os.O_APPEND | os.O_CREAT,
                             mode)
                 else:
-                    os.dup2(0, 1)
-                os.dup2(1, 2)
+                    os.dup2(StandardFD.STDIN, StandardFD.STDOUT)
+                os.dup2(StandardFD.STDOUT, StandardFD.STDERR)
+
             if chdir:
                 os.chdir('/')
             return
 
         # Write out the pid
         path = Path(Path(sys.argv[0]).name).with_suffix('.pid')
-        path.write_text(str(pid), encoding='uft-8')
+        path.write_text(str(pid), encoding='utf-8')
 
     # Exit to return control to the terminal
     # os._exit to prevent the cleanup to run

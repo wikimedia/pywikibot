@@ -1,6 +1,41 @@
 Scripts Changelog
 =================
 
+10.3.0
+------
+
+* i18n updates
+
+archivebot
+^^^^^^^^^^
+
+* Use {{talkarchive}} template by default (:phab:`T400543`)
+* Use Wikidata items for archive header templates (:phab:`T396399`)
+
+create_isbn_edition
+^^^^^^^^^^^^^^^^^^^
+
+* This script will be removed from repository in Pywikibot 11
+
+interwiki
+^^^^^^^^^
+
+* Ignore :exc:`exceptions.SectionError` in :meth:`interwiki.Subject.page_empty_check` and treat it
+  as an empty page (:phab:`T398983`)
+* Show a warning if no username is configured for a site (:phab:`T135228`)
+
+redirect
+^^^^^^^^
+
+* Attempt an additional move to fix redirect targets (:phab:`T396473`)
+* Do not fix broken redirects if source and target namespaces differ (:phab:`T396456`)
+
+tracking_param_remover
+^^^^^^^^^^^^^^^^^^^^^^
+
+* Script for removing tracking URL parameters was added (:phab:`T399698`)
+
+
 10.2.0
 ------
 

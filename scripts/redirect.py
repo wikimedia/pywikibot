@@ -12,12 +12,18 @@ where action can be one of these
 
 :double:       Shortcut: **do**. Fix redirects which point to other redirects.
 
-:broken:       Shortcut: **br**. Tries to fix redirect which point to nowhere
-               by using the last moved target of the destination page. If this
-               fails and the -delete option is set, it either deletes the page
-               or marks it for deletion depending on whether the account has
-               admin rights. It will mark the redirect not for deletion if
-               there is no speedy deletion template available.
+:broken:       Shortcut: **br**. Tries to fix redirect which point to
+               nowhere by using the last moved target of the source page
+               and both have the same namespace. If this fails and the
+               *-delete* option is set, it either deletes the page or
+               marks it for deletion depending on whether the account
+               has delete rights. It will mark the redirect not for
+               deletion if there is no speedy deletion template
+               available.
+
+               .. versionchanged:: 10.3
+                  only tries to fix if the namspace of the source page
+                  is equal to the destination page.
 
 :both:         Both of the above. Retrieves redirect pages from live wiki,
                not from a special page.
@@ -96,6 +102,7 @@ from pywikibot.exceptions import (
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 
 
+BROKEN_REDIRECT_TEMPLATE = 'Q11838699', 'Q4847311', 'Q21528265'
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
@@ -403,40 +410,29 @@ class RedirectRobot(ExistingPageBot):
         else:
             raise NotImplementedError(f'No valid action "{action}" found.')
 
-    def get_sd_template(
-        self, site: pywikibot.site.BaseSite | None = None
-    ) -> str | None:
-        """Look for speedy deletion template and return it.
-
-        :param site: site for which the template has to be given
-        :return: A valid speedy deletion template.
-        """
-        title = None
-        if site:
-            sd = self.opt.sdtemplate
-            if not sd and i18n.twhas_key(site,
-                                         'redirect-broken-redirect-template'):
-                sd = i18n.twtranslate(site,
-                                      'redirect-broken-redirect-template')
-
+    @property
+    def sdtemplate(self) -> str:
+        """Gives the speedy deletion template for the current_page."""
+        title = ''
+        site = self.current_page.site
+        if sd := self.opt.sdtemplate:
             # check whether template exists for this site
-            if sd:
-                template = extract_templates_and_params_regex_simple(sd)
-                if template:
-                    title = template[0][0]
-                    page = pywikibot.Page(site, title, ns=10)
-                    if page.exists():
-                        return sd
+            template = extract_templates_and_params_regex_simple(sd)
+            if template:
+                title = template[0][0]
+                page = pywikibot.Page(site, title, ns=10)
+                if page.exists():
+                    return sd
+        else:
+            for item in BROKEN_REDIRECT_TEMPLATE:
+                tpl = site.page_from_repository(item)
+                if tpl:
+                    return f'{{{{{tpl.title(with_ns=False)}}}}}'
 
         pywikibot.warning(
             'No speedy deletion template {}available.'
             .format(f'"{title}" ' if title else ''))
-        return None
-
-    @property
-    def sdtemplate(self):
-        """Gives the speedy deletion template for the current_page."""
-        return self.get_sd_template(self.current_page.site)
+        return ''
 
     def init_page(self, item) -> pywikibot.Page:
         """Ensure that we process page objects."""
@@ -490,12 +486,56 @@ class RedirectRobot(ExistingPageBot):
             pywikibot.info(f'{page} is on another site, skipping.')
         return None
 
-    def delete_1_broken_redirect(self) -> None:
-        """Treat one broken redirect."""
+    def fix_moved_broken_redirects(self, target: pywikibot.Page) -> None:
+        """Try to fix a deleted redirect using moved_target method."""
         redir_page = self.current_page
         done = not self.opt.delete
+        movedTarget = None
+
+        with suppress(NoMoveTargetError):
+            movedTarget = target.moved_target()
+
+        if movedTarget:
+            if not movedTarget.exists():
+                self.fix_moved_broken_redirects(movedTarget)
+                # process other cases within recursive loop
+                return
+
+            if redir_page.namespace() != movedTarget.namespace():
+                pywikibot.info(f'Namespace of {redir_page} is different'
+                               f'from target page {movedTarget}')
+            elif redir_page == movedTarget:
+                pywikibot.info('Redirect to target page forms a redirect loop')
+            else:
+                pywikibot.info(f'{redir_page} has been moved to {movedTarget}')
+                reason = i18n.twtranslate(
+                    redir_page.site, 'redirect-fix-broken-moved',
+                    {'from': target.title(allow_interwiki=False),
+                     'to': movedTarget.title(as_link=True,
+                                             allow_interwiki=False)},
+                    bot_prefix=True
+                )
+                content = redir_page.get(get_redirect=True)
+                redir_page.set_redirect_target(movedTarget, keep_section=True,
+                                               save=False)
+                pywikibot.info('Summary - ' + reason)
+                done = self.userPut(redir_page, content,
+                                    redir_page.text, summary=reason,
+                                    ignore_save_related_errors=True,
+                                    ignore_server_errors=True)
+
+        if not done and self.user_confirm(
+            f'Redirect target {target.title(as_link=True)} does not exist.\n'
+            f'Do you want to delete {redir_page.title(as_link=True)}?'
+        ):
+            self.delete_redirect(redir_page, 'redirect-remove-broken')
+        elif not (self.opt.delete or movedTarget):
+            pywikibot.info('Cannot fix or delete the broken redirect')
+
+    def delete_1_broken_redirect(self) -> None:
+        """Treat one broken redirect."""
         try:
-            targetPage = self.get_redirect_target(redir_page)
+            targetPage = self.get_redirect_target(self.current_page)
         except InvalidTitleError as e:
             pywikibot.error(e)
             targetPage = None
@@ -508,40 +548,7 @@ class RedirectRobot(ExistingPageBot):
         except InvalidTitleError as e:
             pywikibot.error(e)
         except NoPageError:
-            movedTarget = None
-            with suppress(NoMoveTargetError):
-                movedTarget = targetPage.moved_target()
-            if movedTarget:
-                if not movedTarget.exists():
-                    # FIXME: Test to another move
-                    pywikibot.info(f'Target page {movedTarget} does not exist')
-                elif redir_page == movedTarget:
-                    pywikibot.info(
-                        'Redirect to target page forms a redirect loop')
-                else:
-                    pywikibot.info(
-                        f'{redir_page} has been moved to {movedTarget}')
-                    reason = i18n.twtranslate(
-                        redir_page.site, 'redirect-fix-broken-moved',
-                        {'from': targetPage.title(allow_interwiki=False),
-                         'to': movedTarget.title(as_link=True,
-                                                 allow_interwiki=False)},
-                        bot_prefix=True)
-                    content = redir_page.get(get_redirect=True)
-                    redir_page.set_redirect_target(
-                        movedTarget, keep_section=True, save=False)
-                    pywikibot.info('Summary - ' + reason)
-                    done = self.userPut(redir_page, content,
-                                        redir_page.text, summary=reason,
-                                        ignore_save_related_errors=True,
-                                        ignore_server_errors=True)
-            if not done and self.user_confirm(
-                f'Redirect target {targetPage.title(as_link=True)} does not'
-                ' exist.\nDo you want to delete '
-                    f'{redir_page.title(as_link=True)}?'):
-                self.delete_redirect(redir_page, 'redirect-remove-broken')
-            elif not (self.opt.delete or movedTarget):
-                pywikibot.info('Cannot fix or delete the broken redirect')
+            self.fix_moved_broken_redirects(targetPage)
         except IsRedirectPageError:
             pywikibot.info(
                 'Redirect target {} is also a redirect! {}'.format(

@@ -265,6 +265,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                 else:
                     file_on_commons = val[1].strip()
             return file_on_commons
+        return None
 
     def init_page(self, item: pywikibot.Page) -> pywikibot.FilePage:
         """Ensure that generator retrieves FilePage objects."""

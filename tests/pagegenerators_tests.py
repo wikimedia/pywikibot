@@ -79,7 +79,7 @@ class TestDryPageGenerators(TestCase):
 
     def assertFunction(self, obj) -> None:
         """Assert function test."""
-        self.assertTrue(hasattr(pagegenerators, obj))
+        self.assertHasAttr(pagegenerators, obj)
         self.assertTrue(callable(getattr(pagegenerators, obj)))
 
     def test_module_import(self) -> None:
@@ -596,7 +596,7 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
-            self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertNotHasAttr(page, '_pageprops')
         self.assertLength(links, count)
 
     def test_low_step(self) -> None:
@@ -611,7 +611,7 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
-            self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertNotHasAttr(page, '_pageprops')
         self.assertLength(links, count)
 
     def test_order(self) -> None:
@@ -625,7 +625,7 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page.exists(), bool)
             self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
-            self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertNotHasAttr(page, '_pageprops')
             self.assertEqual(page, links[count])
         self.assertLength(links, count + 1)
 
@@ -1077,7 +1077,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertLessEqual(len(pages), 10)
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(page.title().lower().startswith('a'))
+            self.assertStartsWith(page.title().lower(), 'a')
 
     def test_prefixing_ns(self) -> None:
         """Test prefixindex generator with namespace filter."""
@@ -1666,7 +1666,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
         testentry = entries[0]
         self.assertEqual(testentry.site, site)
-        self.assertTrue(hasattr(testentry, '_rcinfo'))
+        self.assertHasAttr(testentry, '_rcinfo')
 
         rcinfo = testentry._rcinfo
         self.assertEqual(rcinfo['server_name'], site.hostname())

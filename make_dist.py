@@ -52,7 +52,7 @@ Usage::
    The pywikibot-scripts distribution can be created.
 """
 #
-# (C) Pywikibot team, 2022-2024
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -228,7 +228,7 @@ class SetupScripts(SetupBase):
     package = 'pywikibot_scripts'
     replace = 'MANIFEST.in', 'pyproject.toml', 'setup.py'
 
-    def copy_files(self) -> None:
+    def copy_files(self) -> None:  # pragma: no cover
         """Ignore copy files yet."""
         info('<<lightyellow>>Copy files ...', newline=False)
         for filename in self.replace:
@@ -238,7 +238,7 @@ class SetupScripts(SetupBase):
                 shutil.copy(self.folder / 'scripts' / filename, self.folder)
         info('<<lightyellow>>done')
 
-    def cleanup(self) -> None:
+    def cleanup(self) -> None:  # pragma: no cover
         """Ignore cleanup yet."""
         info('<<lightyellow>>Copy files ...', newline=False)
         for filename in self.replace:
@@ -253,7 +253,7 @@ def handle_args() -> tuple[bool, bool, bool, bool]:
     :return: Return whether dist is to be installed locally or to be
         uploaded
     """
-    if '-help' in sys.argv:
+    if '-help' in sys.argv:  # pragma: no cover
         import re
 
         import setup

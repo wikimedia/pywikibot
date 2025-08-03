@@ -10,6 +10,7 @@ from __future__ import annotations
 import unittest
 from contextlib import suppress
 from random import sample
+from unittest.mock import patch
 from urllib.parse import urlparse
 
 from pywikibot import Site
@@ -86,7 +87,9 @@ class TestGenerateFamilyFile(DefaultSiteTestCase):
     def test_attributes_after_run(self) -> None:
         """Test FamilyFileGenerator attributes after run()."""
         gen = self.generator_instance
-        gen.run()
+        with patch.object(FamilyTestGenerator, 'show') as mock_show:
+            gen.run()
+            mock_show.assert_called()
 
         with self.subTest(test='Test whether default is loaded'):
             self.assertIn(self.site.lang, gen.wikis)

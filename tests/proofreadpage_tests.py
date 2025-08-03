@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -142,11 +142,11 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = ProofreadPage(
-            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super().setUp()
+            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12'
+        )
 
     def test_basepage_methods(self) -> None:
         """Test ProofreadPage methods inherited from superclass BasePage."""
@@ -162,11 +162,10 @@ class TestLoadRevisionsCachingProofreadPage(
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super().setUp()
 
     def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""
@@ -343,7 +342,7 @@ class TestProofreadPageValidSite(TestCase):
     def test_div_in_footer(self) -> None:
         """Test ProofreadPage page parsing functions."""
         page = ProofreadPage(self.site, self.div_in_footer['title'])
-        self.assertTrue(page.footer.endswith('</div>'))
+        self.assertEndsWith(page.footer, '</div>')
 
     def test_decompose_recompose_text(self) -> None:
         """Test ProofreadPage page decomposing/composing text."""
@@ -543,7 +542,7 @@ class TestProofreadPageIndexProperty(BS4TestCase):
 
         # Test deleter
         del page.index
-        self.assertFalse(hasattr(page, '_index'))
+        self.assertNotHasAttr(page, '_index')
         # Test setter with wrong type.
         with self.assertRaises(TypeError):
             page.index = 'invalid index'
@@ -637,11 +636,10 @@ class TestBasePageMethodsIndexPage(BS4TestCase, BasePageMethodsTestBase):
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super().setUp()
 
     def test_basepage_methods(self) -> None:
         """Test IndexPage methods inherited from superclass BasePage."""
@@ -657,11 +655,10 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
     family = 'wikisource'
     code = 'en'
 
-    def setUp(self) -> None:
-        """Set up test case."""
+    def setup_page(self) -> None:
+        """Set up test page."""
         self._page = IndexPage(
             self.site, 'Index:Popular Science Monthly Volume 1.djvu')
-        super().setUp()
 
     def test_page_text(self) -> None:
         """Test site.loadrevisions() with Page.text."""

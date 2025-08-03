@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test generate_user_files script."""
 #
-# (C) Pywikibot team, 2018-2023
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,8 +29,8 @@ class TestGenerateUserFiles(TestCase):
 
     def test_base_names(self) -> None:
         """Test basename constants."""
-        self.assertTrue(guf.USER_BASENAME.endswith('.py'))
-        self.assertTrue(guf.PASS_BASENAME.endswith('.py'))
+        self.assertEndsWith(guf.USER_BASENAME, '.py')
+        self.assertEndsWith(guf.PASS_BASENAME, '.py')
 
     def test_config_test(self) -> None:
         """Test config text strings."""

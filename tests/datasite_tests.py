@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,7 +27,7 @@ class TestDataSitePreloading(WikidataTestCase):
         seen = []
         for item in datasite.preload_entities(items):
             self.assertIsInstance(item, pywikibot.ItemPage)
-            self.assertTrue(hasattr(item, '_content'))
+            self.assertHasAttr(item, '_content')
             self.assertNotIn(item, seen)
             seen.append(item)
         self.assertLength(seen, 5)
@@ -42,7 +42,7 @@ class TestDataSitePreloading(WikidataTestCase):
         seen = []
         for item in datasite.preload_entities(pages):
             self.assertIsInstance(item, pywikibot.ItemPage)
-            self.assertTrue(hasattr(item, '_content'))
+            self.assertHasAttr(item, '_content')
             self.assertNotIn(item, seen)
             seen.append(item)
         self.assertLength(seen, 5)
@@ -53,7 +53,7 @@ class TestDataSitePreloading(WikidataTestCase):
         page = pywikibot.Page(datasite, 'P6')
         property_page = next(datasite.preload_entities([page]))
         self.assertIsInstance(property_page, pywikibot.PropertyPage)
-        self.assertTrue(hasattr(property_page, '_content'))
+        self.assertHasAttr(property_page, '_content')
 
 
 class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
@@ -67,7 +67,7 @@ class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
 
         item = next(datasite.preload_entities([mainpage]))
         self.assertIsInstance(item, pywikibot.ItemPage)
-        self.assertTrue(hasattr(item, '_content'))
+        self.assertHasAttr(item, '_content')
         self.assertEqual(item.id, 'Q5296')
 
 

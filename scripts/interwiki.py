@@ -384,6 +384,7 @@ from pywikibot.exceptions import (
     NoPageError,
     NoUsernameError,
     PageSaveRelatedError,
+    SectionError,
     ServerError,
     SiteDefinitionError,
     SpamblacklistError,
@@ -1129,7 +1130,7 @@ class Subject(interwiki_graph.Subject):
 
         # must be behind the page.isRedirectPage() part
         # otherwise a redirect error would be raised
-        if page_empty_check(page):
+        if self.page_empty_check(page):
             self.conf.remove.append(str(page))
             self.conf.note(f'{page} is empty. Skipping.')
             if page == self.origin:
@@ -1512,32 +1513,54 @@ class Subject(interwiki_graph.Subject):
                         break
 
     def process_unlimited(self, new, updated) -> None:
-        """Post process unlimited."""
-        for (site, page) in new.items():
-            # if we have an account for this site
-            if site.family.name in config.usernames \
-               and site.code in config.usernames[site.family.name] \
-               and not site.has_data_repository:
-                # Try to do the changes
-                try:
-                    if self.replaceLinks(page, new):
-                        # Page was changed
-                        updated.append(site)
-                except SaveError:
-                    pass
-                except GiveUpOnPage:
-                    break
+        """Post-process pages: replace links and track updated sites."""
+        for site, page in new.items():
+            if site.has_data_repository:
+                self.conf.note(
+                    f'{site} has a data repository, skipping {page}'
+                )
+                continue
 
-    def replaceLinks(self, page, newPages) -> bool:
-        """Return True if saving was successful."""
+            # Check if a username is configured for this site
+            codes = config.usernames.get(site.family.name, [])
+            if site.code not in codes:
+                pywikibot.warning(
+                    f'username for {site} is not given in your user-config.py'
+                )
+                continue
+
+            # Try to do the changes
+            try:
+                changed = self.replaceLinks(page, new)
+            except SaveError:
+                continue
+            except GiveUpOnPage:
+                break
+
+            if changed:
+                updated.append(site)
+
+    def _fetch_text(self, page: pywikibot.Page) -> str:
+        """Validate page and load it's content for editing.
+
+        This includes checking for:
+        - `-localonly` flag and whether the page is the origin
+        - Section-only pages (pages with `#section`)
+        - Non-existent pages
+        - Empty pages
+
+        :param page: The page to check.
+        :return: The text content of the page if it passes all checks.
+        :raises SaveError: If the page is not eligible for editing.
+        """
         # In this case only continue on the Page we started with
         if self.conf.localonly and page != self.origin:
             raise SaveError('-localonly and page != origin')
 
         if page.section():
             # This is not a page, but a subpage. Do not edit it.
-            pywikibot.info(
-                f'Not editing {page}: not doing interwiki on subpages')
+            pywikibot.info(f'Not editing {page}: interwiki not done on'
+                           ' subpages (#section)')
             raise SaveError('Link has a #section')
 
         try:
@@ -1546,9 +1569,15 @@ class Subject(interwiki_graph.Subject):
             pywikibot.info(f'Not editing {page}: page does not exist')
             raise SaveError("Page doesn't exist")
 
-        if page_empty_check(page):
+        if self.page_empty_check(page):
             pywikibot.info(f'Not editing {page}: page is empty')
             raise SaveError('Page is empty.')
+
+        return pagetext
+
+    def replaceLinks(self, page, newPages) -> bool:
+        """Return True if saving was successful."""
+        pagetext = self._fetch_text(page)
 
         # clone original newPages dictionary, so that we can modify it to the
         # local page's needs
@@ -1787,6 +1816,34 @@ class Subject(interwiki_graph.Subject):
                 if linkedPage.site not in expectedSites:
                     pywikibot.warning(f'{page.site.family.name}: {page} links '
                                       f'to incorrect {linkedPage}')
+
+    @staticmethod
+    def page_empty_check(page: pywikibot.Page) -> bool:
+        """Return True if page should be skipped as it is almost empty.
+
+        Pages in content namespaces are considered empty if they contain
+        fewer than 50 characters, and other pages are considered empty if
+        they are not category pages and contain fewer than 4 characters
+        excluding interlanguage links and categories.
+        """
+        try:
+            txt = page.text
+        except SectionError:
+            # Section doesn't exist — treat page as empty
+            return True
+
+        # Check if the page is in content namespace
+        if page.namespace().content:
+            # Check if the page contains at least 50 characters
+            return len(txt) < 50
+
+        if not page.is_categorypage():
+            site = page.site
+            txt = textlib.removeLanguageLinks(txt, site=site)
+            txt = textlib.removeCategoryLinks(txt, site=site)
+            return len(txt.strip()) < 4
+
+        return False
 
 
 class InterwikiBot:
@@ -2098,28 +2155,6 @@ def botMayEdit(page) -> bool:
             if template[0].title(with_ns=False).lower() in tmpl:
                 return False
     return True
-
-
-def page_empty_check(page) -> bool:
-    """Return True if page should be skipped as it is almost empty.
-
-    Pages in content namespaces are considered empty if they contain
-    less than 50 characters, and other pages are considered empty if
-    they are not category pages and contain less than 4 characters
-    excluding interlanguage links and categories.
-    """
-    txt = page.text
-    # Check if the page is in content namespace
-    if page.namespace().content:
-        # Check if the page contains at least 50 characters
-        return len(txt) < 50
-
-    if not page.is_categorypage():
-        txt = textlib.removeLanguageLinks(txt, site=page.site)
-        txt = textlib.removeCategoryLinks(txt, site=page.site)
-        return len(txt) < 4
-
-    return False
 
 
 class InterwikiDumps(OptionHandler):

@@ -1,3 +1,4 @@
+---
 codecov:
   bot: jayvdb
   max_report_age: 48
@@ -10,25 +11,24 @@ coverage:
   status:
     project:
       default:
-        enabled: yes
+        enabled: true
     patch:
       default:
-        enabled: yes
+        enabled: true
     changes:
       default:
-        enabled: yes
-
+        enabled: true
   ignore:
     - Users
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
     - pywikibot/scripts/preload_sites.py
     - pywikibot/scripts/version.py
+    - scripts/create_isbn_edition.py
     - scripts/maintenance/colors.py
     - scripts/maintenance/make_i18n_dict.py
     - scripts/userscripts/
     - tests/pwb/
-
   notify:
     irc:
       default:
@@ -36,7 +36,6 @@ coverage:
         channel: pywikibot
 
 component_management:
-
   individual_components:
     - component_id: Framework
       paths:

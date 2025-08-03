@@ -622,7 +622,7 @@ class TestTemplateParams(TestCase):
             self.assertIsNone(m['params'])
             self.assertIsNone(m[2])
             self.assertIsNotNone(m['unhandled_depth'])
-            self.assertTrue(m[0].endswith('foo {{bar}}'))
+            self.assertEndsWith(m[0], 'foo {{bar}}')
 
 
 class TestDisabledParts(DefaultDrySiteTestCase):
@@ -990,7 +990,7 @@ class TestDigitsConversion(TestCase):
     net = False
 
     def test_to_local(self) -> None:
-        """Test converting Latin digits to local digits."""
+        """Test converting ASCII digits to local digits."""
         self.assertEqual(textlib.to_local_digits(299792458, 'en'), '299792458')
         self.assertEqual(
             textlib.to_local_digits(299792458, 'fa'), '۲۹۹۷۹۲۴۵۸')
@@ -1001,20 +1001,20 @@ class TestDigitsConversion(TestCase):
             textlib.to_local_digits('299792458', 'km'), '២៩៩៧៩២៤៥៨')
 
     def test_to_latin(self) -> None:
-        """Test converting local digits to Latin digits."""
-        self.assertEqual(textlib.to_latin_digits('299792458'), '299792458')
+        """Test converting local digits to ASCII digits."""
+        self.assertEqual(textlib.to_ascii_digits('299792458'), '299792458')
         self.assertEqual(
-            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸', 'fa'), '299792458')
+            textlib.to_ascii_digits('۲۹۹۷۹۲۴۵۸', 'fa'), '299792458')
         self.assertEqual(
-            textlib.to_latin_digits('۲۹۹۷۹۲۴۵۸ flash'), '299792458 flash')
+            textlib.to_ascii_digits('۲۹۹۷۹۲۴۵۸ flash'), '299792458 flash')
         self.assertEqual(
-            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', 'km'), '299792458')
+            textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', 'km'), '299792458')
         self.assertEqual(
-            textlib.to_latin_digits('២៩៩៧៩២៤៥៨'), '299792458')
+            textlib.to_ascii_digits('២៩៩៧៩២៤៥៨'), '299792458')
         self.assertEqual(
-            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['km', 'en']), '299792458')
+            textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', ['km', 'en']), '299792458')
         self.assertEqual(
-            textlib.to_latin_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
+            textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
 
 
 class TestReplaceExcept(DefaultDrySiteTestCase):
