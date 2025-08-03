@@ -78,17 +78,6 @@ dependencies = [
     'requests>=2.31.0',
 ]
 
-# ------- setup tests_require ------- #
-test_deps = []
-
-# Add all dependencies as test dependencies,
-# so all scripts can be compiled for script_tests, etc.
-if 'PYSETUP_TEST_EXTRAS' in os.environ:  # pragma: no cover
-    test_deps += [i for v in extra_deps.values() for i in v]
-
-# These extra dependencies are needed other unittest fails to load tests.
-test_deps += extra_deps['eventstreams']
-
 
 class _DottedDict(dict):
     __getattr__ = dict.__getitem__
@@ -106,6 +95,12 @@ def read_project() -> str:
 
     .. versionadded:: 9.0
     """
+    if sys.version_info >= (3, 11):
+        import tomllib
+        with open(path / 'pyproject.toml', 'rb') as f:
+            data = tomllib.load(f)
+        return data['project']['name']
+
     toml = []
     with open(path / 'pyproject.toml') as f:
         for line in f:
@@ -174,7 +169,7 @@ def get_validated_version(name: str) -> str:  # pragma: no cover
 
     if warning:
         print(__doc__)
-        print('\n\n{warning}')
+        print(f'\n\n{warning}')
         sys.exit('\nBuild of distribution package canceled.')
 
     return version
@@ -230,8 +225,6 @@ def main() -> None:  # pragma: no cover
         include_package_data=True,
         install_requires=dependencies,
         extras_require=extra_deps,
-        test_suite='tests.collector',
-        tests_require=test_deps,
     )
 
 
