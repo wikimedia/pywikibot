@@ -14,19 +14,8 @@ env:
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
-  wait_for_all:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for all workflows to complete
-        uses: kachick/wait-other-jobs@v3.8.1
-        with:
-          warmup-delay: PT1M
-          minimum-interval: PT5M
-      - name: Proceed with tests
-        run: echo "All workflows have completed. Proceeding with Login CI tests."
   run_tests:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-    needs: wait_for_all
     timeout-minutes: 30
     strategy:
       fail-fast: false
