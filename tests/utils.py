@@ -528,13 +528,13 @@ def execute_pwb(args: list[str], *,
         command.append(
             f'import pwb; import pywikibot; {overrides}; pwb.main()')
     else:
-        command.append(_pwb_py)
+        # Test is running; activate coverage if present
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
+            with suppress(ModuleNotFoundError):
+                import coverage  # noqa: F401
+                command.extend(['-m', 'coverage', 'run'])
 
-    # Test is running; activate coverage if present
-    if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
-        with suppress(ModuleNotFoundError):
-            import coverage  # noqa: F401
-            command = [command[0], '-m', 'coverage', 'run'] + command[1:]
+        command.append(_pwb_py)
 
     return execute(command=command + args, data_in=data_in, timeout=timeout)
 
