@@ -130,6 +130,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 90
         env:
+          COVERAGE_PROCESS_START: pyproject.toml
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
         run: |
           python pwb.py version
