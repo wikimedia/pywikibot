@@ -68,6 +68,7 @@ jobs:
           coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py"
       - name: Show coverage statistics
         run: |
+          coverage combine
           coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

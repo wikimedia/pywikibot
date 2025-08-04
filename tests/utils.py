@@ -530,6 +530,12 @@ def execute_pwb(args: list[str], *,
     else:
         command.append(_pwb_py)
 
+    # Test is running; activate coverage if present
+    if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
+        with suppress(ModuleNotFoundError):
+            import coverage  # noqa: F401
+            command = [command[0], '-m', 'coverage', 'run'] + command[1:]
+
     return execute(command=command + args, data_in=data_in, timeout=timeout)
 
 

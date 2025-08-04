@@ -102,6 +102,7 @@ jobs:
           coverage run -m unittest -vv
       - name: Show coverage statistics
         run: |
+          coverage combine
           coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
