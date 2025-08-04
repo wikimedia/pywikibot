@@ -62,7 +62,6 @@ jobs:
           coverage run -m pytest -s -r A -a "${{ matrix.attr }}"
       - name: Show coverage statistics
         run: |
-          coverage combine
           coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
