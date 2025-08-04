@@ -141,7 +141,6 @@ jobs:
       - name: Show coverage statistics
         run: |
           coverage report
-          coverage xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         env:
