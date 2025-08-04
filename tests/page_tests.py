@@ -1088,11 +1088,15 @@ class TestPageUserAction(DefaultSiteTestCase):
         # watched_pages parameters
         wp_params = {'force': True, 'with_talkpage': False}
         rv = userpage.watch()
-        self.assertTrue(rv)
-        self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
+
+        self.assertEqual(userpage.exists(), rv)
+        if rv:
+            self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
+
         with self.assertWarnsRegex(UserWarning,
                                    r"expiry parameter \('.+'\) is ignored"):
             rv = userpage.watch(unwatch=True, expiry='indefinite')
+
         self.assertTrue(rv)
         rv = userpage.watch(expiry='5 seconds')
         self.assertTrue(rv)
