@@ -1051,12 +1051,6 @@ login
 
 *  update help string
 
-maintenance
-^^^^^^^^^^^
-
-*  Add a preload_sites.py script to preload site information
-   (:phab:`T226157`)
-
 reflinks
 ^^^^^^^^
 
