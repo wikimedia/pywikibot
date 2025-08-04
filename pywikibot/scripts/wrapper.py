@@ -125,14 +125,6 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
     :param package: The package of the script. Used for checks.
     :type package: Optional[module]
     """
-    if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1':
-        try:
-            import coverage
-        except ModuleNotFoundError:
-            pass
-        else:
-            coverage.process_startup()
-
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
     main_mod = types.ModuleType('__main__')
