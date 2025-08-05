@@ -21,7 +21,7 @@ jobs:
       - name: Wait for all workflows to complete excluding this one
         uses: kachick/wait-other-jobs@v3.8.1
         with:
-          skip_same_workflow: true
+          skip-same-workflow: true
           warmup-delay: PT1M
           minimum-interval: PT5M
           fail-on-error: false
