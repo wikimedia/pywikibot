@@ -33,7 +33,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ja', 'jv', 'ka', 'kn', 'ko', 'la', 'li', 'lij', 'lt', 'mk', 'ml',
         'mr', 'ms', 'mul', 'my', 'nap', 'nl', 'no', 'or', 'pa', 'pl', 'pms',
         'pt', 'ro', 'ru', 'sa', 'sah', 'sk', 'sl', 'sr', 'su', 'sv', 'ta',
-        'tcy', 'te', 'th', 'tr', 'uk', 'vec', 'vi', 'wa', 'yi', 'zh',
+        'tcy', 'te', 'th', 'tl', 'tr', 'uk', 'vec', 'vi', 'wa', 'yi', 'zh',
         'zh-min-nan',
     }
 
