@@ -391,8 +391,7 @@ class BasePage(ComparableMixin):
         page_section = self.section()
         if page_section:
             content = textlib.extract_sections(text, self.site)
-            headings = {section.heading for section in content.sections}
-            if page_section not in headings:
+            if page_section not in content.sections:
                 raise SectionError(f'{page_section!r} is not a valid section '
                                    f'of {self.title(with_section=False)}')
 
