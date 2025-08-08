@@ -22,9 +22,15 @@ jobs:
         uses: kachick/wait-other-jobs@v3.8.1
         with:
           skip-same-workflow: true
+          skip-list: |
+            [
+              {
+                "workflowFile": "login_tests-ci.yml",
+                "jobName": "Wait for other workflows to finish"
+              }
+            ]
           warmup-delay: PT1M
           minimum-interval: PT5M
-          fail-on-error: false
 
   run_tests:
     name: Run Login/Logout Tests
