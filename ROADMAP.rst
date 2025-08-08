@@ -1,9 +1,11 @@
 Current Release Changes
 =======================
 
+* Cleanup :mod:`setup` module (:phab:`T396356`)
 * Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
 * Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
-  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>` (:phab:`T330839`)
+  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>`; fix the methods to return False if
+  page is missing and no expiry is set (:phab:`T330839`)
 
 
 Deprecations

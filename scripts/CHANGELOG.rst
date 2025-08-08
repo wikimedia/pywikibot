@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+10.4.0
+------
+
+interwiki
+^^^^^^^^^
+
+* Clarify ``-localonly`` option behavior and help text (:phab:`T57257`)
+
 10.3.0
 ------
 
