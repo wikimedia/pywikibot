@@ -65,7 +65,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.7
+    rev: v0.12.8
     hooks:
       - id: ruff-check
         alias: ruff
