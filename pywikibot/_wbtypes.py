@@ -414,19 +414,26 @@ class WbTime(WbRepresentation):
         12: 334,  # Nov -> Dec: 30 days, plus 304 days in Jan -> Nov
     }
 
-    def __init__(self,
-                 year: int | None = None,
-                 month: int | None = None,
-                 day: int | None = None,
-                 hour: int | None = None,
-                 minute: int | None = None,
-                 second: int | None = None,
-                 precision: int | str | None = None,
-                 before: int = 0,
-                 after: int = 0,
-                 timezone: int = 0,
-                 calendarmodel: str | None = None,
-                 site: DataSite | None = None) -> None:
+    _timestr_re = re.compile(
+        r'([-+]?\d{1,16})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z')
+
+    @deprecate_positionals(since='10.4.0')
+    def __init__(
+        self,
+        year: int,
+        month: int | None = None,
+        day: int | None = None,
+        hour: int | None = None,
+        minute: int | None = None,
+        second: int | None = None,
+        *,
+        precision: int | str | None = None,
+        before: int = 0,
+        after: int = 0,
+        timezone: int = 0,
+        calendarmodel: str | None = None,
+        site: DataSite | None = None
+    ) -> None:
         """Create a new WbTime object.
 
         The precision can be set by the Wikibase int value (0-14) or by
@@ -455,6 +462,11 @@ class WbTime(WbRepresentation):
            *precision* value 'millenia' is deprecated; 'millennium' must
            be used instead.
 
+        .. versionchanged:: 10.4
+           The parameters except timestamp values are now keyword-only.
+           A TypeError is raised if *year* is not an int. Previously, a
+           ValueError was raised if *year* was None.
+
         :param year: The year as a signed integer of between 1 and 16
             digits.
         :param month: Month of the timestamp, if it exists.
@@ -476,56 +488,55 @@ class WbTime(WbRepresentation):
         :param site: The Wikibase site. If not provided, retrieves the
             data repository from the default site from user-config.py.
             Only used if calendarmodel is not given.
+        :raises TypeError: Invalid *year* type.
+        :raises ValueError: Invalid *precision* or *site* or default
+            site has no data repository.
         """
-        if year is None:
-            raise ValueError('no year given')
-        self.precision = self.PRECISION['year']
-        if month is not None:
-            self.precision = self.PRECISION['month']
-        else:
-            month = 1
-        if day is not None:
-            self.precision = self.PRECISION['day']
-        else:
-            day = 1
-        if hour is not None:
-            self.precision = self.PRECISION['hour']
-        else:
-            hour = 0
-        if minute is not None:
-            self.precision = self.PRECISION['minute']
-        else:
-            minute = 0
-        if second is not None:
-            self.precision = self.PRECISION['second']
-        else:
-            second = 0
+        if not isinstance(year, int):
+            raise TypeError(f'year must be an int, not {type(year).__name__}')
+
+        units = [
+            ('month', month, 1),
+            ('day', day, 1),
+            ('hour', hour, 0),
+            ('minute', minute, 0),
+            ('second', second, 0),
+        ]
+
+        # set unit attribute values
         self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
-        self.second = second
+        for unit, value, default in units:
+            setattr(self, unit, value if value is not None else default)
+
+        if precision is None:
+            # Autodetection of precision based on the passed time values
+            prec = self.PRECISION['year']
+
+            for unit, value, _ in units:
+                if value is not None:
+                    prec = self.PRECISION[unit]
+        else:
+            # explicit precision is given
+            if (isinstance(precision, int)
+                    and precision in self.PRECISION.values()):
+                prec = precision
+            elif precision in self.PRECISION:
+                prec = self.PRECISION[precision]
+            else:
+                raise ValueError(f'Invalid precision: "{precision}"')
+
+        self.precision = prec
         self.after = after
         self.before = before
         self.timezone = timezone
         if calendarmodel is None:
+            site = site or pywikibot.Site().data_repository()
             if site is None:
-                site = pywikibot.Site().data_repository()
-                if site is None:
-                    raise ValueError(
-                        f'Site {pywikibot.Site()} has no data repository')
+                raise ValueError(
+                    f'Site {pywikibot.Site()} has no data repository')
             calendarmodel = site.calendarmodel()
+
         self.calendarmodel = calendarmodel
-        # if precision is given it overwrites the autodetection above
-        if precision is not None:
-            if (isinstance(precision, int)
-                    and precision in self.PRECISION.values()):
-                self.precision = precision
-            elif precision in self.PRECISION:
-                self.precision = self.PRECISION[precision]
-            else:
-                raise ValueError(f'Invalid precision: "{precision}"')
 
     def _getSecondsAdjusted(self) -> int:
         """Return an internal representation of the time object as seconds.
@@ -621,60 +632,78 @@ class WbTime(WbRepresentation):
         return self._getSecondsAdjusted() == other._getSecondsAdjusted()
 
     @classmethod
-    def fromTimestr(cls,
-                    datetimestr: str,
-                    precision: int | str = 14,
-                    before: int = 0,
-                    after: int = 0,
-                    timezone: int = 0,
-                    calendarmodel: str | None = None,
-                    site: DataSite | None = None) -> WbTime:
+    @deprecate_positionals(since='10.4.0')
+    def fromTimestr(
+        cls,
+        datetimestr: str,
+        *,
+        precision: int | str = 14,
+        before: int = 0,
+        after: int = 0,
+        timezone: int = 0,
+        calendarmodel: str | None = None,
+        site: DataSite | None = None
+    ) -> WbTime:
         """Create a new WbTime object from a UTC date/time string.
 
-        The timestamp differs from ISO 8601 in that:
+        The timestamp format must match a string resembling ISO 8601
+        with the following constraints:
 
-        * The year is always signed and having between 1 and 16 digits;
-        * The month, day and time are zero if they are unknown;
-        * The Z is discarded since time zone is determined from the timezone
-          param.
+        - Year is signed and can have between 1 and 16 digits.
+        - Month, day, hour, minute and second are always two digits.
+          They may be zero.
+        - Time is always in UTC and ends with ``Z``.
+        - Example: ``+0000000000123456-01-01T00:00:00Z``.
 
-        :param datetimestr: Timestamp in a format resembling ISO 8601,
-            e.g. +2013-01-01T00:00:00Z
-        :param precision: The unit of the precision of the time. Defaults to
-            14 (second).
-        :param before: Number of units after the given time it could be, if
-            uncertain. The unit is given by the precision.
-        :param after: Number of units before the given time it could be, if
-            uncertain. The unit is given by the precision.
-        :param timezone: Timezone information in minutes.
+        .. versionchanged:: 10.4
+           The parameters except *datetimestr* are now keyword-only.
+
+        :param datetimestr: Timestamp string to parse
+        :param precision: The unit of the precision of the time. Defaults
+            to 14 (second).
+        :param before: Number of units after the given time it could be,
+            if uncertain. The unit is given by the precision.
+        :param after: Number of units before the given time it could be,
+            if uncertain. The unit is given by the precision.
+        :param timezone: Timezone offset in minutes.
         :param calendarmodel: URI identifying the calendar model.
-        :param site: The Wikibase site. If not provided, retrieves the data
-            repository from the default site from user-config.py.
+        :param site: The Wikibase site. If not provided, retrieves the
+            data repository from the default site from user-config.py.
             Only used if calendarmodel is not given.
+        :raises ValueError: If the string does not match the expected
+            format.
         """
-        match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
-                         datetimestr)
+        match = cls._timestr_re.match(datetimestr)
         if not match:
             raise ValueError(f"Invalid format: '{datetimestr}'")
+
         t = match.groups()
         return cls(int(t[0]), int(t[1]), int(t[2]),
                    int(t[3]), int(t[4]), int(t[5]),
-                   precision, before, after, timezone, calendarmodel, site)
+                   precision=precision, before=before, after=after,
+                   timezone=timezone, calendarmodel=calendarmodel, site=site)
 
     @classmethod
-    def fromTimestamp(cls,
-                      timestamp: Timestamp,
-                      precision: int | str = 14,
-                      before: int = 0,
-                      after: int = 0,
-                      timezone: int = 0,
-                      calendarmodel: str | None = None,
-                      site: DataSite | None = None,
-                      copy_timezone: bool = False) -> WbTime:
+    @deprecate_positionals(since='10.4.0')
+    def fromTimestamp(
+        cls,
+        timestamp: Timestamp,
+        *,
+        precision: int | str = 14,
+        before: int = 0,
+        after: int = 0,
+        timezone: int = 0,
+        calendarmodel: str | None = None,
+        site: DataSite | None = None,
+        copy_timezone: bool = False
+    ) -> WbTime:
         """Create a new WbTime object from a pywikibot.Timestamp.
 
         .. versionchanged:: 8.0
            Added *copy_timezone* parameter.
+        .. versionchanged:: 10.4
+           The parameters except *timestamp* are now keyword-only.
+
 
         :param timestamp: Timestamp
         :param precision: The unit of the precision of the time.
@@ -699,6 +728,89 @@ class WbTime(WbRepresentation):
                                before=before, after=after, timezone=timezone,
                                calendarmodel=calendarmodel, site=site)
 
+    @staticmethod
+    def _normalize_millennium(year: int) -> int:
+        """Round the given year to the start of its millennium.
+
+        The rounding is performed towards positive infinity for positive
+        years and towards negative infinity for negative years.
+
+        .. versionadded:: 10.4
+
+        :param year: The year as an integer.
+        :return: The first year of the millennium containing the given
+            year.
+        """
+        # For negative years, floor rounds away from zero to correctly handle
+        # BCE dates. For positive years, ceil rounds up to the next
+        # millennium/century.
+        year_float = year / 1000
+        if year_float < 0:
+            year = math.floor(year_float)
+        else:
+            year = math.ceil(year_float)
+        return year * 1000
+
+    @staticmethod
+    def _normalize_century(year: int) -> int:
+        """Round the given year to the start of its century.
+
+        The rounding is performed towards positive infinity for positive
+        years and towards negative infinity for negative years.
+
+        .. versionadded:: 10.4
+
+        :param year: The year as an integer.
+        :return: The first year of the century containing the given year.
+        """
+        # For century, -1301 is the same century as -1400 but not -1401.
+        # Similar for 1901 and 2000 vs 2001.
+        year_float = year / 100
+        if year_float < 0:
+            year = math.floor(year_float)
+        else:
+            year = math.ceil(year_float)
+        return year * 100
+
+    @staticmethod
+    def _normalize_decade(year: int) -> int:
+        """Round the given year down to the start of its decade.
+
+        Unlike millennium or century normalization, this always
+        truncates towards zero.
+
+        .. versionadded:: 10.4
+
+        :param year: The year as an integer.
+        :return: The first year of the decade containing the given year.
+        """
+        # For decade, -1340 is the same decade as -1349 but not -1350.
+        # Similar for 2010 and 2019 vs 2020
+        year_float = year / 10
+        year = math.trunc(year_float)
+        return year * 10
+
+    @staticmethod
+    def _normalize_power_of_ten(year: int, precision: int) -> int:
+        """Round the year to the given power-of-ten precision.
+
+        This is used for very coarse historical precision levels, where
+        the time unit represents a power-of-ten number of years.
+
+        .. versionadded:: 10.4
+
+        :param year: The year as an integer.
+        :param precision: The precision level (Wikibase int value).
+        :return: The normalized year rounded to the nearest matching
+            power-of-ten boundary.
+        """
+        # Wikidata rounds the number based on the first non-decimal digit.
+        # Python's round function will round -15.5 to -16, and +15.5 to +16
+        # so we don't need to do anything complicated like the other
+        # examples.
+        power_of_10 = 10 ** (9 - precision)
+        return round(year / power_of_10) * power_of_10
+
     def normalize(self) -> WbTime:
         """Normalizes the WbTime object to account for precision.
 
@@ -712,45 +824,24 @@ class WbTime(WbRepresentation):
         Normalization will delete timezone information if the precision
         is less than or equal to DAY.
 
-        Note: Normalized WbTime objects can only be compared to other
-        normalized WbTime objects of the same precision. Normalization
-        might make a WbTime object that was less than another WbTime object
-        before normalization, greater than it after normalization, or vice
-        versa.
+        .. note:: Normalized WbTime objects can only be compared to
+           other normalized WbTime objects of the same precision.
+           Normalization might make a WbTime object that was less than
+           another WbTime object before normalization, greater than it
+           after normalization, or vice versa.
         """
         year = self.year
-        # This is going to get messy.
-        if self.PRECISION['1000000000'] <= self.precision <= self.PRECISION['10000']:  # noqa: E501
-            # 1000000000 == 10^9
-            power_of_10 = 10 ** (9 - self.precision)
-            # Wikidata rounds the number based on the first non-decimal digit.
-            # Python's round function will round -15.5 to -16, and +15.5 to +16
-            # so we don't need to do anything complicated like the other
-            # examples.
-            year = round(year / power_of_10) * power_of_10
-        elif self.precision == self.PRECISION['millennium']:
-            # Similar situation with centuries
-            year_float = year / 1000
-            if year_float < 0:
-                year = math.floor(year_float)
-            else:
-                year = math.ceil(year_float)
-            year *= 1000
-        elif self.precision == self.PRECISION['century']:
-            # For century, -1301 is the same century as -1400 but not -1401.
-            # Similar for 1901 and 2000 vs 2001.
-            year_float = year / 100
-            if year_float < 0:
-                year = math.floor(year_float)
-            else:
-                year = math.ceil(year_float)
-            year *= 100
-        elif self.precision == self.PRECISION['decade']:
-            # For decade, -1340 is the same decade as -1349 but not -1350.
-            # Similar for 2010 and 2019 vs 2020
-            year_float = year / 10
-            year = math.trunc(year_float)
-            year *= 10
+        for prec in 'millennium', 'century', 'decade':
+            if self.precision == self.PRECISION[prec]:
+                handler = getattr(self, '_normalize_' + prec)
+                year = handler(year)
+                break
+        else:
+            lower = self.PRECISION['1000000000']
+            upper = self.PRECISION['10000']
+            if lower <= self.precision <= upper:
+                year = self._normalize_power_of_ten(year, self.precision)
+
         kwargs = {
             'precision': self.precision,
             'before': self.before,
@@ -758,18 +849,14 @@ class WbTime(WbRepresentation):
             'calendarmodel': self.calendarmodel,
             'year': year
         }
-        if self.precision >= self.PRECISION['month']:
-            kwargs['month'] = self.month
-        if self.precision >= self.PRECISION['day']:
-            kwargs['day'] = self.day
-        if self.precision >= self.PRECISION['hour']:
-            # See T326693
-            kwargs['timezone'] = self.timezone
-            kwargs['hour'] = self.hour
-        if self.precision >= self.PRECISION['minute']:
-            kwargs['minute'] = self.minute
-        if self.precision >= self.PRECISION['second']:
-            kwargs['second'] = self.second
+
+        for prec in 'month', 'day', 'hour', 'minute', 'second':
+            if self.precision >= self.PRECISION[prec]:
+                kwargs[prec] = getattr(self, prec)
+                if prec == 'hour':
+                    # Add timezone, see T326693
+                    kwargs['timezone'] = self.timezone
+
         return type(self)(**kwargs)
 
     @remove_last_args(['normalize'])  # since 8.2.0
