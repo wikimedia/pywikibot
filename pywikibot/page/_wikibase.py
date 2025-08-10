@@ -1380,24 +1380,27 @@ class ItemPage(WikibasePage):
         prop: str,
         timestamp: pywikibot.WbTime,
         lang: str = 'en'
-    ):
+    ) -> pywikibot.WbRepresentation | None:
         """Return the best value for this page at a given timestamp.
+
+        .. versionadded:: 10.4
 
         :param prop: property id, "P###"
         :param timestamp: the timestamp to check the value at
         :param lang: the language to return the value in
-        :return: WbRepresentation object given by Wikibase property number for
-            this page object and valid for the given timestamp and language.
-        :rtype: pywikibot.WbRepresentation or None
+        :return: :class:`pywikibot.WbRepresentation` object given by
+            Wikibase property number for this page object and valid for
+            the given timestamp and language.
 
         :raises NoWikibaseEntityError: site has no time interval properties
         """
-        if not hasattr(self.site.family, 'interval_start_property') or \
-                not hasattr(self.site.family, 'interval_end_property'):
+        fam = self.site.family
+        if not hasattr(fam, 'interval_start_property') or \
+                not hasattr(fam, 'interval_end_property'):
             raise NoWikibaseEntityError(
-                f'{self.site.family} does not have time interval properties')
-        startp = self.site.family.interval_start_property
-        endp = self.site.family.interval_end_property
+                f'{fam} does not have time interval properties')
+
+        startp, endp = fam.interval_start_property, fam.interval_end_property
 
         def timestamp_in_interval(p, ts):
             """Check if timestamp is within the qualifiers."""
@@ -1418,22 +1421,23 @@ class ItemPage(WikibasePage):
 
         def find_value_at_timestamp(claims, ts, language):
             """Find the first best ranked claim at a given timestamp."""
-            sorted_claims = sorted(claims,
-                                   key=lambda c: c.qualifiers.get(startp)[
-                                       0].getTarget() if c.qualifiers.get(
-                                       startp) else pywikibot.WbTime(0),
-                                   reverse=True)
+            sorted_claims = sorted(
+                claims,
+                key=(lambda c: c.qualifiers.get(startp)[0].getTarget()
+                     if c.qualifiers.get(startp)
+                     else pywikibot.WbTime(0, site=self.site)),
+                reverse=True
+            )
             for claim in sorted_claims:
                 if timestamp_in_interval(claim, ts):
-                    if (claim.type == 'monolingualtext'
-                            and claim.getTarget().language != language):
-                        continue
-                    else:
+                    if (claim.type != 'monolingualtext'
+                            or claim.getTarget().language == language):
                         return claim.getTarget()
             return None
 
         if prop in self.claims:
             return find_value_at_timestamp(self.claims[prop], timestamp, lang)
+
         return None
 
 

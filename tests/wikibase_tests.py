@@ -1529,7 +1529,7 @@ class TestHighLevelApi(WikidataTestCase):
         self.assertEqual(claim.language, 'ru')
 
     def test_with_monolingual_wrong_language(self) -> None:
-        """Test getting a monolingual text claim with a good language."""
+        """Test getting a monolingual text claim with a wrong language."""
         wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q183')
         item.get()
