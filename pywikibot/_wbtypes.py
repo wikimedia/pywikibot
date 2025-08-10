@@ -313,7 +313,7 @@ class _Precision(Mapping):
         'second': 14,
     }
 
-    def __getitem__(self, key) -> int:
+    def __getitem__(self, key: str) -> int:
         if key == 'millenia':
             issue_deprecation_warning(
                 f'{key!r} key for precision', "'millennium'", since='10.0.0')
