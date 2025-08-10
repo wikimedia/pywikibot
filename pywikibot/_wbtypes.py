@@ -12,6 +12,7 @@ import json
 import math
 import re
 from collections.abc import Mapping
+from contextlib import suppress
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
@@ -19,7 +20,11 @@ import pywikibot
 from pywikibot import exceptions
 from pywikibot.backports import Iterator
 from pywikibot.time import Timestamp
-from pywikibot.tools import issue_deprecation_warning, remove_last_args
+from pywikibot.tools import (
+    deprecate_positionals,
+    issue_deprecation_warning,
+    remove_last_args,
+)
 
 
 if TYPE_CHECKING:
@@ -95,28 +100,40 @@ class Coordinate(WbRepresentation):
 
     _items = ('lat', 'lon', 'entity')
 
-    def __init__(self, lat: float, lon: float, alt: float | None = None,
-                 precision: float | None = None,
-                 globe: str | None = None, typ: str = '',
-                 name: str = '', dim: int | None = None,
-                 site: DataSite | None = None,
-                 globe_item: ItemPageStrNoneType = None,
-                 primary: bool = False) -> None:
+    @deprecate_positionals(since='10.4.0')
+    def __init__(
+        self,
+        lat: float,
+        lon: float,
+        *,
+        alt: float | None = None,
+        precision: float | None = None,
+        globe: str | None = None,
+        typ: str = '',
+        name: str = '',
+        dim: int | None = None,
+        site: DataSite | None = None,
+        globe_item: ItemPageStrNoneType = None,
+        primary: bool = False
+    ) -> None:
         """Represent a geo coordinate.
 
-        :param lat: Latitude
-        :param lon: Longitude
-        :param alt: Altitude
-        :param precision: precision
-        :param globe: Which globe the point is on
-        :param typ: The type of coordinate point
-        :param name: The name
-        :param dim: Dimension (in meters)
-        :param site: The Wikibase site
-        :param globe_item: The Wikibase item for the globe, or the
-            entity URI of this Wikibase item. Takes precedence over
-            'globe' if present.
-        :param primary: True for a primary set of coordinates
+        .. versionchanged:: 10.4
+           The parameters after `lat` and `lon` are now keyword-only.
+
+        :param lat: Latitude coordinate
+        :param lon: Longitude coordinate
+        :param alt: Altitude in meters
+        :param precision: Precision of the coordinate
+        :param globe: The globe the coordinate is on (e.g. 'earth')
+        :param typ: Type of coordinate point
+        :param name: Name associated with the coordinate
+        :param dim: Dimension in meters used for precision calculation
+        :param site: The Wikibase site instance
+        :param globe_item: Wikibase item or entity URI for the globe;
+            takes precedence over *globe*
+        :param primary: Indicates if this is a primary coordinate set
+            (default: False)
         """
         self.lat = lat
         self.lon = lon
@@ -137,11 +154,16 @@ class Coordinate(WbRepresentation):
 
     @property
     def entity(self) -> str:
-        """Return the entity uri of the globe."""
+        """Return the entity URI of the globe.
+
+        :raises CoordinateGlobeUnknownError: the globe is not supported
+            by Wikibase
+        """
         if not self._entity:
             if self.globe not in self.site.globes():
                 raise exceptions.CoordinateGlobeUnknownError(
                     f'{self.globe} is not supported in Wikibase yet.')
+
             return self.site.globes()[self.globe]
 
         if isinstance(self._entity, pywikibot.ItemPage):
@@ -152,37 +174,41 @@ class Coordinate(WbRepresentation):
     def toWikibase(self) -> dict[str, Any]:
         """Export the data to a JSON object for the Wikibase API.
 
-        FIXME: Should this be in the DataSite object?
-
-        :return: Wikibase JSON
+        :return: Wikibase JSON representation of the coordinate
         """
-        return {'latitude': self.lat,
-                'longitude': self.lon,
-                'altitude': self.alt,
-                'globe': self.entity,
-                'precision': self.precision,
-                }
+        return {
+            'latitude': self.lat,
+            'longitude': self.lon,
+            'altitude': self.alt,
+            'globe': self.entity,
+            'precision': self.precision,
+        }
 
     @classmethod
     def fromWikibase(cls, data: dict[str, Any],
                      site: DataSite | None = None) -> Coordinate:
-        """Constructor to create an object from Wikibase's JSON output.
+        """Create an object from Wikibase's JSON output.
 
-        :param data: Wikibase JSON
-        :param site: The Wikibase site
+        :param data: Wikibase JSON data
+        :param site: The Wikibase site instance
+        :return: Coordinate instance
         """
-        if site is None:
-            site = pywikibot.Site().data_repository()
-
+        site = site or pywikibot.Site().data_repository()
         globe = None
 
-        if data['globe']:
+        if data.get('globe'):
             globes = {entity: name for name, entity in site.globes().items()}
             globe = globes.get(data['globe'])
 
-        return cls(data['latitude'], data['longitude'],
-                   data['altitude'], data['precision'],
-                   globe, site=site, globe_item=data['globe'])
+        return cls(
+            data['latitude'],
+            data['longitude'],
+            alt=data.get('altitude'),
+            precision=data.get('precision'),
+            globe=globe,
+            site=site,
+            globe_item=data.get('globe')
+        )
 
     @property
     def precision(self) -> float | None:
@@ -214,17 +240,28 @@ class Coordinate(WbRepresentation):
 
            precision = math.degrees(
                self._dim / (radius * math.cos(math.radians(self.lat))))
+
+        :return: precision in degrees or None
         """
-        if self._dim is None and self._precision is None:
+        if self._precision is not None:
+            return self._precision
+
+        if self._dim is None:
             return None
-        if self._precision is None and self._dim is not None:
-            radius = 6378137  # TODO: Support other globes
+
+        radius = 6378137  # Earth radius in meters (TODO: support other globes)
+        with suppress(ZeroDivisionError):
             self._precision = math.degrees(
                 self._dim / (radius * math.cos(math.radians(self.lat))))
+
         return self._precision
 
     @precision.setter
     def precision(self, value: float) -> None:
+        """Set the precision value.
+
+        :param value: precision in degrees
+        """
         self._precision = value
 
     def precisionToDim(self) -> int | None:
@@ -251,38 +288,50 @@ class Coordinate(WbRepresentation):
         But this is not valid, since it returns a float value for dim which is
         an integer. We must round it off to the nearest integer.
 
-        Therefore::
+        Therefore:
 
-            dim = int(round(math.radians(
-                precision)*radius*math.cos(math.radians(self.lat))))
+        .. code-block:: python
+
+           dim = int(round(math.radians(
+               precision)*radius*math.cos(math.radians(self.lat))))
+
+        :return: dimension in meters
+        :raises ValueError: if neither dim nor precision is set
         """
-        if self._dim is None and self._precision is None:
+        if self._dim is not None:
+            return self._dim
+
+        if self._precision is None:
             raise ValueError('No values set for dim or precision')
-        if self._dim is None and self._precision is not None:
-            radius = 6378137
-            self._dim = int(
-                round(
-                    math.radians(self._precision) * radius * math.cos(
-                        math.radians(self.lat))
-                )
+
+        radius = 6378137
+        self._dim = int(
+            round(
+                math.radians(self._precision) * radius * math.cos(
+                    math.radians(self.lat))
             )
+        )
         return self._dim
 
-    def get_globe_item(self, repo: DataSite | None = None,
+    @deprecate_positionals(since='10.4.0')
+    def get_globe_item(self, repo: DataSite | None = None, *,
                        lazy_load: bool = False) -> pywikibot.ItemPage:
         """Return the ItemPage corresponding to the globe.
 
-        Note that the globe need not be in the same data repository as
-        the Coordinate itself.
+        .. note:: The globe need not be in the same data repository as
+           the Coordinate itself.
 
         A successful lookup is stored as an internal value to avoid the
         need for repeated lookups.
 
+        .. versionchanged:: 10.4
+           The *lazy_load* parameter is now keyword-only.
+
         :param repo: the Wikibase site for the globe, if different from
-            that provided with the Coordinate.
-        :param lazy_load: Do not raise NoPage if ItemPage does not
-            exist.
-        :return: pywikibot.ItemPage
+            that provided with the Coordinate
+        :param lazy_load: Do not raise :exc:`exceptions.NoPageError` if
+            ItemPage does not exist
+        :return: pywikibot.ItemPage of the globe
         """
         if isinstance(self._entity, pywikibot.ItemPage):
             return self._entity
