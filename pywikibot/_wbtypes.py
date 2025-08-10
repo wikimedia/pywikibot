@@ -51,7 +51,7 @@ class WbRepresentation(abc.ABC):
 
     @abc.abstractmethod
     def __init__(self) -> None:
-        """Constructor."""
+        """Initializer."""
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -70,28 +70,37 @@ class WbRepresentation(abc.ABC):
         raise NotImplementedError
 
     def __str__(self) -> str:
-        return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
-                          separators=(',', ': '))
+        return json.dumps(
+            self.toWikibase(),
+            indent=4,
+            sort_keys=True,
+            separators=(',', ': ')
+        )
 
     def __repr__(self) -> str:
+        """String representation of this object.
+
+        .. versionchanged:: 10.4
+           Parameters are shown as representations instead of plain
+           strings.
+
+        :meta public:
+        """
         assert isinstance(self._items, tuple)
         assert all(isinstance(item, str) for item in self._items)
 
-        values = ((attr, getattr(self, attr)) for attr in self._items)
-        attrs = ', '.join(f'{attr}={value}'
-                          for attr, value in values)
-        return f'{self.__class__.__name__}({attrs})'
+        attrs = ', '.join(f'{attr}={getattr(self, attr)!r}'
+                          for attr in self._items)
+        return f'{type(self).__name__}({attrs})'
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return self.toWikibase() == other.toWikibase()
+
         return NotImplemented
 
     def __hash__(self) -> int:
-        return hash(frozenset(self.toWikibase().items()))
-
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
+        return hash(json.dumps(self.toWikibase(), sort_keys=True))
 
 
 class Coordinate(WbRepresentation):
