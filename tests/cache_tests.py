@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import re
 import unittest
 
 from pywikibot.login import LoginStatus
@@ -31,6 +32,8 @@ class RequestCacheTests(TestCase):
             self.assertIsNotNone(entry.site._username)  # pragma: no cover
         self.assertIsInstance(entry._params, dict)
         self.assertIsNotNone(entry._params)
+        self.assertLength(str(entry), 64)
+        self.assertIsNotNone(re.fullmatch(r'[0-9a-f]+', str(entry)))
         # TODO: more tests on entry._params, and possibly fixes needed
         # to make it closely replicate the original object.
 
