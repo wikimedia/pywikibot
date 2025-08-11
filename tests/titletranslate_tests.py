@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for titletranslate module."""
 #
-# (C) Pywikibot team, 2022
+# (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,6 +38,14 @@ class TestTitleTranslate(TestCase):
         result = translate(page=self.get_mainpage(site), auto=False,
                            hints=['5:', 'nl,en,zh'], site=site)
         self.assertLength(result, 6)
+        result = translate(page=self.get_mainpage(site))
+        self.assertIsEmpty(result)
+        result = translate(page=self.get_mainpage(site), hints=['nl'])
+        self.assertLength(result, 1)
+        with self.assertRaisesRegex(RuntimeError,
+                                    'Either page or site parameter must be '
+                                    r'given with translate\(\)'):
+            translate()
 
 
 if __name__ == '__main__':
