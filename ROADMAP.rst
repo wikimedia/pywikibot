@@ -1,6 +1,8 @@
 Current Release Changes
 =======================
 
+* Add :meth:`get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>` API
+  to :class:`pywikibot.ItemPage`  (:phab:`T400612`)
 * Cleanup :mod:`setup` module (:phab:`T396356`)
 * Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
 * Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
@@ -14,11 +16,12 @@ Deprecations
 Pending removal in Pywikibot 13
 -------------------------------
 
-* 10.3.0: :meth:`throttle.Trottle.getDelay` and :meth:`throttle.Trottle.setDelays` were renamed; the
-  old methods will be removed (:phab:`T289318`)
-* 10.3.0: :attr:`throttle.Trottle.next_multiplicity` attribute is unused and will be removed
+* 10.3.0: :meth:`throttle.Throttle.getDelay` and :meth:`throttle.Throttle.setDelays` were renamed to
+  :meth:`get_delay()<throttle.Throttle.get_delay>` and :meth:`set_delays()
+  <throttle.Throttle.set_delays>`; the old methods will be removed (:phab:`T289318`)
+* 10.3.0: :attr:`throttle.Throttle.next_multiplicity` attribute is unused and will be removed
   (:phab:`T289318`)
-* 10.3.0: *requestsize* parameter of :class:`throttle.Trottle` call is deprecated and will be
+* 10.3.0: *requestsize* parameter of :class:`throttle.Throttle` call is deprecated and will be
   dropped (:phab:`T289318`)
 * 10.3.0: :func:`textlib.to_latin_digits` will be removed in favour of
   :func:`textlib.to_ascii_digits`, ``NON_LATIN_DIGITS`` of :mod:`userinterfaces.transliteration`

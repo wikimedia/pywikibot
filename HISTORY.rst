@@ -1,6 +1,15 @@
 Release History
 ===============
 
+10.3.2
+------
+*12 August 2025*
+
+* Add support for zghwiktionary, madwikisource, rkiwiki, minwikibooks
+  (:phab:`T391769`, :phab:`T392501`, :phab:`T395501`, :phab:`T399787`)
+* i18n updates
+
+
 10.3.1
 ------
 *08 August 2025*
