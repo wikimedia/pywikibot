@@ -49,7 +49,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
         'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
         'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
-        'wa', 'wo', 'yi', 'yue', 'zh', 'zh-min-nan', 'zu',
+        'wa', 'wo', 'yi', 'yue', 'zgh', 'zh', 'zh-min-nan', 'zu',
     }
 
     category_redirect_templates = {

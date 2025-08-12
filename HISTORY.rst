@@ -1,6 +1,14 @@
 Release History
 ===============
 
+10.3.1
+------
+*08 August 2025*
+
+* Add support for tlwikisource (:phab:`T388656`)
+* i18n updates
+
+
 10.3.0
 ------
 *03 August 2025*

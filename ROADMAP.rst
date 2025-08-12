@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* Add support for tlwikisource (:phab:`T388656`)
+* Add support for zghwiktionary, madwikisource, rkiwiki, minwikibooks
+  (:phab:`T391769`, :phab:`T392501`, :phab:`T395501`, :phab:`T399787`)
 * i18n updates
 
 
