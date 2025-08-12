@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 import pywikibot
+from pywikibot.backports import Generator
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
@@ -285,14 +286,41 @@ class WikibaseClientMixin:
     """APISite mixin for WikibaseClient extension."""
 
     @need_extension('WikibaseClient')
-    def unconnected_pages(self, total=None):
+    def unconnected_pages(
+        self,
+        total: int | None = None,
+        *,
+        strict: bool = False
+    ) -> Generator[pywikibot.Page, None, None]:
         """Yield Page objects from Special:UnconnectedPages.
 
         .. warning:: The retrieved pages may be connected in meantime.
+           To avoid this, use *strict* parameter to check.
 
-        :param total: number of pages to return
+        .. versionchanged::
+           The *strict* parameter was added.
+
+        :param total: Maximum number of pages to return, or ``None`` for
+            all.
+        :param strict: If ``True``, verify that each page still has no
+            data item before yielding it.
         """
-        return self.querypage('UnconnectedPages', total)
+        if total <= 0:
+            return
+
+        if not strict:
+            return self.querypage('UnconnectedPages', total)
+
+        count = 0
+        for page in self.querypage('UnconnectedPages'):
+            if total is not None and count >= total:
+                break
+
+            try:
+                page.data_item()
+            except NoPageError:
+                yield page
+                count += 1
 
 
 class LinterMixin:

@@ -27,7 +27,7 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
     WikibaseItemFilterPageGenerator,
 )
-from tests import join_data_path, unittest_print
+from tests import join_data_path
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
@@ -1687,26 +1687,16 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         if not site:
             self.skipTest('Site is not using a Wikibase repository')
 
-        pages = list(pagegenerators.UnconnectedPageGenerator(self.site, 3))
+        pages = list(
+            pagegenerators.UnconnectedPageGenerator(self.site, 3, strict=True))
         self.assertLessEqual(len(pages), 3)
 
         pattern = (fr'Page \[\[({site.sitename}:|{site.code}:)-1\]\]'
                    r" doesn't exist\.")
-        found = []
         for page in pages:
-            with self.subTest(page=page):
-                try:
-                    page.data_item()
-                except NoPageError as e:
-                    self.assertRegex(str(e), pattern)
-                else:
-                    found.append(page)
-        if found:
-            unittest_print('connection found for ',
-                           ', '.join(str(p) for p in found))
-
-        # assume that we have at least one unconnected page
-        self.assertLess(len(found), 3)
+            with self.subTest(page=page), self.assertRaisesRegex(NoPageError,
+                                                                 pattern):
+                page.data_item()
 
     def test_unconnected_without_repo(self) -> None:
         """Test that it raises a ValueError on sites without repository."""

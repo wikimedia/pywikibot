@@ -282,18 +282,26 @@ def RecentChangesPageGenerator(
 
 def UnconnectedPageGenerator(
     site: BaseSite | None = None,
-    total: int | None = None
+    total: int | None = None,
+    *,
+    strict: bool = False
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all unconnected pages to a Wikibase repository.
 
-    :param total: Maximum number of pages to retrieve in total
+    .. versionchanged::
+       The *strict* parameter was added.
+
     :param site: Site for generator results.
+    :param total: Maximum number of pages to retrieve in total
+    :param strict: If ``True``, verify that each page still has no data
+        item before yielding it.
+    :raises ValueError: The given site does not have Wikibase repository
     """
     if site is None:
         site = pywikibot.Site()
     if not site.data_repository():
         raise ValueError('The given site does not have Wikibase repository.')
-    return site.unconnected_pages(total=total)
+    return site.unconnected_pages(total=total, strict=strict)
 
 
 def FileLinksGenerator(
