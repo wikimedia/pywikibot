@@ -17,6 +17,7 @@ jobs:
   wait_for_all:
     name: Wait for other workflows to finish
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - name: Wait for all workflows to complete excluding this one
         uses: kachick/wait-other-jobs@v3.8.1
