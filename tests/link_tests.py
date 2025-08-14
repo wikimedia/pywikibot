@@ -72,10 +72,11 @@ class TestLink(DefaultDrySiteTestCase):
         for items in iterable:
             if isinstance(items, str):
                 items = [items]
-            items = [re.sub(' ',
-                            self.site.family.title_delimiter_and_aliases[0],
-                            item)
-                     for item in items]
+            items = [
+                item.replace(' ',
+                             self.site.family.title_delimiter_and_aliases[0])
+                for item in items
+            ]
             if len(items) == 1:
                 items = items[0]
             yield items
