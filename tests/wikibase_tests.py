@@ -324,8 +324,12 @@ class TestItemLoad(WikidataTestCase):
         item = ItemPage(wikidata)
         self.assertEqual(item._link._title, '-1')
         self.assertLength(item.labels, 0)
+        self.assertEqual(str(item.labels), 'LanguageDict({})')
+        self.assertEqual(repr(item.labels), 'LanguageDict({})')
         self.assertLength(item.descriptions, 0)
         self.assertLength(item.aliases, 0)
+        self.assertEqual(str(item.aliases), 'AliasesDict({})')
+        self.assertEqual(repr(item.aliases), 'AliasesDict({})')
         self.assertLength(item.claims, 0)
         self.assertLength(item.sitelinks, 0)
 
@@ -1452,6 +1456,23 @@ class TestJSON(WikidataTestCase):
         self.assertEqual(item.labels['en'], 'New York City')
         self.assertIn('en', item.aliases)
         self.assertIn('NYC', item.aliases['en'])
+
+    def test_str_repr(self) -> None:
+        """Test str and repr of labels and aliases."""
+        self.assertEqual(
+            str(self.wdp.labels),
+            "LanguageDict({'af': 'New York Stad', 'als': 'New York City', "
+            "'am': 'ኒው ዮርክ ከተማ', 'an': 'Nueva York', ...})"
+        )
+        self.assertEqual(
+            str(self.wdp.aliases),
+            "AliasesDict({'be': ['Горад Нью-Ёрк'], 'be-tarask': ['Нью Ёрк'], "
+            "'ca': ['Ciutat de Nova York', 'New York City',"
+            " 'New York City (New York)', 'NYC', 'N. Y.', 'N Y'], "
+            "'da': ['New York City'], ...})"
+        )
+        self.assertEqual(str(self.wdp.labels), repr(self.wdp.labels))
+        self.assertEqual(str(self.wdp.aliases), repr(self.wdp.aliases))
 
     def test_itempage_json(self) -> None:
         """Test itempage json."""
