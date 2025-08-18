@@ -32,6 +32,8 @@
 .. automodule:: pywikibot.page._collections
    :synopsis: Structures holding data for Wikibase entities
 
+.. autoclass:: BaseDataDict
+
 :mod:`page.\_decorators` --- Page Decorators
 ============================================
 

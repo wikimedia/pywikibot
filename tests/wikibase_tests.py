@@ -283,9 +283,9 @@ class TestItemLoad(WikidataTestCase):
         self.assertNotHasAttr(item, '_content')
         item.get()
         self.assertHasAttr(item, '_content')
-        self.assertIn('en', item.labels)
+        self.assertIn('mul', item.labels)
         # label could change
-        self.assertIn(item.labels['en'], ['New York', 'New York City'])
+        self.assertIn(item.labels['mul'], ['New York', 'New York City'])
         self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self) -> None:
@@ -300,7 +300,7 @@ class TestItemLoad(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
         item.get()
-        self.assertIn(item.labels['en'], label)
+        self.assertIn(item.labels['mul'], label)
 
         # When the id attribute is modified, the ItemPage goes into
         # an inconsistent state.
@@ -312,7 +312,7 @@ class TestItemLoad(WikidataTestCase):
         # it doesn't help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
-        self.assertIn(item.labels['en'], label)
+        self.assertIn(item.labels['mul'], label)
 
     def test_empty_item(self) -> None:
         """Test empty wikibase item.
@@ -1127,6 +1127,14 @@ class TestWriteNormalizeData(TestCase):
             copy.deepcopy(self.data_out))
         self.assertEqual(response, self.data_out)
 
+    def test_normalized_invalid_data(self) -> None:
+        """Test _normalizeData() method for invalid data."""
+        data = copy.deepcopy(self.data_out)
+        data['aliases']['en'] = tuple(data['aliases']['en'])
+        with self.assertRaisesRegex(TypeError,
+                                    "Unsupported value type 'tuple'"):
+            ItemPage._normalizeData(data)
+
 
 class TestPreloadingEntityGenerator(TestCase):
 
@@ -1436,6 +1444,14 @@ class TestJSON(WikidataTestCase):
         del self.wdp._content['type']
         del self.wdp._content['lastrevid']
         del self.wdp._content['pageid']
+
+    def test_base_data(self) -> None:
+        """Test labels and aliases collections."""
+        item = self.wdp
+        self.assertIn('en', item.labels)
+        self.assertEqual(item.labels['en'], 'New York City')
+        self.assertIn('en', item.aliases)
+        self.assertIn('NYC', item.aliases['en'])
 
     def test_itempage_json(self) -> None:
         """Test itempage json."""
