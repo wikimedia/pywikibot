@@ -941,9 +941,15 @@ class WbTime(WbRepresentation):
         :param site: The Wikibase site. If not provided, retrieves the
             data repository from the default site from user-config.py.
         """
-        return cls.fromTimestr(data['time'], data['precision'],
-                               data['before'], data['after'],
-                               data['timezone'], data['calendarmodel'], site)
+        return cls.fromTimestr(
+            data['time'],
+            precision=data['precision'],
+            before=data['before'],
+            after=data['after'],
+            timezone=data['timezone'],
+            calendarmodel=data['calendarmodel'],
+            site=site
+        )
 
 
 class WbQuantity(WbRepresentation):
