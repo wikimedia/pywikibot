@@ -1248,8 +1248,6 @@ class TestPropertyNames(DefaultSiteTestCase):
             'unexpectedUnconnectedPage',
             'wikibase-badge-Q17437796',
             'wikibase-badge-Q17437798',
-            'wikibase-badge-Q17506997',
-            'wikibase-badge-Q17580674',
             'wikibase-badge-Q70894304',
             'wikibase_item',
         ):
