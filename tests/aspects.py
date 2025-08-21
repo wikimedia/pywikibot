@@ -1693,7 +1693,7 @@ class DeprecationTestCase(TestCase):
                     and 'pywikibot' not in item.filename):
                 continue  # pragma: no cover
 
-            if item.filename != filename:
+            if item.filename != filename:  # pragma: no cover
                 self.fail(f'expected warning filename {filename}; warning '
                           f'item: {item}')
 
