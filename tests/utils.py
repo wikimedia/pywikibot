@@ -9,9 +9,11 @@ from __future__ import annotations
 import inspect
 import os
 import sys
+import tempfile
 import unittest
 import warnings
 from contextlib import contextmanager, suppress
+from pathlib import Path
 from subprocess import PIPE, Popen, TimeoutExpired
 from typing import Any, NoReturn
 
@@ -521,16 +523,36 @@ def execute_pwb(args: list[str], *,
     """
     command = [sys.executable]
 
-    if overrides:
-        command.append('-c')
-        overrides = '; '.join(
-            f'{key} = {value}' for key, value in overrides.items())
-        command.append(
-            f'import pwb; import pywikibot; {overrides}; pwb.main()')
-    else:
-        command.append(_pwb_py)
+    # Test running and  coverage is installed, enable coverage with subprocess
+    if os.environ.get('PYWIKIBOT_TEST_RUNNING') == '1':
+        with suppress(ModuleNotFoundError):
+            import coverage  # noqa: F401
+            command.extend(['-m', 'coverage', 'run', '--parallel-mode'])
 
-    return execute(command=command + args, data_in=data_in, timeout=timeout)
+    tmp_path: Path | None = None
+    try:
+        if overrides:
+            # Write overrides in temporary file
+            with tempfile.NamedTemporaryFile(
+                    'w', suffix='.py', delete=False) as f:
+                f.write('import pwb\nimport pywikibot\n')
+                f.write('\n'.join(f'{k} = {v}' for k, v in overrides.items()))
+                f.write('\npwb.main()\n')
+                tmp_path = Path(f.name)
+            command.append(f.name)
+        else:
+            command.append(_pwb_py)
+
+        # Run subprocess
+        result = execute(
+            command=command + args, data_in=data_in, timeout=timeout)
+
+    finally:
+        # delete temporary file if created
+        if tmp_path and tmp_path.exists():
+            tmp_path.unlink()
+
+    return result
 
 
 @contextmanager
