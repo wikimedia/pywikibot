@@ -131,6 +131,7 @@ jobs:
           coverage run -m unittest -vv tests/site_login_logout_tests.py
       - name: Show coverage statistics
         run: |
+          coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
