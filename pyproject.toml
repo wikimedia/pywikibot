@@ -156,7 +156,7 @@ exclude_also = [
 ]
 
 [tool.coverage.run]
-concurrency = "multiprocessing"
+concurrency = ["multiprocessing", "thread"]
 parallel = true
 
 [tool.docsig]
