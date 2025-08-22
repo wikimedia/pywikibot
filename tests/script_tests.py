@@ -11,7 +11,6 @@ import os
 import sys
 import unittest
 from contextlib import suppress
-from importlib import import_module
 from pathlib import Path
 
 from pywikibot.tools import has_module
@@ -183,17 +182,6 @@ def load_tests(loader=unittest.loader.defaultTestLoader,
     return collector(loader)
 
 
-def import_script(script_name: str) -> None:
-    """Import script for coverage only (T305795)."""
-    if not ci_test_run:
-        return  # pragma: no cover
-
-    prefix = 'scripts.'
-    if script_name in framework_scripts:
-        prefix = 'pywikibot.' + prefix
-    import_module(prefix + script_name)
-
-
 class ScriptTestMeta(MetaTestCaseClass):
 
     """Test meta class."""
@@ -300,7 +288,6 @@ class ScriptTestMeta(MetaTestCaseClass):
         arguments = dct['_arguments']
 
         for script_name in script_list:
-            import_script(script_name)
 
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of

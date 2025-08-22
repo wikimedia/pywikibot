@@ -136,7 +136,7 @@ exclude_also = [
     "@deprecated\\([^\\)]+\\)",
     "@unittest\\.skip",
     "class .+\\bProtocol\\):",
-    "except ImportError",
+    "except (ImportError|ModuleNotFoundError)",
     "except KeyboardInterrupt",
     "except OSError",
     "except SyntaxError",
@@ -149,12 +149,15 @@ exclude_also = [
     "if self\\.mw_version < .+:",
     # Comments to turn coverage on and off:
     "no cover: start(?s:.)*?no cover: stop",
-    "raise ImportError",
+    "raise (ImportError|ModuleNotFoundError)",
     "raise NotImplementedError",
     "raise unittest\\.SkipTest",
     "self\\.skipTest",
 ]
 
+[tool.coverage.run]
+concurrency = "multiprocessing"
+parallel = true
 
 [tool.docsig]
 disable = [
