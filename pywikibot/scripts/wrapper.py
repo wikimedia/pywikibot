@@ -77,13 +77,13 @@ def check_pwb_versions(package: str) -> None:
     scripts_version = Version(getattr(package, '__version__', pwb.__version__))
     wikibot_version = Version(pwb.__version__)
 
-    if scripts_version.release > wikibot_version.release:  # pragma: no cover
+    if scripts_version.release > wikibot_version.release:
         print(f'WARNING: Pywikibot version {wikibot_version} is behind '
               f'scripts package version {scripts_version}.\n'
               'Your Pywikibot may need an update or be misconfigured.\n')
 
     # calculate previous minor release
-    if wikibot_version.minor > 0:  # pragma: no cover
+    if wikibot_version.minor > 0:
         prev_wikibot = Version(
             f'{wikibot_version.major}.{wikibot_version.minor - 1}.'
             f'{wikibot_version.micro}'
@@ -94,7 +94,7 @@ def check_pwb_versions(package: str) -> None:
                   f'behind legacy Pywikibot version {prev_wikibot} and '
                   f'current version {wikibot_version}\n'
                   'Your scripts may need an update or be misconfigured.\n')
-    elif scripts_version.release < wikibot_version.release:  # pragma: no cover
+    elif scripts_version.release < wikibot_version.release:
         print(f'WARNING: Scripts package version {scripts_version} is behind '
               f'current version {wikibot_version}\n'
               'Your scripts may need an update or be misconfigured.\n')
@@ -141,7 +141,7 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
 
     # set environment values
     old_env = os.environ.copy()
-    for key, value in environ:  # pragma: no cover
+    for key, value in environ:
         os.environ[key] = value
 
     sys.argv = [filename, *args]
@@ -165,7 +165,7 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
 # end of snippet from coverage
 
         # Restore environment values
-        for key, value in environ:  # pragma: no cover
+        for key, value in environ:
             if key in old_env:
                 os.environ[key] = old_env[key]
             else:
@@ -210,7 +210,7 @@ def handle_args(
 
 def _print_requirements(requirements,
                         script,
-                        variant) -> None:  # pragma: no cover
+                        variant) -> None:
     """Print pip command to install requirements."""
     if not requirements:
         return
@@ -341,7 +341,7 @@ def find_alternates(filename, script_paths):
     scripts = {}
 
     for folder in script_paths:
-        if not folder.exists():  # pragma: no cover
+        if not folder.exists():
             warning(
                 f'{folder} does not exists; remove it from user_script_paths')
             continue
@@ -376,7 +376,7 @@ def find_alternates(filename, script_paths):
                                      alternatives, default='1')
         except QuitKeyboardInterrupt:
             return None
-        print()  # pragma: no cover
+        print()
     return str(scripts[script])
 
 
@@ -406,7 +406,7 @@ def find_filename(filename):
 
     # search through user scripts paths
     user_script_paths = ['']
-    if config.user_script_paths:  # pragma: no cover
+    if config.user_script_paths:
         if isinstance(config.user_script_paths, list):
             user_script_paths += config.user_script_paths
         else:
@@ -415,10 +415,11 @@ def find_filename(filename):
                  ' Ignoring this setting.', stacklevel=2)
 
     found = test_paths(user_script_paths, Path(config.base_dir))
-    if found:  # pragma: no cover
+    if found:
         return found
 
-    if site_package:  # search for entry points
+    if site_package:  # pragma: no cover
+        # search for entry points
         import importlib
         from importlib.metadata import entry_points
 
@@ -477,7 +478,7 @@ def execute() -> bool:
 
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
-        if unknown_args:  # pragma: no cover
+        if unknown_args:
             print('ERROR: unknown pwb.py argument{}: {}\n'
                   .format('' if len(unknown_args) == 1 else 's',
                           ', '.join(unknown_args)))
@@ -535,7 +536,7 @@ def main() -> None:
     .. versionchanged:: 7.0
        previous implementation was renamed to :func:`execute`
     """
-    if not check_modules():  # pragma: no cover
+    if not check_modules():
         sys.exit()
 
     if not execute():

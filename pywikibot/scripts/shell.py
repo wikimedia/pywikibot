@@ -26,7 +26,7 @@ import code
 import sys
 
 
-def main(*args: str) -> None:  # pragma: no cover
+def main(*args: str) -> None:
     """Script entry point.
 
     .. versionchanged:: 8.2
