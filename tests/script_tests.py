@@ -38,8 +38,6 @@ def check_script_deps(script_name) -> bool:
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
             if not has_module(package_name):
-                unittest_print(f'{script_name} depends on {package_name},'
-                               " which isn't available")
                 return False
     return True
 
@@ -167,11 +165,15 @@ def load_tests(loader: unittest.TestLoader = unittest.defaultTestLoader,
 
 
 def filter_scripts(excluded: set[str] | None = None, *,
-                   exclude_auto_run: bool = False) -> list[str]:
+                   exclude_auto_run: bool = False,
+                   exclude_failed_dep: bool = True) -> list[str]:
     """Return a filtered list of script names.
 
     :param excluded: Scripts to exclude explicitly.
-    :param exclude_auto_run: If True, remove scripts in auto_run_script_set.
+    :param exclude_auto_run: If True, remove scripts in
+        auto_run_script_set.
+    :param exclude_failed_dep: If True, remove scripts in
+        failed_dep_script_set.
     :return: A list of valid script names in deterministic order.
     """
     excluded = excluded or set()
@@ -180,7 +182,7 @@ def filter_scripts(excluded: set[str] | None = None, *,
         name for name in sorted(script_list)
         if name != 'login'
         and name not in unrunnable_script_set
-        and name not in failed_dep_script_set
+        and (not exclude_failed_dep or name not in failed_dep_script_set)
     ]
 
     if exclude_auto_run:
@@ -329,7 +331,7 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
     _results = None
     _skip_results = {}
     _timeout = False
-    _script_list = filter_scripts()
+    _script_list = filter_scripts(exclude_failed_dep=False)
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
