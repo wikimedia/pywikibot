@@ -150,40 +150,43 @@ skip_on_results = {
 
 
 def collector() -> Iterator[str]:
-    """Generate test names in the correct order, respecting filters."""
-    base_tests = ['_login'] + [
-        name for name in sorted(script_list)
-        if name != 'login'
-        # Exclude scripts that cannot or should not run
-        and name not in unrunnable_script_set
-        # Exclude scripts that fail due to missing dependencies
-        and name not in failed_dep_script_set
-    ]
-
-    # Build filtered test lists per class
-    class_to_tests = {
-        TestScriptHelp: base_tests,
-        TestScriptSimulate: base_tests,
-        TestScriptGenerator: [
-            name for name in base_tests if name not in auto_run_script_set
-        ]
-    }
-
-    # Yield fully qualified test names, skipping expected failures
-    for cls, names in class_to_tests.items():
-        expected_failures = getattr(cls, '_expected_failures', set())
-        for name in names:
-            if name not in expected_failures:
-                yield f'tests.script_tests.{cls.__name__}.test_{name}'
+    """Generate test fully qualified names from test classes."""
+    for cls in TestScriptHelp, TestScriptSimulate, TestScriptGenerator:
+        for name in cls._script_list:
+            name = '_' + name if name == 'login' else name
+            yield f'tests.script_tests.{cls.__name__}.test_{name}'
 
 
 def load_tests(loader: unittest.TestLoader = unittest.defaultTestLoader,
-               standard_tests=None,
-               pattern=None) -> unittest.TestSuite:
+               standard_tests: unittest.TestSuite | None = None,
+               pattern: str | None = None) -> unittest.TestSuite:
     """Load the default modules and return a TestSuite."""
     suite = unittest.TestSuite()
     suite.addTests(loader.loadTestsFromNames(collector()))
     return suite
+
+
+def filter_scripts(excluded: set[str] | None = None, *,
+                   exclude_auto_run: bool = False) -> list[str]:
+    """Return a filtered list of script names.
+
+    :param excluded: Scripts to exclude explicitly.
+    :param exclude_auto_run: If True, remove scripts in auto_run_script_set.
+    :return: A list of valid script names in deterministic order.
+    """
+    excluded = excluded or set()
+
+    scripts = ['login'] + [
+        name for name in sorted(script_list)
+        if name != 'login'
+        and name not in unrunnable_script_set
+        and name not in failed_dep_script_set
+    ]
+
+    if exclude_auto_run:
+        scripts = [n for n in scripts if n not in auto_run_script_set]
+
+    return [n for n in scripts if n not in excluded]
 
 
 class ScriptTestMeta(MetaTestCaseClass):
@@ -291,24 +294,19 @@ class ScriptTestMeta(MetaTestCaseClass):
 
         arguments = dct['_arguments']
 
-        for script_name in script_list:
+        for script in dct['_script_list']:
 
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
             # another script.
-            # unrunnable script tests are disabled by default in load_tests()
+            test = 'test__login' if script == 'login' else 'test_' + script
 
-            if script_name == 'login':
-                test_name = 'test__login'
-            else:
-                test_name = 'test_' + script_name
+            cls.add_method(dct, test,
+                           test_execution(script, arguments.split()),
+                           f'Test running {script} {arguments}.')
 
-            cls.add_method(dct, test_name,
-                           test_execution(script_name, arguments.split()),
-                           f'Test running {script_name} {arguments}.')
-
-            if script_name in dct['_expected_failures']:
-                dct[test_name] = unittest.expectedFailure(dct[test_name])
+            if script in dct['_expected_failures']:
+                dct[test] = unittest.expectedFailure(dct[test])
 
         return super().__new__(cls, name, bases, dct)
 
@@ -331,6 +329,7 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
     _results = None
     _skip_results = {}
     _timeout = False
+    _script_list = filter_scripts()
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
@@ -379,6 +378,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _results = no_args_expected_results
     _skip_results = skip_on_results
     _timeout = auto_run_script_set
+    _script_list = filter_scripts(_allowed_failures)
 
 
 class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
@@ -446,6 +446,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
     _timeout = True
+    _script_list = filter_scripts(_allowed_failures, exclude_auto_run=True)
 
 
 if __name__ == '__main__':
