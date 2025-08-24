@@ -13,6 +13,7 @@ import unittest
 from contextlib import suppress
 from pathlib import Path
 
+from pywikibot.backports import Iterator
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
@@ -148,38 +149,41 @@ skip_on_results = {
 }
 
 
-def collector(loader=unittest.loader.defaultTestLoader):
-    """Load the default tests.
+def collector() -> Iterator[str]:
+    """Generate test names in the correct order, respecting filters."""
+    base_tests = ['_login'] + [
+        name for name in sorted(script_list)
+        if name != 'login'
+        # Exclude scripts that cannot or should not run
+        and name not in unrunnable_script_set
+        # Exclude scripts that fail due to missing dependencies
+        and name not in failed_dep_script_set
+    ]
 
-    .. note:: Raising SkipTest during load_tests will cause the loader
-       to fallback to its own discover() ordering of unit tests.
-    """
-    if unrunnable_script_set:  # pragma: no cover
-        unittest_print('Skipping execution of unrunnable scripts:\n'
-                       f'{unrunnable_script_set!r}')
+    # Build filtered test lists per class
+    class_to_tests = {
+        TestScriptHelp: base_tests,
+        TestScriptSimulate: base_tests,
+        TestScriptGenerator: [
+            name for name in base_tests if name not in auto_run_script_set
+        ]
+    }
 
-    test_pattern = 'tests.script_tests.TestScript{}.test_{}'
+    # Yield fully qualified test names, skipping expected failures
+    for cls, names in class_to_tests.items():
+        expected_failures = getattr(cls, '_expected_failures', set())
+        for name in names:
+            if name not in expected_failures:
+                yield f'tests.script_tests.{cls.__name__}.test_{name}'
 
-    tests = ['_login'] + [name for name in sorted(script_list)
-                          if name != 'login'
-                          and name not in unrunnable_script_set]
-    test_list = [test_pattern.format('Help', name) for name in tests]
 
-    tests = [name for name in tests if name not in failed_dep_script_set]
-    test_list += [test_pattern.format('Simulate', name) for name in tests]
-
-    tests = [name for name in tests if name not in auto_run_script_set]
-    test_list += [test_pattern.format('Generator', name) for name in tests]
-
+def load_tests(loader: unittest.TestLoader = unittest.defaultTestLoader,
+               standard_tests=None,
+               pattern=None) -> unittest.TestSuite:
+    """Load the default modules and return a TestSuite."""
     suite = unittest.TestSuite()
-    suite.addTests(loader.loadTestsFromNames(test_list))
+    suite.addTests(loader.loadTestsFromNames(collector()))
     return suite
-
-
-def load_tests(loader=unittest.loader.defaultTestLoader,
-               tests=None, pattern=None):
-    """Load the default modules."""
-    return collector(loader)
 
 
 class ScriptTestMeta(MetaTestCaseClass):
@@ -305,15 +309,6 @@ class ScriptTestMeta(MetaTestCaseClass):
 
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
-            elif script_name in dct['_allowed_failures']:
-                dct[test_name] = unittest.skip(
-                    f'{script_name} is in _allowed_failures set'
-                )(dct[test_name])
-            elif script_name in failed_dep_script_set \
-                    and arguments == '-simulate':
-                dct[test_name] = unittest.skip(
-                    f'{script_name} has dependencies; skipping'
-                )(dct[test_name])
 
         return super().__new__(cls, name, bases, dct)
 
