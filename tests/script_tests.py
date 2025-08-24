@@ -155,10 +155,15 @@ def collector() -> Iterator[str]:
             yield f'tests.script_tests.{cls.__name__}.test_{name}'
 
 
+custom_loader = False
+
+
 def load_tests(loader: unittest.TestLoader = unittest.defaultTestLoader,
                standard_tests: unittest.TestSuite | None = None,
                pattern: str | None = None) -> unittest.TestSuite:
     """Load the default modules and return a TestSuite."""
+    global custom_loader
+    custom_loader = True
     suite = unittest.TestSuite()
     suite.addTests(loader.loadTestsFromNames(collector()))
     return suite
@@ -296,7 +301,11 @@ class ScriptTestMeta(MetaTestCaseClass):
 
         arguments = dct['_arguments']
 
-        for script in dct['_script_list']:
+        if custom_loader:
+            collected_scripts = dct['_script_list']
+        else:
+            collected_scripts = filter_scripts(exclude_failed_dep=False)
+        for script in collected_scripts:
 
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
@@ -309,6 +318,14 @@ class ScriptTestMeta(MetaTestCaseClass):
 
             if script in dct['_expected_failures']:
                 dct[test] = unittest.expectedFailure(dct[test])
+            elif script in dct['_allowed_failures']:
+                dct[test] = unittest.skip(
+                    f'{script} is in _allowed_failures set'
+                )(dct[test])
+            elif script in failed_dep_script_set and arguments == '-simulate':
+                dct[test] = unittest.skip(
+                    f'{script} has dependencies; skipping'
+                )(dct[test])
 
         return super().__new__(cls, name, bases, dct)
 
