@@ -14,6 +14,7 @@ from contextlib import suppress
 from pathlib import Path
 
 from pywikibot.backports import Iterator
+from pywikibot.bot import global_args as pwb_args
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
@@ -212,7 +213,7 @@ class ScriptTestMeta(MetaTestCaseClass):
             def test_script(self) -> None:
                 global_args_msg = \
                     'For global options use -help:global or run pwb'
-                global_args = ['-pwb_close_matches:1']
+                global_args = (pwb_args or []) + ['-pwb_close_matches:1']
 
                 cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
