@@ -526,7 +526,7 @@ def execute_pwb(args: list[str], *,
     """
     tmp_path: Path | None = None
     command = [sys.executable]
-    use_coverage = os.environ.get('GITHUB_ACTIONS') == '1'
+    use_coverage = os.environ.get('GITHUB_ACTIONS')
 
     if use_coverage:
         # Test running and coverage is installed,
