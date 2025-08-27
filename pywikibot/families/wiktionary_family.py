@@ -34,22 +34,22 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     codes = {
-        'af', 'am', 'an', 'ang', 'ar', 'ast', 'ay', 'az', 'bcl', 'be', 'bg',
-        'bjn', 'blk', 'bn', 'br', 'bs', 'btm', 'ca', 'chr', 'ckb', 'co', 'cs',
-        'csb', 'cy', 'da', 'de', 'diq', 'dv', 'el', 'en', 'eo', 'es', 'et',
-        'eu', 'fa', 'fi', 'fj', 'fo', 'fr', 'fy', 'ga', 'gd', 'gl', 'gn',
-        'gom', 'gor', 'gu', 'guw', 'gv', 'ha', 'he', 'hi', 'hif', 'hr', 'hsb',
-        'hu', 'hy', 'ia', 'id', 'ie', 'ig', 'io', 'is', 'it', 'iu', 'ja',
-        'jbo', 'jv', 'ka', 'kaa', 'kbd', 'kcg', 'kk', 'kl', 'km', 'kn', 'ko',
-        'ks', 'ku', 'kw', 'ky', 'la', 'lb', 'li', 'lmo', 'ln', 'lo', 'lt',
-        'lv', 'mad', 'mg', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw', 'mr',
-        'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia', 'nl', 'nn', 'no',
-        'oc', 'om', 'or', 'pa', 'pl', 'pnb', 'ps', 'pt', 'qu', 'ro', 'roa-rup',
-        'ru', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn', 'shy', 'si',
-        'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st', 'su',
-        'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
-        'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
-        'wa', 'wo', 'yi', 'yue', 'zgh', 'zh', 'zh-min-nan', 'zu',
+        'af', 'am', 'an', 'ang', 'ar', 'ast', 'ay', 'az', 'bcl', 'be', 'bew',
+        'bg', 'bjn', 'blk', 'bn', 'br', 'bs', 'btm', 'ca', 'chr', 'ckb', 'co',
+        'cs', 'csb', 'cy', 'da', 'de', 'diq', 'dv', 'el', 'en', 'eo', 'es',
+        'et', 'eu', 'fa', 'fi', 'fj', 'fo', 'fr', 'fy', 'ga', 'gd', 'gl',
+        'gn', 'gom', 'gor', 'gu', 'guw', 'gv', 'ha', 'he', 'hi', 'hif', 'hr',
+        'hsb', 'hu', 'hy', 'ia', 'id', 'ie', 'ig', 'io', 'is', 'it', 'iu',
+        'ja', 'jbo', 'jv', 'ka', 'kaa', 'kbd', 'kcg', 'kk', 'kl', 'km', 'kn',
+        'ko', 'ks', 'ku', 'kw', 'ky', 'la', 'lb', 'li', 'lmo', 'ln', 'lo',
+        'lt', 'lv', 'mad', 'mg', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw',
+        'mr', 'ms', 'mt', 'my', 'na', 'nah', 'nds', 'ne', 'nia', 'nl', 'nn',
+        'no', 'oc', 'om', 'or', 'pa', 'pl', 'pnb', 'ps', 'pt', 'qu', 'ro',
+        'roa-rup', 'ru', 'rw', 'sa', 'sat', 'scn', 'sd', 'sg', 'sh', 'shn',
+        'shy', 'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'so', 'sq', 'sr', 'ss',
+        'st', 'su', 'sv', 'sw', 'ta', 'tcy', 'te', 'tg', 'th', 'ti', 'tk',
+        'tl', 'tn', 'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec',
+        'vi', 'vo', 'wa', 'wo', 'yi', 'yue', 'zgh', 'zh', 'zh-min-nan', 'zu',
     }
 
     category_redirect_templates = {
