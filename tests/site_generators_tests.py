@@ -307,20 +307,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_allpages_pagesize(self) -> None:
         """Test allpages with page maxsize parameter."""
         mysite = self.get_site()
+        encoding = mysite.encoding()
         for page in mysite.allpages(minsize=100, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(page.exists())
-            self.assertGreaterEqual(len(page.text.encode(mysite.encoding())),
-                                    100)
+            self.assertGreaterEqual(len(page.text.encode(encoding)), 100)
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(page.exists())
-            if len(page.text.encode(mysite.encoding())) > 200 \
-               and mysite.data_repository() == mysite:  # pragma: no cover
-                unittest_print(
-                    f'{page}.text is > 200 bytes while raw JSON is <= 200')
-                continue
-            self.assertLessEqual(len(page.text.encode(mysite.encoding())), 200)
+            self.assertLessEqual(len(page.text.encode(encoding)), 200)
 
     def test_allpages_protection(self) -> None:
         """Test allpages with protect_type parameter."""

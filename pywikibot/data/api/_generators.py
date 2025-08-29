@@ -43,11 +43,66 @@ __all__ = (
 
 class APIGeneratorBase(ABC):
 
-    """A wrapper class to handle the usage of the ``parameters`` parameter.
+    """Base class for all API and query request generators.
+
+    Handles request cleaning and filtering. Each instance can have an
+    optional filter function applied to items before yielding. Set this
+    via the :attr:`filter_func` property, which should be a callable
+    accepting a single item and returning True to yield it, alse to skip
+    it. If :attr:`filter_func` is None, no filtering is applied.
+
+    Subclasses can override :meth:`filter_item` for more complex
+    filtering logic.
 
     .. versionchanged:: 7.6
-       renamed from _RequestWrapper
+       Renamed from _RequestWrapper.
+    .. versionchanged:: 10.4
+       Introduced :attr:`filter_func` and :meth:`filter_item` for
+       instance-level item filtering.
     """
+
+    _filter_func: Callable[[Any], bool] | None = None
+
+    @property
+    def filter_func(self) -> Callable[[Any], bool] | None:
+        """Get the filter function for this generator instance.
+
+        Returns the instance-specific filter if set, otherwise the
+        class-level default (None by default).
+
+        .. versionadded:: 10.4
+
+        :return: Callable that accepts an item and returns True to
+            yield, False to skip; or None to disable filtering
+        """
+        return getattr(self, '_filter_func', type(self)._filter_func)
+
+    @filter_func.setter
+    def filter_func(self, func: Callable[[Any], bool] | None):
+        """Set a filter function to apply to items before yielding.
+
+        .. versionadded:: 10.4
+
+        :param func: Callable that accepts an item and returns True to
+            yield, False to skip; or None to disable filtering
+        """
+        self._filter_func = func
+
+    def filter_item(self, item: Any) -> bool:
+        """Determine if a given item should be yielded.
+
+        By default, applies :attr:`filter_func` if set. Returns True if
+        no filter is set.
+
+        .. versionadded:: 10.4
+
+        :param item: The item to check
+        :return: True if the item should be yielded, False otherwise
+        """
+        if self.filter_func is not None:
+            return self.filter_func(item)
+
+        return True
 
     def _clean_kwargs(self, kwargs, **mw_api_args):
         """Clean kwargs, define site and request class."""
@@ -162,13 +217,20 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         """Submit request and iterate the response.
 
         Continues response as needed until limit (if defined) is reached.
+        Applies :meth:`filter_item()<APIGeneratorBase.filter_item>` to
+        each item before yielding.
 
         .. versionchanged:: 7.6
-           changed from iterator method to generator property
+           Changed from iterator method to generator property
+        .. versionchanged:: 10.4
+           Applies `filter_item` for instance-level filtering.
+
+        :yield: Items from the MediaWiki API, filtered by `filter_item()`
         """
         offset = self.starting_offset
         n = 0
         while True:
+            # Set the continue parameter for the request
             self.request[self.continue_name] = offset
             pywikibot.debug(f'{type(self).__name__}: Request: {self.request}')
             data = self.request.submit()
@@ -178,14 +240,17 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
                 f'{type(self).__name__}: Retrieved {n_items} items')
             if n_items > 0:
                 for item in data[self.data_name]:
-                    yield item
-                    n += 1
-                    if self.limit is not None and n >= self.limit:
-                        pywikibot.debug(
-                            f'{type(self).__name__}: Stopped iterating due to'
-                            ' exceeding item limit.'
-                        )
-                        return
+                    # Apply the instance filter function before yielding
+                    if self.filter_item(item):
+                        yield item
+                        n += 1
+                        # Stop iterating if the limit is reached
+                        if self.limit is not None and n >= self.limit:
+                            pywikibot.debug(
+                                f'{type(self).__name__}: Stopped iterating due'
+                                ' to exceeding item limit.'
+                            )
+                            return
                 offset += n_items
             else:
                 pywikibot.debug(f'{type(self).__name__}: Stopped iterating'
@@ -570,17 +635,36 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         return resultdata
 
     def _extract_results(self, resultdata):
-        """Extract results from resultdata."""
+        """Extract results from resultdata, applying `filter_item()`.
+
+        :attr:`generator` helper method which yields each result that
+        passes :meth:`filter_item() <APIGeneratorBase.filter_item>` and
+        respects namespaces and the generator's limit.
+
+        .. versionchanged:: 10.4
+           Applies `filter_item()` for instance-level filtering.
+
+        :param resultdata: List or iterable of raw API items
+        :yield: Processed items that pass the filter
+        :raises RuntimeError: if self.limit is reached
+
+        :meta public:
+        """
         for item in resultdata:
             result = self.result(item)
             if self._namespaces and not self._check_result_namespace(result):
+                continue
+
+            # Apply the instance filter before yielding
+            if not self.filter_item(result):
                 continue
 
             yield result
 
             modules_item_intersection = set(self.modules) & set(item)
             if isinstance(item, dict) and modules_item_intersection:
-                # if we need to count elements contained in items in
+                # Count elements contained in sub-items.
+                # If we need to count elements contained in items in
                 # self.data["query"]["pages"], we want to count
                 # item[self.modules] (e.g. 'revisions') and not
                 # self.resultkey (i.e. 'pages')
@@ -589,7 +673,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             # otherwise we proceed as usual
             else:
                 self._count += 1
-            # note: self.limit could be -1
+
+            # Stop if limit is reached; note: self.limit could be -1
             if self.limit and 0 < self.limit <= self._count:
                 raise RuntimeError(
                     'QueryGenerator._extract_results reached the limit')
@@ -599,9 +684,15 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         """Submit request and iterate the response based on self.resultkey.
 
         Continues response as needed until limit (if any) is reached.
+        Each item is already filtered by `_extract_results()`.
 
         .. versionchanged:: 7.6
-           changed from iterator method to generator property
+           Changed from iterator method to generator property
+        .. versionchanged:: 10.4
+           Items are filtered via :meth:`filter_item()
+           <APIGeneratorBase.filter_item>` inside :meth:`_extract_results`.
+
+        :yield: Items from the API, already filtered
         """
         previous_result_had_data = True
         prev_limit = new_limit = None
@@ -616,7 +707,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(f'{type(self).__name__}: stopped iteration'
-                                ' because no dict retrieved from api.')
+                                ' because no dict retrieved from API.')
                 break
 
             if 'query' in self.data and self.resultkey in self.data['query']:
@@ -638,13 +729,13 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             else:
                 if 'query' not in self.data:
                     pywikibot.log(f"{type(self).__name__}: 'query' not found"
-                                  ' in api response.')
+                                  ' in API response.')
                     pywikibot.log(str(self.data))
 
                 # if (query-)continue is present, self.resultkey might not have
                 # been fetched yet
                 if self.continue_name not in self.data:
-                    break  # No results.
+                    break  # No results
 
                 # self.resultkey not in data in last request.submit()
                 # only "(query-)continue" was retrieved.
@@ -767,13 +858,18 @@ class PropertyGenerator(QueryGenerator):
     decide what to do with the contents of the dict. There will be one
     dict for each page queried via a titles= or ids= parameter (which
     must be supplied when instantiating this class).
+
+    .. versionchanged:: 10.4
+       Supports instance-level filtering via :attr:`filter_func
+       <APIGenerator.filter_func>` / :meth:`filter_item()
+       <APIGenerator.filter_item`.
     """
 
     def __init__(self, prop: str, **kwargs) -> None:
         """Initializer.
 
-        Required and optional parameters are as for ``Request``, except that
-        action=query is assumed and prop is required.
+        Required and optional parameters are as for ``Request``, except
+        that action=query is assumed and prop is required.
 
         :param prop: the "prop=" type from api.php
         """
@@ -781,6 +877,7 @@ class PropertyGenerator(QueryGenerator):
         super().__init__(**kwargs)
         self._props = frozenset(prop.split('|'))
         self.resultkey = 'pages'
+        self._previous_dicts: dict[str, dict] = {}
 
     @property
     def props(self):
@@ -789,17 +886,28 @@ class PropertyGenerator(QueryGenerator):
 
     @property
     def generator(self):
-        """Yield results.
+        """Yield results from the API, including previously retrieved dicts.
 
         .. versionchanged:: 7.6
-           changed from iterator method to generator property
+           Changed from iterator method to generator property.
+
+        .. versionchanged:: 10.4
+           Items are filtered via :meth:`filter_item()
+           <APIGenerator.filter_item` inside :meth:`_extract_results`.
+           Previously retrieved dicts in `_previous_dicts` are also
+           filtered.
+
+        :yield: Filtered page dicts
         """
-        self._previous_dicts = {}
+        self._previous_dicts.clear()
         yield from super().generator
         yield from self._previous_dicts.values()
 
     def _extract_results(self, resultdata):
-        """Yield completed page_data of consecutive API requests."""
+        """Yield completed page_data of consecutive API requests.
+
+        :meta public:
+        """
         yield from self._fully_retrieved_data_dicts(resultdata)
         for data_dict in super()._extract_results(resultdata):
             if 'title' in data_dict:
@@ -812,11 +920,20 @@ class PropertyGenerator(QueryGenerator):
                                   + str(data_dict))
 
     def _fully_retrieved_data_dicts(self, resultdata):
-        """Yield items of self._previous_dicts that are not in resultdata."""
+        """Yield items of self._previous_dicts that are not in resultdata.
+
+        .. versionchanged:: 10.4
+           Applies :meth:`filter_item()<APIGenerator.filter_item` to
+           previously stored dicts.
+
+        :param resultdata: Current API response items
+        :yield: Filtered previously stored page dicts
+        """
         resultdata_titles = {d['title'] for d in resultdata if 'title' in d}
         for prev_title, prev_dict in self._previous_dicts.copy().items():
             if prev_title not in resultdata_titles:
-                yield prev_dict
+                if self.filter_item(prev_dict):
+                    yield prev_dict
                 del self._previous_dicts[prev_title]
 
     @staticmethod
