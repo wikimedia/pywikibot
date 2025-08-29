@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test Interwiki Link functionality."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,7 +45,6 @@ class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-@unittest.expectedFailure  # T403292
 class TestInterwikiLinksToNonLocalSites(TestCase):
 
     """Tests for interwiki links to non local sites."""
