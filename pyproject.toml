@@ -143,7 +143,7 @@ exclude_also = [
     "except \\w*ServerError",
     "if (0|False):",
     "if .+PYWIKIBOT_TEST_\\w+.+:",
-    "if TYPE_CHECKING:",
+    "if (typing\\.)?TYPE_CHECKING:",
     "if __debug__:",
     "if __name__ == .__main__.:",
     "if self\\.mw_version < .+:",
