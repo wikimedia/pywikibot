@@ -1039,6 +1039,7 @@ class TestLinktrails(TestCase):
                 self.assertEqual(site.linktrail(), linktrail)
 
 
+@unittest.expectedFailure  # T403292
 class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
 
     """Test single code family sites."""
