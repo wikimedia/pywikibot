@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Test Interwiki Link functionality."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import os
 from contextlib import suppress
 
 from pywikibot import config
@@ -45,6 +46,8 @@ class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
+@unittest.skipIf(os.environ.get('GITHUB_ACTIONS'),
+                 'Tests blocked on twn, see T403292')
 class TestInterwikiLinksToNonLocalSites(TestCase):
 
     """Tests for interwiki links to non local sites."""
