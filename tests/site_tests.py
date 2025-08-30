@@ -28,6 +28,7 @@ from pywikibot.exceptions import (
 )
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
+    DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
     TestCase,
@@ -1039,28 +1040,23 @@ class TestLinktrails(TestCase):
                 self.assertEqual(site.linktrail(), linktrail)
 
 
-class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
+class TestSingleCodeFamilySite(DefaultDrySiteTestCase):
 
     """Test single code family sites."""
 
-    sites = {
-        'i18n': {
-            'family': 'i18n',
-            'code': 'i18n',
-        },
-    }
+    family = 'i18n'
+    code = 'i18n'
 
     def test_twn(self) -> None:
         """Test translatewiki.net."""
         url = 'translatewiki.net'
-        site = self.get_site('i18n')
-        self.assertEqual(site.hostname(), url)
+        site = self.get_site()
         self.assertEqual(site.code, 'i18n')
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
-        self.assertEqual(site.family.hostname('en'), url)
-        self.assertEqual(site.family.hostname('i18n'), url)
-        self.assertEqual(site.family.hostname('translatewiki'), url)
+        self.assertEqual(site.hostname(), url)
+        for code in 'en', 'i18n', 'translatewiki':
+            self.assertEqual(site.family.hostname(code), url)
 
 
 class TestSubdomainFamilySite(TestCase):
