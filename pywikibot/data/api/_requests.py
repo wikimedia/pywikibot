@@ -49,6 +49,8 @@ TEST_RUNNING = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 if TEST_RUNNING:
     import unittest
 
+    # lazy load unittest_print to prevent circular imports
+
 # Actions that imply database updates on the server, used for various
 # things like throttling or skipping actions when we're in simulation
 # mode
@@ -716,8 +718,15 @@ class Request(MutableMapping, WaitingMixin):
         # TODO: what other exceptions can occur here?
         except Exception:
             # for any other error on the http request, wait and retry
-            pywikibot.error(traceback.format_exc())
-            pywikibot.log(f'{uri}, {paramstring}')
+            tb = traceback.format_exc()
+            msg = f'{uri}, {paramstring}'
+            if TEST_RUNNING:
+                from tests import unittest_print
+                unittest_print(tb)
+                unittest_print(msg)
+            else:
+                pywikibot.error(tb)
+                pywikibot.log(msg)
 
         else:
             return response, use_get
