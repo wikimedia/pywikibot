@@ -4,6 +4,11 @@ Scripts Changelog
 10.4.0
 ------
 
+addwikis
+^^^^^^^^
+
+* Add help options for addwikis script whereas `help` is deprecated.
+
 interwiki
 ^^^^^^^^^
 
