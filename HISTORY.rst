@@ -1,6 +1,39 @@
 Release History
 ===============
 
+10.4.0
+------
+*31 August 2025*
+
+* Apply client-side filtering for *maxsize* in misermode in
+  :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>` (:phab:`T402995`)
+* Add :attr:`filter_func()<data.api.APIGeneratorBase.filter_func>` and :meth:`filter_item()
+  <data.api.APIGeneratorBase.filter_item>` filter function in :class:`APIGeneratorBase
+  <data.api.APIGeneratorBase>` and modify `generator` property to implement filtering in
+  `APIGeneratorBase` subclasses (:phab:`T402995`)
+* All parameters of :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
+  except *start* must be given as keyword arguments.
+* Add support for bewwiktionary (:phab:`T402136`)
+* Add user-agent header to :mod:`eventstreams` requests (:phab:`T402796`)
+* Update i18n
+* Save global options in :attr:`bot.global_args` (:phab:`T250034`)
+* Update :mod:`plural` forms from unicode.org (:phab:`T114978`)
+* Add :class:`textlib.SectionList` to hold :attr:`textlib.Content.sections` (:phab:`T401464`)
+* :class:`pywikibot.Coordinate` parameters are keyword only
+* Add *strict* parameter to :meth:`Site.unconnected_pages()
+  <pywikibot.site._extensions.unconnected_pages>` and :func:`pagegenerators.UnconnectedPageGenerator`
+  (:phab:`T401699`)
+* Raise ValueError if a VAR_POSITIONAL parameter like *\*args* is used with
+  :class:`tools.deprecate_positionals` decorator
+* Add :meth:`get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>` API
+  to :class:`pywikibot.ItemPage` (:phab:`T400612`)
+* Clean up :mod:`setup` module (:phab:`T396356`)
+* Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
+* Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
+  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>`; fix the methods to return False if
+  page is missing and no expiry is set (:phab:`T330839`)
+
+
 10.3.2
 ------
 *12 August 2025*
