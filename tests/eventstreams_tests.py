@@ -77,7 +77,7 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
     """Stream tests for eventstreams module."""
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         site = self.get_site()
         fam = site.family

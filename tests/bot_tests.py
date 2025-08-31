@@ -301,7 +301,7 @@ class TestOptionHandler(TestCase):
     dry = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         self.option_handler = Options(baz=True)
         super().setUp()
 

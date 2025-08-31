@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2019-2022
+# (C) Pywikibot team, 2019-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,7 +44,7 @@ class TestLanguageDict(DataCollectionTestCase):
     dry = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': 'foo', 'zh': 'bar'}
@@ -132,7 +132,7 @@ class TestAliasesDict(DataCollectionTestCase):
     dry = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.site = self.get_site()
         self.lang_out = {'en': ['foo', 'bar'],

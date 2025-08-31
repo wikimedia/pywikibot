@@ -5,7 +5,7 @@ Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failure_tests.py
 """
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -540,7 +540,7 @@ class TestWikibaseDataSiteWbsetActions(WikibaseTestCase):
     write = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         self.testsite = self.get_repo()
         self.item = pywikibot.ItemPage(self.testsite, 'Q68')
         badge = pywikibot.ItemPage(self.testsite, 'Q608')

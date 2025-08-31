@@ -825,7 +825,7 @@ class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     """Test site.loadrevisions() caching."""
 
     def setup_page(self) -> None:
-        """Setup test page."""
+        """Set up test page."""
         self._page = self.get_mainpage(force=True)
 
     def test_page_text(self) -> None:

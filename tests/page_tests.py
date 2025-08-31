@@ -728,7 +728,7 @@ class TestPageBotMayEdit(TestCase):
     login = True
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         self.page = pywikibot.Page(self.site,
                                    'not_existent_page_for_pywikibot_tests')

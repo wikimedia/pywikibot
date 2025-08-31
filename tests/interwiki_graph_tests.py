@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test Interwiki Graph functionality."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Setup test class."""
+        """Set up test class."""
         super().setUpClass()
 
         cls.pages = {
