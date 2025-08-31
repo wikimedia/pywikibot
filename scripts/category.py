@@ -472,16 +472,25 @@ class CategoryAddBot(CategoryPreprocess):
         self.comment = comment
 
     @staticmethod
-    def sorted_by_last_name(catlink, pagelink) -> pywikibot.Page:
-        """Return a Category with key that sorts persons by their last name.
+    def sorted_by_last_name(catlink: pywikibot.Page,
+                            pagelink: pywikibot.Page) -> pywikibot.Page:
+        """Return a category entry for a person, sorted by last name.
 
-        Parameters: catlink - The Category to be linked.
-                    pagelink - the Page to be placed in the category.
+        If the page title contains a disambiguation suffix in brackets,
+        it will be removed. The last word of the (cleaned) title is
+        treated as the surname and moved to the front, separated by a
+        comma.
 
-        Trailing words in brackets will be removed. Example: If
-        category_name is 'Author' and pl is a Page to [[Alexandre Dumas
-        (senior)]], this function will return this Category:
-        [[Category:Author|Dumas, Alexandre]].
+        Example:
+            If *catlink* is ``Category:Author`` and *pagelink* points to
+            ``[[Alexandre Dumas (senior)]]``, this method returns::
+
+                [[Category:Author|Dumas, Alexandre]]
+
+        :param catlink: Category page where the entry should be added.
+        :param pagelink: Page of the person to be categorized.
+        :return: A page object representing the category entry with the
+            correct sort key.
         """
         page_name = pagelink.title()
         site = pagelink.site
@@ -1323,49 +1332,89 @@ class CategoryTreeRobot:
 
     """Robot to create tree overviews of the category structure.
 
-    Parameters:
-        * cat_title - The category which will be the tree's root.
-        * cat_db    - A CategoryDatabase object.
-        * max_depth - The limit beyond which no subcategories will be listed.
-                     This also guarantees that loops in the category structure
-                     won't be a problem.
-        * filename - The textfile where the tree should be saved; None to print
-                     the tree to stdout.
+    This class generates a hierarchical overview of categories starting
+    from a given root category. The tree can be printed to stdout or
+    written to a file. Cycles in the category structure are prevented
+    by limiting the depth.
+
+    Example:
+        Create a tree view of ``Category:Physics`` up to 5 levels deep
+        and save it to ``physics_tree.txt``::
+
+            db = CategoryDatabase()
+            robot = CategoryTreeRobot(
+                'Physics', db, 'physics_tree.txt', max_depth=5)
+
+    .. versionchanged:: 10.4
+       *max_depth* is keyword only.
+
+    :param cat_title: The category that serves as the root of the
+        tree.
+    :param cat_db: A :class:`CategoryDatabase` object
+        providing access to category data.
+    :param filename: Path to the text file where the tree
+        should be saved. If ``None``, the user will be prompted to enter
+        a filename. If an empty string is entered, the tree will be
+        printed to stdout. Relative paths are converted to absolute
+        paths using :meth:`config.datafilepath`.
+    :param max_depth: Maximum depth of subcategories to traverse.
+        Prevents infinite loops.
     """
 
     def __init__(
         self,
-        cat_title,
-        cat_db,
-        filename=None,
+        cat_title: str,
+        cat_db: CategoryDatabase,
+        filename: str | None = None,
+        *,
         max_depth: int = 10
     ) -> None:
         """Initializer."""
-        self.cat_title = cat_title or \
-            pywikibot.input(
+        self.cat_title = cat_title \
+            or pywikibot.input(
                 'For which category do you want to create a tree view?')
         self.cat_db = cat_db
         if filename is None:
             filename = pywikibot.input(
                 'Please enter the name of the file '
                 'where the tree should be saved,\n'
-                'or press enter to simply show the tree:')
+                'or press enter to simply show the tree:'
+            )
         if filename and not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
         self.max_depth = max_depth
         self.site = pywikibot.Site()
 
-    def treeview(self, cat, current_depth: int = 0, parent=None) -> str:
-        """Return a tree view of all subcategories of cat.
+    def treeview(self,
+                 cat: pywikibot.Category,
+                 current_depth: int = 0,
+                 *,
+                 parent: pywikibot.Category | None = None) -> str:
+        """Return a tree view of subcategories as a multi-line string.
 
-        The multi-line string contains a tree view of all subcategories of cat,
-        up to level max_depth. Recursively calls itself.
+        Generates a hierarchical tree view of all subcategories of the
+        given category *cat*, up to the depth specified by
+        ``self.max_depth``. This method is recursive.
 
-        Parameters:
-            * cat - the Category of the node we're currently opening.
-            * current_depth - the current level in the tree (for recursion).
-            * parent - the Category of the category we're coming from.
+        .. versionchanged:: 10.4
+           *parent* is keyword only.
+
+        Example:
+            To get a tree view of ``Category:Physics`` starting at depth 0::
+
+                cat = pywikibot.Category(site, 'Physics')
+                tree = robot.treeview(cat)
+
+        :param cat: The Category object currently being expanded in the
+            tree.
+        :param current_depth: Current depth level in the tree (used for
+            recursion).
+        :param parent: The parent Category from which we descended (to
+            avoid cycles).
+        :return: A multi-line string representing the tree structure,
+            including the number of pages in each category and links to
+            supercategories.
         """
         result = '#' * current_depth
         if current_depth > 0:
@@ -1680,7 +1729,7 @@ def main(*args: str) -> None:
                                 gen_factory.namespaces, summary)
     elif action == 'tree':
         bot = CategoryTreeRobot(options.get('from'), cat_db,
-                                options.get('to'), depth)
+                                options.get('to'), max_depth=depth)
     elif action == 'listify':
         bot = CategoryListifyRobot(options.get('from'),
                                    options.get('to'), summary,
