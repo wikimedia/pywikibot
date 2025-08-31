@@ -1,6 +1,6 @@
 """Module containing plural rules of various languages."""
 #
-# (C) Pywikibot team, 2011-2022
+# (C) Pywikibot team, 2011-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,11 +62,12 @@ plural_rules: dict[str, PluralRule] = {
             0 if (n == 0) else
             1 if n == 1 else
             2},
-    'mt': {'nplurals': 4, 'plural': lambda n:
-           0 if (n == 1) else
-           1 if (n == 0 or (1 < (n % 100) < 11)) else
-           2 if (10 < (n % 100) < 20) else
-           3},
+    'mt': {'nplurals': 5, 'plural': lambda n:
+           0 if n == 1 else
+           1 if n == 2 else
+           2 if n == 0 or 3 <= (n % 100) <= 10 else
+           3 if 11 <= (n % 100) <= 19 else
+           4},
     'pl': {'nplurals': 3, 'plural': lambda n:
            0 if (n == 1) else
            1 if (2 <= (n % 10) <= 4) and (n % 100 < 10 or n % 100 >= 20)

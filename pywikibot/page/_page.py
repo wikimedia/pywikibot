@@ -9,7 +9,7 @@ various pages for Proofread Extensions are defined in
    itself, including its contents.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,7 +182,7 @@ class Page(BasePage, WikiBlameMixin):
         if save:
             self.save(**kwargs)
 
-    def get_best_claim(self, prop: str):
+    def get_best_claim(self, prop: str) -> pywikibot.Claim | None:
         """Return the first best Claim for this page.
 
         Return the first 'preferred' ranked Claim specified by Wikibase
@@ -190,40 +190,29 @@ class Page(BasePage, WikiBlameMixin):
 
         .. versionadded:: 3.0
 
-        :param prop: property id, "P###"
+        .. seealso:: :meth:`pywikibot.ItemPage.get_best_claim`
+
+        :param prop: Wikibase property ID, must be of the form ``P``
+            followed by one or more digits (e.g. ``P31``).
         :return: Claim object given by Wikibase property number
             for this page object.
-        :rtype: pywikibot.Claim or None
 
         :raises UnknownExtensionError: site has no Wikibase extension
         """
-        def find_best_claim(claims):
-            """Find the first best ranked claim."""
-            index = None
-            for i, claim in enumerate(claims):
-                if claim.rank == 'preferred':
-                    return claim
-                if index is None and claim.rank == 'normal':
-                    index = i
-            if index is None:
-                index = 0
-            return claims[index]
-
-        if not self.site.has_data_repository:
-            raise UnknownExtensionError(
-                f'Wikibase is not implemented for {self.site}.')
-
-        def get_item_page(func, *args):
+        def get_item_page(page):
+            if not page.site.has_data_repository:
+                raise UnknownExtensionError(
+                    f'Wikibase is not implemented for {page.site}.')
             try:
-                item_p = func(*args)
+                item_p = page.data_item()
                 item_p.get()
                 return item_p
             except NoPageError:
                 return None
             except IsRedirectPageError:
-                return get_item_page(item_p.getRedirectTarget)
+                return get_item_page(item_p.getRedirectTarget())
 
-        item_page = get_item_page(pywikibot.ItemPage.fromPage, self)
-        if item_page and prop in item_page.claims:
-            return find_best_claim(item_page.claims[prop])
+        item_page = get_item_page(page=self)
+        if item_page:
+            return item_page.get_best_claim(prop)
         return None

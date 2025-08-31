@@ -1542,11 +1542,16 @@ class TestExtractSections(DefaultDrySiteTestCase):
         self.assertEqual(result.footer, footer)
         self.assertEqual(result.title, title)
         self.assertEqual(result, (header, sections, footer))
-        for section in result.sections:
+        for i, section in enumerate(result.sections):
             self.assertIsInstance(section, tuple)
             self.assertLength(section, 2)
             self.assertIsInstance(section.level, int)
             self.assertEqual(section.title.count('=') // 2, section.level)
+            self.assertIn(section.heading, result.sections)
+            count = result.sections.count(section.heading)
+            self.assertGreaterEqual(count, 1)
+            if count == 1:
+                self.assertEqual(result.sections.index(section.heading), i)
 
     def test_no_sections_no_footer(self) -> None:
         """Test for text having no sections or footer."""
@@ -1566,6 +1571,7 @@ class TestExtractSections(DefaultDrySiteTestCase):
                 '==title==\n'
                 'content')
         result = extract_sections(text, self.site)
+        self.assertEqual(result.sections.index('title'), 0)
         self._extract_sections_tests(
             result, 'text\n\n', [('==title==', '\ncontent')])
 
@@ -1601,6 +1607,11 @@ class TestExtractSections(DefaultDrySiteTestCase):
                 '==title 2==\n'
                 'content')
         result = extract_sections(text, self.site)
+        self.assertEqual(result.sections.index('title'), 0)
+        self.assertEqual(result.sections.index(('title', 4)), 0)
+        with self.assertRaisesRegex(ValueError,
+                                    r"\('title', 2\) not found in Section"):
+            result.sections.index(('title', 2))
         self._extract_sections_tests(
             result,
             'text\n\n',
@@ -1675,6 +1686,38 @@ class TestExtractSections(DefaultDrySiteTestCase):
             [],
             title='Pywikibot'
         )
+
+    def test_index(self) -> None:
+        """Test index behaviour of SectionList."""
+        text = """
+= Intro =
+== History ==
+== Usage ==
+=== Details ===
+= References =
+"""
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(result, '\n', [
+            ('= Intro =', '\n'),
+            ('== History ==', '\n'),
+            ('== Usage ==', '\n'),
+            ('=== Details ===', '\n'),
+            ('= References =', '\n'),
+        ])
+        sections = result.sections
+        self.assertIsInstance(sections, textlib.SectionList)
+        self.assertEqual(sections.index('Details'), 3)
+        self.assertEqual(sections.index('Details', 3), 3)
+        self.assertEqual(sections.index(sections[2]), 2)
+        self.assertEqual(sections.index('Intro', -10, 3), 0)
+        header = 'Details', 2
+        pattern = re.escape(f'{header!r} not found in Section headings/levels')
+        with self.assertRaisesRegex(ValueError, pattern):
+            sections.index(header)
+        header = 'Unknown'
+        with self.assertRaisesRegex(
+                ValueError, f'{header!r} not found in Section heading'):
+            sections.index(header)
 
 
 if __name__ == '__main__':

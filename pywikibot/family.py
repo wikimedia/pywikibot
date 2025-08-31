@@ -1111,6 +1111,16 @@ class DefaultWikibaseFamily(WikibaseFamily):
     .. versionadded:: 8.2
     """
 
+    @property
+    def interval_start_property(self) -> str:
+        """Return the property for the start of an interval."""
+        return 'P580'
+
+    @property
+    def interval_end_property(self) -> str:
+        """Return the property for the end of an interval."""
+        return 'P582'
+
     def calendarmodel(self, code) -> str:
         """Default calendar model for WbTime datatype."""
         return 'http://www.wikidata.org/entity/Q1985727'

@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -447,10 +447,18 @@ def deprecate_positionals(since: str = ''):
     """Decorator for methods that issues warnings for positional arguments.
 
     This decorator allows positional arguments after keyword-only
-    argument syntax (:pep:`3102`) but throws a FutureWarning. The
-    decorator makes the needed argument updates before passing them to
-    the called function or method. This decorator may be used for a
-    deprecation period when require keyword-only arguments.
+    argument syntax (:pep:`3102`) but throws a ``FutureWarning``. It
+    automatically maps the provided positional arguments to their
+    corresponding keyword-only parameters before invoking the decorated
+    method.
+
+    The intended use is during a deprecation period in which certain
+    parameters should be passed as keyword-only, allowing legacy calls
+    to continue working with a warning rather than immediately raising a
+    ``TypeError``.
+
+    .. important:: This decorator is only supported for instance or
+       class methods. It does not work for standalone functions.
 
     Example:
 
@@ -462,17 +470,21 @@ def deprecate_positionals(since: str = ''):
 
             f('foo', 'bar')
 
-        This function call passes but throws a FutureWarning. Without
-        decorator a TypeError would be raised.
+        This function call passes but throws a ``FutureWarning``.
+        Without the decorator, a ``TypeError`` would be raised.
 
-    .. caution:: The decorated function may not use ``*args`` or
-       ``**kwargs``. The sequence of keyword-only arguments must match
-       the sequence of the old positional arguments, otherwise the
-       assignment of the arguments to the keyworded arguments will fail.
+    .. caution:: The decorated function must not accept ``*args``. The
+       sequence of keyword-only arguments must match the sequence of the
+       old positional parameters, otherwise argument assignment will
+       fail.
+
     .. versionadded:: 9.2
+    .. versionchanged:: 10.4
+       Raises ``ValueError`` if method has a ``*args`` parameter.
 
-    :param since: a version string when some positional arguments were
-        deprecated
+    :param since: Mandatory version string indicating when certain
+        positional parameters were deprecated
+    :raises ValueError: If the method has an *args parameter.
     """
     def decorator(func):
         """Outer wrapper. Inspect the parameters of *func*.
@@ -512,6 +524,10 @@ def deprecate_positionals(since: str = ''):
 
         # find the first KEYWORD_ONLY index
         for positionals, key in enumerate(arg_keys):
+            if sig.parameters[key].kind == inspect.Parameter.VAR_POSITIONAL:
+                raise ValueError(
+                    f'{func.__qualname__} must not have *{key} parameter')
+
             if sig.parameters[key].kind in (inspect.Parameter.KEYWORD_ONLY,
                                             inspect.Parameter.VAR_KEYWORD):
                 break
@@ -556,7 +572,7 @@ def remove_last_args(arg_names):
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, *_ = getfullargspec(wrapper.__wrapped__)
-            if varargs is not None and kwargs is not None:
+            if varargs is not None and kwargs is not None:  # pragma: no cover
                 raise ValueError(f'{name} may not have * or ** args.')
             deprecated = set(__kw) & set(arg_names)
             if len(__args) > len(args):

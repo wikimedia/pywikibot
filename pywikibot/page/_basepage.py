@@ -391,8 +391,7 @@ class BasePage(ComparableMixin):
         page_section = self.section()
         if page_section:
             content = textlib.extract_sections(text, self.site)
-            headings = {section.heading for section in content.sections}
-            if page_section not in headings:
+            if page_section not in content.sections:
                 raise SectionError(f'{page_section!r} is not a valid section '
                                    f'of {self.title(with_section=False)}')
 
@@ -1458,13 +1457,40 @@ class BasePage(ComparableMixin):
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
-    def watch(self, unwatch: bool = False) -> bool:
-        """Add or remove this page to/from bot account's watchlist.
+    @deprecate_positionals(since='10.4.0')
+    def watch(
+        self, *,
+        unwatch: bool = False,
+        expiry: Timestamp | str | Literal[
+            'infinite', 'indefinite', 'infinity', 'never'] | None = None
+    ) -> bool:
+        """Add or remove this page from the bot account's watchlist.
 
-        :param unwatch: True to unwatch, False (default) to watch.
+        .. versionchanged:: 10.4.0
+           Added the *expiry* parameter to specify watch expiry time.
+           Positional parameters are deprecated; all parameters must be
+           passed as keyword arguments.
+
+        .. seealso::
+           - :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>`
+           - :meth:`Site.watched_pages()
+             <pywikibot.site._generators.GeneratorsMixin.watched_pages>`
+           - :api:`Watch`
+
+        :param unwatch: If True, the page will be from the watchlist.
+        :param expiry: Expiry timestamp to apply to the watch. Passing
+            None or omitting this parameter leaves any existing expiry
+            unchanged. Expiry values may be relative (e.g. ``5 months``
+            or ``2 weeks``) or absolute (e.g. ``2014-09-18T12:34:56Z``).
+            For no expiry, use ``infinite``, ``indefinite``, ``infinity``
+            or `never`. For absolute timestamps the :class:`Timestamp`
+            class can be used.
         :return: True if successful, False otherwise.
+        :raises APIError: badexpiry: Invalid value for expiry parameter
+        :raises KeyError: 'watch' isn't in API response
+        :raises TypeError: unexpected keyword argument
         """
-        return self.site.watch(self, unwatch)
+        return self.site.watch(self, unwatch=unwatch, expiry=expiry)
 
     def clear_cache(self) -> None:
         """Clear the cached attributes of the page."""

@@ -278,6 +278,9 @@ ui: pywikibot.userinterfaces._interface_base.ABUIC | None = None
 """Holds a user interface object defined in :mod:`pywikibot.userinterfaces`
 subpackage."""
 
+#: global args used by tests via pwb wrapper
+global_args: list[str] | None = None
+
 
 def set_interface(module_name: str) -> None:
     """Configures any bots to use the given interface module.
@@ -748,6 +751,9 @@ def handle_args(args: Iterable[str] | None = None,
         # it's the version in pywikibot.__init__ that is changed by scripts,
         # not the one in pywikibot.bot.
         args = pywikibot.argvu[1:]
+
+    global global_args
+    global_args = args
 
     # get the name of the module calling this function. This is
     # required because the -help option loads the module's docstring and

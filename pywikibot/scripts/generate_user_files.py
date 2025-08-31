@@ -311,7 +311,7 @@ def input_sections(variant: str,
         select = pywikibot.input_choice(
             f'Do you want to select {variant} setting sections?',
             answers, default=default, force=force, automatic_quit=False)
-        if select == 'h':  # pragma: no cover
+        if select == 'h':
             answers.pop(-1)
             pywikibot.info(
                 f'The following {variant} setting sections are provided:')
@@ -324,7 +324,7 @@ def input_sections(variant: str,
     choice = {'a': 'all', 'n': 'none', 'y': 'h'}[select]  # mapping
     for item in filter(skip, sections):
         answers = [('Yes', 'y'), ('No', 'n'), ('Help', 'h')]
-        while choice == 'h':  # pragma: no cover
+        while choice == 'h':
             choice = pywikibot.input_choice(
                 f'Do you want to add {item.head} section?',
                 answers, default='n', force=force, automatic_quit=False)
@@ -350,7 +350,7 @@ def create_user_config(
     main_code: str,
     main_username: str,
     force: bool = False
-) -> None:  # pragma: no cover
+) -> None:
     """Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
@@ -440,7 +440,7 @@ def create_user_config(
 
 
 def save_botpasswords(botpasswords: str,
-                      path: Path) -> None:  # pragma: no cover
+                      path: Path) -> None:
     """Write botpasswords to file.
 
     :param botpasswords: botpasswords for password file

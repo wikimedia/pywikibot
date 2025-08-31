@@ -92,6 +92,14 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki",
@@ -128,25 +136,28 @@ exclude_also = [
     "@deprecated\\([^\\)]+\\)",
     "@unittest\\.skip",
     "class .+\\bProtocol\\):",
-    "except ImportError",
+    "except (ImportError|ModuleNotFoundError)",
     "except KeyboardInterrupt",
     "except OSError",
     "except SyntaxError",
     "except \\w*ServerError",
     "if (0|False):",
     "if .+PYWIKIBOT_TEST_\\w+.+:",
-    "if TYPE_CHECKING:",
+    "if (typing\\.)?TYPE_CHECKING:",
     "if __debug__:",
     "if __name__ == .__main__.:",
     "if self\\.mw_version < .+:",
     # Comments to turn coverage on and off:
     "no cover: start(?s:.)*?no cover: stop",
-    "raise ImportError",
+    "raise (ImportError|ModuleNotFoundError)",
     "raise NotImplementedError",
     "raise unittest\\.SkipTest",
     "self\\.skipTest",
 ]
 
+[tool.coverage.run]
+concurrency = ["multiprocessing", "thread"]
+parallel = true
 
 [tool.docsig]
 disable = [

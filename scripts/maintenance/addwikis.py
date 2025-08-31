@@ -7,9 +7,13 @@ Usage:
 
 
 .. versionadded:: 9.2
+.. versionchanged:: 10.4
+   The options ``-h``, ``-help`` and ``--help`` display the help message.
+.. deprecated:: 10.4
+   The ``help`` option
 """
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,7 +24,9 @@ import sys
 from pathlib import Path
 
 import pywikibot
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.family import Family
+from pywikibot.tools import issue_deprecation_warning
 
 
 # supported families by this script
@@ -87,7 +93,14 @@ def main(*args: str) -> None:
     for arg in args:
         if arg.startswith('-family'):
             family = arg.split(':')[1]
-        elif arg == 'help':
+        elif arg in ('help', '-h', '-help', '--help'):
+            if arg == 'help':
+                issue_deprecation_warning(
+                    "'help' option",
+                    "'-h', '-help' or '--help'",
+                    since='10.4.0',
+                    warning_class=ArgumentDeprecationWarning
+                )
             pywikibot.show_help()
             return
         else:

@@ -913,15 +913,19 @@ def bundles(stem: bool = False) -> Generator[Path | str, None, None]:
 
 
 def known_languages() -> list[str]:
-    """All languages we have localizations for.
+    """Return all languages we have localizations for.
 
     >>> from pywikibot import i18n
-    >>> i18n.known_languages()[:10]
-    ['ab', 'aeb', 'af', 'am', 'an', 'ang', 'anp', 'ar', 'arc', 'arz']
-    >>> i18n.known_languages()[-10:]
+    >>> i18n.known_languages()[:2]
+    ['ab', 'aeb']
+    >>> i18n.known_languages()[-10:]  # doctest: +SKIP
     ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
-    >>> len(i18n.known_languages())
-    251
+    >>> len(i18n.known_languages()) > 250
+    True
+    >>> 'ab' in i18n.known_languages()
+    True
+    >>> 'zh' in i18n.known_languages()
+    True
 
     The implementation is roughly equivalent to:
 

@@ -480,7 +480,7 @@ class BinaryTestCase(TestCase):
     def test_requests(self) -> None:
         """Test with requests, underlying package."""
         with requests.Session() as s:
-            r = s.get(self.url)
+            r = s.get(self.url, headers={'User-Agent': http.user_agent()})
 
             self.assertEqual(r.headers['content-type'], 'image/png')
             self.assertEqual(r.content, self.png)

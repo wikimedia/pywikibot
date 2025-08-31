@@ -26,7 +26,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import deprecate_arg, is_ip_address
+from pywikibot.tools import deprecate_arg, deprecate_positionals, is_ip_address
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -925,9 +925,10 @@ class GeneratorsMixin:
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
+    @deprecate_positionals(since='10.4.0')
     def allpages(
         self,
-        start: str = '!',
+        start: str = '!', *,
         prefix: str = '',
         namespace: SingleNamespaceType = 0,
         filterredir: bool | None = None,
@@ -969,6 +970,11 @@ class GeneratorsMixin:
             type such as bool, or an iterable with more than one
             namespace or *filterredir* parameter has an invalid type.
         """
+        def _maxsize_filter(item):
+            """Return True if page text length is within maxsize limit."""
+            return len(item.text.encode(self.encoding())) <= maxsize
+
+        misermode = self.siteinfo.get('misermode') and maxsize is not None
         if filterredir not in (True, False, None):
             raise TypeError('filterredir parameter must be True, False or '
                             f'None, not {type(filterredir)}')
@@ -976,7 +982,7 @@ class GeneratorsMixin:
         apgen = self._generator(api.PageGenerator, type_arg='allpages',
                                 namespaces=namespace,
                                 gapfrom=start, total=total,
-                                g_content=content)
+                                g_content=content or misermode)
         if prefix:
             apgen.request['gapprefix'] = prefix
         if filterredir is not None:
@@ -988,7 +994,7 @@ class GeneratorsMixin:
                                                    'withoutlanglinks')
         if isinstance(minsize, int):
             apgen.request['gapminsize'] = str(minsize)
-        if isinstance(maxsize, int):
+        if not misermode and isinstance(maxsize, int):
             apgen.request['gapmaxsize'] = str(maxsize)
         if isinstance(protect_type, str):
             apgen.request['gapprtype'] = protect_type
@@ -996,6 +1002,9 @@ class GeneratorsMixin:
                 apgen.request['gapprlevel'] = protect_level
         if reverse:
             apgen.request['gapdir'] = 'descending'
+        if misermode:
+            apgen.filter_func = _maxsize_filter
+
         return apgen
 
     def alllinks(

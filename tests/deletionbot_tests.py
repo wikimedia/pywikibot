@@ -109,41 +109,41 @@ class TestDeletionBot(DefaultSiteTestCase):
 
     def setUp(self) -> None:
         """Set up unit test."""
-        self._original_delete = pywikibot.Page.delete
-        self._original_undelete = pywikibot.Page.undelete
-        pywikibot.Page.delete = delete_dummy
-        pywikibot.Page.undelete = undelete_dummy
         super().setUp()
 
-    def tearDown(self) -> None:
-        """Tear down unit test."""
-        pywikibot.Page.delete = self._original_delete
-        pywikibot.Page.undelete = self._original_undelete
-        super().tearDown()
+        patches = (
+            patch.object(pywikibot.Page, 'delete', delete_dummy),
+            patch.object(pywikibot.Page, 'undelete', undelete_dummy),
+            patch.object(delete.DeletionRobot, 'skip_page',
+                         lambda inst, page: False)
+        )
+        for p in patches:
+            self.addCleanup(p.stop)
+            p.start()
 
     def test_dry(self) -> None:
         """Test dry run of bot."""
-        main = self.get_mainpage().title()
         with empty_sites():
-            delete.main(f'-page:{main}', '-always', '-summary:foo')
+            delete.main('-page:Main Page', '-always', '-summary:foo')
             self.assertEqual(self.delete_args,
-                             [f'[[{main}]]', 'foo', False, True, True])
+                             ['[[Main Page]]', 'foo', False, True, True])
         with empty_sites():
             delete.main(
                 '-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
             self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(self, reason, prompt, mark, automatic_quit) -> int:
+def delete_dummy(page_self, reason, prompt, mark, automatic_quit, *,
+                 deletetalk=False) -> int:
     """Dummy delete method."""
-    TestDeletionBot.delete_args = [self.title(as_link=True), reason, prompt,
-                                   mark, automatic_quit]
+    TestDeletionBot.delete_args = [page_self.title(as_link=True), reason,
+                                   prompt, mark, automatic_quit]
     return 0
 
 
-def undelete_dummy(self, reason) -> None:
+def undelete_dummy(page_self, reason) -> None:
     """Dummy undelete method."""
-    TestDeletionBot.undelete_args = [self.title(as_link=True), reason]
+    TestDeletionBot.undelete_args = [page_self.title(as_link=True), reason]
 
 
 if __name__ == '__main__':

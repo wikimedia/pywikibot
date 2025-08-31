@@ -1,11 +1,12 @@
 """Structures holding data for Wikibase entities."""
 #
-# (C) Pywikibot team, 2019-2024
+# (C) Pywikibot team, 2019-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import reprlib
 from collections import defaultdict
 from collections.abc import MutableMapping, MutableSequence
 from typing import Any
@@ -65,7 +66,7 @@ class BaseDataDict(MutableMapping):
         return key in self._data
 
     def __repr__(self) -> str:
-        return f'{type(self)}({self._data})'
+        return f'{type(self).__name__}({reprlib.repr(self._data)})'
 
     @staticmethod
     def normalizeKey(key) -> str:
@@ -241,7 +242,7 @@ class ClaimCollection(MutableMapping):
         return key in self._data
 
     def __repr__(self) -> str:
-        return f'{type(self)}({self._data})'
+        return f'{type(self).__name__}({reprlib.repr(self._data)})'
 
     @classmethod
     def normalizeData(cls, data) -> dict:

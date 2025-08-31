@@ -1,9 +1,33 @@
 Current Release Changes
 =======================
 
-* Add support for zghwiktionary, madwikisource, rkiwiki, minwikibooks
-  (:phab:`T391769`, :phab:`T392501`, :phab:`T395501`, :phab:`T399787`)
-* i18n updates
+* Apply client-side filtering for *maxsize* in misermode in
+  :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>` (:phab:`T402995`)
+* Add :attr:`filter_func()<data.api.APIGeneratorBase.filter_func>` and :meth:`filter_item()
+  <data.api.APIGeneratorBase.filter_item>` filter function in :class:`APIGeneratorBase
+  <data.api.APIGeneratorBase>` and modify `generator` property to implement filtering in
+  `APIGeneratorBase` subclasses (:phab:`T402995`)
+* All parameters of :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
+  except *start* must be given as keyword arguments.
+* Add support for bewwiktionary (:phab:`T402136`)
+* Add user-agent header to :mod:`eventstreams` requests (:phab:`T402796`)
+* Update i18n
+* Save global options in :attr:`bot.global_args` (:phab:`T250034`)
+* Update :mod:`plural` forms from unicode.org (:phab:`T114978`)
+* Add :class:`textlib.SectionList` to hold :attr:`textlib.Content.sections` (:phab:`T401464`)
+* :class:`pywikibot.Coordinate` parameters are keyword only
+* Add *strict* parameter to :meth:`Site.unconnected_pages()
+  <pywikibot.site._extensions.unconnected_pages>` and :func:`pagegenerators.UnconnectedPageGenerator`
+  (:phab:`T401699`)
+* Raise ValueError if a VAR_POSITIONAL parameter like *\*args* is used with
+  :class:`tools.deprecate_positionals` decorator
+* Add :meth:`get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>` API
+  to :class:`pywikibot.ItemPage` (:phab:`T400612`)
+* Clean up :mod:`setup` module (:phab:`T396356`)
+* Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
+* Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
+  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>`; fix the methods to return False if
+  page is missing and no expiry is set (:phab:`T330839`)
 
 
 Deprecations
@@ -12,11 +36,16 @@ Deprecations
 Pending removal in Pywikibot 13
 -------------------------------
 
-* 10.3.0: :meth:`throttle.Trottle.getDelay` and :meth:`throttle.Trottle.setDelays` were renamed; the
-  old methods will be removed (:phab:`T289318`)
-* 10.3.0: :attr:`throttle.Trottle.next_multiplicity` attribute is unused and will be removed
+* 10.4.0: Require all parameters of :meth:`Site.allpages()
+  <pywikibot.site._generators.GeneratorsMixin.allpages>` except *start* to be keyword arguments.
+* 10.4.0: Positional arguments of :class:`pywikibot.Coordinate` are deprecated and must be given as
+  keyword arguments.
+* 10.3.0: :meth:`throttle.Throttle.getDelay` and :meth:`throttle.Throttle.setDelays` were renamed to
+  :meth:`get_delay()<throttle.Throttle.get_delay>` and :meth:`set_delays()
+  <throttle.Throttle.set_delays>`; the old methods will be removed (:phab:`T289318`)
+* 10.3.0: :attr:`throttle.Throttle.next_multiplicity` attribute is unused and will be removed
   (:phab:`T289318`)
-* 10.3.0: *requestsize* parameter of :class:`throttle.Trottle` call is deprecated and will be
+* 10.3.0: *requestsize* parameter of :class:`throttle.Throttle` call is deprecated and will be
   dropped (:phab:`T289318`)
 * 10.3.0: :func:`textlib.to_latin_digits` will be removed in favour of
   :func:`textlib.to_ascii_digits`, ``NON_LATIN_DIGITS`` of :mod:`userinterfaces.transliteration`

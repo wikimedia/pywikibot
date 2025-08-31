@@ -11,9 +11,10 @@ import os
 import sys
 import unittest
 from contextlib import suppress
-from importlib import import_module
 from pathlib import Path
 
+from pywikibot.backports import Iterator
+from pywikibot.bot import global_args as pwb_args
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
@@ -38,8 +39,6 @@ def check_script_deps(script_name) -> bool:
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
             if not has_module(package_name):
-                unittest_print(f'{script_name} depends on {package_name},'
-                               " which isn't available")
                 return False
     return True
 
@@ -149,49 +148,53 @@ skip_on_results = {
 }
 
 
-def collector(loader=unittest.loader.defaultTestLoader):
-    """Load the default tests.
+def collector() -> Iterator[str]:
+    """Generate test fully qualified names from test classes."""
+    for cls in TestScriptHelp, TestScriptSimulate, TestScriptGenerator:
+        for name in cls._script_list:
+            name = '_' + name if name == 'login' else name
+            yield f'tests.script_tests.{cls.__name__}.test_{name}'
 
-    .. note:: Raising SkipTest during load_tests will cause the loader
-       to fallback to its own discover() ordering of unit tests.
-    """
-    if unrunnable_script_set:  # pragma: no cover
-        unittest_print('Skipping execution of unrunnable scripts:\n'
-                       f'{unrunnable_script_set!r}')
 
-    test_pattern = 'tests.script_tests.TestScript{}.test_{}'
+custom_loader = False
 
-    tests = ['_login'] + [name for name in sorted(script_list)
-                          if name != 'login'
-                          and name not in unrunnable_script_set]
-    test_list = [test_pattern.format('Help', name) for name in tests]
 
-    tests = [name for name in tests if name not in failed_dep_script_set]
-    test_list += [test_pattern.format('Simulate', name) for name in tests]
-
-    tests = [name for name in tests if name not in auto_run_script_set]
-    test_list += [test_pattern.format('Generator', name) for name in tests]
-
+def load_tests(loader: unittest.TestLoader = unittest.defaultTestLoader,
+               standard_tests: unittest.TestSuite | None = None,
+               pattern: str | None = None) -> unittest.TestSuite:
+    """Load the default modules and return a TestSuite."""
+    global custom_loader
+    custom_loader = True
     suite = unittest.TestSuite()
-    suite.addTests(loader.loadTestsFromNames(test_list))
+    suite.addTests(loader.loadTestsFromNames(collector()))
     return suite
 
 
-def load_tests(loader=unittest.loader.defaultTestLoader,
-               tests=None, pattern=None):
-    """Load the default modules."""
-    return collector(loader)
+def filter_scripts(excluded: set[str] | None = None, *,
+                   exclude_auto_run: bool = False,
+                   exclude_failed_dep: bool = True) -> list[str]:
+    """Return a filtered list of script names.
 
+    :param excluded: Scripts to exclude explicitly.
+    :param exclude_auto_run: If True, remove scripts in
+        auto_run_script_set.
+    :param exclude_failed_dep: If True, remove scripts in
+        failed_dep_script_set.
+    :return: A list of valid script names in deterministic order.
+    """
+    excluded = excluded or set()
 
-def import_script(script_name: str) -> None:
-    """Import script for coverage only (T305795)."""
-    if not ci_test_run:
-        return  # pragma: no cover
+    scripts = ['login'] + [
+        name for name in sorted(script_list)
+        if name != 'login'
+        and name not in unrunnable_script_set
+        and (not exclude_failed_dep or name not in failed_dep_script_set)
+    ]
 
-    prefix = 'scripts.'
-    if script_name in framework_scripts:
-        prefix = 'pywikibot.' + prefix
-    import_module(prefix + script_name)
+    if exclude_auto_run:
+        scripts = [n for n in scripts if n not in auto_run_script_set]
+
+    return [n for n in scripts if n not in excluded]
 
 
 class ScriptTestMeta(MetaTestCaseClass):
@@ -210,7 +213,7 @@ class ScriptTestMeta(MetaTestCaseClass):
             def test_script(self) -> None:
                 global_args_msg = \
                     'For global options use -help:global or run pwb'
-                global_args = ['-pwb_close_matches:1']
+                global_args = (pwb_args or []) + ['-pwb_close_matches:1']
 
                 cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
@@ -299,34 +302,31 @@ class ScriptTestMeta(MetaTestCaseClass):
 
         arguments = dct['_arguments']
 
-        for script_name in script_list:
-            import_script(script_name)
+        if custom_loader:
+            collected_scripts = dct['_script_list']
+        else:
+            collected_scripts = filter_scripts(exclude_failed_dep=False)
+        for script in collected_scripts:
 
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
             # another script.
-            # unrunnable script tests are disabled by default in load_tests()
+            test = 'test__login' if script == 'login' else 'test_' + script
 
-            if script_name == 'login':
-                test_name = 'test__login'
-            else:
-                test_name = 'test_' + script_name
+            cls.add_method(dct, test,
+                           test_execution(script, arguments.split()),
+                           f'Test running {script} {arguments}.')
 
-            cls.add_method(dct, test_name,
-                           test_execution(script_name, arguments.split()),
-                           f'Test running {script_name} {arguments}.')
-
-            if script_name in dct['_expected_failures']:
-                dct[test_name] = unittest.expectedFailure(dct[test_name])
-            elif script_name in dct['_allowed_failures']:
-                dct[test_name] = unittest.skip(
-                    f'{script_name} is in _allowed_failures set'
-                )(dct[test_name])
-            elif script_name in failed_dep_script_set \
-                    and arguments == '-simulate':
-                dct[test_name] = unittest.skip(
-                    f'{script_name} has dependencies; skipping'
-                )(dct[test_name])
+            if script in dct['_expected_failures']:
+                dct[test] = unittest.expectedFailure(dct[test])
+            elif script in dct['_allowed_failures']:
+                dct[test] = unittest.skip(
+                    f'{script} is in _allowed_failures set'
+                )(dct[test])
+            elif script in failed_dep_script_set and arguments == '-simulate':
+                dct[test] = unittest.skip(
+                    f'{script} has dependencies; skipping'
+                )(dct[test])
 
         return super().__new__(cls, name, bases, dct)
 
@@ -349,6 +349,7 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
     _results = None
     _skip_results = {}
     _timeout = False
+    _script_list = filter_scripts(exclude_failed_dep=False)
 
 
 class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
@@ -397,6 +398,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _results = no_args_expected_results
     _skip_results = skip_on_results
     _timeout = auto_run_script_set
+    _script_list = filter_scripts(_allowed_failures)
 
 
 class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
@@ -464,6 +466,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
     _timeout = True
+    _script_list = filter_scripts(_allowed_failures, exclude_auto_run=True)
 
 
 if __name__ == '__main__':

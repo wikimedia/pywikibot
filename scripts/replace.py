@@ -1006,7 +1006,9 @@ def main(*args: str) -> None:
 
     # The summary stored here won't be actually used but is only an example
     site = pywikibot.Site()
-    single_summary = None
+    single_summary = (
+        'Not needed' if edit_summary and edit_summary is not True else None
+    )
     for old, new in batched(commandline_replacements, 2):
         replacement = Replacement(old, new)
         if not single_summary:

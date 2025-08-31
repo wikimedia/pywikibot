@@ -1,6 +1,19 @@
 Scripts Changelog
 =================
 
+10.4.0
+------
+
+addwikis
+^^^^^^^^
+
+* Add help options for addwikis script whereas `help` is deprecated.
+
+interwiki
+^^^^^^^^^
+
+* Clarify ``-localonly`` option behavior and help text (:phab:`T57257`)
+
 10.3.0
 ------
 
@@ -1050,12 +1063,6 @@ login
 ^^^^^
 
 *  update help string
-
-maintenance
-^^^^^^^^^^^
-
-*  Add a preload_sites.py script to preload site information
-   (:phab:`T226157`)
 
 reflinks
 ^^^^^^^^

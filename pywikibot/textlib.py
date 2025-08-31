@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import itertools
 import re
+import sys
 from collections import OrderedDict
 from collections.abc import Sequence
 from contextlib import closing, suppress
@@ -1119,6 +1120,101 @@ class Section(NamedTuple):
         return self.title[level:-level].strip()
 
 
+class SectionList(list):
+
+    """List of :class:`Section` objects with heading/level-aware index().
+
+    Introduced for handling lists of sections with custom lookup by
+    :attr:`Section.heading` and :attr:`level<Section.level>`.
+
+    .. versionadded:: 10.4
+    """
+
+    def __contains__(self, value: object) -> bool:
+        """Check if a section matching the given value exists.
+
+        :param value: The section heading string, a (heading, level) tuple,
+            or a :class:`Section` instance to search for.
+        :return: ``True`` if a matching section exists, ``False`` otherwise.
+        """
+        with suppress(ValueError):
+            self.index(value)
+            return True
+
+        return False
+
+    def count(self, value: str | tuple[str, int] | Section, /) -> int:
+        """Count the number of sections matching the given value.
+
+        :param value: The section heading string, a (heading, level) tuple,
+            or a :class:`Section` instance to search for.
+        :return: The number of matching sections.
+        """
+        if isinstance(value, Section):
+            return super().count(value)
+
+        if isinstance(value, tuple) and len(value) == 2:
+            heading, level = value
+            return sum(1 for sec in self
+                       if sec.heading == heading and sec.level == level)
+
+        if isinstance(value, str):
+            return sum(1 for sec in self if sec.heading == value)
+
+        return super().count(value)
+
+    def index(
+        self,
+        value: str | tuple[str, int] | Section,
+        start: int = 0,
+        stop: int = sys.maxsize,
+        /,
+    ) -> int:
+        """Return the index of a matching section.
+
+        Works like ``list.index(value, start, stop)`` but also allows:
+
+        - *value* as a string → match by :attr:`Section.heading` (any level)
+        - *value* as a ``(heading, level)`` tuple → match both
+          :attr:`heading<Section.heading>` and :attr:`level<Section.level>`
+        - *value* as a ``Section`` object → normal list.index() behavior
+
+        :param value: The item to search for. May be:
+            - ``str`` — search by section heading.
+            - ``tuple[str, int]`` — search by heading and section level.
+            - :class:`Section` — search for an exact section object.
+        :param start: Index to start searching from (inclusive).
+        :param stop: Index to stop searching at (exclusive).
+        :return: The integer index of the matching section.
+        :raises ValueError: If no matching section is found.
+        """
+        # Normalize negative indices
+        n = len(self)
+        start = max(0, n + start) if start < 0 else start
+        stop = max(0, n + stop) if stop < 0 else stop
+
+        if isinstance(value, Section):
+            return super().index(value, start, stop)
+
+        if isinstance(value, tuple) and len(value) == 2:
+            heading, level = value
+            for i, sec in enumerate(self[start:stop], start):
+                if sec.heading == heading and sec.level == level:
+                    return i
+
+            raise ValueError(
+                f'{value!r} not found in Section headings/levels')
+
+        if isinstance(value, str):
+            for i, sec in enumerate(self[start:stop], start):
+                if sec.heading == value:
+                    return i
+
+            raise ValueError(f'{value!r} not found in Section headings')
+
+        return super().index(value, start, stop)
+
+
 class Content(NamedTuple):
 
     """A namedtuple as result of :func:`extract_sections` holding page content.
@@ -1128,7 +1224,7 @@ class Content(NamedTuple):
     """
 
     header: str  #: the page header
-    sections: list[Section]  #: the page sections
+    sections: SectionList[Section]  #: the page sections
     footer: str  #: the page footer
 
     @property
@@ -1156,7 +1252,7 @@ def _extract_headings(text: str) -> list[_Heading]:
 
 def _extract_sections(text: str, headings) -> list[Section]:
     """Return a list of :class:`Section` objects."""
-    sections = []
+    sections = SectionList()
     if headings:
         # Assign them their contents
         for heading, next_heading in pairwise(headings):
@@ -1217,6 +1313,16 @@ def extract_sections(
     '== History of this =='
     >>> result.sections[1].content.strip()
     'Enter "import this" for usage...'
+    >>> 'Details' in result.sections
+    True
+    >>> ('Details', 2) in result.sections
+    False
+    >>> result.sections.index('Details')
+    2
+    >>> result.sections.index(('Details', 2))
+    Traceback (most recent call last):
+    ...
+    ValueError: ('Details', 2) not found in Section headings/levels
     >>> result.sections[2].heading
     'Details'
     >>> result.sections[2].level
@@ -1232,6 +1338,9 @@ def extract_sections(
     .. versionchanged:: 8.2
        The :class:`Content` and :class:`Section` class have additional
        properties.
+    .. versionchanged:: 10.4
+       Added custom ``index()``, ``count()`` and ``in`` operator support
+       for :attr:`Content.sections`.
 
     :return: The parsed namedtuple.
     """  # noqa: D300, D301

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 from contextlib import suppress
 from unittest import mock
@@ -45,8 +46,11 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertIsNone(e._streams)
-        self.assertEqual(repr(e),
-                         f"EventStreams(url='{self.sites[key]['hostname']}')")
+        self.assertRegex(
+            repr(e),
+            rf"^EventStreams\(url={self.sites[key]['hostname']!r}, "
+            r"headers={'user-agent': '[^']+'}\)$"
+        )
 
     def test_url_from_site(self, key) -> None:
         """Test EventStreams with url from site."""
@@ -59,9 +63,12 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertEqual(e._streams, streams)
-        site_repr = f'site={site!r}, ' if site != Site() else ''
-        self.assertEqual(repr(e),
-                         f"EventStreams({site_repr}streams='{streams}')")
+        site_repr = re.escape(f'site={site!r}, ') if site != Site() else ''
+        self.assertRegex(
+            repr(e),
+            r"^EventStreams\(headers={'user-agent': '[^']+'}, "
+            rf'{site_repr}streams={streams!r}\)$'
+        )
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())

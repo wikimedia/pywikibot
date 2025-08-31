@@ -283,9 +283,9 @@ class TestItemLoad(WikidataTestCase):
         self.assertNotHasAttr(item, '_content')
         item.get()
         self.assertHasAttr(item, '_content')
-        self.assertIn('en', item.labels)
+        self.assertIn('mul', item.labels)
         # label could change
-        self.assertIn(item.labels['en'], ['New York', 'New York City'])
+        self.assertIn(item.labels['mul'], ['New York', 'New York City'])
         self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self) -> None:
@@ -300,7 +300,7 @@ class TestItemLoad(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
         item.get()
-        self.assertIn(item.labels['en'], label)
+        self.assertIn(item.labels['mul'], label)
 
         # When the id attribute is modified, the ItemPage goes into
         # an inconsistent state.
@@ -312,7 +312,7 @@ class TestItemLoad(WikidataTestCase):
         # it doesn't help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
-        self.assertIn(item.labels['en'], label)
+        self.assertIn(item.labels['mul'], label)
 
     def test_empty_item(self) -> None:
         """Test empty wikibase item.
@@ -324,8 +324,12 @@ class TestItemLoad(WikidataTestCase):
         item = ItemPage(wikidata)
         self.assertEqual(item._link._title, '-1')
         self.assertLength(item.labels, 0)
+        self.assertEqual(str(item.labels), 'LanguageDict({})')
+        self.assertEqual(repr(item.labels), 'LanguageDict({})')
         self.assertLength(item.descriptions, 0)
         self.assertLength(item.aliases, 0)
+        self.assertEqual(str(item.aliases), 'AliasesDict({})')
+        self.assertEqual(repr(item.aliases), 'AliasesDict({})')
         self.assertLength(item.claims, 0)
         self.assertLength(item.sitelinks, 0)
 
@@ -1127,6 +1131,14 @@ class TestWriteNormalizeData(TestCase):
             copy.deepcopy(self.data_out))
         self.assertEqual(response, self.data_out)
 
+    def test_normalized_invalid_data(self) -> None:
+        """Test _normalizeData() method for invalid data."""
+        data = copy.deepcopy(self.data_out)
+        data['aliases']['en'] = tuple(data['aliases']['en'])
+        with self.assertRaisesRegex(TypeError,
+                                    "Unsupported value type 'tuple'"):
+            ItemPage._normalizeData(data)
+
 
 class TestPreloadingEntityGenerator(TestCase):
 
@@ -1437,6 +1449,31 @@ class TestJSON(WikidataTestCase):
         del self.wdp._content['lastrevid']
         del self.wdp._content['pageid']
 
+    def test_base_data(self) -> None:
+        """Test labels and aliases collections."""
+        item = self.wdp
+        self.assertIn('en', item.labels)
+        self.assertEqual(item.labels['en'], 'New York City')
+        self.assertIn('en', item.aliases)
+        self.assertIn('NYC', item.aliases['en'])
+
+    def test_str_repr(self) -> None:
+        """Test str and repr of labels and aliases."""
+        self.assertEqual(
+            str(self.wdp.labels),
+            "LanguageDict({'af': 'New York Stad', 'als': 'New York City', "
+            "'am': 'ኒው ዮርክ ከተማ', 'an': 'Nueva York', ...})"
+        )
+        self.assertEqual(
+            str(self.wdp.aliases),
+            "AliasesDict({'be': ['Горад Нью-Ёрк'], 'be-tarask': ['Нью Ёрк'], "
+            "'ca': ['Ciutat de Nova York', 'New York City',"
+            " 'New York City (New York)', 'NYC', 'N. Y.', 'N Y'], "
+            "'da': ['New York City'], ...})"
+        )
+        self.assertEqual(str(self.wdp.labels), repr(self.wdp.labels))
+        self.assertEqual(str(self.wdp.aliases), repr(self.wdp.aliases))
+
     def test_itempage_json(self) -> None:
         """Test itempage json."""
         old = json.dumps(self.wdp._content, indent=2, sort_keys=True)
@@ -1495,6 +1532,47 @@ class TestJSON(WikidataTestCase):
         }
         diff = self.wdp.toJSON(diffto=self.wdp._content)
         self.assertEqual(diff, expected)
+
+
+class TestHighLevelApi(WikidataTestCase):
+
+    """Test high-level API for Wikidata."""
+
+    def test_get_best_claim(self) -> None:
+        """Test getting the best claim for a property."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q90')
+        item.get()
+        self.assertEqual(item.get_best_claim('P17').getTarget(),
+                         pywikibot.ItemPage(wikidata, 'Q142'))
+
+    def test_get_value_at_timestamp(self) -> None:
+        """Test getting the value of a claim at a specific timestamp."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q90')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P17', wbtime)
+        self.assertEqual(claim, pywikibot.ItemPage(wikidata, 'Q142'))
+
+    def test_with_monolingual_good_language(self) -> None:
+        """Test getting a monolingual text claim with a good language."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q183')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P1448', wbtime, 'ru')
+        self.assertIsInstance(claim, pywikibot.WbMonolingualText)
+        self.assertEqual(claim.language, 'ru')
+
+    def test_with_monolingual_wrong_language(self) -> None:
+        """Test getting a monolingual text claim with a wrong language."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q183')
+        item.get()
+        wbtime = pywikibot.WbTime(year=2021, month=1, day=1, site=wikidata)
+        claim = item.get_value_at_timestamp('P1448', wbtime, 'en')
+        self.assertIsNone(claim, None)
 
 
 if __name__ == '__main__':

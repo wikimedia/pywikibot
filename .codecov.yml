@@ -19,14 +19,9 @@ coverage:
       default:
         enabled: true
   ignore:
-    - Users
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
-    - pywikibot/scripts/preload_sites.py
-    - pywikibot/scripts/version.py
     - scripts/create_isbn_edition.py
-    - scripts/maintenance/colors.py
-    - scripts/maintenance/make_i18n_dict.py
     - scripts/userscripts/
     - tests/pwb/
   notify:

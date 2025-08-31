@@ -2,7 +2,8 @@
 
 .. versionadded:: 7.0
 .. versionremoved:: 9.4
-   ``preload_sites`` script was removed (:phab:`T348925`).
+   ``preload_sites`` script, previously added in release 6.0
+   (:phab:`T226157`), was removed (:phab:`T348925`).
 """
 #
 # (C) Pywikibot team, 2021-2025

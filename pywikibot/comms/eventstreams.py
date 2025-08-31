@@ -27,6 +27,7 @@ from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
 from pywikibot.backports import NoneType
+from pywikibot.comms.http import user_agent
 from pywikibot.tools import cached, deprecated_args
 from pywikibot.tools.collections import GeneratorWrapper
 
@@ -207,6 +208,10 @@ class EventStreams(GeneratorWrapper):
             kwargs['reconnection_time'] = timedelta(milliseconds=retry)
 
         kwargs.setdefault('timeout', config.socket_timeout)
+
+        kwargs.setdefault('headers', {})
+        kwargs['headers'].setdefault('user-agent', user_agent(self._site))
+
         self.sse_kwargs = kwargs
 
     def __repr__(self) -> str:

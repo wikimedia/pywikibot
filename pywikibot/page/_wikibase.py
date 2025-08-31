@@ -1341,6 +1341,105 @@ class ItemPage(WikibasePage):
             return self._isredir
         return super().isRedirectPage()
 
+    def get_best_claim(self, prop: str) -> pywikibot.Claim | None:
+        """Return the first best Claim for this page.
+
+        Return the first 'preferred' ranked Claim specified by Wikibase
+        property or the first 'normal' one otherwise.
+
+        .. versionadded:: 10.4
+
+        .. seealso:: :meth:`pywikibot.Page.get_best_claim`
+
+        :param prop:  Wikibase property ID, must be of the form ``P``
+            followed by one or more digits (e.g. ``P31``).
+        :return: Claim object given by Wikibase property number
+            for this page object.
+
+        :raises UnknownExtensionError: site has no Wikibase extension
+        """
+
+        def find_best_claim(claims):
+            """Find the first best ranked claim."""
+            index = None
+            for i, claim in enumerate(claims):
+                if claim.rank == 'preferred':
+                    return claim
+                if index is None and claim.rank == 'normal':
+                    index = i
+            if index is None:
+                index = 0
+            return claims[index]
+
+        if prop in self.claims:
+            return find_best_claim(self.claims[prop])
+        return None
+
+    def get_value_at_timestamp(
+        self,
+        prop: str,
+        timestamp: pywikibot.WbTime,
+        lang: str = 'en'
+    ) -> pywikibot.WbRepresentation | None:
+        """Return the best value for this page at a given timestamp.
+
+        .. versionadded:: 10.4
+
+        :param prop: property id, "P###"
+        :param timestamp: the timestamp to check the value at
+        :param lang: the language to return the value in
+        :return: :class:`pywikibot.WbRepresentation` object given by
+            Wikibase property number for this page object and valid for
+            the given timestamp and language.
+
+        :raises NoWikibaseEntityError: site has no time interval properties
+        """
+        fam = self.site.family
+        if not hasattr(fam, 'interval_start_property') or \
+                not hasattr(fam, 'interval_end_property'):
+            raise NoWikibaseEntityError(
+                f'{fam} does not have time interval properties')
+
+        startp, endp = fam.interval_start_property, fam.interval_end_property
+
+        def timestamp_in_interval(p, ts):
+            """Check if timestamp is within the qualifiers."""
+            q1 = p.qualifiers.get(startp, [])
+            q2 = p.qualifiers.get(endp, [])
+            d1 = d2 = None
+            if q1:
+                d1 = q1[0].getTarget()
+            if q2:
+                d2 = q2[0].getTarget()
+            if d1 and d2:
+                return d1 <= ts <= d2
+            if d1:
+                return d1 <= ts
+            if d2:
+                return d2 >= ts
+            return False
+
+        def find_value_at_timestamp(claims, ts, language):
+            """Find the first best ranked claim at a given timestamp."""
+            sorted_claims = sorted(
+                claims,
+                key=(lambda c: c.qualifiers.get(startp)[0].getTarget()
+                     if c.qualifiers.get(startp)
+                     else pywikibot.WbTime(0, site=self.site)),
+                reverse=True
+            )
+            for claim in sorted_claims:
+                if timestamp_in_interval(claim, ts):
+                    if (claim.type != 'monolingualtext'
+                            or claim.getTarget().language == language):
+                        return claim.getTarget()
+            return None
+
+        if prop in self.claims:
+            return find_value_at_timestamp(self.claims[prop], timestamp, lang)
+
+        return None
+
 
 class Property:
 

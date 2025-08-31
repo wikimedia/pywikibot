@@ -274,8 +274,8 @@ The following arguments are only important for users who have accounts
 for multiple languages, and specify on which sites the bot should modify
 pages:
 
--localonly      Only work on the local wiki, not on other wikis in the
-                family I have a login at.
+-localonly      Process only pages from the default site; ignore pages
+                from other family members.
 
 -limittwo       Only update two pages - one in the local wiki (if
                 logged-in) and one in the top available one. For example,
@@ -341,6 +341,10 @@ the subjects in that list. After finishing the dump file will be deleted.
 To run the script on all pages on a language, run it with option
 ``-start:!``, and if it takes so long that you have to break it off, use
 ``-continue`` next time.
+
+.. versionchanged:: 10.4
+   The ``-localonly`` option now restricts page processing to the
+   default site only, instead of the origin page.
 """
 #
 # (C) Pywikibot team, 2003-2025
@@ -443,46 +447,46 @@ class InterwikiBotConfig:
 
     """Container class for interwikibot's settings."""
 
-    autonomous = False
-    confirm = False
     always = False
-    select = False
-    followredirect = True
-    initialredirect = False
-    force = False
-    cleanup = False
-    remove = []
-    maxquerysize = 50
-    same = False
-    skip = set()
-    skipauto = False
-    untranslated = False
-    untranslatedonly = False
-    auto = True
-    neverlink = []
-    showtextlink = 0
-    showtextlinkadd = 300
-    localonly = False
-    limittwo = False
-    strictlimittwo = False
-    needlimit = 0
-    ignore = []
-    parenthesesonly = False
-    rememberno = False
-    followinterwiki = True
-    minsubjects = config.interwiki_min_subjects
-    nobackonly = False
     askhints = False
+    asynchronous = False
+    auto = True
+    autonomous = False
+    cleanup = False
+    confirm = False
+    followinterwiki = True
+    followredirect = True
+    force = False
     hintnobracket = False
     hints = []
     hintsareright = False
+    ignore = []
+    initialredirect = False
+    limittwo = False
+    localonly = False
     lacklanguage = None
+    maxquerysize = 50
     minlinks = 0
+    minsubjects = config.interwiki_min_subjects
+    needlimit = 0
+    neverlink = []
+    nobackonly = False
+    parenthesesonly = False
     quiet = False
-    restore_all = False
-    asynchronous = False
-    summary = ''
+    rememberno = False
+    remove = []
     repository = False
+    restore_all = False
+    same = False
+    select = False
+    showtextlink = 0
+    showtextlinkadd = 300
+    skip = set()
+    skipauto = False
+    strictlimittwo = False
+    summary = ''
+    untranslated = False
+    untranslatedonly = False
 
     def note(self, text: str) -> None:
         """Output a notification message with.
@@ -672,6 +676,8 @@ class Subject(interwiki_graph.Subject):
         self.hintsAsked = False
         self.forcedStop = False
         self.workonme = True
+        # default site for -localonly option
+        self.site = pywikibot.Site()
 
     def getFoundDisambig(self, site):
         """Return the first disambiguation found.
@@ -1541,10 +1547,10 @@ class Subject(interwiki_graph.Subject):
                 updated.append(site)
 
     def _fetch_text(self, page: pywikibot.Page) -> str:
-        """Validate page and load it's content for editing.
+        """Validate page and load its content for editing.
 
         This includes checking for:
-        - `-localonly` flag and whether the page is the origin
+        - `-localonly` flag and whether the page is on default site
         - Section-only pages (pages with `#section`)
         - Non-existent pages
         - Empty pages
@@ -1553,9 +1559,10 @@ class Subject(interwiki_graph.Subject):
         :return: The text content of the page if it passes all checks.
         :raises SaveError: If the page is not eligible for editing.
         """
-        # In this case only continue on the Page we started with
-        if self.conf.localonly and page != self.origin:
-            raise SaveError('-localonly and page != origin')
+        # In this case only continue on the Page if on default site
+        if self.conf.localonly and page.site != self.site:
+            raise SaveError(f'-localonly: {page} is on site {page.site}; '
+                            f'only {self.site} is accepted with this option.')
 
         if page.section():
             # This is not a page, but a subpage. Do not edit it.

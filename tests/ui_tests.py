@@ -10,8 +10,9 @@ from __future__ import annotations
 import io
 import logging
 import os
+import platform
 import unittest
-from contextlib import redirect_stdout, suppress
+from contextlib import nullcontext, redirect_stdout, suppress
 from typing import NoReturn
 from unittest.mock import patch
 
@@ -26,6 +27,7 @@ from pywikibot.bot import (
     VERBOSE,
     WARNING,
 )
+from pywikibot.tools import suppress_warnings
 from pywikibot.userinterfaces import (
     terminal_interface_base,
     terminal_interface_unix,
@@ -205,13 +207,21 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(returned, 'input to read')
 
     def test_input_yn(self) -> None:
-        self.strin.write('\n')
-        self.strin.seek(0)
-        returned = pywikibot.input_yn('question', False, automatic_quit=False)
+        if platform.python_implementation() == 'PyPy':
+            context = suppress_warnings(r'subprocess \d+ is still running',
+                                        ResourceWarning)
+        else:
+            context = nullcontext()
+        with context:
+            self.strin.write('\n')
+            self.strin.seek(0)
+            returned = pywikibot.input_yn('question', False,
+                                          automatic_quit=False)
 
-        self.assertEqual(self.strout.getvalue(), '')
-        self.assertEqual(self.strerr.getvalue(), 'question ([y]es, [N]o): ')
-        self.assertFalse(returned)
+            self.assertEqual(self.strout.getvalue(), '')
+            self.assertEqual(self.strerr.getvalue(),
+                             'question ([y]es, [N]o): ')
+            self.assertFalse(returned)
 
     def _call_input_choice(self):
         rv = pywikibot.input_choice(
@@ -242,12 +252,18 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(returned, 'n')
 
     def testInputChoiceNonCapital(self) -> None:
-        self.strin.write('n\n')
-        self.strin.seek(0)
-        returned = self._call_input_choice()
+        if platform.python_implementation() == 'PyPy':
+            context = suppress_warnings(r'subprocess \d+ is still running',
+                                        ResourceWarning)
+        else:
+            context = nullcontext()
+        with context:
+            self.strin.write('n\n')
+            self.strin.seek(0)
+            returned = self._call_input_choice()
 
-        self.assertEqual(self.strerr.getvalue(), self.input_choice_output)
-        self.assertEqual(returned, 'n')
+            self.assertEqual(self.strerr.getvalue(), self.input_choice_output)
+            self.assertEqual(returned, 'n')
 
     def testInputChoiceIncorrectAnswer(self) -> None:
         self.strin.write('X\nN\n')

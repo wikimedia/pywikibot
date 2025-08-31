@@ -1,18 +1,18 @@
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import os.path
+from pathlib import Path
 
 from pywikibot import config
 
 
 parameter_help = """
-                  Currently available predefined fixes are:
+                  Currently available predefined fixes:
 
                   * HTML        - Convert HTML tags to wiki syntax, and
                                   fix XHTML.
@@ -20,21 +20,20 @@ parameter_help = """
                   * syntax      - Try to fix bad wiki markup. Do not run
                                   this in automatic mode, as the bot may
                                   make mistakes.
-                  * syntax-safe - Like syntax, but less risky, so you can
-                                  run this in automatic mode.
-                  * case-de     - fix upper/lower case errors in German
-                  * grammar-de  - fix grammar and typography in German
-                  * vonbis      - Ersetze Binde-/Gedankenstrich durch "bis"
-                                  in German
-                  * music       - Links auf Begriffsklärungen in German
-                  * datum       - specific date formats in German
-                  * correct-ar  - Typo corrections for Arabic Wikipedia and any
-                                  Arabic wiki.
-                  * yu-tld      - Fix links to .yu domains because it is
-                                  disabled, see:
+                  * syntax-safe - Like syntax, but less risky; can be run
+                                  in automatic mode.
+                  * case-de     - Fix upper/lower case errors in German.
+                  * grammar-de  - Fix grammar and typography in German.
+                  * vonbis      - Replace hyphens or dashes with "bis"
+                                  in German.
+                  * music       - Links to disambiguation pages in German.
+                  * datum       - Specific date formats in German.
+                  * correct-ar  - Typo corrections for Arabic Wikipedia
+                                  and other Arabic wikis.
+                  * yu-tld      - Fix links to .yu domains, which are disabled.
+                                  See:
                                   https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
-                  * fckeditor   - Try to convert FCKeditor HTML tags to wiki
-                                  syntax.
+                  * fckeditor   - Convert FCKeditor HTML tags to wiki syntax.
 """
 
 __doc__ += parameter_help
@@ -673,20 +672,27 @@ fixes = {
         'msg': 'pywikibot-fixes-fckeditor',
         'replacements': [
             # replace <br> with a new line
-            (r'(?i)<br>',                      r'\n'),
+            (r'(?i)<br>', r'\n'),
             # replace &nbsp; with a space
-            (r'(?i)&nbsp;',                      r' '),
+            (r'(?i)&nbsp;', r' '),
         ],
     },
 }
 
 
 def _load_file(filename: str) -> bool:
-    """Load the fixes from the given filename."""
-    if os.path.exists(filename):
-        # load binary, to let compile decode it according to the file header
-        with open(filename, 'rb') as f:
-            exec(compile(f.read(), filename, 'exec'), globals())
+    """Load the fixes from the given filename.
+
+    Returns True if the file existed and was loaded, False otherwise.
+
+    :meta public:
+    """
+    path = Path(filename)
+    if path.exists():
+        # Read file as binary, so that compile can detect encoding from header
+        with path.open('rb') as f:
+            code = compile(f.read(), filename, 'exec')
+            exec(code, globals())  # intentionally in globals
         return True
 
     return False

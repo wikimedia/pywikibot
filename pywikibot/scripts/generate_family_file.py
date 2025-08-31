@@ -102,7 +102,7 @@ class FamilyFileGenerator:
         """Wrapper around print to be mocked in tests."""
         print(*args, **kwargs)
 
-    def get_params(self) -> bool:  # pragma: no cover
+    def get_params(self) -> bool:
         """Ask for parameters if necessary."""
         if self.base_url is None:
             with suppress(KeyboardInterrupt):
@@ -147,7 +147,7 @@ class FamilyFileGenerator:
                     break
             else:
                 return w, verify
-        return None, None  # pragma: no cover
+        return None, None
 
     def run(self) -> None:
         """Main method, generate family file."""
@@ -182,7 +182,7 @@ class FamilyFileGenerator:
             self.langs = w.langs
             self.show(fill(' '.join(sorted(wiki['prefix']
                                            for wiki in self.langs))))
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             self.langs = []
             self.show(e, '; continuing...')
 
@@ -197,7 +197,7 @@ class FamilyFileGenerator:
         code_len = len(self.langs)
         if code_len > 1:
             if self.dointerwiki is None:
-                while True:  # pragma: no cover
+                while True:
                     makeiw = input(
                         '\n'
                         f'There are {code_len} sites available.'
@@ -225,7 +225,7 @@ class FamilyFileGenerator:
                 self.langs = [wiki for wiki in self.langs
                               if domain in wiki['url']]
 
-            elif makeiw == 'e':  # pragma: no cover
+            elif makeiw == 'e':
                 for wiki in self.langs:
                     self.show(wiki['prefix'], wiki['url'])
                 do_langs = re.split(' *,| +',
@@ -251,7 +251,7 @@ class FamilyFileGenerator:
                 try:
                     self.wikis[key] = self.Wiki(lang['url'])
                     self.show('downloaded')
-                except Exception as e:  # pragma: no cover
+                except Exception as e:
                     self.show(e)
                     remove.append(lang)
             else:
@@ -260,7 +260,7 @@ class FamilyFileGenerator:
         for lang in remove:
             self.langs.remove(lang)
 
-    def writefile(self, verify) -> None:  # pragma: no cover
+    def writefile(self, verify) -> None:
         """Write the family file."""
         fp = Path(self.base_dir, 'families', f'{self.name}_family.py')
         self.show(f'Writing {fp}... ')

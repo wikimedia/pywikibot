@@ -335,12 +335,21 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertNotEqual(t11, t12)
         self.assertEqual(t11_normalized, t12_normalized)
         self.assertEqual(t13.normalize().timezone, -300)
+        # test _normalize handler functions
+        self.assertEqual(pywikibot.WbTime._normalize_millennium(1301), 2000)
+        self.assertEqual(pywikibot.WbTime._normalize_millennium(-1301), -2000)
+        self.assertEqual(pywikibot.WbTime._normalize_century(1301), 1400)
+        self.assertEqual(pywikibot.WbTime._normalize_century(-1301), -1400)
+        self.assertEqual(pywikibot.WbTime._normalize_decade(1301), 1300)
+        self.assertEqual(pywikibot.WbTime._normalize_decade(-1301), -1300)
+        self.assertEqual(
+            pywikibot.WbTime._normalize_power_of_ten(123456, 7), 123500)
+        self.assertEqual(
+            pywikibot.WbTime._normalize_power_of_ten(-987654, 3), -1000000)
 
     def test_WbTime_normalization_very_low_precision(self) -> None:
         """Test WbTime normalization with very low precision."""
         repo = self.get_repo()
-        # flake8 is being annoying, so to reduce line length, I'll make
-        # some aliases here
         year_10000 = pywikibot.WbTime.PRECISION['10000']
         year_100000 = pywikibot.WbTime.PRECISION['100000']
         year_1000000 = pywikibot.WbTime.PRECISION['1000000']
@@ -423,15 +432,18 @@ class TestWbTime(WbRepresentationTestCase):
     def test_WbTime_errors(self) -> None:
         """Test WbTime precision errors."""
         repo = self.get_repo()
-        regex = r'^no year given$'
-        with self.assertRaisesRegex(ValueError, regex):
+        regex = '^year must be an int, not NoneType$'
+        with self.assertRaisesRegex(TypeError, regex):
+            pywikibot.WbTime(None, site=repo, precision=15)
+        regex = "missing 1 required positional argument: 'year'"
+        with self.assertRaisesRegex(TypeError, regex):
             pywikibot.WbTime(site=repo, precision=15)
-        with self.assertRaisesRegex(ValueError, regex):
+        with self.assertRaisesRegex(TypeError, regex):
             pywikibot.WbTime(site=repo, precision='invalid_precision')
-        regex = r'^Invalid precision: "15"$'
+        regex = '^Invalid precision: "15"$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTime(site=repo, year=2020, precision=15)
-        regex = r'^Invalid precision: "invalid_precision"$'
+        regex = '^Invalid precision: "invalid_precision"$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTime(site=repo, year=2020,
                              precision='invalid_precision')
@@ -460,10 +472,11 @@ class TestWbTime(WbRepresentationTestCase):
         self.assertEqual(t2.second, 0)
         self.assertEqual(t1.toTimestr(), '+00000002010-01-01T12:43:00Z')
         self.assertEqual(t2.toTimestr(), '-00000002005-01-01T16:45:00Z')
-        self.assertRaises(ValueError, pywikibot.WbTime, site=repo,
-                          precision=15)
-        self.assertRaises(ValueError, pywikibot.WbTime, site=repo,
-                          precision='invalid_precision')
+        with self.assertRaisesRegex(ValueError, 'Invalid precision: "15"'):
+            pywikibot.WbTime(0, site=repo, precision=15)
+        with self.assertRaisesRegex(ValueError,
+                                    'Invalid precision: "invalid_precision"'):
+            pywikibot.WbTime(0, site=repo, precision='invalid_precision')
         self.assertIsInstance(t1.toTimestamp(), pywikibot.Timestamp)
         self.assertRaises(ValueError, t2.toTimestamp)
 
@@ -621,18 +634,20 @@ class TestWbQuantity(WbRepresentationTestCase):
     def test_WbQuantity_formatting_bound(self) -> None:
         """Test WbQuantity formatting with bounds."""
         repo = self.get_repo()
-        q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
+        amount = '0.044405586'
+        repr_amount = repr(Decimal(amount))
+        q = pywikibot.WbQuantity(amount=amount, error='0', site=repo)
         self.assertEqual(str(q),
-                         '{{\n'
-                         '    "amount": "+{val}",\n'
-                         '    "lowerBound": "+{val}",\n'
-                         '    "unit": "1",\n'
-                         '    "upperBound": "+{val}"\n'
-                         '}}'.format(val='0.044405586'))
+                         f'{{\n'
+                         f'    "amount": "+{amount}",\n'
+                         f'    "lowerBound": "+{amount}",\n'
+                         f'    "unit": "1",\n'
+                         f'    "upperBound": "+{amount}"\n'
+                         f'}}')
         self.assertEqual(repr(q),
-                         'WbQuantity(amount={val}, '
-                         'upperBound={val}, lowerBound={val}, '
-                         'unit=1)'.format(val='0.044405586'))
+                         f'WbQuantity(amount={repr_amount}, '
+                         f'upperBound={repr_amount}, '
+                         f"lowerBound={repr_amount}, unit='1')")
 
     def test_WbQuantity_self_equality(self) -> None:
         """Test WbQuantity equality."""
@@ -704,18 +719,19 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     def test_WbQuantity_formatting_unbound(self) -> None:
         """Test WbQuantity formatting without bounds."""
-        q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
+        amount = '0.044405586'
+        q = pywikibot.WbQuantity(amount=amount, site=self.repo)
         self.assertEqual(str(q),
-                         '{{\n'
-                         '    "amount": "+{val}",\n'
-                         '    "lowerBound": null,\n'
-                         '    "unit": "1",\n'
-                         '    "upperBound": null\n'
-                         '}}'.format(val='0.044405586'))
+                         f'{{\n'
+                         f'    "amount": "+{amount}",\n'
+                         f'    "lowerBound": null,\n'
+                         f'    "unit": "1",\n'
+                         f'    "upperBound": null\n'
+                         f'}}')
         self.assertEqual(repr(q),
-                         'WbQuantity(amount={val}, '
-                         'upperBound=None, lowerBound=None, '
-                         'unit=1)'.format(val='0.044405586'))
+                         f'WbQuantity(amount={Decimal(amount)!r}, '
+                         f'upperBound=None, lowerBound=None, '
+                         f"unit='1')")
 
     def test_WbQuantity_fromWikibase_unbound(self) -> None:
         """Test WbQuantity.fromWikibase() instantiating without bounds."""

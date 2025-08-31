@@ -1,6 +1,15 @@
 Release History
 ===============
 
+10.3.2
+------
+*12 August 2025*
+
+* Add support for zghwiktionary, madwikisource, rkiwiki, minwikibooks
+  (:phab:`T391769`, :phab:`T392501`, :phab:`T395501`, :phab:`T399787`)
+* i18n updates
+
+
 10.3.1
 ------
 *08 August 2025*
@@ -1991,7 +2000,7 @@ Release History
 * UploadBot got a filename prefix parameter (:phab:`T170123`)
 * cosmetic_changes is able to remove empty sections (:phab:`T140570`)
 * Pywikibot is following :pep:`396` versioning
-* pagegenerators AllpagesPageGenerator, CombinedPageGenerator, UnconnectedPageGenerator are deprecated
+* CombinedPageGenerator is deprecated, itertools.chain can be used instead
 * Some DayPageGenerator parameters has been renamed
 * unicodedata2, httpbin and Flask dependency was removed
   (:phab:`T102461`, :phab:`T108068`, :phab:`T178864`, :phab:`T193383`)

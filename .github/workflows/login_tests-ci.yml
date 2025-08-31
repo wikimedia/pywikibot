@@ -14,8 +14,29 @@ env:
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
+  wait_for_all:
+    name: Wait for other workflows to finish
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Wait for all workflows to complete excluding this one
+        uses: kachick/wait-other-jobs@v3.8.1
+        with:
+          skip-same-workflow: true
+          skip-list: |
+            [
+              {
+                "workflowFile": "login_tests-ci.yml",
+                "jobName": "Wait for other workflows to finish"
+              }
+            ]
+          warmup-delay: PT1M
+          minimum-interval: PT5M
+
   run_tests:
+    name: Run Login/Logout Tests
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    needs: wait_for_all
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -110,6 +131,7 @@ jobs:
           coverage run -m unittest -vv tests/site_login_logout_tests.py
       - name: Show coverage statistics
         run: |
+          coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

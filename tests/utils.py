@@ -9,9 +9,11 @@ from __future__ import annotations
 import inspect
 import os
 import sys
+import tempfile
 import unittest
 import warnings
 from contextlib import contextmanager, suppress
+from pathlib import Path
 from subprocess import PIPE, Popen, TimeoutExpired
 from typing import Any, NoReturn
 
@@ -515,22 +517,52 @@ def execute_pwb(args: list[str], *,
        the *error* parameter was removed.
     .. versionchanged:: 9.1
        parameters except *args* are keyword only.
+    .. versionchanged:: 10.4
+       coverage is used if running github actions and a temporary file
+       is used for overrides.
 
     :param args: list of arguments for pwb.py
     :param overrides: mapping of pywikibot symbols to test replacements
     """
+    tmp_path: Path | None = None
     command = [sys.executable]
+    use_coverage = os.environ.get('GITHUB_ACTIONS')
+
+    if use_coverage:
+        # Test running and coverage is installed,
+        # enable coverage with subprocess
+        with suppress(ModuleNotFoundError):
+            import coverage  # noqa: F401
+            command.extend(['-m', 'coverage', 'run', '--parallel-mode'])
 
     if overrides:
-        command.append('-c')
-        overrides = '; '.join(
-            f'{key} = {value}' for key, value in overrides.items())
-        command.append(
-            f'import pwb; import pywikibot; {overrides}; pwb.main()')
+        override_code = 'import pwb, pywikibot\n'
+        override_code += '\n'.join(f'{k} = {v}' for k, v in overrides.items())
+        override_code += '\npwb.main()'
+
+        if use_coverage:
+            # Write overrides in temporary file
+            with tempfile.NamedTemporaryFile(
+                    'w', suffix='.py', delete=False) as f:
+                f.write(override_code)
+                tmp_path = Path(f.name)
+                command.append(f.name)
+        else:
+            command.extend(['-c', override_code])
+
     else:
         command.append(_pwb_py)
 
-    return execute(command=command + args, data_in=data_in, timeout=timeout)
+    try:
+        # Run subprocess
+        result = execute(
+            command=command + args, data_in=data_in, timeout=timeout)
+    finally:
+        # delete temporary file if created
+        if tmp_path and tmp_path.exists():
+            tmp_path.unlink()
+
+    return result
 
 
 @contextmanager
