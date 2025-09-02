@@ -83,12 +83,12 @@ import re
 from contextlib import suppress
 from itertools import chain
 from pathlib import Path
-from typing import Generator
 
 import pywikibot
 from pywikibot import config
 from pywikibot import editor as editarticle
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import Generator
 from pywikibot.bot import (
     HighlightContextOption,
     ListOption,

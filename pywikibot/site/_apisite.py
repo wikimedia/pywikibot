@@ -9,7 +9,6 @@ from __future__ import annotations
 import datetime
 import re
 import time
-import typing
 import webbrowser
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
@@ -1068,7 +1067,7 @@ class APISite(
 
         return self._months_names
 
-    def list_to_text(self, args: typing.Iterable[str]) -> str:
+    def list_to_text(self, args: Iterable[str]) -> str:
         """Convert a list of strings into human-readable text.
 
         The MediaWiki messages 'and' and 'word-separator' are used as

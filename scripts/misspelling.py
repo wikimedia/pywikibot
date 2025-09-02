@@ -20,17 +20,17 @@ Command line options:
                given, it starts at the beginning.
 """
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 from itertools import chain
-from typing import Generator
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
+from pywikibot.backports import Generator
 
 
 try:
