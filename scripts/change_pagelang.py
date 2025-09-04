@@ -154,7 +154,7 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
     specialpages = site.siteinfo['specialpagealiases']
     specialpagelist = {item['realname'] for item in specialpages}
-    allowedlanguages = site._paraminfo.parameter(module='setpagelanguage',
+    allowedlanguages = site._paraminfo.parameter(module_name='setpagelanguage',
                                                  param_name='lang')['type']
     # Check if the special page PageLanguage is enabled on the wiki
     # If it is not, page languages can't be set, and there's no point in

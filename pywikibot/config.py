@@ -146,7 +146,7 @@ user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
 # User agent description
 # This is a free-form string that can be user to describe specific bot/tool,
 # provide contact information, etc.
-user_agent_description = None
+user_agent_description: str | None = None
 # Fake user agent.
 # Some external websites reject bot-like user agents. It is possible to use
 # fake user agents in requests to these websites.
@@ -225,7 +225,7 @@ authenticate: dict[str, tuple[str, ...]] = {}
 # use them. In this case, the password file should contain a BotPassword object
 # in the following format:
 # (username, BotPassword(botname, botpassword))
-password_file = None
+password_file: str | os.PathLike | None = None
 
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
@@ -498,7 +498,7 @@ console_encoding = getattr(sys.stdout, 'encoding', None)
 #    transliteration_target = console_encoding
 # After emitting the warning, this last option will be set.
 
-transliteration_target = None
+transliteration_target: str | None = None
 
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is 'utf-8'; 'utf-8-sig' recognizes BOM.

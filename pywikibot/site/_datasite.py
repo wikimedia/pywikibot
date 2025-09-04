@@ -212,7 +212,7 @@ class DataSite(APISite):
         if not hasattr(self, '_entity_namespaces'):
             self._cache_entity_namespaces()
         for batch in batched(pagelist, groupsize):
-            req = {'ids': [], 'titles': [], 'sites': []}
+            req: dict[str, list[str]] = {'ids': [], 'titles': [], 'sites': []}
             for p in batch:
                 if isinstance(p, pywikibot.page.WikibaseEntity):
                     ident = p._defined_by()

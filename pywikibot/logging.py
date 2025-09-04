@@ -24,7 +24,7 @@ argument, which is a string indicating the debugging layer.
    - :python:`Logging Cookbook<howto/logging-cookbook.html>`
 """
 #
-# (C) Pywikibot team, 2010-2024
+# (C) Pywikibot team, 2010-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,7 +61,7 @@ INPUT = 25  #:
 """
 
 _init_routines: list[Callable[[], Any]] = []
-_inited_routines = set()
+_inited_routines: set[Callable[[], Any]] = set()
 
 
 def add_init_routine(routine: Callable[[], Any]) -> None:
@@ -349,7 +349,7 @@ def exception(msg: Any = None, *args: Any,
     if msg is None:
         exc_type, value, _tb = sys.exc_info()
         msg = str(value)
-        if not exc_info:
+        if exc_type is not None and not exc_info:
             msg += f' ({exc_type.__name__})'
     assert msg is not None
     error(msg, *args, exc_info=exc_info, **kwargs)

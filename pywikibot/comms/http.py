@@ -196,7 +196,7 @@ def user_agent_username(username=None):
 
 
 def user_agent(site: pywikibot.site.BaseSite | None = None,
-               format_string: str = '') -> str:
+               format_string: str | None = '') -> str:
     """Generate the user agent string for a given site and format.
 
     :param site: The site for which this user agent is intended. May be
@@ -211,7 +211,7 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
                                 pywikibot.bot.calledModuleName()))
     values.update(dict.fromkeys(['family', 'code', 'lang', 'site'], ''))
 
-    script_comments = []
+    script_comments: list[str] = []
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
@@ -539,7 +539,7 @@ def _decide_encoding(response: requests.Response,
             pywikibot.warning(
                 f'Unknown or invalid encoding {encoding!r} for {response.url}')
         except UnicodeDecodeError as e:
-            pywikibot.warning(f'{e} found in {content}')
+            pywikibot.warning(f'{e} found in {content!r}')
         else:
             return encoding
 

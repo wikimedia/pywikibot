@@ -11,7 +11,7 @@ import logging
 import re
 import sys
 import threading
-from typing import Any, NoReturn
+from typing import Any, Literal, NoReturn, TextIO
 
 import pywikibot
 from pywikibot import config
@@ -95,7 +95,7 @@ class UI(ABUIC):
     def init_handlers(
         self,
         root_logger,
-        default_stream: str = 'stderr'
+        default_stream: TextIO | Literal['stderr', 'stdout'] = 'stderr'
     ) -> None:
         """Initialize the handlers for user output.
 
@@ -536,15 +536,15 @@ class UI(ABUIC):
                 choice = self.input(question, default=default, force=force)
 
                 try:
-                    choice = int(choice) - 1
+                    parsedchoice = int(choice) - 1
                 except (TypeError, ValueError):
                     if choice in answers:
                         return choice
-                    choice = -1
+                    parsedchoice = -1
 
                 # User typed choice number
-                if 0 <= choice < len(answers):
-                    return answers[choice]
+                if 0 <= parsedchoice < len(answers):
+                    return answers[parsedchoice]
 
                 if force:
                     raise ValueError(

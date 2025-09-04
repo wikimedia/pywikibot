@@ -1,6 +1,6 @@
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2022
+# (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,7 +44,7 @@ def mysql_query(query: str, params=None,
     """
     # These are specified in config.py or your user config file
     if verbose is None:
-        verbose = config.verbose_output
+        verbose = config.verbose_output > 0
 
     if config.db_connect_file is None:
         credentials = {'user': config.db_username,

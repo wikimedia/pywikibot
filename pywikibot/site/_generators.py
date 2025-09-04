@@ -89,7 +89,7 @@ class GeneratorsMixin:
             # Store the order of the input data.
             priority_dict = dict(zip(batch, range(len(batch))))
 
-            prio_queue = []
+            prio_queue: list[tuple[int, pywikibot.Page]] = []
             next_prio = 0
             params = {'pageids': batch}
             rvgen = api.PropertyGenerator('info', site=self, parameters=params)
@@ -172,7 +172,7 @@ class GeneratorsMixin:
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in batch
                        if hasattr(p, '_pageid') and p._pageid > 0]
-            cache = {}
+            cache: dict[str, tuple[int, pywikibot.Page]] = {}
             # In case of duplicates, return the first entry.
             for priority, page in enumerate(batch):
                 try:
@@ -181,7 +181,7 @@ class GeneratorsMixin:
                 except InvalidTitleError:
                     pywikibot.exception()
 
-            prio_queue = []
+            prio_queue: list[tuple[int, pywikibot.Page]] = []
             next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
