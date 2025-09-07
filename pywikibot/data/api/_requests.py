@@ -532,8 +532,16 @@ class Request(MutableMapping, WaitingMixin):
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
+            if action == 'rollback':
+                result = {
+                    'title': self._params['title'][0].title(),
+                    'summary': self._params.get('summary',
+                                                ['Rollback simulation'])[0],
+                }
+            else:
+                result = {'result': 'Success', 'nochange': ''}
             return {
-                action: {'result': 'Success', 'nochange': ''},
+                action: result,
 
                 # wikibase results
                 'entity': {'lastrevid': -1, 'id': '-1'},

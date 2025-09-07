@@ -2505,68 +2505,122 @@ class APISite(
 
     # catalog of rollback errors for use in error messages
     _rb_errors = {
-        'noapiwrite': 'API editing not enabled on {site} wiki',
-        'writeapidenied': 'User {user} not allowed to edit through the API',
-        'alreadyrolled':
-            'Page [[{title}]] already rolled back; action aborted.',
-    }  # other errors shouldn't arise because we check for those errors
+        'alreadyrolled': 'The last edit of page {title!r} by user {user!r} '
+                         'was already rolled back.',
+        'onlyauthor': 'The page {title!r} has only {user!r} as author',
+    }  # standard error messages raises API error
 
     @need_right('rollback')
     def rollbackpage(
         self,
-        page: BasePage,
+        page: BasePage | None = None,
+        *,
+        pageid: int | None = None,
         **kwargs: Any
-    ) -> None:
-        """Roll back page to version before last user's edits.
+    ) -> dict[str, int | str]:
+        """Roll back a page to the version before the last edit by a user.
 
-        .. seealso:: :api:`Rollback`
+        This method wraps the MediaWiki :api:`Rollback`. The rollback
+        will revert the last edit(s) made by the specified user on the
+        given page.
 
-        The keyword arguments are those supported by the rollback API.
+        .. versionchanged:: 10.5
+           Added *pageid* as alternative to *page* (one must be given).
+           *markbot* defaults to True if the rollbacker is a bot and not
+           explicitly given. The method now returns a dictionary with
+           rollback information.
 
-        As a precaution against errors, this method will fail unless
-        the page history contains at least two revisions, and at least
-        one that is not by the same user who made the last edit.
+        .. seealso::
+           :meth:`page.BasePage.rollback`
 
-        :param page: the Page to be rolled back (must exist)
-        :keyword user: the last user to be rollbacked;
-            default is page.latest_revision.user
+        :param page: the Page to be rolled back. Cannot be used together
+            with *pageid*.
+        :param pageid: Page ID of the page to be rolled back. Cannot be
+            used together with *page*.
+        :keyword tags: Tags to apply to the rollback.
+        :kwtype tags: str | Sequence[str] | None
+        :keyword str user: The last user to be rolled back; Must be
+            given with *pageid*. Default is
+            :attr:`BasePage.latest_revision.user
+            <page.BasePage.latest_revision>` if *page* is given.
+        :keyword str | None summary: Custom edit summary for the rollback
+        :keyword bool | None markbot: Mark the reverted edits and the
+            revert as bot edits. If not given, it is set to True if the
+            rollback user belongs to the 'bot' group, otherwise False.
+        :keyword watchlist: Unconditionally add or remove the page from
+            the current user's watchlist; 'preferences' is ignored for
+            bot users.
+        :kwtype watchlist: Literal['watch', 'unwatch', 'preferences',
+            'nochange'] | None
+        :keyword watchlistexpiry: Watchlist expiry timestamp. Omit this
+            parameter entirely to leave the current expiry unchanged.
+        :kwtype watchlistexpiry: pywikibot.Timestamp | str | Literal[
+            'infinite', 'indefinite', 'infinity', 'never'] | None
+        :returns: Dictionary containing rollback result like
+
+            .. code:: python
+
+               {
+                   'title': <page title>,
+                   'pageid': <page ID>,
+                   'summary': <rollback summary>,
+                   'revid': <ID of the new revision created by the rollback>,
+                   'old_revid': <ID of the newest revision being rolled back>,
+                   'last_revid': <ID of the revision restored by the rollback>,
+               }
+
+        :raises APIError: An error was returned by the rollback API, or
+            another standard API error occurred.
+        :raises Error: The page was already rolled back, or the given
+            *user* is the only author.
+        :raises NoPageError: The given *page* or *pageid* does not exist.
+        :raises TypeError: *pageid* is of invalid type.
+        :raises ValueError: Both *page* and *pageid* were given, or none
+            of them, or *pageid* has an invalid value.
         """
-        if len(page._revisions) < 2:
-            raise Error(
-                f'Rollback of {page} aborted; load revision history first.')
+        if page is not None and pageid is not None:
+            raise ValueError(
+                "The parameters 'page' and 'pageid' cannot be used together.")
+
+        if page is None and pageid is None:
+            raise ValueError(
+                "One of parameters 'page' or 'pageid' is required.")
+
+        if page is None and pageid is not None:
+            page = next(self.load_pages_from_pageids(str(pageid)), None)
+
+        if page is None:
+            raise NoPageError(pageid)
 
         user = kwargs.pop('user', page.latest_revision.user)
-        for rev in sorted(page._revisions.values(), reverse=True,
-                          key=lambda r: r.timestamp):
-            # start with most recent revision first
-            if rev.user != user:
-                break
-        else:
-            raise Error(f'Rollback of {page} aborted; only one user in '
-                        f'revision history.')
+        params = merge_unique_dicts(
+            kwargs,
+            action='rollback',
+            title=page,
+            token=self.tokens['rollback'],
+            user=user,
+        )
 
-        parameters = merge_unique_dicts(kwargs,
-                                        action='rollback',
-                                        title=page,
-                                        token=self.tokens['rollback'],
-                                        user=user)
+        rb_user = self.user()
+        if rb_user is not None and 'markbot' not in kwargs:
+            params['markbot'] = self.has_group('bot')
+
         self.lock_page(page)
-        req = self.simple_request(**parameters)
+        req = self.simple_request(**params)
         try:
-            req.submit()
+            result = req.submit()
         except APIError as err:
             errdata = {
-                'site': self,
                 'title': page.title(with_section=False),
-                'user': self.user(),
+                'user': user,
             }
             if err.code in self._rb_errors:
                 raise Error(
                     self._rb_errors[err.code].format_map(errdata)
                 ) from None
-            pywikibot.debug(
-                f"rollback: Unexpected error code '{err.code}' received.")
             raise
+        else:
+            return result['rollback']
         finally:
             self.unlock_page(page)
 

@@ -2004,6 +2004,50 @@ class BasePage(ComparableMixin):
                                   noredirect=noredirect,
                                   movesubpages=movesubpages)
 
+    def rollback(self, **kwargs: Any) -> dict[str, int | str]:
+        """Roll back this page to the version before the last edit by a user.
+
+        .. versionadded:: 10.5
+
+        .. seealso::
+           :meth:`Site.rollbackpage()
+           <pywikibot.site._apisite.APISite.rollbackpage>`
+
+        :keyword tags: Tags to apply to the rollback.
+        :kwtype tags: str | Sequence[str] | None
+        :keyword str user: The last user to be rolled back; Default is
+            :attr:`BasePage.latest_revision.user
+            <page.BasePage.latest_revision>`.
+        :keyword str | None summary: Custom edit summary for the rollback
+        :keyword bool | None markbot: Mark the reverted edits and the
+            revert as bot edits. If not given, it is set to True if the
+            rollback user belongs to the 'bot' group, otherwise False.
+        :keyword watchlist: Unconditionally add or remove the page from
+            the current user's watchlist; 'preferences' is ignored for
+            bot users.
+        :kwtype watchlist: Literal['watch', 'unwatch', 'preferences',
+            'nochange'] | None
+        :keyword watchlistexpiry: Watchlist expiry timestamp. Omit this
+            parameter entirely to leave the current expiry unchanged.
+        :kwtype watchlistexpiry: pywikibot.Timestamp | str | Literal[
+            'infinite', 'indefinite', 'infinity', 'never'] | None
+        :returns: Dictionary containing rollback result like
+
+            .. code:: python
+
+               {
+                   'title': <page title>,
+                   'pageid': <page ID>,
+                   'summary': <rollback summary>,
+                   'revid': <ID of the new revision created by the rollback>,
+                   'old_revid': <ID of the newest revision being rolled back>,
+                   'last_revid': <ID of the revision restored by the rollback>,
+               }
+
+        raises exceptions.Error: The rollback fails.
+        """
+        return self.site.rollbackpage(self, **kwargs)
+
     def delete(
         self,
         reason: str | None = None,
