@@ -17,13 +17,20 @@ env:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
         python-version:
           - 3.14-dev
           - 3.15-dev
+        include:
+          - python-version: '3.9'
+            os: windows-latest
+          - python-version: '3.13'
+            os: windows-latest
+          - python-version: '3'
+            os: macOS-latest
     steps:
       - name: set up python ${{ matrix.python-version }}
         if: "!endsWith(matrix.python-version, '-dev')"
