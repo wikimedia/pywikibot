@@ -33,7 +33,7 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 """
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -937,7 +937,8 @@ if os.path.exists(_filename):
     _filestatus = os.stat(_filename)
     _filemode = _filestatus[0]
     _fileuid = _filestatus[4]
-    if not OSWIN32 and _fileuid not in [os.getuid(), 0]:
+    if not OSWIN32 \
+       and _fileuid not in [os.getuid(), 0]:  # type: ignore[attr-defined]
         warning(f'Skipped {_filename!r}: owned by someone else.')
     elif OSWIN32 or _filemode & 0o02 == 0:
         with open(_filename, 'rb') as f:

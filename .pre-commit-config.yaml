@@ -65,7 +65,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.11
+    rev: v0.12.12
     hooks:
       - id: ruff-check
         alias: ruff
@@ -122,7 +122,7 @@ repos:
         # Test for files which already passed in past.
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
         files: >
-          ^pywikibot/(__metadata__|echo|exceptions|fixes|time)\.py$|
+          ^pywikibot/(__metadata__|config|echo|exceptions|fixes|time)\.py$|
           ^pywikibot/(comms|data|families|specialbots)/__init__\.py$|
           ^pywikibot/families/[a-z][a-z\d]+_family\.py$|
           ^pywikibot/page/(__init__|_decorators|_revision)\.py$|
