@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,7 +64,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertIn({'ext': 'png'}, fileextensions)
         # restrictions
         self.assertIn('restrictions', self.site.siteinfo)
-        restrictions = self.site.siteinfo.get('restrictions')
+        restrictions = self.site.restrictions
         self.assertIsInstance(restrictions, dict)
         self.assertIn('cascadinglevels', restrictions)
 

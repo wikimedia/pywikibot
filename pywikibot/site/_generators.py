@@ -2346,7 +2346,7 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    @deprecate_arg('type', 'protect_type')
+    @deprecate_arg('type', 'protect_type')  # since 9.0
     def protectedpages(
         self,
         namespace: NamespaceArgType = 0,
@@ -2368,13 +2368,13 @@ class GeneratorsMixin:
         :param namespace: The searched namespace.
         :param protect_type: The protection type to search for
             (default 'edit').
-        :param level: The protection level (like 'autoconfirmed'). If False it
-            shows all protection levels.
+        :param level: The protection level (like 'autoconfirmed'). If
+            False it shows all protection levels.
         :return: The pages which are protected.
         """
         namespaces = self.namespaces.resolve(namespace)
         # always assert, so we are be sure that protect_type could be 'create'
-        assert 'create' in self.protection_types(), \
+        assert 'create' in self.restrictions['types'], \
             "'create' should be a valid protection type."
         if protect_type == 'create':
             return self._generator(

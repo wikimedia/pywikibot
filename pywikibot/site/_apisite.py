@@ -1566,7 +1566,7 @@ class APISite(
 
         :raises ValueError: invalid action parameter
         """
-        if action not in self.siteinfo.get('restrictions')['types']:
+        if action not in self.restrictions['types']:
             raise ValueError(
                 f'{type(self).__name__}.page_can_be_edited(): '
                 f'Invalid value "{action}" for "action" parameter'
@@ -2788,6 +2788,61 @@ class APISite(
         finally:
             self.unlock_page(page)
 
+    @deprecated("the 'restrictions' property", since='10.5.0')
+    def protection_types(self) -> set[str]:
+        """Return the protection types available on this site.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_types())
+        ['create', 'edit', 'move', 'upload']
+
+        .. deprecated:: 10.5
+           Use :attr:`restrictions[types]<restrictions>` instead.
+
+        :return: protection types available
+        """
+        return self.restrictions['types']
+
+    @deprecated("the 'restrictions' property", since='10.5.0')
+    def protection_levels(self) -> set[str]:
+        """Return the protection levels available on this site.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> sorted(site.protection_levels())
+        ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
+
+        .. deprecated:: 10.5
+           Use :attr:`restrictions[levels]<restrictions>` instead.
+
+        :return: protection levels available
+        """
+        return self.restrictions['levels']
+
+    @property
+    def restrictions(self) -> dict[str, set[str]]:
+        """Return the page restrictions available on this site.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> r = site.restrictions
+        >>> sorted(r['types'])
+        ['create', 'edit', 'move', 'upload']
+        >>> sorted(r['levels'])
+        ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
+
+        .. versionadded:: 10.5
+        .. seealso:: :meth:`page_restrictions`
+
+        :return: dict with keys 'types', 'levels', 'cascadinglevels' and
+            'semiprotectedlevels', all as sets of strings
+        """
+        return {k: set(v) for k, v in self.siteinfo['restrictions'].items()}
+
     _protect_errors = {
         'noapiwrite': 'API editing not enabled on {site} wiki',
         'writeapidenied': 'User {user} not allowed to edit through the API',
@@ -2798,36 +2853,6 @@ class APISite(
             "can't edit it.",
         'protect-invalidlevel': 'Invalid protection level'
     }
-
-    def protection_types(self) -> set[str]:
-        """Return the protection types available on this site.
-
-        **Example:**
-
-        >>> site = pywikibot.Site('wikipedia:test')
-        >>> sorted(site.protection_types())
-        ['create', 'edit', 'move', 'upload']
-
-        .. seealso:: :py:obj:`Siteinfo._get_default()`
-
-        :return: protection types available
-        """
-        return set(self.siteinfo.get('restrictions')['types'])
-
-    def protection_levels(self) -> set[str]:
-        """Return the protection levels available on this site.
-
-        **Example:**
-
-        >>> site = pywikibot.Site('wikipedia:test')
-        >>> sorted(site.protection_levels())
-        ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
-
-        .. seealso:: :py:obj:`Siteinfo._get_default()`
-
-        :return: protection types available
-        """
-        return set(self.siteinfo.get('restrictions')['levels'])
 
     @need_right('protect')
     def protect(
@@ -2842,15 +2867,14 @@ class APISite(
 
         .. seealso::
            - :meth:`page.BasePage.protect`
-           - :meth:`protection_types`
-           - :meth:`protection_levels`
+           - :attr:`restrictions`
+           - :meth:`page_restrictions`
            - :api:`Protect`
 
         :param protections: A dict mapping type of protection to
-            protection level of that type. Refer :meth:`protection_types`
-            for valid restriction types and :meth:`protection_levels`
-            for valid restriction levels. If None is given, however,
-            that protection will be skipped.
+            protection level of that type. Refer :meth:`restrictions`
+            for valid restriction types restriction levels. If None is
+            given, however, that protection will be skipped.
         :param reason: Reason for the action
         :param expiry: When the block should expire. This expiry will be
             applied to all protections. If ``None``, ``'infinite'``,

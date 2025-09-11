@@ -56,7 +56,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 #
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -172,11 +172,11 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
 
     generator_type = None
-    protection_levels = site.protection_levels()
+    protection_levels = site.restrictions['levels']
     if '' in protection_levels:
         protection_levels.add('all')
 
-    protection_types = site.protection_types()
+    protection_types = site.restrictions['types']
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         option, sep, value = arg.partition(':')
