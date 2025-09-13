@@ -841,7 +841,7 @@ class APISite(
 
         :raises ValueError: missing "$1" placeholder
         """
-        path = self.siteinfo['general']['articlepath']
+        path = self.siteinfo['articlepath']
         if '$1' not in path:
             raise ValueError(
                 f'Invalid article path "{path}": missing "$1" placeholder')
@@ -864,7 +864,7 @@ class APISite(
             'ca': "(?:[a-zàèéíòóúç·ïü]|'(?!'))*",
             'kaa': "(?:[a-zıʼ’“»]|'(?!'))*",
         }
-        linktrail = self.siteinfo['general']['linktrail']
+        linktrail = self.siteinfo['linktrail']
         if linktrail == '/^()(.*)$/sD':  # empty linktrail
             return ''
 
@@ -1183,10 +1183,10 @@ class APISite(
         for nsdata in self.siteinfo.get('namespaces', cache=False).values():
             ns = nsdata.pop('id')
             if ns == 0:
-                canonical_name = nsdata.pop('*')
+                custom_name = canonical_name = nsdata.pop('name')
                 custom_name = canonical_name
             else:
-                custom_name = nsdata.pop('*')
+                custom_name = nsdata.pop('name')
                 canonical_name = nsdata.pop('canonical')
 
             default_case = Namespace.default_case(ns)
@@ -1199,16 +1199,16 @@ class APISite(
             namespace = Namespace(ns, canonical_name, custom_name, **nsdata)
             _namespaces[ns] = namespace
 
-        for item in self.siteinfo.get('namespacealiases'):
+        for item in self.siteinfo['namespacealiases']:
             ns = int(item['id'])
             try:
                 namespace = _namespaces[ns]
             except KeyError:
                 pywikibot.warning('Broken namespace alias "{}" (id: {}) on {}'
-                                  .format(item['*'], ns, self))
+                                  .format(item['alias'], ns, self))
             else:
-                if item['*'] not in namespace:
-                    namespace.aliases.append(item['*'])
+                if item['alias'] not in namespace:
+                    namespace.aliases.append(item['alias'])
 
         return _namespaces
 
@@ -3122,7 +3122,7 @@ class APISite(
         >>> site.is_uploaddisabled()
         True
         """
-        return not self.siteinfo.get('general')['uploadsenabled']
+        return not self.siteinfo['uploadsenabled']
 
     def stash_info(
         self,

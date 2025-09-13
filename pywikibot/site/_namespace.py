@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -323,11 +323,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
 class NamespacesDict(Mapping):
 
-    """An immutable dictionary containing the Namespace instances.
-
-    It adds a deprecation message when called as the 'namespaces'
-    property of APISite was callable.
-    """
+    """An immutable dictionary containing the Namespace instances."""
 
     def __init__(self, namespaces) -> None:
         """Create new dict using the given namespaces."""

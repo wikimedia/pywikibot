@@ -11,9 +11,10 @@ import datetime
 import re
 from collections.abc import Container
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pywikibot
+from pywikibot.backports import Dict, List
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
 
@@ -24,42 +25,42 @@ if TYPE_CHECKING:
 
 class Siteinfo(Container):
 
-    """A 'dictionary' like container for siteinfo.
+    """A dictionary-like container for siteinfo.
 
     This class queries the server to get the requested siteinfo
-    property. Optionally it can cache this directly in the instance so
-    that later requests don't need to query the server.
+    property. Results can be cached in the instance to avoid repeated
+    queries.
 
-    All values of the siteinfo property 'general' are directly
-    available.
+    All values of the 'general' property  are directly available.
+
+    .. versionchanged:: 10.5
+       formatversion 2 is used for API calls.
+
+    .. admonition:: Compatibility note
+       :class: note
+
+       For formatversion 2, some siteinfo data structures differ from
+       version 1. Fallback '*' keys are added in the data structure for
+       'namespaces', 'languages', 'namespacealiases' and 'skins'
+       properties for backwards compatibility. These fallbacks may be
+       removed in future versions of Pywikibot.
+
+       The 'thumblimits', 'imagelimits' and 'magiclinks' entries of the
+       'general' property are normalized to lists for easier use and to
+       match the format used in formatversion 1. For example:
+
+       :code:`'thumblimits': [120, 150, 180, 200, 220, 250, 300, 400]`
+
+    .. deprecated:: 10.5
+       Accessing the fallback '*' keys in 'languages', 'namespaces',
+       'namespacealiases', and 'skins' properties are deprecated and
+       will be removed in a future release of Pywikibot.
+
+    .. seealso:: :api:`siteinfo`
     """
 
     WARNING_REGEX = re.compile(r'Unrecognized values? for parameter '
                                r'["\']siprop["\']: (.+?)\.?')
-
-    # Until we get formatversion=2, we have to convert empty-string properties
-    # into booleans so they are easier to use.
-    BOOLEAN_PROPS = {
-        'general': [
-            'imagewhitelistenabled',
-            'langconversion',
-            'titleconversion',
-            'rtl',
-            'readonly',
-            'writeapi',
-            'variantarticlepath',
-            'misermode',
-            'uploadsenabled',
-        ],
-        'namespaces': [  # for each namespace
-            'subpages',
-            'content',
-            'nonincludable',
-        ],
-        'magicwords': [  # for each magicword
-            'case-sensitive',
-        ],
-    }
 
     def __init__(self, site: APISite) -> None:
         """Initialize Siteinfo for a given site with an empty cache."""
@@ -81,35 +82,40 @@ class Siteinfo(Container):
 
         Modifies *data* in place.
 
+        .. versionchanged:: 10.5
+           Modify *data* for formatversion 1 compatibility and easier
+           to use lists.
+
         :param prop: The siteinfo property name (e.g., 'general',
             'namespaces', 'magicwords')
         :param data: The raw data returned from the server
+
+        :meta public:
         """
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
 
-        # Convert boolean props from empty strings to actual boolean values
-        if prop not in Siteinfo.BOOLEAN_PROPS:
-            return
-
-        bool_props = Siteinfo.BOOLEAN_PROPS[prop]
         if prop == 'general':
-            # Direct properties of 'general'
-            for p in bool_props:
-                data[p] = p in data
-        else:
-            # 'namespaces' (dict) or 'magicwords' (list of dicts)
-            items: list[dict[str, Any]]
-            if isinstance(data, dict):
-                items = list(data.values())
-            elif isinstance(data, list):
-                items = data
-            else:
-                return  # unexpected format
-
-            for item in items:
-                for p in bool_props:
-                    item[p] = p in item
+            data = cast(Dict[str, Any], data)
+            for key in 'thumblimits', 'imagelimits':
+                data[key] = list(data[key].values())
+            data['magiclinks'] = [k for k, v in data['magiclinks'].items()
+                                  if v]
+        elif prop == 'namespaces':
+            data = cast(Dict[str, Any], data)
+            for ns_info in data.values():
+                ns_info['*'] = ns_info['name']
+        elif prop in ('languages', 'namespacealiases'):
+            data = cast(List[Dict[str, Any]], data)
+            for ns_info in data:
+                key = 'name' if 'name' in ns_info else 'alias'
+                ns_info['*'] = ns_info[key]
+        elif prop == 'skins':
+            data = cast(List[Dict[str, Any]], data)
+            for ns_info in data:
+                ns_info['*'] = ns_info['name']
+                for key in 'default', 'unusable':
+                    ns_info.setdefault(key, False)
 
     def _get_siteinfo(self, prop, expiry) -> dict:
         """Retrieve one or more siteinfo properties from the server.
@@ -144,7 +150,10 @@ class Siteinfo(Container):
             expiry=pywikibot.config.API_config_expiry
             if expiry is False else expiry,
             parameters={
-                'action': 'query', 'meta': 'siteinfo', 'siprop': props,
+                'action': 'query',
+                'meta': 'siteinfo',
+                'siprop': props,
+                'formatversion': 2,
             }
         )
 
@@ -168,7 +177,7 @@ class Siteinfo(Container):
                 return results
             raise
 
-        result = {}
+        result: dict[str, tuple[Any, datetime.datetime | Literal[False]]] = {}
         if invalid_properties:
             for invalid_prop in invalid_properties:
                 result[invalid_prop] = (EMPTY_DEFAULT, False)
@@ -334,18 +343,27 @@ class Siteinfo(Container):
 
         return True
 
-    def __contains__(self, key: str) -> bool:
-        """Return whether the value is in Siteinfo container.
+    def __contains__(self, key: object) -> bool:
+        """Check whether the given key is present in the Siteinfo container.
+
+        This method implements the Container protocol and allows usage
+        like `key in container`.Only string keys are valid. Non-string
+        keys always return False.
 
         .. versionchanged:: 7.1
            Previous implementation only checked for cached keys.
-        """
-        try:
-            self[key]
-        except KeyError:
-            return False
 
-        return True
+        :param key: The key to check for presence. Should be a string.
+        :return: True if the key exists in the container, False otherwise.
+
+        :meta public:
+        """
+        if isinstance(key, str):
+            with suppress(KeyError):
+                self[key]
+                return True
+
+        return False
 
     def is_recognised(self, key: str) -> bool | None:
         """Return if 'key' is a valid property name.

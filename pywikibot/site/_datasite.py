@@ -138,35 +138,32 @@ class DataSite(APISite):
         raise NoWikibaseEntityError(entity)
 
     @property
-    def sparql_endpoint(self):
+    def sparql_endpoint(self) -> str | None:
         """Return the sparql endpoint url, if any has been set.
 
         :return: sparql endpoint url
-        :rtype: str|None
         """
-        return self.siteinfo['general'].get('wikibase-sparql')
+        return self.siteinfo.get('wikibase-sparql')
 
     @property
-    def concept_base_uri(self):
+    def concept_base_uri(self) -> str:
         """Return the base uri for concepts/entities.
 
         :return: concept base uri
-        :rtype: str
         """
-        return self.siteinfo['general']['wikibase-conceptbaseuri']
+        return self.siteinfo['wikibase-conceptbaseuri']
 
-    def geo_shape_repository(self):
+    def geo_shape_repository(self) -> DataSite | None:
         """Return Site object for the geo-shapes repository e.g. commons."""
-        url = self.siteinfo['general'].get('wikibase-geoshapestoragebaseurl')
+        url = self.siteinfo.get('wikibase-geoshapestoragebaseurl')
         if url:
             return pywikibot.Site(url=url, user=self.username())
 
         return None
 
-    def tabular_data_repository(self):
+    def tabular_data_repository(self) -> DataSite | None:
         """Return Site object for the tabular-data repository e.g. commons."""
-        url = self.siteinfo['general'].get(
-            'wikibase-tabulardatastoragebaseurl')
+        url = self.siteinfo.get('wikibase-tabulardatastoragebaseurl')
         if url:
             return pywikibot.Site(url=url, user=self.username())
 

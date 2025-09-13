@@ -53,6 +53,7 @@ if PYTHON_VERSION < (3, 9):
         Generator,
         Iterable,
         Iterator,
+        List,
         Mapping,
         Match,
         Pattern,
@@ -70,6 +71,7 @@ else:
     )
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
+    List = list  # type: ignore[misc]
 
 
 if PYTHON_VERSION < (3, 9, 2):
