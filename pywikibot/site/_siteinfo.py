@@ -1,6 +1,6 @@
 """Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,11 +11,15 @@ import datetime
 import re
 from collections.abc import Container
 from contextlib import suppress
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import pywikibot
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import APISite
 
 
 class Siteinfo(Container):
@@ -57,48 +61,58 @@ class Siteinfo(Container):
         ],
     }
 
-    def __init__(self, site) -> None:
-        """Initialise it with an empty cache."""
+    def __init__(self, site: APISite) -> None:
+        """Initialize Siteinfo for a given site with an empty cache."""
         self._site = site
-        self._cache: dict[str, Any] = {}
+        self._cache: dict[str,
+                          tuple[Any, datetime.datetime | Literal[False]]] = {}
 
     def clear(self) -> None:
-        """Remove all items from Siteinfo.
+        """Clear all cached siteinfo properties.
 
         .. versionadded:: 7.1
         """
         self._cache.clear()
 
     @staticmethod
-    def _post_process(prop, data) -> None:
-        """Do some default handling of data.
+    def _post_process(prop: str,
+                      data: dict[str, Any] | list[dict[str, Any]]) -> None:
+        """Convert empty-string boolean properties to actual booleans.
 
-        Directly modifies data.
+        Modifies *data* in place.
+
+        :param prop: The siteinfo property name (e.g., 'general',
+            'namespaces', 'magicwords')
+        :param data: The raw data returned from the server
         """
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
 
         # Convert boolean props from empty strings to actual boolean values
-        if prop in Siteinfo.BOOLEAN_PROPS:
-            # siprop=namespaces and
-            # magicwords has properties per item in result
-            if prop in ('namespaces', 'magicwords'):
-                for index, value in enumerate(data):
-                    # namespaces uses a dict, while magicwords uses a list
-                    key = index if isinstance(data, list) else value
-                    for p in Siteinfo.BOOLEAN_PROPS[prop]:
-                        data[key][p] = p in data[key]
+        if prop not in Siteinfo.BOOLEAN_PROPS:
+            return
+
+        bool_props = Siteinfo.BOOLEAN_PROPS[prop]
+        if prop == 'general':
+            # Direct properties of 'general'
+            for p in bool_props:
+                data[p] = p in data
+        else:
+            # 'namespaces' (dict) or 'magicwords' (list of dicts)
+            items: list[dict[str, Any]]
+            if isinstance(data, dict):
+                items = list(data.values())
+            elif isinstance(data, list):
+                items = data
             else:
-                for p in Siteinfo.BOOLEAN_PROPS[prop]:
-                    data[p] = p in data
+                return  # unexpected format
+
+            for item in items:
+                for p in bool_props:
+                    item[p] = p in item
 
     def _get_siteinfo(self, prop, expiry) -> dict:
-        """Retrieve a siteinfo property.
-
-        All properties which the site doesn't
-        support contain the default value. Because pre-1.12 no data was
-        returned when a property doesn't exists, it queries each property
-        independently if a property is invalid.
+        """Retrieve one or more siteinfo properties from the server.
 
         .. seealso:: :api:Siteinfo
 
@@ -110,6 +124,8 @@ class Siteinfo(Container):
             the dictionary is a tuple of the value and a boolean to save if it
             is the default value.
         """
+        invalid_properties: list[str] = []
+
         def warn_handler(mod, message) -> bool:
             """Return True if the warning is handled."""
             matched = Siteinfo.WARNING_REGEX.fullmatch(message)
@@ -119,11 +135,11 @@ class Siteinfo(Container):
                 return True
             return False
 
-        props = [prop] if isinstance(prop, str) else prop
+        # Convert to list for consistent iteration
+        props = [prop] if isinstance(prop, str) else list(prop)
         if not props:
             raise ValueError('At least one property name must be provided.')
 
-        invalid_properties: list[str] = []
         request = self._site._request(
             expiry=pywikibot.config.API_config_expiry
             if expiry is False else expiry,
@@ -134,6 +150,7 @@ class Siteinfo(Container):
 
         # warnings are handled later
         request._warning_handler = warn_handler
+
         try:
             data = request.submit()
         except APIError as e:
@@ -158,6 +175,7 @@ class Siteinfo(Container):
             pywikibot.log("Unable to get siprop(s) '{}'"
                           .format("', '".join(invalid_properties)))
 
+        # Process valid properties
         if 'query' in data:
             # If the request is a CachedRequest, use the _cachetime attr.
             cache_time = getattr(
@@ -169,8 +187,16 @@ class Siteinfo(Container):
         return result
 
     @staticmethod
-    def _is_expired(cache_date, expire):
-        """Return true if the cache date is expired."""
+    def _is_expired(cache_date: datetime.datetime | Literal[False] | None,
+                    expire: datetime.timedelta | Literal[False]) -> bool:
+        """Return true if the cache date is expired.
+
+        :param cache_date: The timestamp when the value was cached, or
+            False if default, None if never.
+        :param expire: Expiry period as timedelta, or False to never
+            expire.
+        :return: True if expired, False otherwise.
+        """
         if isinstance(expire, bool):
             return expire
 
@@ -215,8 +241,10 @@ class Siteinfo(Container):
                 self._cache[prop] = default_info[prop]
             if key in default_info:
                 return default_info[key]
+
         if key in self._cache['general'][0]:
             return self._cache['general'][0][key], self._cache['general']
+
         return None
 
     def __getitem__(self, key: str):
