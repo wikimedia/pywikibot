@@ -1,7 +1,11 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* i18n Updates
+* Use 'login' token from API response in :meth:`login.ClientLoginManager.login_to_site`
+  (:phab:`T328814`)
+* Always use *fallback_prompt* in :func:`i18n.twtranslate` whenever no
+  translation is found, including unknown keys in existing packages (:phab:`T326470`)
 
 
 Deprecations
