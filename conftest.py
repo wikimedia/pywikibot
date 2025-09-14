@@ -18,6 +18,7 @@ EXCLUDE_PATTERN = re.compile(
     r'(?:'
     r'(__metadata__|config|echo|exceptions|fixes|logging|time)|'
     r'(comms|data|families|specialbots)/__init__|'
+    r'data/memento|'
     r'families/[a-z][a-z\d]+_family|'
     r'page/(__init__|_decorators|_revision)|'
     r'pagegenerators/__init__|'
