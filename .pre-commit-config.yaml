@@ -65,7 +65,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.12
+    rev: v0.13.0
     hooks:
       - id: ruff-check
         alias: ruff
@@ -113,7 +113,7 @@ repos:
           - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v1.18.1
     hooks:
       - id: mypy
         args:
@@ -127,6 +127,6 @@ repos:
           ^pywikibot/families/[a-z][a-z\d]+_family\.py$|
           ^pywikibot/page/(__init__|_decorators|_revision)\.py$|
           ^pywikibot/scripts/(?:i18n/)?__init__\.py$|
-          ^pywikibot/site/(__init__|_basesite|_decorators|_extensions|_interwikimap|_upload)\.py$|
+          ^pywikibot/site/(__init__|_basesite|_decorators|_extensions|_interwikimap|_tokenwallet|_upload)\.py$|
           ^pywikibot/tools/(_logging|_unidata|formatter)\.py$|
           ^pywikibot/userinterfaces/(__init__|_interface_base|terminal_interface)\.py$

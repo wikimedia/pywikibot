@@ -1,6 +1,6 @@
 """Objects representing api tokens."""
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -119,11 +119,25 @@ class TokenWallet(Container):
            r._params['token'] = r.site.tokens.update_tokens(r._params['token'])
 
         .. versionadded:: 8.0
+
+        :param tokens: A list of token types that need to be updated.
+        :return: A list of updated tokens corresponding to the given
+            *tokens* types.
+        :raises KeyError: If no valid token types can be determined to
+            update.
         """
         # find the token types
         types = [key
                  for key, value in self._tokens.items() for token in tokens
-                 if value == token] or [self._last_token_key]
+                 if value == token]
+
+        # fallback to _last_token_key if no types found
+        if not types and self._last_token_key is not None:
+            types = [self._last_token_key]
+
+        if not types:
+            raise KeyError('No valid token types found to update.')
+
         self.clear()  # clear the cache
         return [self[token_type] for token_type in types]
 
