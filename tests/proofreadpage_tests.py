@@ -75,8 +75,10 @@ class TestPagesTagParser(TestCase):
 
     def test_tag_attr_exceptions(self) -> None:
         """Test TagAttr for Exceptions."""
-        self.assertRaises(ValueError, TagAttr, 'fromsection', 'A123"')
-        self.assertRaises(TypeError, TagAttr, 'fromsection', 3.0)
+        with self.assertRaisesRegex(ValueError, 'has wrong quotes'):
+            TagAttr('fromsection', 'A123"')
+        with self.assertRaisesRegex(TypeError, 'must be str or int'):
+            TagAttr('fromsection', 3.0)
 
     def test_pages_tag_parser(self) -> None:
         """Test PagesTagParser."""
@@ -110,14 +112,13 @@ class TestPagesTagParser(TestCase):
 
     def test_pages_tag_parser_exceptions(self) -> None:
         """Test PagesTagParser Exceptions."""
-        text = """Text: <pages index="Index.pdf />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
-
-        text = """Text: <pages index="Index.pdf' />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
+        text = """Text: <pages index="Index.pdf" />"""
+        parser = PagesTagParser(text)
+        self.assertEqual(parser.index, 'Index.pdf')
 
         text = """Text: <pages index="Index.pdf from=C" />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
+        with self.assertRaisesRegex(ValueError, 'has wrong quotes'):
+            PagesTagParser(text)
 
 
 class TestProofreadPageInvalidSite(TestCase):

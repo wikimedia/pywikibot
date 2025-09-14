@@ -273,7 +273,11 @@ class TestPageObjectEnglish(TestCase):
             'File:Example #3.jpg',  # file extension in section
         ):
             with self.subTest(title=title), \
-                    self.assertRaises(ValueError):
+                    self.assertRaisesRegex(
+                        ValueError,
+                        r'(not.*valid.*file'
+                        r'|not in the file namespace'
+                        r'|does not have a valid extension)'):
                 pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self) -> None:

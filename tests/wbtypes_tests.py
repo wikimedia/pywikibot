@@ -478,7 +478,8 @@ class TestWbTime(WbRepresentationTestCase):
                                     'Invalid precision: "invalid_precision"'):
             pywikibot.WbTime(0, site=repo, precision='invalid_precision')
         self.assertIsInstance(t1.toTimestamp(), pywikibot.Timestamp)
-        self.assertRaises(ValueError, t2.toTimestamp)
+        with self.assertRaisesRegex(ValueError, 'BC dates.*Timestamp'):
+            t2.toTimestamp()
 
     def test_comparison_types(self) -> None:
         """Test WbTime comparison with different types."""
@@ -486,10 +487,14 @@ class TestWbTime(WbRepresentationTestCase):
         t1 = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
         t2 = pywikibot.WbTime(site=repo, year=-2005, hour=16, minute=45)
         self.assertGreater(t1, t2)
-        self.assertRaises(TypeError, operator.lt, t1, 5)
-        self.assertRaises(TypeError, operator.gt, t1, 5)
-        self.assertRaises(TypeError, operator.le, t1, 5)
-        self.assertRaises(TypeError, operator.ge, t1, 5)
+        with self.assertRaisesRegex(TypeError, 'not supported'):
+            operator.lt(t1, 5)
+        with self.assertRaisesRegex(TypeError, 'not supported'):
+            operator.gt(t1, 5)
+        with self.assertRaisesRegex(TypeError, 'not supported'):
+            operator.le(t1, 5)
+        with self.assertRaisesRegex(TypeError, 'not supported'):
+            operator.ge(t1, 5)
 
     def test_comparison_timezones(self) -> None:
         """Test comparisons with timezones."""

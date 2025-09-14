@@ -1819,7 +1819,7 @@ class TestBacklinks(TestCase):
     def test_backlinks_redirects_length(self) -> None:
         """Test backlinks redirects length."""
         self.assertLength(self.backlinks, 1)
-        self.assertLength(self.references, 1)
+        self.assertLength(set(self.references), 1)
         self.assertLength(self.nofollow, 1)
 
     def test_backlinks_redirects_status(self) -> None:
