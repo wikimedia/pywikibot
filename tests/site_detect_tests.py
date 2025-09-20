@@ -103,7 +103,11 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     def test_standard_version_sites(self) -> None:
         """Test detection of standard MediaWiki sites."""
         for url in self.standard_version_sites:
-            with self.subTest(url=urlparse(url).netloc):
+            nl = urlparse(url).netloc
+            with self.subTest(url=nl):
+                if os.getenv('GITHUB_ACTIONS') and nl == 'en.citizendium.org':
+                    self.skipTest('Skip test on github due to T404583')
+
                 self.assertSite(url)
 
     def test_proofreadwiki(self) -> None:
