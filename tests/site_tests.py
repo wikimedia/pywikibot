@@ -828,7 +828,8 @@ class TestRollbackPage(PatchingTestCase):
         self.patch(self.site, 'has_right', lambda right: False)
         with self.assertRaisesRegex(
             Error,
-            r'User "\w+" does not have required user right "rollback" on site'
+            rf'User "{self.site.user()}" does not have required user right'
+            ' "rollback" on site'
         ):
             self.site.rollbackpage(self.page, pageid=4711)
 
