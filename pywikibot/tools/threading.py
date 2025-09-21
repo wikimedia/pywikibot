@@ -69,7 +69,7 @@ class ThreadedGenerator(threading.Thread):
             raise RuntimeError('No generator for ThreadedGenerator to run.')
         self.args, self.kwargs = args, kwargs
         super().__init__(group=group, name=name)
-        self.queue = queue.Queue(qsize)
+        self.queue: queue.Queue[Any] = queue.Queue(qsize)
         self.finished = threading.Event()
 
     def __iter__(self):

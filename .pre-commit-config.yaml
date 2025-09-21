@@ -135,6 +135,6 @@ repos:
             pagegenerators/(__init__|_filters)|
             scripts/(?:i18n/)?__init__|
             site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|
-            tools/(_logging|_unidata|formatter)|
-            userinterfaces/(__init__|_interface_base|terminal_interface)
+            tools/(_deprecate|_logging|_unidata|chars|formatter)|
+            userinterfaces/(__init__|_interface_base|buffer_interface|terminal_interface|transliteration)
           )\.py$

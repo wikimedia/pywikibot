@@ -20,8 +20,8 @@ from typing import TYPE_CHECKING, Any
 
 
 # Placed here to omit circular import in tools
-PYTHON_VERSION = sys.version_info[:3]
-SPHINX_RUNNING = 'sphinx' in sys.modules
+PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
+SPHINX_RUNNING: bool = 'sphinx' in sys.modules
 
 # functools.cache
 if PYTHON_VERSION >= (3, 9):

@@ -26,8 +26,9 @@ EXCLUDE_PATTERN = re.compile(
     r'scripts/(i18n/)?__init__|'
     r'site/(__init__|_basesite|_decorators|_interwikimap|'
     r'_tokenwallet|_upload)|'
-    r'tools/(_logging|_unidata|formatter)|'
-    r'userinterfaces/(__init__|_interface_base|terminal_interface)'
+    r'tools/(_deprecate|_logging|_unidata|chars|formatter)|'
+    r'userinterfaces/(__init__|_interface_base|buffer_interface|'
+    r'terminal_interface|transliteration)'
     r')\.py'
 )
 
