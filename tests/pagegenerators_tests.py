@@ -73,7 +73,7 @@ class TestDryPageGenerators(TestCase):
     titles = en_wp_page_titles + en_wp_nopage_titles
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         self.site = self.get_site()
 
@@ -202,7 +202,7 @@ class BasetitleTestCase(TestCase):
                   'Calf Case.pdf/{}')
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.site = self.get_site()
         self.titles = [self.base_title.format(i) for i in range(1, 11)]
@@ -228,7 +228,7 @@ class TestCategoryFilterPageGenerator(BasetitleTestCase):
     category_list = ['Category:Validated']
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.catfilter_list = [pywikibot.Category(self.site, cat)
                                for cat in self.category_list]
@@ -1427,7 +1427,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
     """Test pagegenerators.GeneratorFactory for wanted pages."""
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.gf = pagegenerators.GeneratorFactory(site=self.site)
 
@@ -1547,7 +1547,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Setup test class."""
+        """Set up test class."""
         super().setUpClass()
         site = pywikibot.Site()
         newuser_logevents = list(site.logevents(logtype='newusers', total=1))

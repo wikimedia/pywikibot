@@ -3,7 +3,7 @@
 .. versionadded:: 6.4
 """
 #
-# (C) Pywikibot team, 2021-2024
+# (C) Pywikibot team, 2021-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import logging
 import queue
-from typing import Any, Sequence
+from typing import Any
 
 from pywikibot import config
+from pywikibot.backports import Sequence
 from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
 

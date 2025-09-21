@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol
 
 import pywikibot
-from pywikibot.backports import Generator
+from pywikibot.backports import Generator, Iterable
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
@@ -328,28 +328,31 @@ class LinterMixin:
     """APISite mixin for Linter extension."""
 
     @need_extension('Linter')
-    def linter_pages(self, lint_categories=None, total=None,
-                     namespaces=None, pageids=None, lint_from=None):
+    def linter_pages(
+        self,
+        lint_categories=None,
+        total: int = None,
+        namespaces=None,
+        pageids: str | int | None = None,
+        lint_from: str | int | None = None
+    ) -> Iterable[pywikibot.Page]:
         """Return a generator to pages containing linter errors.
 
         :param lint_categories: categories of lint errors
         :type lint_categories: an iterable that returns values (str), or
             a pipe-separated string of values.
         :param total: if not None, yielding this many items in total
-        :type total: int
         :param namespaces: only iterate pages in these namespaces
         :type namespaces: iterable of str or Namespace key, or a single
             instance of those types. May be a '|' separated list of
             namespace identifiers.
         :param pageids: only include lint errors from the specified
             pageids
-        :type pageids: an iterable that returns pageids (str or int), or
-            a comma- or pipe-separated string of pageids (e.g.
-            '945097,1483753, 956608' or '945097|483753|956608')
+        :type pageids: an iterable that returns pageids, or a comma- or
+             pipe-separated string of pageids (e.g. '945097,1483753,
+             956608' or '945097|483753|956608')
         :param lint_from: Lint ID to start querying from
-        :type lint_from: str representing digit or integer
         :return: pages with Linter errors.
-        :rtype: typing.Iterable[pywikibot.Page]
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',
                                 total=total,  # Will set lntlimit

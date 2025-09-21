@@ -103,7 +103,7 @@ See the table below for a cross reference between MediaWiki's API and Pywikibot'
      -
    * - :api:`rollback<rollback>`
      - :meth:`rollbackpage()<pywikibot.site._apisite.APISite.rollbackpage>`
-     -
+     - meth:`BasePage.rollback()<page.BasePage.rollback>`
      -
    * - :api:`shortenurl<shortenurl>`
      - :meth:`create_short_link()<pywikibot.site._extensions.UrlShortenerMixin.create_short_link>`

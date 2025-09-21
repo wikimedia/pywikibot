@@ -247,7 +247,7 @@ class SetupScripts(SetupBase):
         info('<<lightyellow>>done')
 
 
-def handle_args() -> tuple[bool, bool, bool, bool]:
+def handle_args() -> tuple[bool, bool, bool, bool, bool]:
     """Handle arguments and print documentation if requested.
 
     :return: Return whether dist is to be installed locally or to be

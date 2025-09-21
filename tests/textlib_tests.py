@@ -43,7 +43,7 @@ class TestSectionFunctions(TestCase):
         cls.content = file.read_text(encoding='utf-8')
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         self.catresult1 = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
         super().setUp()
 

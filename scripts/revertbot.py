@@ -36,11 +36,13 @@ and override its `callback` method. Here is a sample:
             return False
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
+
+from textwrap import fill
 
 import pywikibot
 from pywikibot import i18n
@@ -84,7 +86,8 @@ class BaseRevertBot(OptionHandler):
             if callback(item):
                 result = self.revert(item)
                 if result:
-                    pywikibot.info(f"{item['title']}: {result}")
+                    pywikibot.info(
+                        fill(f"{item['title']}: {result}", width=77))
                 else:
                     pywikibot.info(f"Skipped {item['title']}")
             else:
@@ -134,17 +137,17 @@ class BaseRevertBot(OptionHandler):
             return comment
 
         try:
-            self.site.rollbackpage(page, user=self.user, markbot=True)
+            result = page.rollback(user=self.user)
         except APIError as e:
             if e.code == 'badtoken':
                 pywikibot.error(
-                    'There was an API token error rollbacking the edit')
+                    'There was an API token error rolling back the edit')
                 return False
         except Error:
             pass
         else:
-            return (f'The edit(s) made in {page.title()} by {self.user}'
-                    ' was rollbacked')
+            return (f'The edit(s) made in {result["title"]} by {self.user} '
+                    f'was rolled back to revision {result["last_revid"]}')
 
         pywikibot.exception(exc_info=False)
         return False

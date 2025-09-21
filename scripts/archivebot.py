@@ -203,12 +203,12 @@ from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
 from textwrap import fill
-from typing import Any, Pattern
+from typing import Any
 from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import pairwise
+from pywikibot.backports import Pattern, pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,

@@ -51,7 +51,7 @@ class UITestCase(TestCaseBase):
     net = False
 
     def setUp(self) -> None:
-        """Setup test.
+        """Set up test.
 
         Here we patch standard input, output, and errors, essentially
         redirecting to `StringIO` streams.

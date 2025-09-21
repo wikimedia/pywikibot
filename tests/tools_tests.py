@@ -1016,7 +1016,7 @@ class TestTinyCache(TestCase):
     net = False
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         self.foo = DecoratedMethods()
         super().setUp()
 

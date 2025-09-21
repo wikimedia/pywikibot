@@ -61,10 +61,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     standard_version_sites = (
         'http://www.ck-wissen.de/ckwiki/index.php?title=$1',
         'http://en.citizendium.org/wiki/$1',
-        # Server that hosts www.wikichristian.org is unreliable - it
-        # occasionally responding with 500 error (see: T151368).
         'http://www.wikichristian.org/index.php?title=$1',
-        'http://kb.mozillazine.org/$1'  # 1.40.1
     )
 
     non_standard_version_sites = (
@@ -106,7 +103,11 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
     def test_standard_version_sites(self) -> None:
         """Test detection of standard MediaWiki sites."""
         for url in self.standard_version_sites:
-            with self.subTest(url=urlparse(url).netloc):
+            nl = urlparse(url).netloc
+            with self.subTest(url=nl):
+                if os.getenv('GITHUB_ACTIONS') and nl == 'en.citizendium.org':
+                    self.skipTest('Skip test on github due to T404583')
+
                 self.assertSite(url)
 
     def test_proofreadwiki(self) -> None:

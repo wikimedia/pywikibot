@@ -75,7 +75,7 @@ take the right parameter:
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,11 +85,11 @@ import collections
 import re
 import time
 from itertools import zip_longest
-from typing import Generator
 
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot import pagegenerators as pg
+from pywikibot.backports import Generator
 from pywikibot.bot import suggest_help
 from pywikibot.exceptions import (
     EditConflictError,

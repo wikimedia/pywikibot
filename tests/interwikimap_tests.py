@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2018-2024
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -112,7 +112,7 @@ class TestInterwikiMapPrefix(TestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.iw_map = self.site._interwikimap
 

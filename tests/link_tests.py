@@ -241,7 +241,7 @@ class LinkTestWikiEn(LinkTestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
@@ -313,7 +313,7 @@ class TestPartiallyQualifiedExplicitLinkDifferentFamilyParser(LinkTestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
@@ -389,7 +389,7 @@ class TestFullyQualifiedLinkDifferentFamilyParser(LinkTestCase):
     PATTERN = '{colon}{first}:{second}:{title}'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
@@ -439,7 +439,7 @@ class TestFullyQualifiedExplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'wikidata'
         config.family = 'wikidata'
@@ -493,7 +493,7 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
     }
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
@@ -527,7 +527,7 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
     code = 'species'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
@@ -618,7 +618,7 @@ class TestPartiallyQualifiedImplicitLinkDifferentFamilyParser(LinkTestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikisource'
@@ -669,7 +669,7 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
     code = 'en'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'wikidata'
         config.family = 'wikidata'
@@ -715,7 +715,7 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
     code = 'test'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'
@@ -753,7 +753,7 @@ class TestFullyQualifiedOneSiteFamilyImplicitLinkParser(LinkTestCase):
     code = 'species'
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         config.mylang = 'en'
         config.family = 'wikipedia'

@@ -1,33 +1,25 @@
 Current Release Changes
 =======================
 
-* Apply client-side filtering for *maxsize* in misermode in
-  :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>` (:phab:`T402995`)
-* Add :attr:`filter_func()<data.api.APIGeneratorBase.filter_func>` and :meth:`filter_item()
-  <data.api.APIGeneratorBase.filter_item>` filter function in :class:`APIGeneratorBase
-  <data.api.APIGeneratorBase>` and modify `generator` property to implement filtering in
-  `APIGeneratorBase` subclasses (:phab:`T402995`)
-* All parameters of :meth:`Site.allpages()<pywikibot.site._generators.GeneratorsMixin.allpages>`
-  except *start* must be given as keyword arguments.
-* Add support for bewwiktionary (:phab:`T402136`)
-* Add user-agent header to :mod:`eventstreams` requests (:phab:`T402796`)
-* Update i18n
-* Save global options in :attr:`bot.global_args` (:phab:`T250034`)
-* Update :mod:`plural` forms from unicode.org (:phab:`T114978`)
-* Add :class:`textlib.SectionList` to hold :attr:`textlib.Content.sections` (:phab:`T401464`)
-* :class:`pywikibot.Coordinate` parameters are keyword only
-* Add *strict* parameter to :meth:`Site.unconnected_pages()
-  <pywikibot.site._extensions.unconnected_pages>` and :func:`pagegenerators.UnconnectedPageGenerator`
-  (:phab:`T401699`)
-* Raise ValueError if a VAR_POSITIONAL parameter like *\*args* is used with
-  :class:`tools.deprecate_positionals` decorator
-* Add :meth:`get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>` API
-  to :class:`pywikibot.ItemPage` (:phab:`T400612`)
-* Clean up :mod:`setup` module (:phab:`T396356`)
-* Implement :meth:`pywikibot.ItemPage.get_best_claim` (:phab:`T400610`)
-* Add *expiry* parameter to :meth:`BasePage.watch()<page.BasePage.watch>` and
-  :meth:`Site.watch()<pywikibot.site._apisite.APISite.watch>`; fix the methods to return False if
-  page is missing and no expiry is set (:phab:`T330839`)
+* :class:`Siteinfo<pywikibot.site._siteinfo.Siteinfo>` query is made with formatversion 2. Several
+  boolean values are available now. Note that '*' keys for some data are kept for backward
+  compatibility but may be removed later. (:phab:`T404301`)
+* A new property :attr:`APISite.restrictions<pywikibot.site._apisite.APISite.restrictions>` was
+  added. It replaces the methods :meth:`APISite.protection_types()
+  <pywikibot.site._apisite.APISite.protection_types>` and :meth:`APISite.protection_levels()
+  <pywikibot.site._apisite.APISite.protection_levels>` which are deprecated now.
+* Support for mswikiquote was added (:phab:`T404702`)
+* :meth:`APISite.rollbackpage()<pywikibot.site._apisite.APISite.rollbackpage>` supports *pageid*
+  argument as alternative to *page*. *markbot* defaults to True if the rollbacker is a bot and not
+  explicitly given. The method now returns a dictionary with rollback information. The version
+  history no longer has to be preloaded. (:phab:`T403425`)
+* :meth:`BasePage.rollback()<page.BasePage.rollback>` was implemented (:phab:`T403425`)
+* The first parameter of :exc:`exceptions.PageRelatedError` may now be a pageid (:phab:`T403425`)
+* i18n Updates
+* Use 'login' token from API response in :meth:`login.ClientLoginManager.login_to_site`
+  (:phab:`T328814`)
+* Always use *fallback_prompt* in :func:`i18n.twtranslate` whenever no
+  translation is found, including unknown keys in existing packages (:phab:`T326470`)
 
 
 Deprecations
@@ -36,6 +28,13 @@ Deprecations
 Pending removal in Pywikibot 13
 -------------------------------
 
+* 10.5.0: Accessing the fallback '*' keys in 'languages', 'namespaces', 'namespacealiases', and
+  'skins' properties of :attr:`APISite.siteinfo<pywikibot.site._apisite.APISite.siteinfo>` are
+  deprecated and will be removed.
+* 10.5.0: The methods :meth:`APISite.protection_types()
+  <pywikibot.site._apisite.APISite.protection_types>` and :meth:`APISite.protection_levels()
+  <pywikibot.site._apisite.APISite.protection_levels>` are deprecated.
+  :attr:`APISite.restrictions<pywikibot.site._apisite.APISite.restrictions>` should be used instead.
 * 10.4.0: Require all parameters of :meth:`Site.allpages()
   <pywikibot.site._generators.GeneratorsMixin.allpages>` except *start* to be keyword arguments.
 * 10.4.0: Positional arguments of :class:`pywikibot.Coordinate` are deprecated and must be given as

@@ -261,16 +261,21 @@ class DummySiteinfo:
         self._cache[key] = (value, False)
 
     def get(self, key, get_default=True, cache=True, expiry=False):
-        """Return dry data."""
+        """Return dry cached data or default value."""
         # Default values are always expired, so only expiry=False doesn't force
         # a reload
         force = expiry is not False
-        if not force and key in self._cache:
-            loaded = self._cache[key]
-            if not loaded[1] and not get_default:
+        if not force and (key in self._cache or 'general' in self._cache):
+            try:
+                value, is_default = self._cache[key]
+            except KeyError:
+                value, is_default = self._cache['general']
+                value = value[key]
+
+            if not is_default and not get_default:
                 raise KeyError(key)
 
-            return loaded[0]
+            return value
 
         if get_default:
             default = EMPTY_DEFAULT
@@ -343,7 +348,7 @@ class DrySite(pywikibot.site.APISite):
         self._siteinfo._cache['case'] = (
             'case-sensitive' if self.family.name == 'wiktionary' else
             'first-letter', True)
-        self._siteinfo._cache['mainpage'] = 'Main Page'
+        self._siteinfo._cache['mainpage'] = ('Main Page', True)
         extensions = []
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})

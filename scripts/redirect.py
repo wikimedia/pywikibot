@@ -71,7 +71,7 @@ Furthermore the following options are provided:
 &params;
 """
 #
-# (C) Pywikibot team, 2004-2024
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -80,11 +80,12 @@ from __future__ import annotations
 import datetime
 from contextlib import suppress
 from textwrap import fill
-from typing import Any, Generator
+from typing import Any
 
 import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
+from pywikibot.backports import Generator
 from pywikibot.bot import ExistingPageBot, OptionHandler, suggest_help
 from pywikibot.exceptions import (
     CircularRedirectError,

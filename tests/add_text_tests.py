@@ -46,7 +46,7 @@ class TestAddTextScript(TestCase):
     dry = True
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         pywikibot.bot.ui.clear()
         self.generator_factory = pywikibot.pagegenerators.GeneratorFactory()

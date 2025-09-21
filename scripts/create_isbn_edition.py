@@ -1561,7 +1561,7 @@ def main(*args: str) -> None:
                    f'{pywikibot.__version__}, {pgmlic}, {creator}')
 
     # This script requires a bot flag
-    wdbotflag = 'bot' in pywikibot.User(repo, repo.user()).groups()
+    wdbotflag = repo.has_group('bot')
 
     # Prebuilt targets
     target_author = pywikibot.ItemPage(repo, AUTHORINSTANCE)

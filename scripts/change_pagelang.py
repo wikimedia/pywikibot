@@ -23,7 +23,7 @@ Furthermore, the following command line parameters are supported:
 .. versionadded:: 5.1
 """
 #
-# (C) Pywikibot team, 2018-2024
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -80,17 +80,19 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
         :type page: pywikibot.page.BasePage
         """
         # Current content language of the page and site language
-        parameters = {'action': 'query',
-                      'prop': 'info',
-                      'titles': page.title(),
-                      'meta': 'siteinfo'}
+        parameters = {
+            'action': 'query',
+            'prop': 'info',
+            'titles': page.title(),
+        }
         r = self.site.simple_request(**parameters)
         langcheck = r.submit()['query']
 
         currentlang = ''
         for k in langcheck['pages']:
             currentlang = langcheck['pages'][k]['pagelanguage']
-        sitelang = langcheck['general']['lang']
+
+        sitelang = self.site.siteinfo['lang']
 
         if self.opt.setlang == currentlang:
             pywikibot.info(
@@ -109,7 +111,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
             choice = pywikibot.input_choice(
                 f'The content language for this page is already set to '
                 f'<<yellow>>{currentlang}<<default>>, which is different from '
-                f'the default ({sitelang}). Change it to'
+                f'the default ({sitelang}). Change it to '
                 f'<<green>>{self.opt.setlang}<<default>> anyway?',
                 [('Always', 'a'), ('Yes', 'y'), ('No', 'n'), ('Never', 'v')],
                 default='Y')
@@ -152,7 +154,7 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
     specialpages = site.siteinfo['specialpagealiases']
     specialpagelist = {item['realname'] for item in specialpages}
-    allowedlanguages = site._paraminfo.parameter(module='setpagelanguage',
+    allowedlanguages = site._paraminfo.parameter(module_name='setpagelanguage',
                                                  param_name='lang')['type']
     # Check if the special page PageLanguage is enabled on the wiki
     # If it is not, page languages can't be set, and there's no point in

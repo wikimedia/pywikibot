@@ -736,13 +736,8 @@ def twtranslate(
          "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
       }
 
-    and so on.
-
-    >>> # this code snippet is running in test environment
-    >>> # ignore test message "tests: max_retries reduced from 15 to 1"
     >>> import os
     >>> os.environ['PYWIKIBOT_TEST_QUIET'] = '1'
-
     >>> from pywikibot import i18n
     >>> i18n.set_messages_package('tests.i18n')
     >>> # use a dictionary
@@ -752,7 +747,7 @@ def twtranslate(
     >>> str(i18n.twtranslate(
     ...    'fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
     'Robot: Changer seulement une page.'
-    >>> # use format strings also outside
+    >>> # use parameter for plural and format strings outside
     >>> str(i18n.twtranslate(
     ...    'fr', 'test-plural', {'num': 10}, only_plural=True
     ... ) % {'descr': 'seulement'})
@@ -761,73 +756,92 @@ def twtranslate(
     .. versionchanged:: 8.1
        the *bot_prefix* parameter was added.
 
-    :param source: When it's a site it's using the lang attribute and otherwise
-        it is using the value directly. The site object is recommended.
-    :param twtitle: The TranslateWiki string title, in <package>-<key> format
-    :param parameters: For passing parameters. It should be a mapping but for
-        backwards compatibility can also be a list, tuple or a single value.
-        They are also used for plural entries in which case they must be a
-        Mapping and will cause a TypeError otherwise.
+    .. versionchanged:: 10.5
+       *fallback_prompt* is now returned whenever no translation is found,
+       including unknown keys in existing packages.
+
+    :param source: When it's a site it's using the lang attribute and
+        otherwise it is using the value directly. The site object is
+        recommended.
+    :param twtitle: The TranslateWiki string title, in <package>-<key>
+        format
+    :param parameters: For passing parameters. It should be a mapping
+        but for backwards compatibility can also be a list, tuple or a
+        single value. They are also used for plural entries in which
+        case they must be a Mapping and will cause a TypeError otherwise.
     :param fallback: Try an alternate language code
     :param fallback_prompt: The English message if i18n is not available
-    :param only_plural: Define whether the parameters should be only applied to
-        plural instances. If this is False it will apply the parameters also
-        to the resulting string. If this is True the placeholders must be
-        manually applied afterwards.
+    :param only_plural: Define whether the parameters should be only
+        applied to plural instances. If this is False it will apply the
+        parameters also to the resulting string. If this is True the
+        placeholders must be manually applied afterwards.
     :param bot_prefix: If True, prepend the message with a bot prefix
         which depends on the ``config.bot_prefix`` setting
-    :raise IndexError: If the language supports and requires more plurals than
-        defined for the given translation template.
+    :raise IndexError: If the language supports and requires more
+        plurals than defined for the given translation template.
+    :raise TypeError: If parameters are not a mapping for plural
+        messages.
+    :raise ValueError: If parameters are not a mapping but required.
+    :raise TranslationError: If no translation found and
+        *fallback_prompt* is None.
     """
-    prefix = get_bot_prefix(source, use_prefix=bot_prefix)
-
-    if not messages_available():
-        if fallback_prompt:
+    def _return_fallback_or_raise() -> str:
+        """Return formatted fallback_prompt, or raise TranslationError."""
+        if fallback_prompt is not None:
             if parameters and not only_plural:
-                return fallback_prompt % parameters
-            return fallback_prompt
-
+                return prefix + fallback_prompt % parameters
+            return prefix + fallback_prompt
         raise pywikibot.exceptions.TranslationError(
-            f'Unable to load messages package {_messages_package_name} for '
-            f' bundle {twtitle}\nIt can happen due to lack of i18n submodule '
-            f'or files. See {__url__}/i18n'
+            fill(
+                f'No translation available for key {twtitle} of '
+                f'{_messages_package_name} package in language '
+                f'{getattr(source, "lang", source)}. It can happen due to an '
+                f'outdated or missing i18n submodule or files. '
+                f'See {__url__}/i18n.'
+            )
         )
 
-    # if source is a site then use its lang attribute, otherwise it's a str
+    # Get the bot prefix, if requested
+    prefix = get_bot_prefix(source, use_prefix=bot_prefix)
+
+    # If the messages package isn't available at all, use fallback_prompt
+    if not messages_available():
+        return _return_fallback_or_raise()
+
+    # Determine language code from source
     lang = getattr(source, 'lang', source)
 
-    # There are two possible failure modes: the translation dict might not have
-    # the language altogether, or a specific key could be untranslated. Both
-    # modes are caught with the KeyError.
+    # Prepare list of languages to try; fallback adds alternatives and English
     langs = [lang]
     if fallback:
         langs += [*_altlang(lang), 'en']
+
+    # Try each language until a translation is found
     for alt in langs:
         trans = _get_translation(alt, twtitle)
         if trans:
             break
     else:
-        raise pywikibot.exceptions.TranslationError(fill(
-            'No {} translation has been defined for TranslateWiki key "{}". '
-            'It can happen due to lack of i18n submodule or files or an '
-            'outdated submodule. See {}/i18n'
-            .format('English' if 'en' in langs else f"'{lang}'",
-                    twtitle, __url__)))
+        # No translation found: return fallback_prompt if available
+        return _return_fallback_or_raise()
 
+    # Handle plural forms if present
     if '{{PLURAL:' in trans:
-        # _extract_plural supports in theory non-mappings, but they are
-        # deprecated
         if not isinstance(parameters, Mapping):
             raise TypeError('parameters must be a mapping.')
         trans = _extract_plural(alt, trans, parameters)
 
+    # Validate parameters type for string formatting
     if parameters is not None and not isinstance(parameters, Mapping):
         raise ValueError(
             f'parameters should be a mapping, not {type(parameters).__name__}'
         )
 
+    # Apply string formatting if requested
     if not only_plural and parameters:
         trans = trans % parameters
+
+    # Return the final translation with bot prefix
     return prefix + trans
 
 

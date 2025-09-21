@@ -31,6 +31,7 @@ from tests.aspects import (
     DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
+    PatchingTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,
 )
@@ -784,6 +785,83 @@ class TestSiteSysopWrite(TestCase):
         site.undelete(fp, 'pywikibot unit tests', fileids=[fileid])
 
 
+class TestRollbackPage(PatchingTestCase):
+
+    """Test rollbackpage site method."""
+
+    family = 'wikipedia'
+    code = 'test'
+    login = True
+
+    @staticmethod
+    @PatchingTestCase.patched(pywikibot.data.api.Request, '_simulate')
+    def _simulate(self, action):
+        """Patch api.Request._simulate. Note: self is the Request instance."""
+        if action == 'rollback':
+            result = {
+                'title': self._params['title'][0].title(),
+                'summary': self._params.get('summary',
+                                            ['Rollback simulation'])[0],
+                'last_revid': 381070,
+            }
+            return {action: result}
+
+        if action and config.simulate and self.write:
+            result = {'result': 'Success', 'nochange': ''}
+            return {action: result}
+
+        return None
+
+    @classmethod
+    def setUpClass(cls):
+        """Use sandbox page for tests."""
+        super().setUpClass()
+        cls.page = pywikibot.Page(cls.site, 'Sandbox')
+
+    def setUp(self):
+        """Patch has_right method."""
+        super().setUp()
+        self.patch(self.site, 'has_right', lambda right: True)
+
+    def test_missing_rights(self):
+        """Test missing rollback right."""
+        self.patch(self.site, 'has_right', lambda right: False)
+        with self.assertRaisesRegex(
+            Error,
+            rf'User "{self.site.user()}" does not have required user right'
+            ' "rollback" on site'
+        ):
+            self.site.rollbackpage(self.page, pageid=4711)
+
+    def test_exceptions(self):
+        """Test rollback exceptions."""
+        with self.assertRaisesRegex(
+            ValueError,
+            "The parameters 'page' and 'pageid' cannot be used together"
+        ):
+            self.site.rollbackpage(self.page, pageid=4711)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"One of parameters 'page' or 'pageid' is required\."
+        ):
+            self.site.rollbackpage()
+
+        with self.assertRaisesRegex(
+                NoPageError, r"Page -1 \(pageid\) doesn't exist\."):
+            self.site.rollbackpage(pageid=-1)
+
+    def test_rollback_simulation(self):
+        """Test rollback in simulate mode."""
+        result = self.site.rollbackpage(self.page)
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result['title'], self.page.title())
+        self.assertEqual(result['last_revid'], 381070)
+        self.assertEqual(result['summary'], 'Rollback simulation')
+        result = self.site.rollbackpage(self.page, summary='Rollback test')
+        self.assertEqual(result['summary'], 'Rollback test')
+
+
 class TestUsernameInUsers(DefaultSiteTestCase):
 
     """Test that the user account can be found in users list."""
@@ -825,7 +903,7 @@ class TestSiteLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     """Test site.loadrevisions() caching."""
 
     def setup_page(self) -> None:
-        """Setup test page."""
+        """Set up test page."""
         self._page = self.get_mainpage(force=True)
 
     def test_page_text(self) -> None:

@@ -89,7 +89,7 @@ class GeneratorsMixin:
             # Store the order of the input data.
             priority_dict = dict(zip(batch, range(len(batch))))
 
-            prio_queue = []
+            prio_queue: list[tuple[int, pywikibot.Page]] = []
             next_prio = 0
             params = {'pageids': batch}
             rvgen = api.PropertyGenerator('info', site=self, parameters=params)
@@ -172,7 +172,7 @@ class GeneratorsMixin:
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in batch
                        if hasattr(p, '_pageid') and p._pageid > 0]
-            cache = {}
+            cache: dict[str, tuple[int, pywikibot.Page]] = {}
             # In case of duplicates, return the first entry.
             for priority, page in enumerate(batch):
                 try:
@@ -181,7 +181,7 @@ class GeneratorsMixin:
                 except InvalidTitleError:
                     pywikibot.exception()
 
-            prio_queue = []
+            prio_queue: list[tuple[int, pywikibot.Page]] = []
             next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
@@ -2346,7 +2346,7 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    @deprecate_arg('type', 'protect_type')
+    @deprecate_arg('type', 'protect_type')  # since 9.0
     def protectedpages(
         self,
         namespace: NamespaceArgType = 0,
@@ -2368,13 +2368,13 @@ class GeneratorsMixin:
         :param namespace: The searched namespace.
         :param protect_type: The protection type to search for
             (default 'edit').
-        :param level: The protection level (like 'autoconfirmed'). If False it
-            shows all protection levels.
+        :param level: The protection level (like 'autoconfirmed'). If
+            False it shows all protection levels.
         :return: The pages which are protected.
         """
         namespaces = self.namespaces.resolve(namespace)
         # always assert, so we are be sure that protect_type could be 'create'
-        assert 'create' in self.protection_types(), \
+        assert 'create' in self.restrictions['types'], \
             "'create' should be a valid protection type."
         if protect_type == 'create':
             return self._generator(

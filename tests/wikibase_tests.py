@@ -51,7 +51,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
     """Test site.loadrevisions() caching."""
 
     def setup_page(self) -> None:
-        """Setup test page."""
+        """Set up test page."""
         self._page = ItemPage(self.get_repo(), 'Q15169668')
 
     def test_page_text(self) -> None:
@@ -66,7 +66,7 @@ class TestGeneral(WikidataTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Setup test class."""
+        """Set up test class."""
         super().setUpClass()
         enwiki = pywikibot.Site('en', 'wikipedia')
         cls.mainpage = pywikibot.Page(pywikibot.page.Link('Main Page', enwiki))
@@ -163,7 +163,7 @@ class TestLoadUnknownType(WikidataTestCase):
     dry = True
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         wikidata = self.get_repo()
         self.wdp = ItemPage(wikidata, 'Q60')
@@ -230,12 +230,12 @@ class TestItemLoad(WikidataTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Setup test class."""
+        """Set up test class."""
         super().setUpClass()
         cls.site = cls.get_site('enwiki')
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
                                                       self.site))
@@ -1017,7 +1017,7 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
     """Test behavior of ItemPage methods inherited from BasePage."""
 
     def setup_page(self) -> None:
-        """Setup test page."""
+        """Set up test page."""
         self._page = ItemPage(self.get_repo(), 'Q60')
 
     def test_basepage_methods(self) -> None:
@@ -1036,7 +1036,7 @@ class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
     """Test behavior of Page methods for wikibase item."""
 
     def setup_page(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         self._page = pywikibot.Page(self.site, 'Q60')
 
     def test_basepage_methods(self) -> None:
@@ -1066,7 +1066,7 @@ class TestLinks(WikidataTestCase):
     }
 
     def setUp(self) -> None:
-        """Setup Tests."""
+        """Set up tests."""
         super().setUp()
         self.wdp = ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
@@ -1100,7 +1100,7 @@ class TestWriteNormalizeData(TestCase):
     net = False
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.data_out = {
             'labels': {'en': {'language': 'en', 'value': 'Foo'}},
@@ -1299,7 +1299,7 @@ class TestAlternateNamespaces(WikidataTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Setup test class."""
+        """Set up test class."""
         super().setUpClass()
 
         cls.get_repo()._namespaces = NamespacesDict({
@@ -1436,7 +1436,7 @@ class TestJSON(WikidataTestCase):
     """Test cases to test toJSON() functions."""
 
     def setUp(self) -> None:
-        """Setup test."""
+        """Set up test."""
         super().setUp()
         wikidata = self.get_repo()
         self.wdp = ItemPage(wikidata, 'Q60')

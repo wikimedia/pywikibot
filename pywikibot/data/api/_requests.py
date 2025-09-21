@@ -532,8 +532,16 @@ class Request(MutableMapping, WaitingMixin):
             # for more realistic simulation
             if config.simulate is not True:
                 pywikibot.sleep(float(config.simulate))
+            if action == 'rollback':
+                result = {
+                    'title': self._params['title'][0].title(),
+                    'summary': self._params.get('summary',
+                                                ['Rollback simulation'])[0],
+                }
+            else:
+                result = {'result': 'Success', 'nochange': ''}
             return {
-                action: {'result': 'Success', 'nochange': ''},
+                action: result,
 
                 # wikibase results
                 'entity': {'lastrevid': -1, 'id': '-1'},
@@ -835,6 +843,10 @@ but {scheme!r} is required. Please add the following code to your family file:
 
         .. versionchanged:: 7.2
            Return True to retry the current request and False to resume.
+        .. versionchanged:: 10.5
+           Handle warnings of formatversion 2.
+
+        .. seealso:: :api:`Errors and warnings`
 
         :meta public:
         """
@@ -845,7 +857,9 @@ but {scheme!r} is required. Please add the following code to your family file:
         for mod, warning in result['warnings'].items():
             if mod == 'info':
                 continue
-            if '*' in warning:
+            if 'warnings' in warning:  # formatversion 2
+                text = warning['warnings']
+            elif '*' in warning:  # formatversion 1
                 text = warning['*']
             elif 'html' in warning:
                 # bug T51978
@@ -1058,9 +1072,13 @@ but {scheme!r} is required. Please add the following code to your family file:
                 assert key not in error
                 error[key] = result[key]
 
-            if '*' in error:
-                # help text returned
-                error['help'] = error.pop('*')
+            # help text returned
+            # see also: https://www.mediawiki.org/wiki/API:Errors_and_warnings
+            if 'docref' in error:
+                error['help'] = error.pop('docref')  # formatversion 2
+            elif '*' in error:
+                error['help'] = error.pop('*')  # formatversion 1
+
             code = error.setdefault('code', 'Unknown')
             info = error.setdefault('info', None)
 

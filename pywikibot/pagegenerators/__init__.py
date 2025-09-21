@@ -12,7 +12,7 @@ These parameters are supported to specify which pages titles to be used:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -594,7 +594,9 @@ def PageWithTalkPageGenerator(
         if not return_talk_only or page.isTalkPage():
             yield page
         if not page.isTalkPage():
-            yield page.toggleTalkPage()
+            talk_page = page.toggleTalkPage()
+            if talk_page is not None:
+                yield talk_page
 
 
 def RepeatingGenerator(

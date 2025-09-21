@@ -608,7 +608,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test protectedpages protection level."""
         site = self.get_site()
         levels = set()
-        all_levels = site.protection_levels().difference([''])
+        all_levels = site.restrictions['levels'].difference([''])
         for level in all_levels:
             if list(site.protectedpages(protect_type='edit', level=level,
                                         total=1)):
@@ -1662,7 +1662,7 @@ class TestSiteLoadRevisions(TestCase):
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.mysite = self.get_site()
         self.mainpage = pywikibot.Page(pywikibot.Link('Main Page',
@@ -1795,7 +1795,7 @@ class TestBacklinks(TestCase):
     cached = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.page = pywikibot.Page(self.site, 'File:BoA – Woman.png')
         self.backlinks = list(self.page.backlinks(follow_redirects=False,
@@ -1910,7 +1910,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
     cached = True
 
     def setUp(self) -> None:
-        """Setup tests."""
+        """Set up tests."""
         super().setUp()
         self.site = self.get_site()
         mainpage = self.get_mainpage()

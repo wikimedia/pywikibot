@@ -172,7 +172,7 @@ UserWarning: warnings targeted at users
    instead.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -286,17 +286,20 @@ class PageRelatedError(Error):
 
     This class should be used when the Exception concerns a particular
     Page, and when a generic message can be written once for all.
+
+    .. versionchanged:: 10.5
+       A pageid is accepted with the first parameter
     """
 
     # Preformatted message where the page title will be inserted.
     # Override this in subclasses.
     message = ''
 
-    def __init__(self, page: pywikibot.page.BasePage,
+    def __init__(self, page: pywikibot.page.BasePage | int,
                  message: str | None = None) -> None:
         """Initializer.
 
-        :param page: Page that caused the exception
+        :param page: Page object or pageid that caused the exception
         """
         if message:
             self.message = message
@@ -305,13 +308,17 @@ class PageRelatedError(Error):
             raise Error("PageRelatedError is abstract. Can't instantiate it!")
 
         self.page = page
-        self.title = page.title(as_link=True)
-        self.site = page.site
+        if isinstance(page, pywikibot.page.BasePage):
+            self.title = str(page)
+            self.site = page.site
+        else:
+            self.title = f'{page} (pageid)'
+            self.site = ''
 
         if re.search(r'\{\w+\}', self.message):
             msg = self.message.format_map(self.__dict__)
         else:
-            msg = self.message.format(page)
+            msg = self.message.format(self.title)
 
         super().__init__(msg)
 

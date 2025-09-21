@@ -1,6 +1,6 @@
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,13 +12,14 @@ import subprocess
 from collections import Counter
 
 import pywikibot
+from pywikibot.backports import Sequence
 
 
-def _call_cmd(args, lib: str = 'djvulibre') -> tuple:
+def _call_cmd(args: str | Sequence[str],
+              lib: str = 'djvulibre') -> tuple[bool, str]:
     """Tiny wrapper around subprocess.Popen().
 
     :param args: same as Popen()
-    :type args: str or typing.Sequence[string]
     :param lib: library to be logged in logging messages
     :return: returns a tuple (res, stdoutdata), where res is True if
         dp.returncode != 0 else False
