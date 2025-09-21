@@ -1,6 +1,31 @@
 Release History
 ===============
 
+10.5.0
+------
+*21 September 2025*
+
+* :class:`Siteinfo<pywikibot.site._siteinfo.Siteinfo>` query is made with formatversion 2. Several
+  boolean values are available now. Note that '*' keys for some data are kept for backward
+  compatibility but may be removed later. (:phab:`T404301`)
+* A new property :attr:`APISite.restrictions<pywikibot.site._apisite.APISite.restrictions>` was
+  added. It replaces the methods :meth:`APISite.protection_types()
+  <pywikibot.site._apisite.APISite.protection_types>` and :meth:`APISite.protection_levels()
+  <pywikibot.site._apisite.APISite.protection_levels>` which are deprecated now.
+* Support for mswikiquote was added (:phab:`T404702`)
+* :meth:`APISite.rollbackpage()<pywikibot.site._apisite.APISite.rollbackpage>` supports *pageid*
+  argument as alternative to *page*. *markbot* defaults to True if the rollbacker is a bot and not
+  explicitly given. The method now returns a dictionary with rollback information. The version
+  history no longer has to be preloaded. (:phab:`T403425`)
+* :meth:`BasePage.rollback()<page.BasePage.rollback>` was implemented (:phab:`T403425`)
+* The first parameter of :exc:`exceptions.PageRelatedError` may now be a pageid (:phab:`T403425`)
+* i18n Updates
+* Use 'login' token from API response in :meth:`login.ClientLoginManager.login_to_site`
+  (:phab:`T328814`)
+* Always use *fallback_prompt* in :func:`i18n.twtranslate` whenever no
+  translation is found, including unknown keys in existing packages (:phab:`T326470`)
+
+
 10.4.0
 ------
 *31 August 2025*
