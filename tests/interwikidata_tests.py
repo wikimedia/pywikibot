@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for scripts/interwikidata.py."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from typing import Any
 
 import pywikibot
 from pywikibot import Link
@@ -21,7 +22,7 @@ class DummyBot(interwikidata.IWBot):
 
     """A dummy bot to prevent editing in production wikis."""
 
-    def put_current(self) -> bool:
+    def put_current(self, *args: Any, **kwargs: Any) -> bool:
         """Prevent editing."""
         return False
 

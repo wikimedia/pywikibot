@@ -1840,21 +1840,26 @@ class CurrentPageBot(BaseBot):
         self.current_page = page
         self.treat_page()
 
-    def put_current(self, new_text: str,
-                    ignore_save_related_errors: bool | None = None,
-                    ignore_server_errors: bool | None = None,
-                    **kwargs: Any) -> bool:
+    def put_current(
+        self,
+        new_text: str,
+        ignore_save_related_errors: bool | None = None,
+        ignore_server_errors: bool | None = None,
+        **kwargs: Any
+    ) -> bool:
         """Call :py:obj:`Bot.userPut` but use the current page.
 
         It compares the new_text to the current page text.
 
         :param new_text: The new text
-        :param ignore_save_related_errors: Ignore save related errors and
-            automatically print a message. If None uses this instances default.
-        :param ignore_server_errors: Ignore server errors and automatically
-            print a message. If None uses this instances default.
+        :param ignore_save_related_errors: Ignore save related errors
+            and automatically print a message. If None uses this
+            instances default.
+        :param ignore_server_errors: Ignore server errors and
+            automatically print a message. If None uses this instances
+            default.
         :param kwargs: Additional parameters directly given to
-            :py:obj:`Bot.userPut`.
+            :meth:`BaseBot.userPut`.
         :return: whether the page was saved successfully
         """
         if ignore_save_related_errors is None:
@@ -1862,10 +1867,13 @@ class CurrentPageBot(BaseBot):
         if ignore_server_errors is None:
             ignore_server_errors = self.ignore_server_errors
         return self.userPut(
-            self.current_page, self.current_page.text, new_text,
+            self.current_page,
+            self.current_page.text,
+            new_text,
             ignore_save_related_errors=ignore_save_related_errors,
             ignore_server_errors=ignore_server_errors,
-            **kwargs)
+            **kwargs
+        )
 
 
 class AutomaticTWSummaryBot(CurrentPageBot):
@@ -1902,8 +1910,14 @@ class AutomaticTWSummaryBot(CurrentPageBot):
         """Delete the i18n dictionary."""
         del self._summary_parameters
 
-    def put_current(self, *args: Any, **kwargs: Any) -> None:
-        """Defining a summary if not already defined and then call original."""
+    def put_current(self, *args: Any, **kwargs: Any) -> bool:
+        """Defining a summary if not already defined and then call original.
+
+        For parameters see :meth:`CurrentPageBot.put_current`
+
+        .. versionchanged:: 10.6
+           return whether the page was saved successfully
+        """
         if not kwargs.get('summary'):
             if self.summary_key is None:
                 raise ValueError('The summary_key must be set.')
@@ -1912,7 +1926,8 @@ class AutomaticTWSummaryBot(CurrentPageBot):
                                        self.summary_parameters)
             _log(f'Use automatic summary message "{summary}"')
             kwargs['summary'] = summary
-        super().put_current(*args, **kwargs)
+
+        return super().put_current(*args, **kwargs)
 
 
 class ExistingPageBot(CurrentPageBot):

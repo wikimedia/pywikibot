@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Return :meth:`bot.BaseBot.userPut` result with :meth:`AutomaticTWSummaryBot.put_current()
+  <bot.AutomaticTWSummaryBot.put_current>` method
 
 
 Deprecations
