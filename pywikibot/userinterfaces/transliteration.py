@@ -1148,7 +1148,7 @@ class Transliterator:
             result = prev
         # Lao
         elif char == 'ຫ':
-            result = '' if next in 'ງຍນຣລຼຼວ' else 'h'
+            result = '' if succ in 'ງຍນຣລຼຼວ' else 'h'
         return result
 
 
