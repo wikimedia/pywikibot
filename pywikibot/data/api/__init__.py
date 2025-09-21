@@ -1,6 +1,6 @@
 """Interface to MediaWiki's api.php."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,7 +55,7 @@ def _invalidate_superior_cookies(family) -> None:
     """
     if isinstance(family, SubdomainFamily):
         for cookie in http.cookie_jar:
-            if family.domain == cookie.domain:
+            if family.domain == cookie.domain:  # type: ignore[attr-defined]
                 http.cookie_jar.clear(cookie.domain, cookie.path, cookie.name)
 
 
@@ -71,9 +71,10 @@ class CTEBinaryBytesGenerator(BytesGenerator):
 
     def _handle_text(self, msg) -> None:
         if msg['content-transfer-encoding'] == 'binary':
-            self._fp.write(msg.get_payload(decode=True))
+            self._fp.write(  # type: ignore[attr-defined]
+                msg.get_payload(decode=True))
         else:
-            super()._handle_text(msg)
+            super()._handle_text(msg)  # type: ignore[misc]
 
     _writeBody = _handle_text  # noqa: N815
 

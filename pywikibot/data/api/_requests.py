@@ -1080,7 +1080,7 @@ but {scheme!r} is required. Please add the following code to your family file:
                 error['help'] = error.pop('*')  # formatversion 1
 
             code = error.setdefault('code', 'Unknown')
-            info = error.setdefault('info', None)
+            info = error.setdefault('info', '')
 
             if (code == self.last_error['code']
                     and info == self.last_error['info']):

@@ -32,7 +32,7 @@ class BaseDataDict(MutableMapping):
     in subclasses.
     """
 
-    def __init__(self, data=None) -> None:
+    def __init__(self, data: dict[str, Any] = None) -> None:
         super().__init__()
         self._data = {}
         if data:
@@ -43,15 +43,15 @@ class BaseDataDict(MutableMapping):
         """Construct a new empty BaseDataDict."""
         return cls()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: BaseSite | str) -> Any:
         key = self.normalizeKey(key)
         return self._data[key]
 
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(self, key: BaseSite | str, value: Any) -> None:
         key = self.normalizeKey(key)
         self._data[key] = value
 
-    def __delitem__(self, key) -> None:
+    def __delitem__(self, key: BaseSite | str) -> None:
         key = self.normalizeKey(key)
         del self._data[key]
 
@@ -61,7 +61,7 @@ class BaseDataDict(MutableMapping):
     def __len__(self) -> int:
         return len(self._data)
 
-    def __contains__(self, key) -> bool:
+    def __contains__(self, key: BaseSite | str) -> bool:
         key = self.normalizeKey(key)
         return key in self._data
 

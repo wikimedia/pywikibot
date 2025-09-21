@@ -119,16 +119,22 @@ repos:
         args:
           - --config-file=pyproject.toml
           - --follow-imports=silent
+        additional_dependencies:
+          - types-PyMySQL
+          - types-requests
         # Test for files which already passed in past.
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
-        files: >
-          ^pywikibot/(__metadata__|config|echo|exceptions|fixes|logging|time)\.py$|
-          ^pywikibot/(comms|data|families|specialbots)/__init__\.py$|
-          ^pywikibot/data/memento\.py$|
-          ^pywikibot/families/[a-z][a-z\d]+_family\.py$|
-          ^pywikibot/page/(__init__|_decorators|_revision)\.py$|
-          ^pywikibot/pagegenerators/__init__\.py$|
-          ^pywikibot/scripts/(?:i18n/)?__init__\.py$|
-          ^pywikibot/site/(__init__|_basesite|_decorators|_extensions|_interwikimap|_tokenwallet|_upload)\.py$|
-          ^pywikibot/tools/(_logging|_unidata|formatter)\.py$|
-          ^pywikibot/userinterfaces/(__init__|_interface_base|terminal_interface)\.py$
+        files: |
+          (?x)^pywikibot/(
+            (__metadata__|backports|config|diff|echo|exceptions|fixes|logging|time)|
+            (comms|data|families|specialbots)/__init__|
+            comms/eventstreams|
+            data/(api/(__init__|_optionset)|memento)|
+            families/[a-z][a-z\d]+_family|
+            page/(__init__|_decorators|_revision)|
+            pagegenerators/(__init__|_filters)|
+            scripts/(?:i18n/)?__init__|
+            site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|
+            tools/(_logging|_unidata|formatter)|
+            userinterfaces/(__init__|_interface_base|terminal_interface)
+          )\.py$

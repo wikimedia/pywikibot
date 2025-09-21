@@ -61,7 +61,7 @@ class Category(Page):
 
     def subcategories(self, *,
                       recurse: int | bool = False,
-                      **kwargs: Any) -> Generator[Page, None, None]:
+                      **kwargs: Any) -> Generator[Category, None, None]:
         """Yield all subcategories of the current category.
 
         **Usage:**
@@ -200,7 +200,7 @@ class Category(Page):
                     return
 
     def members(self, *,
-                recurse: bool = False,
+                recurse: int | bool = False,
                 total: int | None = None,
                 **kwargs: Any) -> Generator[Page, None, None]:
         """Yield all category contents (subcats, pages, and files).

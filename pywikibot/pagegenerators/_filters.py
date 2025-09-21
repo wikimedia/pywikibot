@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,16 +20,18 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from pywikibot.site import BaseSite, Namespace
 
     PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
                              list[pywikibot.page.BasePage]]
-    PATTERN_STR_OR_SEQ_TYPE = (
-        str
-        | Pattern[str]
-        | Sequence[str]
-        | Sequence[Pattern[str]]
-    )
+    PATTERN_STR_OR_SEQ_TYPE = Union[
+        str,
+        Pattern[str],
+        Sequence[str],
+        Sequence[Pattern[str]],
+    ]
 
 
 # This is the function that will be used to de-duplicate page iterators.

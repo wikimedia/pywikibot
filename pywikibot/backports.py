@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 
 # Placed here to omit circular import in tools
@@ -58,6 +58,7 @@ if PYTHON_VERSION < (3, 9):
         Match,
         Pattern,
         Sequence,
+        Set,
     )
 else:
     from collections import Counter
@@ -72,6 +73,7 @@ else:
     from re import Match, Pattern
     Dict = dict  # type: ignore[misc]
     List = list  # type: ignore[misc]
+    Set = set  # type: ignore[misc]
 
 
 if PYTHON_VERSION < (3, 9, 2):
@@ -137,8 +139,9 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         a, b = tee(iterable)
         next(b, None)
         return zip(a, b)
-else:
-    from itertools import pairwise  # type: ignore[no-redef]
+
+elif not TYPE_CHECKING:
+    from itertools import pairwise
     from types import NoneType
 
 
@@ -202,13 +205,18 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
                     raise ValueError(msg)
                 yield tuple(group)
         else:  # PYTHON_VERSION == (3, 12)
-            from itertools import batched as _batched
+            if TYPE_CHECKING:
+                _batched: Callable[[Iterable, int], Iterable]
+            else:
+                from itertools import batched as _batched
+
             for group in _batched(iterable, n):
                 if strict and len(group) < n:
                     raise ValueError(msg)
                 yield group
-else:
-    from itertools import batched  # type: ignore[no-redef]
+
+elif not TYPE_CHECKING:
+    from itertools import batched
 
 
 # gh-115942, gh-134323
@@ -291,4 +299,4 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
                 return status == 'locked'
 
 else:
-    from threading import RLock
+    from threading import RLock  # type: ignore[assignment]

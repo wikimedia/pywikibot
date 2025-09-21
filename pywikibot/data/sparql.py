@@ -1,19 +1,20 @@
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2024
+# (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 from textwrap import fill
+from typing import Any
 from urllib.parse import quote
 
 from requests import JSONDecodeError
 from requests.exceptions import Timeout
 
 from pywikibot import Site
-from pywikibot.backports import removeprefix
+from pywikibot.backports import Dict, removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import Error, NoUsernameError, ServerError
@@ -111,7 +112,7 @@ class SparqlQuery(WaitingMixin):
         result = []
         qvars = data['head']['vars']
         for row in data['results']['bindings']:
-            values = {}
+            values: Dict[str, Any] = {}
             for var in qvars:
                 if var not in row:
                     # var is not available (OPTIONAL is probably used)

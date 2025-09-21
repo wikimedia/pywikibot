@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,8 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
-from difflib import SequenceMatcher, _format_range_unified
+from difflib import _format_range_unified  # type: ignore[attr-defined]
+from difflib import SequenceMatcher
 from heapq import nlargest
 from itertools import zip_longest
 
@@ -612,12 +613,14 @@ def html_comparator(compare_string: str) -> dict[str, list[str]]:
     return comparands
 
 
-def get_close_matches_ratio(word: Sequence,
-                            possibilities: list[Sequence],
-                            *,
-                            n: int = 3,
-                            cutoff: float = 0.6,
-                            ignorecase: bool = False) -> list[float, Sequence]:
+def get_close_matches_ratio(
+    word: str,
+    possibilities: list[str],
+    *,
+    n: int = 3,
+    cutoff: float = 0.6,
+    ignorecase: bool = False
+) -> list[tuple[float, str]]:
     """Return a list of the best “good enough” matches and its ratio.
 
     This method is similar to Python's :pylib:`difflib.get_close_matches()
