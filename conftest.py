@@ -16,12 +16,13 @@ from typing import Literal
 
 EXCLUDE_PATTERN = re.compile(
     r'(?:'
-    r'(__metadata__|backports|config|diff|echo|exceptions|fixes|logging|time)|'
+    r'(__metadata__|backports|config|diff|echo|exceptions|fixes|logging|'
+    r'plural|time)|'
     r'(comms|data|families|specialbots)/__init__|'
     r'comms/eventstreams|'
-    r'data/(api/(__init__|_optionset)|memento)|'
+    r'data/(api/(__init__|_optionset)|memento|wikistats)|'
     r'families/[a-z][a-z\d]+_family|'
-    r'page/(__init__|_decorators|_revision)|'
+    r'page/(__init__|_decorators|_page|_revision)|'
     r'pagegenerators/(__init__|_filters)|'
     r'scripts/(i18n/)?__init__|'
     r'site/(__init__|_basesite|_decorators|_interwikimap|'

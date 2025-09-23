@@ -190,9 +190,11 @@ from pywikibot.tools._logging import LoggingFormatter
 
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from pywikibot.site import BaseSite
 
-    AnswerType = Iterable[tuple[str, str] | Option] | Option
+    AnswerType = Union[Iterable[Union[tuple[str, str], Option]], Option]
 
 _GLOBAL_HELP = """
 GLOBAL OPTIONS

@@ -64,15 +64,17 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    LANGUAGE_IDENTIFIER = str | pywikibot.site.APISite
+    from typing import Union
+    LANGUAGE_IDENTIFIER = Union[str, pywikibot.site.APISite]
     ALIASES_TYPE = dict[LANGUAGE_IDENTIFIER, list[str]]
     LANGUAGE_TYPE = dict[LANGUAGE_IDENTIFIER, str]
-    SITELINK_TYPE = (
-        pywikibot.page.BasePage
-        | pywikibot.page.BaseLink
-        | dict[str, str]
-    )
-    ENTITY_DATA_TYPE = dict[str, LANGUAGE_TYPE | ALIASES_TYPE | SITELINK_TYPE]
+    SITELINK_TYPE = Union[
+        pywikibot.page.BasePage,
+        pywikibot.page.BaseLink,
+        dict[str, str]
+    ]
+    ENTITY_DATA_TYPE = dict[str,
+                            Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
 
 
 class WikibaseEntity:

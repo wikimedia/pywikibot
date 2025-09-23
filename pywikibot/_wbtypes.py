@@ -28,10 +28,12 @@ from pywikibot.tools import (
 
 
 if TYPE_CHECKING:
+    from typing import Union, cast
+
     from pywikibot.site import APISite, BaseSite, DataSite
 
-    ItemPageStrNoneType = str | pywikibot.ItemPage | None
-    ToDecimalType = int | float | str | Decimal | None
+    ItemPageStrNoneType = Union[str, pywikibot.ItemPage, None]
+    ToDecimalType = Union[int, float, str, Decimal, None]
 
 
 __all__ = (
@@ -48,6 +50,8 @@ __all__ = (
 class WbRepresentation(abc.ABC):
 
     """Abstract class for Wikibase representations."""
+
+    _items: tuple[str, ...]
 
     @abc.abstractmethod
     def __init__(self) -> None:
@@ -379,7 +383,7 @@ class _Precision(Mapping):
 
         return self.PRECISION[key]
 
-    def __iter__(self) -> Iterator[int]:
+    def __iter__(self) -> Iterator[str]:
         return iter(self.PRECISION)
 
     def __len__(self) -> int:
@@ -400,6 +404,12 @@ class WbTime(WbRepresentation):
     For converting python datetime objects to WbTime objects, see
     :class:`pywikibot.Timestamp` and :meth:`fromTimestamp`.
     """
+
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
 
     PRECISION = _Precision()
 
@@ -529,8 +539,8 @@ class WbTime(WbRepresentation):
             if (isinstance(precision, int)
                     and precision in self.PRECISION.values()):
                 prec = precision
-            elif precision in self.PRECISION:
-                prec = self.PRECISION[precision]
+            elif isinstance(precision, str) and precision in self.PRECISION:
+                prec = self.PRECISION[cast(str, precision)]
             else:
                 raise ValueError(f'Invalid precision: "{precision}"')
 

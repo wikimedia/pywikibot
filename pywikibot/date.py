@@ -30,16 +30,17 @@ from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
 if TYPE_CHECKING:
-    tuplst_type = list[tuple[Callable[[int | str], Any],
-                             Callable[[int | str], bool]]]
-    encf_type = Callable[[int], int | Sequence[int]]
+    from typing import Union
+    tuplst_type = list[tuple[Callable[[Union[int, str]], Any],
+                             Callable[[Union[int, str]], bool]]]
+    encf_type = Callable[[int], Union[int, Sequence[int]]]
     decf_type = Callable[[Sequence[int]], int]
     # decoders are three value tuples, with an optional fourth to represent a
     # required number of digits
-    decoder_type = (
-        tuple[str, Callable[[int], str], Callable[[str], int]]
-        | tuple[str, Callable[[int], str], Callable[[str], int], int]
-    )
+    decoder_type = Union[
+        tuple[str, Callable[[int], str], Callable[[str], int]],
+        tuple[str, Callable[[int], str], Callable[[str], int], int]
+    ]
 
 #
 # Different collections of well known formats

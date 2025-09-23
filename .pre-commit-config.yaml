@@ -126,12 +126,12 @@ repos:
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
         files: |
           (?x)^pywikibot/(
-            (__metadata__|backports|config|diff|echo|exceptions|fixes|logging|time)|
+            (__metadata__|backports|config|diff|echo|exceptions|fixes|logging|plural|time)|
             (comms|data|families|specialbots)/__init__|
             comms/eventstreams|
-            data/(api/(__init__|_optionset)|memento)|
+            data/(api/(__init__|_optionset)|memento|wikistats)|
             families/[a-z][a-z\d]+_family|
-            page/(__init__|_decorators|_revision)|
+            page/(__init__|_decorators|_page|_revision)|
             pagegenerators/(__init__|_filters)|
             scripts/(?:i18n/)?__init__|
             site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|

@@ -91,6 +91,26 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
        metaclass from :class:`MetaNamespace`
     """
 
+    # Hints of BuiltinNamespace types added with initializer
+    MEDIA: int
+    SPECIAL: int
+    MAIN: int
+    TALK: int
+    USER: int
+    USER_TALK: int
+    PROJECT: int
+    PROJECT_TALK: int
+    FILE: int
+    FILE_TALK: int
+    MEDIAWIKI: int
+    MEDIAWIKI_TALK: int
+    TEMPLATE: int
+    TEMPLATE_TALK: int
+    HELP: int
+    HELP_TALK: int
+    CATEGORY: int
+    CATEGORY_TALK: int
+
     def __init__(self, id,
                  canonical_name: str | None = None,
                  custom_name: str | None = None,
