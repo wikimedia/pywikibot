@@ -1798,15 +1798,23 @@ class TestBacklinks(TestCase):
         """Set up tests."""
         super().setUp()
         self.page = pywikibot.Page(self.site, 'File:BoA – Woman.png')
-        self.backlinks = list(self.page.backlinks(follow_redirects=False,
-                                                  filter_redirects=True,
-                                                  total=5))
-        self.references = list(self.page.getReferences(follow_redirects=True,
-                                                       filter_redirects=True,
-                                                       total=5))
-        self.nofollow = list(self.page.getReferences(follow_redirects=False,
-                                                     filter_redirects=True,
-                                                     total=5))
+        self.backlinks = list(
+            self.page.backlinks(follow_redirects=False,
+                                filter_redirects=True,
+                                total=5)
+        )
+        self.references = list(
+            self.page.getReferences(follow_redirects=True,
+                                    filter_redirects=True,
+                                    with_template_inclusion=False,
+                                    total=5)
+        )
+        self.nofollow = list(
+            self.page.getReferences(follow_redirects=False,
+                                    filter_redirects=True,
+                                    with_template_inclusion=False,
+                                    total=5)
+        )
 
     def test_backlinks_redirects_length(self) -> None:
         """Test backlinks redirects length."""
