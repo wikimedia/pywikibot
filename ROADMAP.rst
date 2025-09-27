@@ -1,6 +1,8 @@
 Current Release Changes
 =======================
 
+* Positional arguments of :func:`daemonize()<daemonize.daemonize>` are deprecated and must
+  be given as keyword arguments.
 * Return :meth:`bot.BaseBot.userPut` result with :meth:`AutomaticTWSummaryBot.put_current()
   <bot.AutomaticTWSummaryBot.put_current>` method
 
@@ -11,6 +13,8 @@ Deprecations
 Pending removal in Pywikibot 13
 -------------------------------
 
+* 10.6.0: Positional arguments of :func:`daemonize()<daemonize.daemonize>` are deprecated and must
+  be given as keyword arguments.
 * 10.5.0: Accessing the fallback '*' keys in 'languages', 'namespaces', 'namespacealiases', and
   'skins' properties of :attr:`APISite.siteinfo<pywikibot.site._apisite.APISite.siteinfo>` are
   deprecated and will be removed.
