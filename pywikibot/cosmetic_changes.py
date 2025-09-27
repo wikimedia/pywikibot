@@ -369,10 +369,8 @@ class CosmeticChangesToolkit:
         if not self.talkpage:
             subpage = False
             if self.template:
-                loc = None
-                with suppress(TypeError):
-                    _tmpl, loc = i18n.translate(self.site.code, moved_links)
-                if loc is not None and loc in self.title:
+                loc = i18n.translate(self.site.code, moved_links)
+                if loc is not None and loc[1] in self.title:
                     subpage = True
 
             # get interwiki

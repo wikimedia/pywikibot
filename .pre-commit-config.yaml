@@ -126,7 +126,7 @@ repos:
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
         files: |
           (?x)^pywikibot/(
-            (__metadata__|backports|config|daemonize|diff|echo|exceptions|fixes|logging|plural|time)|
+            (__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|exceptions|fixes|logging|plural|time|titletranslate)|
             (comms|data|families|specialbots)/__init__|
             comms/eventstreams|
             data/(api/(__init__|_optionset)|memento|wikistats)|
