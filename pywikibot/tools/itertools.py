@@ -4,19 +4,25 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import collections
+import heapq
 import itertools
 from contextlib import suppress
-from itertools import chain, zip_longest
 from typing import Any
 
-from pywikibot.backports import Generator, batched
+from pywikibot.backports import (
+    Callable,
+    Generator,
+    Iterable,
+    Iterator,
+    batched,
+)
 from pywikibot.logging import debug
 from pywikibot.tools import deprecated
 
@@ -27,6 +33,7 @@ __all__ = (
     'islice_with_ellipsis',
     'itergroup',
     'roundrobin_generators',
+    'union_generators',
 )
 
 
@@ -88,6 +95,47 @@ def islice_with_ellipsis(iterable, *args, marker: str = '…'):
         with suppress(StopIteration):
             next(_iterable)
             yield marker
+
+
+def union_generators(*iterables: Iterable[Any],
+                     key: Callable[[Any], Any] | None = None,
+                     reverse: bool = False) -> Iterator[Any]:
+    """Generator of union of sorted iterables.
+
+    Yield all items from the input iterables in sorted order, removing
+    duplicates. The input iterables must already be sorted according to
+    the same *key* and direction. For descending direction, *reverse*
+    must be ``True``. The generator will yield each element only once,
+    even if it appears in multiple iterables. This behaves similarly to:
+
+        sorted(set(itertools.chain(*iterables)), key=key, reverse=reverse)
+
+    but is memory-efficient since it processes items lazily.
+
+    Sample:
+
+    >>> list(union_generators([1, 2, 3, 4], [3, 4, 5], [2, 6]))
+    [1, 2, 3, 4, 5, 6]
+    >>> list(union_generators([4, 3, 2, 1], [5, 4, 3], [6, 2], reverse=True))
+    [6, 5, 4, 3, 2, 1]
+
+    .. versionadded:: 10.6
+
+    .. note::
+       All input iterables must be sorted consistently. *reverse* must
+       be set to ``True`` only if the iterables are sorted in descending
+       order. For simple concatenation without duplicate removal, use
+       :pylib:`itertools.chain<itertools#itertools.chain>` instead.
+
+    :param iterables: Sorted iterables to merge.
+    :param key: Optional key function to compare elements. If ``None``,
+        items are compared directly.
+    :param reverse: Whether the input iterables are sorted in descending
+        order.
+    :return: Generator yielding all unique items in sorted order.
+    """
+    merged = heapq.merge(*iterables, key=key, reverse=reverse)
+    return (list(group)[0] for _, group in itertools.groupby(merged, key=key))
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):
@@ -155,7 +203,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     # Get items from iterables in a round-robin way.
     sentinel = object()
-    for items in zip_longest(*iterables, fillvalue=sentinel):
+    for items in itertools.zip_longest(*iterables, fillvalue=sentinel):
         for index, item in enumerate(items):
 
             if item is sentinel:
@@ -184,7 +232,8 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
         # a subset of active iterables.
         if len(active_iterables) < n_gen:
             cached_iterables = set(
-                chain.from_iterable(v.keys() for v in cache.values()))
+                itertools.chain.from_iterable(v.keys()
+                                              for v in cache.values()))
             if cached_iterables <= active_iterables:
                 return
 
@@ -210,7 +259,7 @@ def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
     sentinel = object()
     return (item
             for item in itertools.chain.from_iterable(
-                zip_longest(*iterables, fillvalue=sentinel))
+                itertools.zip_longest(*iterables, fillvalue=sentinel))
             if item is not sentinel)
 
 
