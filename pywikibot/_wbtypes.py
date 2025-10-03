@@ -21,7 +21,7 @@ from pywikibot import exceptions
 from pywikibot.backports import Iterator
 from pywikibot.time import Timestamp
 from pywikibot.tools import (
-    deprecate_positionals,
+    deprecated_signature,
     issue_deprecation_warning,
     remove_last_args,
 )
@@ -113,7 +113,7 @@ class Coordinate(WbRepresentation):
 
     _items = ('lat', 'lon', 'entity')
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def __init__(
         self,
         lat: float,
@@ -326,7 +326,7 @@ class Coordinate(WbRepresentation):
         )
         return self._dim
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def get_globe_item(self, repo: DataSite | None = None, *,
                        lazy_load: bool = False) -> pywikibot.ItemPage:
         """Return the ItemPage corresponding to the globe.
@@ -436,7 +436,7 @@ class WbTime(WbRepresentation):
     _timestr_re = re.compile(
         r'([-+]?\d{1,16})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z')
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def __init__(
         self,
         year: int,
@@ -651,7 +651,7 @@ class WbTime(WbRepresentation):
         return self._getSecondsAdjusted() == other._getSecondsAdjusted()
 
     @classmethod
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def fromTimestr(
         cls,
         datetimestr: str,
@@ -703,7 +703,7 @@ class WbTime(WbRepresentation):
                    timezone=timezone, calendarmodel=calendarmodel, site=site)
 
     @classmethod
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def fromTimestamp(
         cls,
         timestamp: Timestamp,

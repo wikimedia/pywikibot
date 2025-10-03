@@ -443,28 +443,35 @@ def deprecated_args(**arg_pairs: str | None):
     return decorator
 
 
-def deprecate_positionals(since: str = ''):
-    """Decorator for methods that issues warnings for positional arguments.
+def deprecated_signature(since: str = ''):
+    """Decorator handling deprecated changes in function or method signatures.
 
-    This decorator allows positional arguments after keyword-only
-    argument syntax (:pep:`3102`) but throws a ``FutureWarning``. It
-    automatically maps the provided positional arguments to their
-    corresponding keyword-only parameters before invoking the decorated
-    method.
+    This decorator supports:
 
-    The intended use is during a deprecation period in which certain
-    parameters should be passed as keyword-only, allowing legacy calls
-    to continue working with a warning rather than immediately raising a
-    ``TypeError``.
+    - Deprecation of positional arguments that have been converted to
+      keyword-only parameters.
+    - Detection of invalid keyword usage for positional-only parameters.
 
-    .. important:: This decorator is only supported for instance or
-       class methods. It does not work for standalone functions.
+    Positional-only parameters (introduced in :pep:`570`) must be passed
+    positionally. If such parameters are passed as keyword arguments,
+    this decorator will emit a ``FutureWarning`` and automatically remap
+    them to positional arguments for backward compatibility.
+
+    It allows positional arguments after keyword-only syntax (:pep:`3102`)
+    but emits a ``FutureWarning``. Positional arguments that are now
+    keyword-only are automatically mapped to their corresponding
+    keyword parameters before the decorated function or method is
+    invoked.
+
+    The intended use is during a deprecation period, allowing legacy
+    calls to continue working with a warning instead of raising a
+    ``TypeError`` immediately.
 
     Example:
 
         .. code-block:: python
 
-            @deprecate_positionals(since='9.2.0')
+            @deprecated_signature(since='10.6.0')
             def f(posarg, *, kwarg):
                ...
 
@@ -473,18 +480,27 @@ def deprecate_positionals(since: str = ''):
         This function call passes but throws a ``FutureWarning``.
         Without the decorator, a ``TypeError`` would be raised.
 
-    .. caution:: The decorated function must not accept ``*args``. The
-       sequence of keyword-only arguments must match the sequence of the
-       old positional parameters, otherwise argument assignment will
-       fail.
+    .. note::
+       If the parameter name was changed, use :func:`deprecated_args`
+       first.
+
+    .. caution::
+       The decorated function must not accept ``*args``. The order of
+       keyword-only arguments must match the order of the old positional
+       parameters; otherwise, argument assignment may fail.
 
     .. versionadded:: 9.2
     .. versionchanged:: 10.4
        Raises ``ValueError`` if method has a ``*args`` parameter.
+    .. versionchanged:: 10.6
+       Renamed from ``deprecate_positionals``. Adds handling of
+       positional-only parameters and emits warnings if they are passed
+       as keyword arguments.
 
-    :param since: Mandatory version string indicating when certain
-        positional parameters were deprecated
-    :raises ValueError: If the method has an *args parameter.
+    :param since: Mandatory version string indicating when signature
+        changed.
+    :raises TypeError: If required positional arguments are missing.
+    :raises ValueError: If the method has an ``*args`` parameter.
     """
     def decorator(func):
         """Outer wrapper. Inspect the parameters of *func*.
@@ -502,10 +518,64 @@ def deprecate_positionals(since: str = ''):
             :return: the value returned by the decorated function or
                   method
             """
+            # 1. fix deprecated positional-only usage
+            pos_only_in_kwargs = {
+                name: kwargs[name]
+                for name, p in params.items()
+                if p.kind == const.POSITIONAL_ONLY and name in kwargs
+            }
+
+            if pos_only_in_kwargs:
+                new_args: list[Any] = []
+                args_repr = []  # build representation for deprecation warning
+                idx = 0  # index for args
+
+                for name in arg_keys:
+                    param = params[name]
+
+                    if param.kind != const.POSITIONAL_ONLY:
+                        # append remaining POSITIONAL_OR_KEYWORD arguments
+                        new_args.extend(args[idx:])
+                        break
+
+                    if name in pos_only_in_kwargs:
+                        # Value was passed as keyword → use it
+                        value = kwargs.pop(name)
+                        args_repr.append(repr(value))
+                    elif idx < len(args):
+                        # Value from original args
+                        value = args[idx]
+                        idx += 1
+                        # Add ellipsis once for original args
+                        if name not in ('cls', 'self') and (
+                                not args_repr or args_repr[-1] != '...'):
+                            args_repr.append('...')
+                    elif param.default is not param.empty:
+                        # Value from default → show actual value
+                        value = param.default
+                        args_repr.append(repr(value))
+                    else:
+                        raise TypeError(
+                            f'Missing required positional argument: {name}'
+                        )
+
+                    new_args.append(value)
+
+                args = tuple(new_args)
+
+                args_str = ', '.join(args_repr)
+                issue_deprecation_warning(
+                    f'Passing positional-only arguments as keywords to '
+                    f"{func.__qualname__}(): {', '.join(pos_only_in_kwargs)}",
+                    f'positional arguments like {func.__name__}({args_str})',
+                    since=since
+                )
+
+            # 2.  warn for deprecated keyword-only usage as positional
             if len(args) > positionals:
                 replace_args = list(zip(arg_keys[positionals:],
                                         args[positionals:]))
-                pos_args = "', '".join(name for name, arg in replace_args)
+                pos_args = "', '".join(name for name, _ in replace_args)
                 keyw_args = ', '.join(f'{name}={arg!r}'
                                       for name, arg in replace_args)
                 issue_deprecation_warning(
@@ -520,17 +590,25 @@ def deprecate_positionals(since: str = ''):
             return func(*args, **kwargs)
 
         sig = inspect.signature(func)
+        params = sig.parameters
         arg_keys = list(sig.parameters)
+        const = inspect.Parameter
 
         # find the first KEYWORD_ONLY index
+        positionals = 0
         for positionals, key in enumerate(arg_keys):
-            if sig.parameters[key].kind == inspect.Parameter.VAR_POSITIONAL:
+            kind = params[key].kind
+
+            # disallow *args entirely
+            if kind == const.VAR_POSITIONAL:
                 raise ValueError(
                     f'{func.__qualname__} must not have *{key} parameter')
 
-            if sig.parameters[key].kind in (inspect.Parameter.KEYWORD_ONLY,
-                                            inspect.Parameter.VAR_KEYWORD):
+            # stop counting when we reach keyword-only or **kwargs
+            if kind in (const.KEYWORD_ONLY, const.VAR_KEYWORD):
                 break
+        else:
+            positionals += 1  # all were positional, no keyword found
 
         return wrapper
 

@@ -64,7 +64,7 @@ from contextlib import suppress
 from enum import IntEnum
 from pathlib import Path
 
-from pywikibot.tools import deprecate_positionals
+from pywikibot.tools import deprecated_signature
 
 
 class StandardFD(IntEnum):
@@ -79,7 +79,7 @@ class StandardFD(IntEnum):
 is_daemon = False
 
 
-@deprecate_positionals(since='10.6.0')
+@deprecated_signature(since='10.6.0')
 def daemonize(*,
               close_fd: bool = True,
               chdir: bool = True,

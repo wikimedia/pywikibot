@@ -38,9 +38,9 @@ from pywikibot.site import Namespace, NamespaceArgType
 from pywikibot.tools import (
     ComparableMixin,
     cached,
-    deprecate_positionals,
     deprecated,
     deprecated_args,
+    deprecated_signature,
     first_upper,
 )
 
@@ -1457,7 +1457,7 @@ class BasePage(ComparableMixin):
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def watch(
         self, *,
         unwatch: bool = False,
@@ -1660,7 +1660,7 @@ class BasePage(ComparableMixin):
         """Convenience function to get the Wikibase item of a page."""
         return pywikibot.ItemPage.fromPage(self)
 
-    @deprecate_positionals(since='9.2')
+    @deprecated_signature(since='9.2')
     def templates(self,
                   *,
                   content: bool = False,
@@ -1705,7 +1705,7 @@ class BasePage(ComparableMixin):
 
         return list(self._templates)
 
-    @deprecate_positionals(since='9.2')
+    @deprecated_signature(since='9.2')
     def itertemplates(
         self,
         total: int | None = None,

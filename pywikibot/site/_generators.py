@@ -26,7 +26,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import deprecate_arg, deprecate_positionals, is_ip_address
+from pywikibot.tools import deprecate_arg, deprecated_signature, is_ip_address
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -925,7 +925,7 @@ class GeneratorsMixin:
             for linkdata in pageitem['extlinks']:
                 yield linkdata['*']
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def allpages(
         self,
         start: str = '!', *,
