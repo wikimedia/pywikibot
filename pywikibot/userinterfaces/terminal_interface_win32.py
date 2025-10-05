@@ -1,6 +1,6 @@
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,6 +57,7 @@ class Win32UI(terminal_interface_base.UI):
             addr = -12
         else:
             super().encounter_color(color, target_stream)
+            return
 
         from ctypes.wintypes import DWORD, HANDLE
         get_handle = ctypes.WINFUNCTYPE(HANDLE, DWORD)(
