@@ -76,7 +76,6 @@ def deprecated_func(foo=None):
 @deprecated()
 def deprecated_func_docstring(foo=None):
     """DEPRECATED. Deprecated function."""
-    return foo
 
 
 @deprecated
@@ -88,7 +87,6 @@ def deprecated_func2(foo=None):
 @deprecated
 def deprecated_func2_docstring(foo=None):
     """DEPRECATED, don't use this. Deprecated function."""
-    return foo
 
 
 @deprecated(instead='baz')
@@ -118,7 +116,6 @@ def deprecated_func_arg(foo=None):
 @deprecated
 def deprecated_func_docstring_arg(foo=None):
     """:param foo: Foo. DEPRECATED."""
-    return foo
 
 
 @deprecated
@@ -127,7 +124,6 @@ def deprecated_func_docstring_arg2(foo=None):
 
     :param foo: Foo. DEPRECATED.
     """
-    return foo
 
 
 @deprecated_args(bah='foo')
