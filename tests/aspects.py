@@ -1666,13 +1666,15 @@ class DeprecationTestCase(TestCase):
 
     def assertOneDeprecation(self, msg=None, count=1) -> None:
         """Assert that exactly one deprecation message happened and reset."""
-        self.assertDeprecation(msg)
-        # This is doing such a weird structure, so that it shows any other
-        # deprecation message from the set.
-        self.assertCountEqual(set(self.deprecation_messages),
-                              [self.deprecation_messages[0]])
-        self.assertLength(self.deprecation_messages, count)
-        self._reset_messages()
+        try:
+            self.assertDeprecation(msg)
+            # This is doing such a weird structure, so that it shows any other
+            # deprecation message from the set.
+            self.assertCountEqual(set(self.deprecation_messages),
+                                  [self.deprecation_messages[0]])
+            self.assertLength(self.deprecation_messages, count)
+        finally:
+            self._reset_messages()
 
     def assertNoDeprecation(self, msg=None) -> None:
         """Assert that no deprecation warning happened."""
