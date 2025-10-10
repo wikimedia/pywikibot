@@ -203,6 +203,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'he': ('בעבודה',),
         'hr': ('Radovi',),
         'hy': ('Խմբագրում եմ',),
+        'ro': ('Dezvoltare', 'S-dezvoltare', 'Modific acum'),
         'ru': ('Редактирую',),
         'sr': ('Радови у току', 'Рут'),
         'test': ('In use',),
@@ -219,6 +220,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                'Archivace start', 'Posloupnost archivů', 'Rfa-archiv-start',
                'Rfc-archiv-start'),
         'de': ('Archiv',),
+        'ro': ('Arhivă',),
     }
 
     @classmethod
