@@ -732,7 +732,7 @@ class Family:
         :return: mapping of old codes to new codes (or None)
         """
         data = dict.fromkeys(self.interwiki_removals)
-        data.update(self.interwiki_replacements)
+        data.update(self.code_aliases)
         return types.MappingProxyType(data)
 
     @classproperty
@@ -749,6 +749,7 @@ class Family:
         return set(cls.langs.keys())
 
     @classproperty
+    @deprecated('code_aliases', since='10.6.0')
     def interwiki_replacements(cls) -> Mapping[str, str]:
         """Return an interwiki code replacement mapping.
 
@@ -757,6 +758,8 @@ class Family:
         xx: now should get code yy:, add {'xx':'yy'} to
         :attr:`code_aliases`.
 
+        .. deprecated:: 10.6
+           Use :attr:`code_aliases` directly instead.
         .. versionchanged:: 8.2
            changed from dict to invariant mapping.
         """

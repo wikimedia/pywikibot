@@ -5,6 +5,8 @@ Current Release Changes
   be given as keyword arguments.
 * Return :meth:`bot.BaseBot.userPut` result with :meth:`AutomaticTWSummaryBot.put_current()
   <bot.AutomaticTWSummaryBot.put_current>` method
+* :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
+  use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
 
 
 Deprecations
@@ -13,6 +15,8 @@ Deprecations
 Pending removal in Pywikibot 13
 -------------------------------
 
+* 10.6.0: :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
+  use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
 * 10.6.0: Positional arguments of :func:`daemonize()<daemonize.daemonize>` are deprecated and must
   be given as keyword arguments.
 * 10.5.0: Accessing the fallback '*' keys in 'languages', 'namespaces', 'namespacealiases', and

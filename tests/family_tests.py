@@ -13,6 +13,7 @@ from contextlib import suppress
 import pywikibot
 from pywikibot.exceptions import UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
+from pywikibot.tools import suppress_warnings
 from tests.aspects import PatchingTestCase, TestCase, unittest
 from tests.utils import DrySite
 
@@ -100,13 +101,16 @@ class TestFamily(TestCase):
         self.assertIsInstance(family.obsolete, Mapping)
         # redirected code (see site tests test_alias_code_site)
         self.assertEqual(family.code_aliases['dk'], 'da')
-        self.assertEqual(family.interwiki_replacements['dk'], 'da')
+        msg = 'pywikibot.family.Family.interwiki_replacements is deprecated'
+        with suppress_warnings(msg, FutureWarning):
+            self.assertEqual(family.interwiki_replacements['dk'], 'da')
         self.assertEqual(family.obsolete['dk'], 'da')
         # closed/locked site (see site tests test_locked_site)
         self.assertIsNone(family.obsolete['mh'])
         # offline site (see site tests test_removed_site)
         self.assertIsNone(family.obsolete['ru-sib'])
-        self.assertIn('dk', family.interwiki_replacements)
+        with suppress_warnings(msg, FutureWarning):
+            self.assertIn('dk', family.interwiki_replacements)
 
     def test_obsolete_from_attributes(self) -> None:
         """Test obsolete property for given class attributes."""
@@ -114,14 +118,17 @@ class TestFamily(TestCase):
         family = type('TempFamily', (Family,), {})()
 
         self.assertEqual(family.obsolete, {})
-        self.assertEqual(family.interwiki_replacements, {})
+        msg = 'pywikibot.family.Family.interwiki_replacements is deprecated'
+        with suppress_warnings(msg, FutureWarning):
+            self.assertEqual(family.interwiki_replacements, {})
         self.assertEqual(family.interwiki_removals, frozenset())
 
         # Construct a temporary family with other attributes and instantiate it
         family = type('TempFamily', (Family,),
                       {'code_aliases': {'a': 'b'}, 'closed_wikis': ['c']})()
         self.assertEqual(family.obsolete, {'a': 'b', 'c': None})
-        self.assertEqual(family.interwiki_replacements, {'a': 'b'})
+        with suppress_warnings(msg, FutureWarning):
+            self.assertEqual(family.interwiki_replacements, {'a': 'b'})
         self.assertEqual(family.interwiki_removals, frozenset('c'))
 
     def test_obsolete_readonly(self) -> None:
