@@ -30,6 +30,7 @@ jobs:
           - macOS-latest
         include:
           - python-version: '3.14'
+            os: ubuntu-latest
           - python-version: 3.15-dev
     steps:
       - name: set up python ${{ matrix.python-version }}
