@@ -223,6 +223,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ro': ('Arhivă',),
     }
 
+    citoid_endpoint = '/api/rest_v1/data/citation/'
+
     @classmethod
     def __post_init__(cls) -> None:
         """Add 'yue' code alias due to :phab:`T341960`.
