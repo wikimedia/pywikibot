@@ -25,7 +25,7 @@ Command line options:
    watchlist is retrieved in parallel tasks.
 """
 #
-# (C) Pywikibot team, 2005-2024
+# (C) Pywikibot team, 2005-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,12 @@ from concurrent.futures import as_completed
 import pywikibot
 from pywikibot import config
 from pywikibot.data.api import CachedRequest
-from pywikibot.exceptions import InvalidTitleError
+from pywikibot.exceptions import (
+    APIError,
+    InvalidTitleError,
+    NoUsernameError,
+    ServerError,
+)
 from pywikibot.tools.threading import BoundedPoolExecutor
 
 
@@ -72,8 +77,13 @@ def count_watchlist_all(quiet=False) -> None:
         futures = {executor.submit(refresh, pywikibot.Site(lang, family))
                    for family in config.usernames
                    for lang in config.usernames[family]}
-        wl_count_all = sum(len(future.result())
-                           for future in as_completed(futures))
+        wl_count_all = 0
+        for future in as_completed(futures):
+            try:
+                watchlist_pages = future.result()
+                wl_count_all += len(watchlist_pages)
+            except (NoUsernameError, APIError, ServerError) as e:
+                pywikibot.error(f'Failed to retrieve watchlist: {e}')
     if not quiet:
         pywikibot.info(f'There are a total of {wl_count_all} page(s) in the'
                        ' watchlists for all wikis.')
