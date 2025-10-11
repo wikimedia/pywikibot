@@ -3,7 +3,7 @@
 .. versionadded:: 9.2
 """
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot.comms import http
-from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import NoUsernameError, ServerError
 
 
@@ -23,7 +22,7 @@ if TYPE_CHECKING:
     from pywikibot.site import BaseSite
 
 
-class SupersetQuery(WaitingMixin):
+class SupersetQuery:
 
     """Superset Query class.
 
