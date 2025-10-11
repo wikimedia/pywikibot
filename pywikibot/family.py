@@ -703,8 +703,12 @@ class Family:
         """Return the shared image repository, if any."""
         return (None, None)
 
+    @deprecated(since='10.6.0')
     def isPublic(self, code) -> bool:
-        """Check the wiki require logging in before viewing it."""
+        """Check the wiki require logging in before viewing it.
+
+        .. deprecated:: 10.6
+        """
         return True
 
     def post_get_convert(self, site, getText):
