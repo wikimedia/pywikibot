@@ -2,7 +2,7 @@
 Change log
 **********
 
-What is new with Pywikibot |release|? What are the main changes of older version?
+New features, improvements, and fixes in Pywikibot |release|.
 
 .. include:: ../ROADMAP.rst
 
