@@ -52,7 +52,6 @@ class TestSupersetWithAuth(TestCase):
     family = 'meta'
     code = 'meta'
 
-    @unittest.expectedFailure  # T395664
     def test_login_and_oauth_permission(self) -> None:
         """Superset login and queries."""
         sql = 'SELECT page_id, page_title FROM page LIMIT 2;'

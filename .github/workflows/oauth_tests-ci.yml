@@ -96,7 +96,7 @@ jobs:
         env:
           PYWIKIBOT_TEST_WRITE: 1
           PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-          PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth
+          PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth,superset
         run: |
           python pwb.py version
           coverage run -m unittest -vv
