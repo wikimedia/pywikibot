@@ -1,6 +1,7 @@
 Current Release Changes
 =======================
 
+* Python 3.8 support will be discontinued and probably this is the last version supporting it.
 * :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
   use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
 * The first parameter of :meth:`Transliterator.transliterate
@@ -31,6 +32,7 @@ removed in in the third subsequent major release, remaining available for the tw
 Pending removal in Pywikibot 11
 -------------------------------
 
+* 10.6.0: Python 3.8 support is deprecated and will be dropped soon
 * 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
   :attr:`data.api.QueryGenerator.modules`
 * 8.4.0: The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
