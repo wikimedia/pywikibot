@@ -1,7 +1,11 @@
 Current Release Changes
 =======================
 
-* Python 3.8 support will be discontinued and probably this is the last version supporting it.
+* Added :func:`tools.itertools.union_generators` for sorted merging of pre-sorted iterables.
+* **Support for Python 3.8 will be discontinued**;
+  this is likely the last Pywikibot version to support it.
+* Added a Citoid Query interface with the :mod:`data.citoid` module.
+* Updated localization (L10N) files.
 * :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
   use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
 * The first parameter of :meth:`Transliterator.transliterate
