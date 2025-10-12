@@ -129,7 +129,7 @@ repos:
             (__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|exceptions|fixes|logging|plural|time|titletranslate)|
             (comms|data|families|specialbots)/__init__|
             comms/eventstreams|
-            data/(api/(__init__|_optionset)|memento|wikistats)|
+            data/(api/(__init__|_optionset)|citoid|memento|wikistats)|
             families/[a-z][a-z\d]+_family|
             page/(__init__|_decorators|_page|_revision)|
             pagegenerators/(__init__|_filters)|

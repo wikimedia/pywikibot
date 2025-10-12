@@ -1,4 +1,4 @@
-"""Superset Query interface.
+"""Citoid Query interface.
 
 .. versionadded:: 10.6
 """
@@ -10,6 +10,8 @@
 from __future__ import annotations
 
 import urllib.parse
+from dataclasses import dataclass
+from typing import Any
 
 import pywikibot
 from pywikibot.comms import http
@@ -22,6 +24,7 @@ VALID_FORMAT = [
 ]
 
 
+@dataclass(eq=False)
 class CitoidClient:
 
     """Citoid client class.
@@ -29,11 +32,13 @@ class CitoidClient:
     This class allows to call the Citoid API used in production.
     """
 
-    def __init__(self, site: BaseSite):
-        """Initialize the CitoidClient."""
-        self.site = site
+    site: BaseSite
 
-    def get_citation(self, response_format: str, ref_url: str) -> dict:
+    def get_citation(
+        self,
+        response_format: str,
+        ref_url: str
+    ) -> dict[str, Any]:
         """Get a citation from the citoid service.
 
         :param response_format: Return format, e.g. 'bibtex', 'wikibase', etc.

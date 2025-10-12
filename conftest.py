@@ -20,7 +20,7 @@ EXCLUDE_PATTERN = re.compile(
     r'exceptions|fixes|logging|plural|time|titletranslate)|'
     r'(comms|data|families|specialbots)/__init__|'
     r'comms/eventstreams|'
-    r'data/(api/(__init__|_optionset)|memento|wikistats)|'
+    r'data/(api/(__init__|_optionset)|citoid|memento|wikistats)|'
     r'families/[a-z][a-z\d]+_family|'
     r'page/(__init__|_decorators|_page|_revision)|'
     r'pagegenerators/(__init__|_filters)|'

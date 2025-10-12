@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import datetime
+import unittest
 
 import pywikibot
 from pywikibot.data import citoid
@@ -59,3 +60,7 @@ class TestCitoid(TestCase):
                 'mediawiki2',
                 'https://ro.wikipedia.org/wiki/România'
             )
+
+
+if __name__ == '__main__':
+    unittest.main()
