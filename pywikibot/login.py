@@ -153,9 +153,8 @@ class LoginManager:
 
         if user['name'] != main_username:
             # Report the same error as server error code NotExists
-            raise NoUsernameError(
-                f"Username '{main_username}' does not exist on {self.site}"
-            )
+            msg = f"Username '{main_username}' does not exist on {self.site}"
+            raise NoUsernameError(msg)
 
     def botAllowed(self) -> bool:
         """Check whether the bot is listed on a specific page.
@@ -322,7 +321,7 @@ class LoginManager:
 
             if error_code in ('NotExists', 'Illegal', 'readapidenied',
                               'Failed', 'Aborted', 'FAIL'):
-                error_msg = f'{e.code}: {e.info}'
+                error_msg = f'{e.code} on {self.site}: {e.info}'
                 raise NoUsernameError(error_msg)
 
             pywikibot.error(f'Login failed ({error_code}).')
