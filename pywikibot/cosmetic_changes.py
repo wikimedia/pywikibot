@@ -518,9 +518,7 @@ class CosmeticChangesToolkit:
 
         cache: dict[bool | str, Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
-        regex = re.compile(
-            textlib.FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-            flags=re.VERBOSE)
+        regex = textlib.get_regexes('file', self.site)[0]
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 
