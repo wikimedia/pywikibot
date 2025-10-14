@@ -431,17 +431,19 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '[[File:Foo.bar|250px|zentriert|Bar]]',
             self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Bar]]'))
-
-    @unittest.expectedFailure  # T396715
-    def test_translateMagicWords_fail(self) -> None:
-        """Test translateMagicWords method.
-
-        The current implementation doesn't check whether the magic word
-        is inside a template.
-        """
+        # test magic word inside template
         self.assertEqual(
             '[[File:Foo.bar|{{Baz|thumb|foo}}]]',
             self.cct.translateMagicWords('[[File:Foo.bar|{{Baz|thumb|foo}}]]'))
+        # test magic word inside link and template
+        self.assertEqual(
+            '[[File:ABC.jpg|123px|mini|links|[[Foo|left]] {{Bar|thumb}}]]',
+            self.cct.translateMagicWords(
+                '[[File:ABC.jpg|123px|thumb|left|[[Foo|left]] {{Bar|thumb}}]]')
+        )
+        self.assertEqual(
+            '[[File:Foo.bar]]',
+            self.cct.translateMagicWords('[[File:Foo.bar]]'))
 
     def test_cleanUpLinks_pipes(self) -> None:
         """Test cleanUpLinks method."""
