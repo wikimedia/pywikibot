@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       max-parallel: 19
       matrix:
-        python-version: [pypy3.10, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: [pypy3.10, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         site: ['wikipedia:en', 'wikisource:zh']
         include:
           - python-version: '3.8'
