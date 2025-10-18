@@ -23,6 +23,8 @@
 .. automodule:: data.memento
    :synopsis: Fix ups for memento-client package version 0.6.1
 
+.. autodata:: data.memento.DEFAULT_TIMEGATE_BASE_URI
+
 :mod:`data.mysql` --- Mysql Requests
 ====================================
 

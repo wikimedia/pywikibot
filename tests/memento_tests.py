@@ -39,10 +39,10 @@ class MementoTestCase(TestCase):
 
 class TestMementoArchive(MementoTestCase):
 
-    """New WebCite Memento tests."""
+    """Web Archive Memento tests."""
 
-    timegate_uri = 'http://timetravel.mementoweb.org/timegate/'
-    hostname = timegate_uri.replace('gate/', 'map/json/http://google.com')
+    timegate_uri = 'https://web.archive.org/web/'
+    hostname = timegate_uri
 
     def test_newest(self) -> None:
         """Test Archive for an old https://google.com."""
@@ -55,7 +55,7 @@ class TestMementoArchive(MementoTestCase):
 
 class TestMementoDefault(MementoTestCase):
 
-    """Test InternetArchive is default Memento timegate."""
+    """Test Web Archive is default Memento timegate."""
 
     timegate_uri = None
     net = True
@@ -64,6 +64,8 @@ class TestMementoDefault(MementoTestCase):
         """Test getting memento for newest https://google.com."""
         archivedversion = self._get_archive_url('https://google.com')
         self.assertIsNotNone(archivedversion)
+        from pywikibot.data.memento import DEFAULT_TIMEGATE_BASE_URI
+        self.assertStartsWith(archivedversion, DEFAULT_TIMEGATE_BASE_URI)
 
     def test_invalid(self) -> None:
         """Test getting memento for invalid URL."""
