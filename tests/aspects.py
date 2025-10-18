@@ -655,8 +655,8 @@ class CheckHostnameMixin(TestCaseBase):
                     f'{cls.__name__}: accessing {hostname} caused exception:')
 
                 cls._checked_hostnames[hostname] = e
-                raise unittest.SkipTest(f'{cls.__name__}: hostname {hostname}'
-                                        ' failed: {e}') from None
+                raise unittest.SkipTest(f'{cls.__name__}: hostname {hostname} '
+                                        f'failed: {e}') from None
 
             cls._checked_hostnames[hostname] = True
 
