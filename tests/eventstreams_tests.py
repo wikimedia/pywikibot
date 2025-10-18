@@ -141,7 +141,7 @@ class TestEventStreamsSettingTests(TestCase):
         """Test EventStreams filter function settings."""
         def foo() -> bool:
             """Dummy function."""
-            return True
+            return True  # pragma: no cover
 
         self.es.register_filter(foo)
         self.assertEqual(self.es.filter['all'][0], foo)

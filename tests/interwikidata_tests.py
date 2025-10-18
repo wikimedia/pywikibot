@@ -24,11 +24,11 @@ class DummyBot(interwikidata.IWBot):
 
     def put_current(self, *args: Any, **kwargs: Any) -> bool:
         """Prevent editing."""
-        return False
+        raise NotImplementedError
 
-    def create_item(self) -> bool:
+    def create_item(self) -> pywikibot.ItemPage:
         """Prevent creating items."""
-        return False
+        raise NotImplementedError
 
     def try_to_add(self) -> None:
         """Prevent adding sitelinks to items."""

@@ -92,7 +92,7 @@ def setUpModule() -> None:
 
     try:
         dialog = tkinter.Tk()
-    except RuntimeError as e:
+    except RuntimeError as e:  # pragma: no cover
         raise unittest.SkipTest(f'Skipping due to T380732 - {e}')
     dialog.destroy()
 
