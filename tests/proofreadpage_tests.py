@@ -791,11 +791,6 @@ class TestIndexPageMappings(BS4TestCase):
             self.assertEqual(index_page.get_page_number_from_label(str(label)),
                              num_set)
 
-        # Error if label does not exists.
-        label, num_set = 'dummy label', []
-        with self.assertRaises(KeyError):
-            index_page.get_page_number_from_label('dummy label')
-
         # Test get_page_from_label.
         for label, page_set in data['get_page']:
             # Get set of pages from label with label as int or str.
@@ -803,10 +798,6 @@ class TestIndexPageMappings(BS4TestCase):
                              page_set)
             self.assertEqual(index_page.get_page_from_label(str(label)),
                              page_set)
-
-        # Error if label does not exists.
-        with self.assertRaises(KeyError):
-            index_page.get_page_from_label('dummy label')
 
         # Test get_page.
         for n in num_set:
@@ -817,6 +808,10 @@ class TestIndexPageMappings(BS4TestCase):
         for p in page_set:
             n = index_page.get_number(p)
             self.assertEqual(index_page.get_page(n), p)
+
+        # Error if label does not exists.
+        with self.assertRaises(KeyError):
+            index_page.get_page_number_from_label('dummy label')
 
     def test_page_gen(self, key) -> None:
         """Test Index page generator."""
