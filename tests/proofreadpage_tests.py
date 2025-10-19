@@ -500,7 +500,7 @@ class TestPageOCR(BS4TestCase):
         """Test page.ocr(ocr_tool='wmfOCR')."""
         try:
             text = self.page.ocr(ocr_tool='wmfOCR')
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             self.assertIsInstance(exc, ValueError)
         else:
             ref_text = self.data['wmfOCR']

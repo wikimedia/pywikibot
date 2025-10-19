@@ -1453,7 +1453,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
             if not isinstance(page, pywikibot.FilePage):
-                with self.assertRaisesRegex(ValueError,
+                with self.assertRaisesRegex(ValueError,  # pragma: no cover
                                             'does not have a valid extension'):
                     pywikibot.FilePage(page)
             else:
