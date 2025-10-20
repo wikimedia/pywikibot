@@ -26,7 +26,12 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import deprecate_arg, deprecated_signature, is_ip_address
+from pywikibot.tools import (
+    deprecate_arg,
+    deprecated,
+    deprecated_signature,
+    is_ip_address,
+)
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -1007,6 +1012,7 @@ class GeneratorsMixin:
 
         return apgen
 
+    @deprecated(since='10.7.0')
     def alllinks(
         self,
         start: str = '',
@@ -1043,6 +1049,10 @@ class GeneratorsMixin:
 
            The minimum read timeout value should be 60 seconds in that
            case.
+
+        .. deprecated:: 10.7
+           This method is dysfunctional and should no longer be used. It
+           will probably be removed in Pywikibot 11.
 
         .. seealso::
            - :api:`Alllinks`
