@@ -49,7 +49,7 @@ extra_deps = {
         'Pillow==10.4.0; platform_python_implementation == "PyPy" '
         'and python_version < "3.9"',
         'Pillow>=11.1.0,<11.3.0; platform_python_implementation == "PyPy" '
-        'and python_version > "3.9" and python_version < "3.11"',
+        'and python_version >= "3.9" and python_version < "3.11"',
         'Pillow>=11.1.0; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
         'Pillow==10.4.0; platform_python_implementation != "PyPy" '
