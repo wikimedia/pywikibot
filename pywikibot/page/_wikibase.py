@@ -2239,8 +2239,10 @@ class Claim(Property):
             'type': self.value_types.get(self.type, self.type)
         }
 
-    def has_better_rank(self, other) -> bool:
+    def has_better_rank(self, other: Claim | None) -> bool:
         """Check if this claim has a better rank than the other claim.
+
+        .. versionadded:: 10.6
 
         :param other: The other claim to compare with.
         :return: True if this claim has a better rank, False otherwise.

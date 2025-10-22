@@ -1,6 +1,9 @@
 Current Release Changes
 =======================
 
+* Fix :meth:`ItemPage.get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>`;
+  keep the rank of the claims in the loop. (:phab:`T407701`)
+* :meth:`Family.isPublic()<family.Family.isPublic>` is deprecated (:phab:`T407049`)
 * Added :func:`tools.itertools.union_generators` for sorted merging of pre-sorted iterables.
 * **Support for Python 3.8 will be discontinued**;
   this is likely the last Pywikibot version to support it.
@@ -113,6 +116,7 @@ Pending removal in Pywikibot 12
 Pending removal in Pywikibot 13
 -------------------------------
 
+* 10.6.0: :meth:`Family.isPublic()<family.Family.isPublic>` will be removed (:phab:`T407049`)
 * 10.6.0: :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
   use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
 * Keyword argument for *char* parameter of :meth:`Transliterator.transliterate
