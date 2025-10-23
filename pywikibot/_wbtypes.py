@@ -21,17 +21,19 @@ from pywikibot import exceptions
 from pywikibot.backports import Iterator
 from pywikibot.time import Timestamp
 from pywikibot.tools import (
-    deprecate_positionals,
+    deprecated_signature,
     issue_deprecation_warning,
     remove_last_args,
 )
 
 
 if TYPE_CHECKING:
+    from typing import Union, cast
+
     from pywikibot.site import APISite, BaseSite, DataSite
 
-    ItemPageStrNoneType = str | pywikibot.ItemPage | None
-    ToDecimalType = int | float | str | Decimal | None
+    ItemPageStrNoneType = Union[str, pywikibot.ItemPage, None]
+    ToDecimalType = Union[int, float, str, Decimal, None]
 
 
 __all__ = (
@@ -48,6 +50,8 @@ __all__ = (
 class WbRepresentation(abc.ABC):
 
     """Abstract class for Wikibase representations."""
+
+    _items: tuple[str, ...]
 
     @abc.abstractmethod
     def __init__(self) -> None:
@@ -109,7 +113,7 @@ class Coordinate(WbRepresentation):
 
     _items = ('lat', 'lon', 'entity')
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def __init__(
         self,
         lat: float,
@@ -322,7 +326,7 @@ class Coordinate(WbRepresentation):
         )
         return self._dim
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def get_globe_item(self, repo: DataSite | None = None, *,
                        lazy_load: bool = False) -> pywikibot.ItemPage:
         """Return the ItemPage corresponding to the globe.
@@ -379,7 +383,7 @@ class _Precision(Mapping):
 
         return self.PRECISION[key]
 
-    def __iter__(self) -> Iterator[int]:
+    def __iter__(self) -> Iterator[str]:
         return iter(self.PRECISION)
 
     def __len__(self) -> int:
@@ -400,6 +404,12 @@ class WbTime(WbRepresentation):
     For converting python datetime objects to WbTime objects, see
     :class:`pywikibot.Timestamp` and :meth:`fromTimestamp`.
     """
+
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
 
     PRECISION = _Precision()
 
@@ -426,7 +436,7 @@ class WbTime(WbRepresentation):
     _timestr_re = re.compile(
         r'([-+]?\d{1,16})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z')
 
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def __init__(
         self,
         year: int,
@@ -529,8 +539,8 @@ class WbTime(WbRepresentation):
             if (isinstance(precision, int)
                     and precision in self.PRECISION.values()):
                 prec = precision
-            elif precision in self.PRECISION:
-                prec = self.PRECISION[precision]
+            elif isinstance(precision, str) and precision in self.PRECISION:
+                prec = self.PRECISION[cast(str, precision)]
             else:
                 raise ValueError(f'Invalid precision: "{precision}"')
 
@@ -641,7 +651,7 @@ class WbTime(WbRepresentation):
         return self._getSecondsAdjusted() == other._getSecondsAdjusted()
 
     @classmethod
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def fromTimestr(
         cls,
         datetimestr: str,
@@ -693,7 +703,7 @@ class WbTime(WbRepresentation):
                    timezone=timezone, calendarmodel=calendarmodel, site=site)
 
     @classmethod
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def fromTimestamp(
         cls,
         timestamp: Timestamp,

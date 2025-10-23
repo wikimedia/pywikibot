@@ -64,15 +64,17 @@ __all__ = (
 )
 
 if TYPE_CHECKING:
-    LANGUAGE_IDENTIFIER = str | pywikibot.site.APISite
+    from typing import Union
+    LANGUAGE_IDENTIFIER = Union[str, pywikibot.site.APISite]
     ALIASES_TYPE = dict[LANGUAGE_IDENTIFIER, list[str]]
     LANGUAGE_TYPE = dict[LANGUAGE_IDENTIFIER, str]
-    SITELINK_TYPE = (
-        pywikibot.page.BasePage
-        | pywikibot.page.BaseLink
-        | dict[str, str]
-    )
-    ENTITY_DATA_TYPE = dict[str, LANGUAGE_TYPE | ALIASES_TYPE | SITELINK_TYPE]
+    SITELINK_TYPE = Union[
+        pywikibot.page.BasePage,
+        pywikibot.page.BaseLink,
+        dict[str, str]
+    ]
+    ENTITY_DATA_TYPE = dict[str,
+                            Union[LANGUAGE_TYPE, ALIASES_TYPE, SITELINK_TYPE]]
 
 
 class WikibaseEntity:
@@ -1428,12 +1430,16 @@ class ItemPage(WikibasePage):
                      else pywikibot.WbTime(0, site=self.site)),
                 reverse=True
             )
+            best_claim = None
             for claim in sorted_claims:
+                if claim.rank == 'deprecated':
+                    continue
                 if timestamp_in_interval(claim, ts):
                     if (claim.type != 'monolingualtext'
-                            or claim.getTarget().language == language):
-                        return claim.getTarget()
-            return None
+                            or claim.getTarget().language == language)\
+                            and claim.has_better_rank(best_claim):
+                        best_claim = claim
+            return best_claim and best_claim.getTarget()
 
         if prop in self.claims:
             return find_value_at_timestamp(self.claims[prop], timestamp, lang)
@@ -2232,6 +2238,19 @@ class Claim(Property):
             'value': self._formatValue(),
             'type': self.value_types.get(self.type, self.type)
         }
+
+    def has_better_rank(self, other: Claim | None) -> bool:
+        """Check if this claim has a better rank than the other claim.
+
+        .. versionadded:: 10.6
+
+        :param other: The other claim to compare with.
+        :return: True if this claim has a better rank, False otherwise.
+        """
+        if other is None:
+            return True
+        rank_order = {'preferred': 3, 'normal': 2, 'deprecated': 1}
+        return rank_order.get(self.rank, 0) > rank_order.get(other.rank, 0)
 
 
 class LexemePage(WikibasePage):

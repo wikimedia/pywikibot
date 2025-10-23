@@ -30,7 +30,7 @@ class UI(ABUIC):
         """Initialize the UI."""
         super().__init__()
 
-        self._buffer = queue.Queue()
+        self._buffer: queue.Queue[Any] = queue.Queue()
 
         self.log_handler = logging.handlers.QueueHandler(self._buffer)
         self.log_handler.setLevel(VERBOSE if config.verbose_output else INFO)

@@ -29,6 +29,7 @@ from collections import abc, defaultdict
 from contextlib import suppress
 from pathlib import Path
 from textwrap import fill
+from typing import Any
 
 import pywikibot
 from pywikibot import __url__, config
@@ -554,9 +555,9 @@ DEFAULT_FALLBACK = ('_default', )
 
 
 def translate(code: str | pywikibot.site.BaseSite,
-              xdict: str | Mapping[str, str],
+              xdict: str | Mapping[str, Any],
               parameters: Mapping[str, int] | None = None,
-              fallback: bool | Iterable[str] = False) -> str | None:
+              fallback: bool | Iterable[str] = False) -> Any | None:
     """Return the most appropriate localization from a localization dict.
 
     Given a site code and a dictionary, returns the dictionary's value
@@ -591,7 +592,7 @@ def translate(code: str | pywikibot.site.BaseSite,
     :param parameters: For passing (plural) parameters
     :param fallback: Try an alternate language code. If it's iterable
         it'll also try those entries and choose the first match.
-    :return: the localized string
+    :return: the localized value, usually a string
     :raise IndexError: If the language supports and requires more
         plurals than defined for the given PLURAL pattern.
     :raise KeyError: No fallback key found if fallback is not False

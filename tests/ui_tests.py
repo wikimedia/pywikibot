@@ -13,7 +13,9 @@ import os
 import platform
 import unittest
 from contextlib import nullcontext, redirect_stdout, suppress
+from functools import partial
 from typing import NoReturn
+from unicodedata import normalize
 from unittest.mock import patch
 
 import pywikibot
@@ -33,7 +35,11 @@ from pywikibot.userinterfaces import (
     terminal_interface_unix,
     terminal_interface_win32,
 )
-from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS, _trans
+from pywikibot.userinterfaces.transliteration import (
+    NON_ASCII_DIGITS,
+    Transliterator,
+    _trans,
+)
 from tests.aspects import TestCase, TestCaseBase
 
 
@@ -366,27 +372,44 @@ class TestTransliterationUnix(UITestCase):
             '\x1b[93mu\x1b[0m\x1b[93me\x1b[0m\x1b[93mo\x1b[0m\n')
 
 
-class TestTransliterationTable(TestCase):
+class TestTransliteration(TestCase):
 
     """Test transliteration table."""
 
     net = False
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Set up Transliterator function."""
+        trans = Transliterator('ascii')
+        cls.t = staticmethod(partial(trans.transliterate, prev='P'))
+
     def test_ascii_digits(self) -> None:
         """Test that non ascii digits are in transliteration table."""
         for lang, digits in NON_ASCII_DIGITS.items():
             with self.subTest(lang=lang):
-                for char in digits:
+                for i, char in enumerate(digits):
                     self.assertTrue(char.isdigit())
                     self.assertFalse(char.isascii())
                     self.assertIn(char, _trans,
                                   f'{char!r} not in transliteration table')
+                    self.assertEqual(self.t(char), str(i))
 
     def test_transliteration_table(self) -> None:
         """Test transliteration table consistency."""
         for k, v in _trans.items():
             with self.subTest():
                 self.assertNotEqual(k, v)
+
+    def test_transliterator(self) -> None:
+        """Test Transliterator."""
+        for char in 'äöü':
+            self.assertEqual(self.t(char), normalize('NFD', char)[0] + 'e')
+        self.assertEqual(self.t('1'), '?')
+        self.assertEqual(self.t('◌'), 'P')
+        self.assertEqual(self.t('ッ'), '?')
+        self.assertEqual(self.t('仝'), 'P')
+        self.assertEqual(self.t('ຫ'), 'h')
 
 
 # TODO: add tests for background colors.

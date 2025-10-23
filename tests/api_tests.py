@@ -294,9 +294,10 @@ class TestOptionSet(TestCase):
     def test_non_lazy_load(self) -> None:
         """Test OptionSet with initialised site."""
         options = api.OptionSet(self.get_site(), 'recentchanges', 'show')
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(KeyError, 'Invalid name "invalid_name"'):
             options.__setitem__('invalid_name', True)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+                ValueError, 'Invalid value "invalid_value"'):
             options.__setitem__('anon', 'invalid_value')
         options['anon'] = True
         self.assertCountEqual(['anon'], options._enabled)
@@ -324,13 +325,17 @@ class TestOptionSet(TestCase):
         options['anon'] = True
         self.assertIn('invalid_name', options._enabled)
         self.assertLength(options, 2)
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(
+                KeyError,
+                r'OptionSet already contains invalid name\(s\) "invalid_name"'
+        ):
             options._set_site(self.get_site(), 'recentchanges', 'show')
         self.assertLength(options, 2)
         options._set_site(self.get_site(), 'recentchanges', 'show',
                           clear_invalid=True)
         self.assertLength(options, 1)
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError, 'The site cannot be set multiple times.'):
             options._set_site(self.get_site(), 'recentchanges', 'show')
 
 
@@ -529,7 +534,8 @@ class TestPropertyGenerator(TestCase):
         gen = api.PropertyGenerator(
             site=self.site,
             prop='revisions|info|categoryinfo|langlinks|templates',
-            parameters=params)
+            parameters=params
+        )
 
         # An APIError is raised if set_maximum_items is not called.
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
@@ -629,13 +635,18 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            TypeError,
+            (r'int\(\) argument must be a string, a bytes-like object '
+             r"or (?:a real number|a number), not 'NoneType'")):
             self.gen.set_namespace(None)
 
     def test_namespace_non_multi(self) -> None:
         """Test ListGenerator set_namespace when non multi."""
         self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                'alllinks module does not support multiple namespaces'):
             self.gen.set_namespace([0, 1])
         self.assertIsNone(self.gen.set_namespace(0))
 
@@ -649,7 +660,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
         """Test ListGenerator set_namespace when resolve fails."""
         self.gen = api.ListGenerator(listaction='allpages', site=self.site)
         self.assertTrue(self.gen.support_namespace())
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(KeyError, '10000'):
             self.gen.set_namespace(10000)
 
 
@@ -675,7 +686,10 @@ class TestDryListGenerator(TestCase):
 
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            TypeError,
+            (r'int\(\) argument must be a string, a bytes-like object '
+             r"or (?:a real number|a number), not 'NoneType'")):
             self.gen.set_namespace(None)
 
     def test_namespace_zero(self) -> None:

@@ -11,7 +11,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, batched
+from pywikibot.backports import Dict, Iterable, Set, batched
 from pywikibot.tools import (
     classproperty,
     deprecated,
@@ -35,6 +35,9 @@ class ParamInfo(Sized, Container):
     root_modules = frozenset(['main'])
     init_modules = frozenset(['main', 'paraminfo'])
     param_modules = ('list', 'meta', 'prop')
+
+    _action_modules: frozenset[str]
+    _modules: Dict[str, Set[str] | Dict[str, str]]
 
     @remove_last_args(['modules_only_mode'])
     def __init__(self,
@@ -72,7 +75,7 @@ class ParamInfo(Sized, Container):
             if self._action_modules:
                 assert modules == self._action_modules
             else:
-                self._action_modules = modules
+                self._action_modules = frozenset(modules)
         elif name in self._modules:
             # update required to updates from dict and set
             self._modules[name].update(modules)

@@ -7,9 +7,24 @@ The following option is supported:
          registered family
 
 .. versionchanged:: 7.0
-   version script was moved to the framework scripts folder
+   version script was moved to the framework scripts folder.
 .. versionadded:: 9.1.2
-   the *-nouser* option.
+   the *-nouser* option was added.
+.. versionchanged:: 10.6
+   The User-Agent string is now printed for the default site. To print
+   it for another site, call the ``pwb`` wrapper with the global option,
+   e.g.:
+
+       pwb -site:wikipedia:test version
+
+   .. note::
+      The shown UA reflects the default config settings. It might differ
+      if a user-agent is passed via the *headers* parameter to
+      :func:`comms.http.request`, :func:`comms.http.fetch` or to
+      :class:`comms.eventstreams.EventStreams`. It can also differ if
+      :func:`comms.http.fetch` is used with *use_fake_user_agent* set to
+      ``True`` or to a custom UA string, or if
+      *fake_user_agent_exceptions* is defined in the :mod:`config` file.
 """
 #
 # (C) Pywikibot team, 2007-2025
@@ -23,6 +38,7 @@ import sys
 from pathlib import Path
 
 import pywikibot
+from pywikibot.comms.http import user_agent
 from pywikibot.version import getversion
 
 
@@ -93,6 +109,7 @@ def main(*args: str) -> None:
         pywikibot.info('  Please reinstall requests!')
 
     pywikibot.info('Python: ' + sys.version)
+    pywikibot.info('User-Agent: ' + user_agent(pywikibot.Site()))
 
     # check environment settings
     settings = {key for key in os.environ if key.startswith('PYWIKIBOT')}

@@ -50,6 +50,11 @@ class BaseSiteProtocol(Protocol):
     def simple_request(self, **kwargs) -> api.Request:
         ...
 
+    def querypage(
+        self, *args, **kwargs
+    ) -> Generator[tuple[pywikibot.Page, int], None, None]:
+        ...
+
 
 class EchoMixin:
 
@@ -287,7 +292,7 @@ class WikibaseClientMixin:
 
     @need_extension('WikibaseClient')
     def unconnected_pages(
-        self,
+        self: BaseSiteProtocol,
         total: int | None = None,
         *,
         strict: bool = False
@@ -305,7 +310,7 @@ class WikibaseClientMixin:
         :param strict: If ``True``, verify that each page still has no
             data item before yielding it.
         """
-        if total <= 0:
+        if total is not None and total <= 0:
             return
 
         if not strict:
@@ -329,9 +334,9 @@ class LinterMixin:
 
     @need_extension('Linter')
     def linter_pages(
-        self,
+        self: BaseSiteProtocol,
         lint_categories=None,
-        total: int = None,
+        total: int | None = None,
         namespaces=None,
         pageids: str | int | None = None,
         lint_from: str | int | None = None

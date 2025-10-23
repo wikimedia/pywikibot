@@ -603,7 +603,7 @@ class UnhandledAnswer(Exception):  # noqa: N818
 
     """The given answer didn't suffice."""
 
-    def __int__(self, stop: bool = False) -> None:
+    def __init__(self, stop: bool = False) -> None:
         """Initializer."""
         self.stop = stop
 

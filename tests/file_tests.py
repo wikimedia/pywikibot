@@ -79,8 +79,10 @@ class TestSharedFiles(TestCase):
 
     def test_local_only(self) -> None:
         """Test file_is_shared() on file page with local file only."""
-        title = 'File:Untitled (Three Forms), stainless steel sculpture by ' \
-                '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
+        title = (
+            'File:Untitled (Three Forms), stainless steel sculpture by '
+            '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
+        )
 
         commons = self.get_site('commons')
         enwp = self.get_site('enwiki')
@@ -238,12 +240,14 @@ class TestFilePageLatestFileInfo(TestCase):
     def test_get_file_url(self) -> None:
         """Get File url."""
         self.assertTrue(self.image.exists())
-        self.assertEqual(self.image.get_file_url(),
-                         'https://upload.wikimedia.org/wikipedia/commons/'
-                         'd/d3/Albert_Einstein_Head.jpg')
-        self.assertEqual(self.image.latest_file_info.url,
-                         'https://upload.wikimedia.org/wikipedia/commons/'
-                         'd/d3/Albert_Einstein_Head.jpg')
+        self.assertEqual(
+            self.image.get_file_url(),
+            'https://upload.wikimedia.org/wikipedia/commons/'
+            'd/d3/Albert_Einstein_Head.jpg')
+        self.assertEqual(
+            self.image.latest_file_info.url,
+            'https://upload.wikimedia.org/wikipedia/commons/'
+            'd/d3/Albert_Einstein_Head.jpg')
 
     @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_width(self) -> None:
@@ -333,8 +337,8 @@ class TestFilePageDownload(TestCase):
 
     def test_not_existing_download(self) -> None:
         """Test not existing download."""
-        page = pywikibot.FilePage(self.site,
-                                  'File:notexisting_Albert Einstein.jpg')
+        page = pywikibot.FilePage(
+            self.site, 'File:notexisting_Albert Einstein.jpg')
         filename = join_images_path('Albert Einstein.jpg')
 
         with self.assertRaisesRegex(
@@ -386,25 +390,33 @@ class TestFilePageDataItem(TestCase):
     def test_data_item_not_file(self) -> None:
         """Test data item with invalid pageid."""
         item = pywikibot.MediaInfo(self.site, 'M1')  # Main Page
-        with self.assertRaises(Error):
+        with self.assertRaisesRegex(Error, r'not.*file'):
             item.file
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             item.get()
         self.assertFalse(item.exists())
 
     def test_data_item_when_no_file_or_data_item(self) -> None:
         """Test data item associated to file that does not exist."""
-        page = pywikibot.FilePage(self.site,
-                                  'File:Notexisting_Albert Einstein.jpg')
+        page = pywikibot.FilePage(
+            self.site, 'File:Notexisting_Albert Einstein.jpg')
         self.assertFalse(page.exists())
         item = page.data_item()
         self.assertIsInstance(item, pywikibot.MediaInfo)
 
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             item.get()
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             item.title()
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             item.labels
 
     def test_data_item_when_file_exist_but_without_item(self) -> None:
@@ -520,11 +532,15 @@ class TestMediaInfoEditing(TestCase):
         item = page.data_item()
 
         # Insert claim to non-existing file
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             item.addClaim(new_claim)
 
         # Insert claim using site object to non-existing file
-        with self.assertRaises(NoWikibaseEntityError):
+        with self.assertRaisesRegex(
+                NoWikibaseEntityError,
+                r"Entity.*(not.*exist|doesn't exist)"):
             self.site.addClaim(item, new_claim)
 
         # Test adding claim existing file
@@ -574,7 +590,8 @@ class TestMediaInfoEditing(TestCase):
         self.assertTrue(claim_found)
 
         # Note removeClaims() parameter needs to be array
-        summary = f'Removing {property_id} with {value} using site object'
+        summary = (f'Removing {property_id} with {value} '
+                   'using site object')
         self.site.removeClaims(remove_statements, summary=summary)
 
         # Test that the claims were actually removed

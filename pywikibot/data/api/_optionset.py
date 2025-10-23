@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections.abc import MutableMapping
 
 import pywikibot
+from pywikibot.backports import Set
 from pywikibot.tools import deprecate_arg
 
 
@@ -41,21 +42,26 @@ class OptionSet(MutableMapping):
            *dict* parameter was renamed to *data*.
 
         :param site: The associated site
-        :param module: The module name which is used by paraminfo. (Ignored
-            when site is None)
-        :param param: The parameter name inside the module. That parameter must
-            have a 'type' entry. (Ignored when site is None)
+        :param module: The module name which is used by paraminfo.
+            (Ignored when site is None)
+        :param param: The parameter name inside the module. That
+            parameter must have a 'type' entry. (Ignored when site is
+            None)
         :param data: The initializing data dict which is used for
             :meth:`from_dict`
         """
         self._site_set = False
-        self._enabled = set()
-        self._disabled = set()
+        self._enabled: Set[str] = set()
+        self._disabled: Set[str] = set()
         self._set_site(site, module, param)
         if data:
             self.from_dict(data)
 
-    def _set_site(self, site, module: str, param: str, *,
+    def _set_site(self,
+                  site: pywikibot.site.APISite | None,
+                  module: str | None,
+                  param: str | None,
+                  *,
                   clear_invalid: bool = False) -> None:
         """Set the site and valid names.
 
@@ -64,7 +70,6 @@ class OptionSet(MutableMapping):
         thrown.
 
         :param site: The associated site
-        :type site: pywikibot.site.APISite
         :param module: The module name which is used by paraminfo.
         :param param: The parameter name inside the module. That
             parameter must have a 'type' entry.
@@ -80,6 +85,7 @@ class OptionSet(MutableMapping):
         self._valid_disable = set()
         if site is None:
             return
+
         for type_value in site._paraminfo.parameter(module, param)['type']:
             if type_value[0] == '!':
                 self._valid_disable.add(type_value[1:])
@@ -96,7 +102,7 @@ class OptionSet(MutableMapping):
                                '"{}"'.format('", "'.join(invalid_names)))
         self._site_set = True
 
-    def from_dict(self, dictionary) -> None:
+    def from_dict(self, dictionary: dict[str, bool | None]) -> None:
         """Load options from the dict.
 
         The options are not cleared before. If changes have been made
@@ -107,7 +113,6 @@ class OptionSet(MutableMapping):
             the value False, True or None. The names must be valid
             depending on whether they enable or disable the option. All
             names with the value None can be in either of the list.
-        :type dictionary: dict (keys are strings, values are bool/None)
         """
         enabled = set()
         disabled = set()

@@ -27,7 +27,7 @@ from typing import NamedTuple
 import pywikibot
 from pywikibot import config
 from pywikibot.backports import Counter as CounterType
-from pywikibot.tools import deprecate_positionals, deprecated, deprecated_args
+from pywikibot.tools import deprecated, deprecated_args, deprecated_signature
 
 
 FORMAT_LINE = '{module_id} {pid} {time} {site}\n'
@@ -343,7 +343,7 @@ class Throttle:
         time.sleep(seconds)
 
     @deprecated_args(requestsize=None)  # since: 10.3.0
-    @deprecate_positionals(since='10.3.0')
+    @deprecated_signature(since='10.3.0')
     def __call__(self, *, requestsize: int = 1, write: bool = False) -> None:
         """Apply throttling based on delay rules and request type.
 

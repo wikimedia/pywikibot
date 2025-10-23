@@ -273,7 +273,11 @@ class TestPageObjectEnglish(TestCase):
             'File:Example #3.jpg',  # file extension in section
         ):
             with self.subTest(title=title), \
-                    self.assertRaises(ValueError):
+                    self.assertRaisesRegex(
+                        ValueError,
+                        r'(not.*valid.*file'
+                        r'|not in the file namespace'
+                        r'|does not have a valid extension)'):
                 pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self) -> None:
@@ -1010,6 +1014,7 @@ class TestPageRedirects(TestCase):
     def testPageGet(self) -> None:
         """Test ``Page.get()`` on different types of pages."""
         fail_msg = '{page!r}.get() raised {error!r} unexpectedly!'
+        unexpected_exceptions = IsRedirectPageError, NoPageError, SectionError
         site = self.get_site('en')
         p1 = pywikibot.Page(site, 'User:Legoktm/R2')
         p2 = pywikibot.Page(site, 'User:Legoktm/R1')
@@ -1025,7 +1030,7 @@ class TestPageRedirects(TestCase):
 
         try:
             p2.get(get_redirect=True)
-        except (IsRedirectPageError, NoPageError, SectionError) as e:
+        except unexpected_exceptions as e:  # pragma: no cover
             self.fail(fail_msg.format(page=p2, error=e))
 
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
@@ -1040,7 +1045,7 @@ class TestPageRedirects(TestCase):
         page = pywikibot.Page(site, 'Manual:Pywikibot/2.0 #See_also')
         try:
             page.get()
-        except (IsRedirectPageError, NoPageError, SectionError) as e:
+        except unexpected_exceptions as e:  # pragma: no cover
             self.fail(fail_msg.format(page=page, error=e))
 
     def test_set_redirect_target(self) -> None:

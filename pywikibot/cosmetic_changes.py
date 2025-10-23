@@ -369,10 +369,8 @@ class CosmeticChangesToolkit:
         if not self.talkpage:
             subpage = False
             if self.template:
-                loc = None
-                with suppress(TypeError):
-                    _tmpl, loc = i18n.translate(self.site.code, moved_links)
-                if loc is not None and loc in self.title:
+                loc = i18n.translate(self.site.code, moved_links)
+                if loc is not None and loc[1] in self.title:
                     subpage = True
 
             # get interwiki
@@ -520,9 +518,7 @@ class CosmeticChangesToolkit:
 
         cache: dict[bool | str, Any] = {}
         exceptions = ['comment', 'nowiki', 'pre', 'syntaxhighlight']
-        regex = re.compile(
-            textlib.FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
-            flags=re.VERBOSE)
+        regex = textlib.get_regexes('file', self.site)[0]
         return textlib.replaceExcept(
             text, regex, replace_magicword, exceptions)
 

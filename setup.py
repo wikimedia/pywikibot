@@ -46,8 +46,18 @@ extra_deps = {
     'mysql': ['PyMySQL >= 1.1.1'],
     # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
     'Tkinter': [
-        'Pillow>=11.1.0; python_version > "3.8"',
-        'Pillow==10.4.0; python_version < "3.9"',
+        'Pillow==10.4.0; platform_python_implementation == "PyPy" '
+        'and python_version < "3.9"',
+        'Pillow>=11.1.0,<11.3.0; platform_python_implementation == "PyPy" '
+        'and python_version >= "3.9" and python_version < "3.11"',
+        'Pillow>=11.1.0; platform_python_implementation == "PyPy" '
+        'and python_version >= "3.11"',
+        'Pillow==10.4.0; platform_python_implementation != "PyPy" '
+        'and python_version < "3.9"',
+        'Pillow>=11.1.0,<11.3.0; platform_python_implementation != "PyPy" '
+        'and python_version == "3.9"',
+        'Pillow>=11.1.0; platform_python_implementation != "PyPy" '
+        'and python_version >= "3.10"',
     ],
     'mwoauth': [
         'PyJWT != 2.10.0, != 2.10.1; python_version > "3.8"',  # T380270

@@ -1,6 +1,6 @@
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -122,10 +122,10 @@ class WikiStats:
             alphanumeric keys are sorted in normal way.
         :return: The sorted table
         """
-        table = self.get(table)
+        data = self.get(table)
 
         # take the first entry to determine the sorting key
-        first_entry = table[0]
+        first_entry = data[0]
         if first_entry[key].isdigit():
             def sort_key(d): return int(d[key])
             reverse = reverse if reverse is not None else True
@@ -133,7 +133,7 @@ class WikiStats:
             def sort_key(d): return d[key]
             reverse = reverse if reverse is not None else False
 
-        return sorted(table, key=sort_key, reverse=reverse)
+        return sorted(data, key=sort_key, reverse=reverse)
 
     def languages_by_size(self, table: str):
         """Return ordered list of languages by size from WikiStats."""

@@ -29,7 +29,6 @@ from tests.aspects import (
     TestCase,
     unittest,
 )
-from tests.utils import DummySiteinfo
 
 
 class DryCachedRequestTests(SiteAttributeTestCase):
@@ -149,48 +148,20 @@ class MockCachedRequestKeyTests(TestCase):
         class MockFamily(Family):
 
             @property
-            def name(self) -> str:
-                return 'mock'
+            def langs(self) -> str:
+                return {'mock': ''}
 
         class MockSite(pywikibot.site.APISite):
 
             _loginstatus = LoginStatus.NOT_ATTEMPTED
-
             _namespaces = {2: ['User']}
 
             def __init__(self) -> None:
-                self._user = 'anon'
-                pywikibot.site.BaseSite.__init__(self, 'mock', MockFamily())
-                self._siteinfo = DummySiteinfo({'case': 'first-letter'})
-
-            def version(self) -> str:
-                return '1.31'  # lowest supported release
-
-            def protocol(self) -> str:
-                return 'http'
-
-            @property
-            def codes(self):
-                return {'mock'}
-
-            def user(self):
-                return self._user
-
-            def encoding(self) -> str:
-                return 'utf-8'
-
-            def encodings(self):
-                return []
-
-            @property
-            def siteinfo(self):
-                return self._siteinfo
+                pywikibot.site.BaseSite.__init__(
+                    self, 'mock', MockFamily(), 'MyUser')
 
             def __repr__(self) -> str:
                 return 'MockSite()'
-
-            def __getattr__(self, attr):
-                raise Exception(f'Attribute {attr!r} not defined')
 
         self.mocksite = MockSite()
         super().setUp()
@@ -201,15 +172,18 @@ class MockCachedRequestKeyTests(TestCase):
                             parameters={'action': 'query', 'meta': 'siteinfo'})
         anonpath = req._cachefile_path()
 
-        self.mocksite._userinfo = {'name': 'MyUser'}
+        self.assertIsNone(self.mocksite.user())
+
+        self.mocksite._userinfo = {'name': 'MyUser', 'id': 4711}
         self.mocksite._loginstatus = LoginStatus.AS_USER
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
         userpath = req._cachefile_path()
 
         self.assertNotEqual(anonpath, userpath)
+        self.assertEqual(self.mocksite.user(), 'MyUser')
 
-        self.mocksite._userinfo = {'name': 'MyOtherUser'}
+        self.mocksite._userinfo = {'name': 'MyOtherUser', 'id': 4712}
         self.mocksite._loginstatus = LoginStatus.AS_USER
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -217,6 +191,8 @@ class MockCachedRequestKeyTests(TestCase):
 
         self.assertNotEqual(anonpath, otherpath)
         self.assertNotEqual(userpath, otherpath)
+        self.assertIsNone(self.mocksite.user())
+        self.assertEqual(self.mocksite.username(), 'MyUser')
 
     def test_unicode(self) -> None:
         """Test caching with Unicode content."""

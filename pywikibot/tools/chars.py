@@ -1,6 +1,6 @@
 """Character based helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 from contextlib import suppress
+from typing import cast
 from urllib.parse import unquote
 
 from pywikibot.backports import Iterable
@@ -125,13 +126,13 @@ def url2string(title: str,
     if isinstance(encodings, str):
         return unquote(title, encodings, errors='strict')
 
-    first_exception = None
+    first_exception: BaseException | None = None
     for enc in encodings:
         try:
             return unquote(title, enc, errors='strict')
         except (UnicodeError, LookupError) as e:
-            if not first_exception:
+            if first_exception is None:
                 first_exception = e
 
     # Couldn't convert, raise the first exception
-    raise first_exception
+    raise cast(BaseException, first_exception)

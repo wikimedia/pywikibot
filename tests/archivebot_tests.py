@@ -94,15 +94,22 @@ class TestArchiveBotFunctions(TestCase):
 
     def test_str2size_failures(self) -> None:
         """Test for rejecting of invalid shorthand notation of sizes."""
-        with self.assertRaises(archivebot.MalformedConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MalformedConfigError, "Couldn't parse size: 4 KK"):
             archivebot.str2size('4 KK')
-        with self.assertRaises(archivebot.MalformedConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MalformedConfigError, "Couldn't parse size: K4"):
             archivebot.str2size('K4')
-        with self.assertRaises(archivebot.MalformedConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MalformedConfigError, "Couldn't parse size: 4X"):
             archivebot.str2size('4X')
-        with self.assertRaises(archivebot.MalformedConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MalformedConfigError,
+                "Couldn't parse size: 1 234 56"):
             archivebot.str2size('1 234 56')
-        with self.assertRaises(archivebot.MalformedConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MalformedConfigError,
+                "Couldn't parse size: 1234 567"):
             archivebot.str2size('1234 567')
 
 
@@ -130,8 +137,8 @@ class TestArchiveBot(TestCase):
         self.assertIsInstance(talk.threads, list)
         self.assertGreaterEqual(
             len(talk.threads), THREADS[code],
-            f'{len(talk.threads)} Threads found on {talk},\n{THREADS[code]} or'
-            ' more expected'
+            f'{len(talk.threads)} Threads found on {talk},\n'
+            f'{THREADS[code]} or more expected'
         )
 
         for thread in talk.threads:
@@ -344,7 +351,9 @@ class TestPageArchiverObject(TestCase):
         except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
 
-        with self.assertRaises(archivebot.MissingConfigError):
+        with self.assertRaisesRegex(
+                archivebot.MissingConfigError,
+                'Missing or malformed template'):
             archivebot.PageArchiver(page, tmpl_without_ns, '')
 
 

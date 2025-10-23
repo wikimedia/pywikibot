@@ -1,6 +1,6 @@
-"""Objects representing API upload to MediaWiki site."""
+"""Objects representing API upload to MediaWiki sites."""
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #

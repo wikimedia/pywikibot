@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,9 +15,9 @@ from pywikibot.tools import (
     PYTHON_VERSION,
     add_full_name,
     deprecate_arg,
-    deprecate_positionals,
     deprecated,
     deprecated_args,
+    deprecated_signature,
     remove_last_args,
 )
 from tests.aspects import DeprecationTestCase
@@ -76,7 +76,6 @@ def deprecated_func(foo=None):
 @deprecated()
 def deprecated_func_docstring(foo=None):
     """DEPRECATED. Deprecated function."""
-    return foo
 
 
 @deprecated
@@ -88,7 +87,6 @@ def deprecated_func2(foo=None):
 @deprecated
 def deprecated_func2_docstring(foo=None):
     """DEPRECATED, don't use this. Deprecated function."""
-    return foo
 
 
 @deprecated(instead='baz')
@@ -118,7 +116,6 @@ def deprecated_func_arg(foo=None):
 @deprecated
 def deprecated_func_docstring_arg(foo=None):
     """:param foo: Foo. DEPRECATED."""
-    return foo
 
 
 @deprecated
@@ -127,7 +124,6 @@ def deprecated_func_docstring_arg2(foo=None):
 
     :param foo: Foo. DEPRECATED.
     """
-    return foo
 
 
 @deprecated_args(bah='foo')
@@ -154,9 +150,9 @@ def deprecated_all2(foo):
     return foo
 
 
-@deprecate_positionals()
-def positionals_test_function(foo: str, *,
-                              bar: int, baz: str = '') -> tuple[int, str]:
+@deprecated_signature()
+def positionals_test_function(foo: str, /, *,
+                              bar: int, baz: str = '') -> tuple[str, int]:
     """Deprecating positional parameters."""
     return foo + baz, bar ** 2
 
@@ -240,9 +236,9 @@ class DeprecatedMethodClass:
         """Deprecating last positional parameter."""
         return foo
 
-    @deprecate_positionals()
-    def test_method(self, foo: str, *,
-                    bar: int = 5, baz: str = '') -> tuple[int, str]:
+    @deprecated_signature()
+    def test_method(self, foo: str, /, *,
+                    bar: int = 5, baz: str = '') -> tuple[str, int]:
         """Deprecating positional parameters."""
         return foo + baz, bar ** 2
 
@@ -613,81 +609,94 @@ class DeprecatorTestCase(DeprecationTestCase):
             " The value(s) provided for 'bar' have been dropped."
         )
 
-    def test_deprecate_positionals(self) -> None:
-        """Test deprecation of positional parameters."""
-        msg = ('Passing {param} as positional argument(s) to {func}() is '
-               'deprecated; use keyword arguments like {instead} instead.')
+    def test_deprecated_signature(self) -> None:
+        """Test deprecation of parameters signature."""
+        msg1 = ('Passing {param} as positional argument(s) to {func}() is '
+                'deprecated; use keyword arguments like {instead} instead.')
+        msg2 = (
+            'Passing positional-only arguments as keywords to {qual}(): '
+            'foo is deprecated; '
+            "use positional arguments like {func}('Pywiki') instead."
+        )
 
         f = DeprecatedMethodClass().test_method
-        func = 'DeprecatedMethodClass.test_method'
+        qual = f.__qualname__
+        func = f.__name__
 
         with self.subTest(test=1):
             rv1, rv2 = f('Pywiki', 1, 'bot')
             self.assertEqual(rv1, 'Pywikibot')
             self.assertEqual(rv2, 1)
-            self.assertOneDeprecation(msg.format(param="'bar', 'baz'",
-                                                 func=func,
-                                                 instead="bar=1, baz='bot'"))
+            self.assertOneDeprecation(msg1.format(param="'bar', 'baz'",
+                                                  func=qual,
+                                                  instead="bar=1, baz='bot'"))
 
         with self.subTest(test=2):
             rv1, rv2 = f('Pywiki', 2)
             self.assertEqual(rv1, 'Pywiki')
             self.assertEqual(rv2, 4)
-            self.assertOneDeprecation(msg.format(param="'bar'",
-                                                 func=func,
-                                                 instead='bar=2'))
+            self.assertOneDeprecation(msg1.format(param="'bar'",
+                                                  func=qual,
+                                                  instead='bar=2'))
 
         with self.subTest(test=3):
             rv1, rv2 = f('Pywiki', 3, baz='bot')
             self.assertEqual(rv1, 'Pywikibot')
             self.assertEqual(rv2, 9)
-            self.assertOneDeprecation(msg.format(param="'bar'",
-                                                 func=func,
-                                                 instead='bar=3'))
+            self.assertOneDeprecation(msg1.format(param="'bar'",
+                                                  func=qual,
+                                                  instead='bar=3'))
 
         with self.subTest(test=4):
-            rv1, rv2 = f('Pywiki', bar=4)
+            rv1, rv2 = f(foo='Pywiki')
             self.assertEqual(rv1, 'Pywiki')
-            self.assertEqual(rv2, 16)
-            self.assertNoDeprecation()
+            self.assertEqual(rv2, 25)
+            self.assertOneDeprecation(msg2.format(qual=qual, func=func))
 
         with self.subTest(test=5):
-            rv1, rv2 = f(foo='Pywiki')
+            rv1, rv2 = f('Pywiki', bar=5)
             self.assertEqual(rv1, 'Pywiki')
             self.assertEqual(rv2, 25)
             self.assertNoDeprecation()
 
         f = positionals_test_function
-        func = 'positionals_test_function'
+        func = f.__name__
+        qual = f.__qualname__
 
-        with self.subTest(test=6):
+        with self.subTest(test=1):
             rv1, rv2 = f('Pywiki', 6, 'bot')
             self.assertEqual(rv1, 'Pywikibot')
             self.assertEqual(rv2, 36)
-            self.assertOneDeprecation(msg.format(param="'bar', 'baz'",
-                                                 func=func,
-                                                 instead="bar=6, baz='bot'"))
+            self.assertOneDeprecation(msg1.format(param="'bar', 'baz'",
+                                                  func=qual,
+                                                  instead="bar=6, baz='bot'"))
 
         with self.subTest(test=7):
             rv1, rv2 = f('Pywiki', 7)
             self.assertEqual(rv1, 'Pywiki')
             self.assertEqual(rv2, 49)
-            self.assertOneDeprecation(msg.format(param="'bar'",
-                                                 func=func,
-                                                 instead='bar=7'))
+            self.assertOneDeprecation(msg1.format(param="'bar'",
+                                                  func=qual,
+                                                  instead='bar=7'))
 
         with self.subTest(test=8):
             rv1, rv2 = f('Pywiki', 8, baz='bot')
             self.assertEqual(rv1, 'Pywikibot')
             self.assertEqual(rv2, 64)
-            self.assertOneDeprecation(msg.format(param="'bar'",
-                                                 func=func,
-                                                 instead='bar=8'))
+            self.assertOneDeprecation(msg1.format(param="'bar'",
+                                                  func=qual,
+                                                  instead='bar=8'))
 
         with self.subTest(test=9):
-            rv1, rv2 = f('Pywiki', bar=9)
+            rv1, rv2 = f(foo='Pywiki', bar=9)
             self.assertEqual(rv1, 'Pywiki')
             self.assertEqual(rv2, 81)
+            self.assertOneDeprecation(msg2.format(qual=qual, func=func))
+
+        with self.subTest(test=10):
+            rv1, rv2 = f('Pywiki', bar=10)
+            self.assertEqual(rv1, 'Pywiki')
+            self.assertEqual(rv2, 100)
             self.assertNoDeprecation()
 
     def test_remove_last_args_invalid(self) -> None:

@@ -655,8 +655,8 @@ class CheckHostnameMixin(TestCaseBase):
                     f'{cls.__name__}: accessing {hostname} caused exception:')
 
                 cls._checked_hostnames[hostname] = e
-                raise unittest.SkipTest(f'{cls.__name__}: hostname {hostname}'
-                                        ' failed: {e}') from None
+                raise unittest.SkipTest(f'{cls.__name__}: hostname {hostname} '
+                                        f'failed: {e}') from None
 
             cls._checked_hostnames[hostname] = True
 
@@ -1542,6 +1542,7 @@ class DeprecationTestCase(TestCase):
         r'(; use .* instead)?\.')
 
     source_adjustment_skips = [
+        unittest.case._AssertRaisesBaseContext,
         unittest.case._AssertRaisesContext,
         TestCase.assertRaises,
         TestCase.assertRaisesRegex,
@@ -1551,10 +1552,6 @@ class DeprecationTestCase(TestCase):
     NO_INSTEAD = object()
     # Require an instead string
     INSTEAD = object()
-
-    # Python 3 component in the call stack of _AssertRaisesContext
-    if hasattr(unittest.case, '_AssertRaisesBaseContext'):
-        source_adjustment_skips.append(unittest.case._AssertRaisesBaseContext)
 
     def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
@@ -1666,13 +1663,15 @@ class DeprecationTestCase(TestCase):
 
     def assertOneDeprecation(self, msg=None, count=1) -> None:
         """Assert that exactly one deprecation message happened and reset."""
-        self.assertDeprecation(msg)
-        # This is doing such a weird structure, so that it shows any other
-        # deprecation message from the set.
-        self.assertCountEqual(set(self.deprecation_messages),
-                              [self.deprecation_messages[0]])
-        self.assertLength(self.deprecation_messages, count)
-        self._reset_messages()
+        try:
+            self.assertDeprecation(msg)
+            # This is doing such a weird structure, so that it shows any other
+            # deprecation message from the set.
+            self.assertCountEqual(set(self.deprecation_messages),
+                                  [self.deprecation_messages[0]])
+            self.assertLength(self.deprecation_messages, count)
+        finally:
+            self._reset_messages()
 
     def assertNoDeprecation(self, msg=None) -> None:
         """Assert that no deprecation warning happened."""

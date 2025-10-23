@@ -11,6 +11,12 @@
 .. automodule:: data.api
    :synopsis: Module providing several layers of data access to the wiki
 
+:mod:`data.citoid` --- Citoid Requests
+======================================
+
+.. automodule:: data.citoid
+   :synopsis: Citoid Query interface
+
 :mod:`data.memento` --- Memento Requests
 ========================================
 

@@ -112,12 +112,13 @@ class User(Page):
         if force and hasattr(self, '_userprops'):
             del self._userprops
         if not hasattr(self, '_userprops'):
-            self._userprops = list(self.site.users([self.username]))[0]
+            self._userprops = next(self.site.users([self.username]))
             if self.isAnonymous() or self.is_CIDR():
-                r = list(self.site.blocks(iprange=self.username, total=1))
+                r = next(self.site.blocks(iprange=self.username, total=1),
+                         None)
                 if r:
-                    self._userprops['blockedby'] = r[0]['by']
-                    self._userprops['blockreason'] = r[0]['reason']
+                    self._userprops['blockedby'] = r['by']
+                    self._userprops['blockreason'] = r['reason']
         return self._userprops
 
     def registration(self,

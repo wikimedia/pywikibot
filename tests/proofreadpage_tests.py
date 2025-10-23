@@ -75,8 +75,10 @@ class TestPagesTagParser(TestCase):
 
     def test_tag_attr_exceptions(self) -> None:
         """Test TagAttr for Exceptions."""
-        self.assertRaises(ValueError, TagAttr, 'fromsection', 'A123"')
-        self.assertRaises(TypeError, TagAttr, 'fromsection', 3.0)
+        with self.assertRaisesRegex(ValueError, 'has wrong quotes'):
+            TagAttr('fromsection', 'A123"')
+        with self.assertRaisesRegex(TypeError, 'must be str or int'):
+            TagAttr('fromsection', 3.0)
 
     def test_pages_tag_parser(self) -> None:
         """Test PagesTagParser."""
@@ -110,14 +112,13 @@ class TestPagesTagParser(TestCase):
 
     def test_pages_tag_parser_exceptions(self) -> None:
         """Test PagesTagParser Exceptions."""
-        text = """Text: <pages index="Index.pdf />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
-
-        text = """Text: <pages index="Index.pdf' />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
+        text = """Text: <pages index="Index.pdf" />"""
+        parser = PagesTagParser(text)
+        self.assertEqual(parser.index, 'Index.pdf')
 
         text = """Text: <pages index="Index.pdf from=C" />"""
-        self.assertRaises(ValueError, PagesTagParser, text)
+        with self.assertRaisesRegex(ValueError, 'has wrong quotes'):
+            PagesTagParser(text)
 
 
 class TestProofreadPageInvalidSite(TestCase):
@@ -499,7 +500,7 @@ class TestPageOCR(BS4TestCase):
         """Test page.ocr(ocr_tool='wmfOCR')."""
         try:
             text = self.page.ocr(ocr_tool='wmfOCR')
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             self.assertIsInstance(exc, ValueError)
         else:
             ref_text = self.data['wmfOCR']
@@ -790,11 +791,6 @@ class TestIndexPageMappings(BS4TestCase):
             self.assertEqual(index_page.get_page_number_from_label(str(label)),
                              num_set)
 
-        # Error if label does not exists.
-        label, num_set = 'dummy label', []
-        with self.assertRaises(KeyError):
-            index_page.get_page_number_from_label('dummy label')
-
         # Test get_page_from_label.
         for label, page_set in data['get_page']:
             # Get set of pages from label with label as int or str.
@@ -802,10 +798,6 @@ class TestIndexPageMappings(BS4TestCase):
                              page_set)
             self.assertEqual(index_page.get_page_from_label(str(label)),
                              page_set)
-
-        # Error if label does not exists.
-        with self.assertRaises(KeyError):
-            index_page.get_page_from_label('dummy label')
 
         # Test get_page.
         for n in num_set:
@@ -816,6 +808,10 @@ class TestIndexPageMappings(BS4TestCase):
         for p in page_set:
             n = index_page.get_number(p)
             self.assertEqual(index_page.get_page(n), p)
+
+        # Error if label does not exists.
+        with self.assertRaises(KeyError):
+            index_page.get_page_number_from_label('dummy label')
 
     def test_page_gen(self, key) -> None:
         """Test Index page generator."""

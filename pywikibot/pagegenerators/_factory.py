@@ -62,13 +62,13 @@ from pywikibot.tools.itertools import (
 
 
 if TYPE_CHECKING:
-    from typing import Any, Literal
+    from typing import Any, Literal, Optional
 
     from pywikibot.site import BaseSite, Namespace
 
     HANDLER_GEN_TYPE = Iterable[pywikibot.page.BasePage]
     GEN_FACTORY_CLAIM_TYPE = list[tuple[str, str, dict[str, str], bool]]
-    OPT_GENERATOR_TYPE = HANDLER_GEN_TYPE | None
+    OPT_GENERATOR_TYPE = Optional[HANDLER_GEN_TYPE]
 
 
 # This is the function that will be used to de-duplicate page iterators.

@@ -73,8 +73,8 @@ from pywikibot.tools import (
     MediaWikiVersion,
     cached,
     deprecate_arg,
-    deprecate_positionals,
     deprecated,
+    deprecated_signature,
     issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
@@ -2995,7 +2995,7 @@ class APISite(
         return req.submit()
 
     @need_right('editmywatchlist')
-    @deprecate_positionals(since='10.4.0')
+    @deprecated_signature(since='10.4.0')
     def watch(
         self,
         pages: BasePage | str | list[BasePage | str],

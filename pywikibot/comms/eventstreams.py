@@ -26,7 +26,7 @@ from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
-from pywikibot.backports import NoneType
+from pywikibot.backports import Dict, List, NoneType
 from pywikibot.comms.http import user_agent
 from pywikibot.tools import cached, deprecated_args
 from pywikibot.tools.collections import GeneratorWrapper
@@ -179,7 +179,7 @@ class EventStreams(GeneratorWrapper):
         if isinstance(EventSource, ModuleNotFoundError):
             raise ImportError(INSTALL_MSG) from EventSource
 
-        self.filter = {'all': [], 'any': [], 'none': []}
+        self.filter: Dict[str, List[Any]] = {'all': [], 'any': [], 'none': []}
         self._total: int | None = None
         self._canary = kwargs.pop('canary', False)
 

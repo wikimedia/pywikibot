@@ -187,7 +187,7 @@ extra_standard_library = ["tomllib"]
 
 
 [tool.mypy]
-python_version = 3.9
+python_version = "3.9"
 enable_error_code = [
     "ignore-without-code",
 ]

@@ -1,6 +1,6 @@
 """Title translate module."""
 #
-# (C) Pywikibot team, 2003-2024
+# (C) Pywikibot team, 2003-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,7 +46,7 @@ def translate(
 
     for h in hints:
         # argument may be given as -hint:xy where xy is a language code
-        codes, _, newname = h.partition(':')
+        code, _, newname = h.partition(':')
         if not newname:
             # if given as -hint:xy or -hint:xy:, assume that there should
             # be a page in language xy with the same title as the page
@@ -55,12 +55,12 @@ def translate(
                 continue
             newname = page.title(with_ns=False,
                                  without_brackets=removebrackets)
-        if codes.isdigit():
-            codes = site.family.languages_by_size[:int(codes)]
-        elif codes == 'all':
+        if code.isdigit():
+            codes = site.family.languages_by_size[:int(code)]
+        elif code == 'all':
             codes = list(site.family.codes)
         else:
-            codes = site.family.language_groups.get(codes, codes.split(','))
+            codes = site.family.language_groups.get(code, code.split(','))
 
         for newcode in codes:
             if newcode in site.codes:

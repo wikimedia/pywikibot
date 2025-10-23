@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [pypy3.8, pypy3.10, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', 3.14-dev, 3.15-dev]
+        python-version: [pypy3.8, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
         family: [wikipedia]
         code: [test]
         domain: [test.wikipedia.org]
@@ -87,6 +87,7 @@ jobs:
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           echo "usernames['commons']['beta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
+          echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
           echo "noisysleep = float('inf')" >> user-config.py
           echo "maximum_GET_length = 5000" >> user-config.py
@@ -96,7 +97,7 @@ jobs:
         env:
           PYWIKIBOT_TEST_WRITE: 1
           PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
-          PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth
+          PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth,superset
         run: |
           python pwb.py version
           coverage run -m unittest -vv
