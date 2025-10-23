@@ -476,7 +476,8 @@ def execute(command: list[str], *, data_in=None, timeout=None):
     :param command: executable to run and arguments to use
     """
     if PYTHON_VERSION < (3, 9):
-        command.insert(1, '-W ignore::FutureWarning:pywikibot:92')
+        command.insert(1, '-W ignore::FutureWarning:pwb:46')
+        command.insert(1, '-W ignore::FutureWarning:__main__:46')
 
     env = os.environ.copy()
 

@@ -18,6 +18,12 @@ Pywikibot is not available on:
 
 This version of Pywikibot only supports Python 3.8+.
 """
+DEPRECATED_PYTHON_MESSAGE = """
+
+Python {version} will be dropped soon with Pywikibot 11.
+It is recommended to use Python 3.9 or above.
+See phab: T401802 for further information.
+"""
 
 
 def python_is_supported():
@@ -25,8 +31,20 @@ def python_is_supported():
     return sys.version_info[:3] >= (3, 8)
 
 
+def python_is_deprecated():
+    """Check that Python is deprecated."""
+    return sys.version_info[:3] < (3, 9)
+
+
 if not python_is_supported():  # pragma: no cover
     sys.exit(VERSIONS_REQUIRED_MESSAGE.format(version=sys.version))
+
+if python_is_deprecated():
+    import warnings
+    msg = DEPRECATED_PYTHON_MESSAGE.format(
+        version=sys.version.split(maxsplit=1)[0])
+    warnings.warn(msg, FutureWarning)  # adjust this line no in utils.execute()
+    del warnings
 
 
 def main() -> None:
