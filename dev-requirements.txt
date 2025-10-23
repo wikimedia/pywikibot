@@ -20,4 +20,4 @@ tomli>=2.3.0; python_version < "3.11"
 
 # optional but needed for tests
 fake-useragent >= 2.2.0; python_version > "3.8"
-fake-useragent == 2.1.0; python_version < "3.9"
+fake-useragent == 2.0.0; python_version < "3.9"
