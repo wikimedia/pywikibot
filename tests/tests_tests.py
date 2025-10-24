@@ -23,7 +23,7 @@ class HttpServerProblemTestCase(TestCase):
         }
     }
 
-    def test_502(self) -> None:
+    def test_502(self) -> None:  # pragma: no cover
         """Test that framework is skipping this test due to HTTP status 502."""
         self.fail("The test framework should skip this test but it hasn't.")
 
@@ -51,7 +51,7 @@ class TestLengthAssertion(TestCase):
     def test_assert_is_empty_fail(self) -> None:
         """Test assertIsEmpty method failing."""
         self.assertIsEmpty(self.seq1)
-        self.assertIsEmpty(self.seq2)
+        self.assertIsEmpty(self.seq2)  # pragma: no cover
 
     def test_assert_is_not_empty(self) -> None:
         """Test assertIsNotEmpty method."""
@@ -62,7 +62,7 @@ class TestLengthAssertion(TestCase):
     def test_assert_is_not_empty_fail(self) -> None:
         """Test that assertIsNotEmpty method may fail."""
         self.assertIsNotEmpty([])
-        self.assertIsNotEmpty('')
+        self.assertIsNotEmpty('')  # pragma: no cover
 
     def test_assert_length(self) -> None:
         """Test assertLength method."""
@@ -74,8 +74,10 @@ class TestLengthAssertion(TestCase):
     def test_assert_length_fail(self) -> None:
         """Test that assertLength method is failing."""
         self.assertLength([], 1)
+        # no cover: start
         self.assertLength(self.seq1, 0)
         self.assertLength(None, self.seq)
+        # no cover: stop
 
 
 class TestRequireVersionDry(DefaultSiteTestCase):
@@ -106,7 +108,7 @@ class TestRequireVersion(DefaultSiteTestCase):
 
     def method_failing(self) -> None:
         """Test method for decorator with invalid parameter."""
-        self.assertTrue(False, 'should never happen')
+        self.assertTrue(False, 'should never happen')  # pragma: no cover
 
     @require_version('>=1.31')
     def method_succeed(self) -> None:
@@ -116,7 +118,7 @@ class TestRequireVersion(DefaultSiteTestCase):
     @require_version('<1.31')
     def method_fail(self) -> None:
         """Test that decorator skips."""
-        self.assertTrue(False, 'intentional fail for test')
+        self.assertTrue(False, 'intentional fail for test')  # pragma: no cover
 
     def test_unsupported_methods(self) -> None:
         """Test require_version with unsupported methods."""
