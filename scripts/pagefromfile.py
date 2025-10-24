@@ -96,9 +96,19 @@ class NoTitleError(Exception):
 
     """No title found."""
 
-    def __init__(self, offset) -> None:
-        """Initializer."""
+    def __init__(self, offset: int, source: str | None = None) -> None:
+        """Initializer.
+
+        .. versionchanged:: 10.7
+           *source* was added; a message was passed to Exception super
+           class.
+        """
         self.offset = offset
+        self.source = source
+        message = f'No title found at offset {offset}'
+        if source:
+            message += f' in {source!r}'
+        super().__init__(message)
 
 
 class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
@@ -249,7 +259,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 break
 
             except NoTitleError as err:
-                pywikibot.info('\nNo title found - skipping a page.')
+                pywikibot.info('\n{err} - skipping a page.')
                 text = text[err.offset:]
             else:
                 page = pywikibot.Page(self.site, title)
