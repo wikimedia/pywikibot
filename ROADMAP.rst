@@ -1,7 +1,15 @@
 Current Release Changes
 =======================
 
-* (no changes yet)
+* Deprecate dysfunctional :meth:`APISite.alllinks()
+  <pywikibot.site._generators.GeneratorsMixin.alllinks>`. (:phab:`T359427`, :phab:`T407708`)
+* Refactor ``replace_magicwords`` in
+  :meth:`cosmetic_changes.CosmeticChangesToolkit.translateMagicWords`. (:phab:`T396715`)
+* Deprecate old ``(type, value, traceback)`` signature in
+  :meth:`tools.collections.GeneratorWrapper.throw`. (:phab:`T340641`)
+* Replace default timetravel.mementoweb.org with web.archive.org in :mod:`data.memento` module.
+  (:phab:`T400570`, :phab:`T407694`)
+* i18n updates
 
 
 Deprecations
@@ -20,6 +28,9 @@ removed in in the third subsequent major release, remaining available for the tw
 Pending removal in Pywikibot 11
 -------------------------------
 
+* 10.7.0: Dysfunctional :meth:`APISite.alllinks()
+  <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
+  (:phab:`T359427`, :phab:`T407708`)
 * 10.6.0: Python 3.8 support is deprecated and will be dropped soon
 * 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
   :attr:`data.api.QueryGenerator.modules`
@@ -97,6 +108,9 @@ Pending removal in Pywikibot 12
 Pending removal in Pywikibot 13
 -------------------------------
 
+* 10.6.0: The old ``(type, value, traceback)`` signature in
+  :meth:`tools.collections.GeneratorWrapper.throw` will be removed in Pywikibot 13, or earlier if it
+  is dropped from a future Python release. (:phab:`T340641`)
 * 10.6.0: :meth:`Family.isPublic()<family.Family.isPublic>` will be removed (:phab:`T407049`)
 * 10.6.0: :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
   use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.

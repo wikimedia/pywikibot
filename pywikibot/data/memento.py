@@ -2,7 +2,7 @@
 
 .. versionadded:: 7.4
 .. versionchanged:: 10.7
-   Set default timegate to :attr`DEFAULT_TIMEGATE_BASE_URI`
+   Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
 .. seealso:: https://github.com/mementoweb/py-memento-client#readme
 """
 #
