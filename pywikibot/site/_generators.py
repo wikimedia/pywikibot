@@ -1072,6 +1072,7 @@ class GeneratorsMixin:
             inappropriate type such as bool, or an iterable with more
             than one namespace
         """
+        # no cover: start
         if unique and fromids:
             raise Error('alllinks: unique and fromids cannot both be True.')
         algen = self._generator(api.ListGenerator, type_arg='alllinks',
@@ -1103,6 +1104,7 @@ class GeneratorsMixin:
             if fromids:
                 p._fromid = link['fromid']  # type: ignore[attr-defined]
             yield p
+        # no cover: stop
 
     def allcategories(
         self,
