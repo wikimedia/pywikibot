@@ -2022,6 +2022,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertEqual(page.pageid, page._pageid)
             del page._pageid
 
+        links.restart()  # restart generator
         for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
