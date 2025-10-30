@@ -988,14 +988,10 @@ class TestRecentChanges(DefaultSiteTestCase):
             for change in mysite.recentchanges(anon=False, total=5):
                 self.assertIsInstance(change, dict)
         with self.subTest(redirect=True):
-            if mysite.sitename == 'wikipedia:test':
-                self.skipTest('Faulty rcshow filter: T408667')
             for change in mysite.recentchanges(redirect=True, total=5):
                 self.assertIsInstance(change, dict)
                 self.assertIn('redirect', change)
         with self.subTest(redirect=False):
-            if mysite.sitename == 'wikipedia:test':
-                self.skipTest('Faulty rcshow filter: T408667')
             for change in mysite.recentchanges(redirect=False, total=5):
                 self.assertIsInstance(change, dict)
                 self.assertNotIn('redirect', change)
