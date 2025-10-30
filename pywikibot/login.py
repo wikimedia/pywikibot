@@ -34,9 +34,6 @@ except ImportError as e:
     mwoauth = e
 
 
-TEST_RUNNING = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
-
-
 class _PasswordFileWarning(UserWarning):
 
     """The format of password file is incorrect."""
@@ -237,8 +234,9 @@ class LoginManager:
             password_path = Path(config.password_file)
 
         # ignore this check when running tests
-        if not TEST_RUNNING and (not password_path.is_file(**params)
-                                 or password_path.is_symlink()):
+        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0' \
+           and (not password_path.is_file(**params)
+                or password_path.is_symlink()):
             raise FileNotFoundError(
                 f'Password file {password_path.name} does not exist in '
                 f'{password_path.parent}'
@@ -624,8 +622,6 @@ class OauthLoginManager(LoginManager):
                 pywikibot.error(e)
                 if retry:
                     return self.login(retry=True, force=force)
-                if TEST_RUNNING:
-                    print('>>> login:', e)  # noqa: T201
                 return False
         else:
             pywikibot.info(f'Logged in to {self.site} via consumer '
@@ -670,8 +666,6 @@ class OauthLoginManager(LoginManager):
         """
         if self.access_token is None:
             pywikibot.error('Access token not set')
-            if TEST_RUNNING:
-                print('>>> identity: Access token not set')  # noqa: T201
             return None
 
         consumer_token = mwoauth.ConsumerToken(*self.consumer_token)
@@ -683,11 +677,7 @@ class OauthLoginManager(LoginManager):
                                         leeway=30.0)
         except Exception as e:
             pywikibot.error(e)
-            if TEST_RUNNING:
-                print('<<< identity:', e)  # noqa: T201
         else:
-            if TEST_RUNNING:
-                print('<<< identity =', identity)  # noqa: T201
             return identity
 
         return None
