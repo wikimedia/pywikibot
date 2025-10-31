@@ -3,7 +3,15 @@
 
 Usage:
 
-    python pwb.py addwikis [-family:<family>] {<wiki>}
+    python pwb.py addwikis [-family:<fam>] {<wiki>} {-family:<fam> {<wiki>}}
+
+
+Example:
+
+    :code:`python pwb.py addwikis foo -family:wikisource bar baz`
+
+    adds code ``foo`` to the default (wikipedia) family, and codes ``bar``
+    and ``baz`` to wikisource.
 
 
 .. versionadded:: 9.2
@@ -11,6 +19,8 @@ Usage:
    The options ``-h``, ``-help`` and ``--help`` display the help message.
 .. deprecated:: 10.4
    The ``help`` option
+.. versionchanged:: 11.0
+   Multiple families can be given with one run.
 """
 #
 # (C) Pywikibot team, 2024-2025
@@ -21,6 +31,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import pywikibot
@@ -42,7 +53,7 @@ families_list = [
 ]
 
 
-def update_family(family, wikis) -> None:
+def update_family(family: str, wikis: set) -> None:
     """Update codes set in family file."""
     joined_wikis = "', '".join(wikis)
     pywikibot.info(f"Adding '{joined_wikis}' to {family} family...\n")
@@ -88,11 +99,11 @@ def main(*args: str) -> None:
         args = sys.argv[1:]
         sys.argv = [sys.argv[0]]
 
-    family = 'wikipedia'
-    wikis = []
+    current_family = 'wikipedia'
+    wikis = defaultdict(set)
     for arg in args:
         if arg.startswith('-family'):
-            family = arg.split(':')[1]
+            current_family = arg.split(':')[1]
         elif arg in ('help', '-h', '-help', '--help'):
             if arg == 'help':
                 issue_deprecation_warning(
@@ -104,16 +115,18 @@ def main(*args: str) -> None:
             pywikibot.show_help()
             return
         else:
-            wikis.append(arg)
+            wikis[current_family].add(arg)
 
     if not wikis:
         pywikibot.bot.suggest_help(
             additional_text='No wiki is specified to be added.')
-    elif family not in families_list:
-        pywikibot.bot.suggest_help(
-            additional_text=f'Script cannot be used for {family} family.')
-    else:
-        update_family(family, wikis)
+
+    for family, codes in wikis.items():
+        if family not in families_list:
+            pywikibot.bot.suggest_help(
+                additional_text=f'Script cannot be used for {family} family.')
+        else:
+            update_family(family, codes)
 
 
 if __name__ == '__main__':
