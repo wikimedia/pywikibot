@@ -331,54 +331,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIn('edit', page._protection)
             self.assertIn('sysop', page._protection['edit'])
 
-    def test_all_links(self) -> None:
-        """Test the site.alllinks() method."""
-        mysite = self.get_site()
-        fwd = list(mysite.alllinks(total=10))
-        uniq = list(mysite.alllinks(total=10, unique=True))
-
-        with self.subTest(msg='Test that unique links are in all links'):
-            self.assertLessEqual(len(fwd), 10)
-            self.assertLessEqual(len(uniq), len(fwd))
-            for link in fwd:
-                self.assertIsInstance(link, pywikibot.Page)
-                self.assertIn(link, uniq)
-
-        with self.subTest(msg='Test with start parameter'):
-            for page in mysite.alllinks(start='Link', total=5):
-                self.assertIsInstance(page, pywikibot.Page)
-                self.assertEqual(page.namespace(), 0)
-                self.assertGreaterEqual(page.title(), 'Link')
-
-        with self.subTest(msg='Test with prefix parameter'):
-            for page in mysite.alllinks(prefix='Fix', total=5):
-                self.assertIsInstance(page, pywikibot.Page)
-                self.assertEqual(page.namespace(), 0)
-                self.assertStartsWith(page.title(), 'Fix')
-
-        # increase timeout due to T359427/T359425
-        # ~ 47s are required on wikidata
-        config_timeout = pywikibot.config.socket_timeout
-        pywikibot.config.socket_timeout = (config_timeout[0], 60)
-        with self.subTest(msg='Test namespace parameter'):
-            for page in mysite.alllinks(namespace=1, total=5):
-                self.assertIsInstance(page, pywikibot.Page)
-                self.assertEqual(page.namespace(), 1)
-        pywikibot.config.socket_timeout = config_timeout
-
-        with self.subTest(msg='Test with fromids parameter'):
-            for page in mysite.alllinks(start='From', namespace=4,
-                                        fromids=True, total=5):
-                self.assertIsInstance(page, pywikibot.Page)
-                self.assertGreaterEqual(page.title(with_ns=False), 'From')
-                self.assertHasAttr(page, '_fromid')
-
-        with self.subTest(
-                msg='Test that Error is raised with unique and fromids'):
-            errgen = mysite.alllinks(unique=True, fromids=True)
-            with self.assertRaises(Error):
-                next(errgen)
-
     def test_all_categories(self) -> None:
         """Test the site.allcategories() method."""
         mysite = self.get_site()
@@ -1013,28 +965,36 @@ class TestRecentChanges(DefaultSiteTestCase):
     def test_flags(self) -> None:
         """Test the site.recentchanges() with boolean flags."""
         mysite = self.site
-        for change in mysite.recentchanges(minor=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertIn('minor', change)
-        for change in mysite.recentchanges(minor=False, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertNotIn('minor', change)
-        for change in mysite.recentchanges(bot=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertIn('bot', change)
-        for change in mysite.recentchanges(bot=False, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertNotIn('bot', change)
-        for change in mysite.recentchanges(anon=True, total=5):
-            self.assertIsInstance(change, dict)
-        for change in mysite.recentchanges(anon=False, total=5):
-            self.assertIsInstance(change, dict)
-        for change in mysite.recentchanges(redirect=False, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertNotIn('redirect', change)
-        for change in mysite.recentchanges(redirect=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertIn('redirect', change)
+        with self.subTest(minor=True):
+            for change in mysite.recentchanges(minor=True, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertIn('minor', change)
+        with self.subTest(minor=False):
+            for change in mysite.recentchanges(minor=False, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertNotIn('minor', change)
+        with self.subTest(bot=True):
+            for change in mysite.recentchanges(bot=True, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertIn('bot', change)
+        with self.subTest(bot=False):
+            for change in mysite.recentchanges(bot=False, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertNotIn('bot', change)
+        with self.subTest(anon=True):
+            for change in mysite.recentchanges(anon=True, total=5):
+                self.assertIsInstance(change, dict)
+        with self.subTest(anon=False):
+            for change in mysite.recentchanges(anon=False, total=5):
+                self.assertIsInstance(change, dict)
+        with self.subTest(redirect=True):
+            for change in mysite.recentchanges(redirect=True, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertIn('redirect', change)
+        with self.subTest(redirect=False):
+            for change in mysite.recentchanges(redirect=False, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertNotIn('redirect', change)
 
     def test_tag_filter(self) -> None:
         """Test the site.recentchanges() with tag filter."""
@@ -2058,6 +2018,7 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertEqual(page.pageid, page._pageid)
             del page._pageid
 
+        links.restart()  # restart generator
         for count, page in enumerate(mysite.preloadpages(links), start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)

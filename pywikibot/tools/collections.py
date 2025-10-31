@@ -1,6 +1,6 @@
 """Collections datatypes."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,9 +11,16 @@ from abc import ABC, abstractmethod
 from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
 from itertools import chain
+from types import TracebackType
 from typing import Any, NamedTuple
 
 from pywikibot.backports import Generator as GeneratorType
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import (
+    PYTHON_VERSION,
+    deprecated_args,
+    issue_deprecation_warning,
+)
 
 
 __all__ = (
@@ -277,18 +284,50 @@ class GeneratorWrapper(ABC, Generator):
             self._started_gen = self.generator
         return next(self._started_gen)
 
-    def throw(self, typ: Exception, val=None, tb=None) -> None:
+    @deprecated_args(val='value', tb='traceback')  # since 10.7.0
+    def throw(self,
+              typ: BaseException | type[BaseException] | None = None,
+              value: Any = None,
+              traceback: TracebackType | None = None) -> None:
         """Raise an exception inside the wrapped generator.
 
         Refer :python:`generator.throw()
         <reference/expressions.html#generator.throw>` for various
         parameter usage.
 
+        .. versionchanged:: 10.7
+           The *val* and *tb* parameters were renamed to *value* and
+           *traceback*.
+        .. deprecated:: 10.7
+           The ``(type, value, traceback)`` signature is deprecated; use
+           single-arg signature ``throw(value)`` instead.
+
         :raises RuntimeError: No generator started
+        :raises TypeError: Invalid type for *typ* argument
         """
         if not hasattr(self, '_started_gen'):
             raise RuntimeError('No generator was started')
-        self._started_gen.throw(typ, val, tb)
+
+        # New-style (single exception instance) with keyword argument
+        if typ is None and traceback is None and isinstance(value,
+                                                            BaseException):
+            self._started_gen.throw(value)
+            return
+
+        if PYTHON_VERSION > (3, 8) and not (value is None
+                                            and traceback is None):
+            # Old-style (type, value, traceback) signature
+            issue_deprecation_warning(
+                'The (type, value, traceback) signature of throw()',
+                'the single-arg signature',
+                warning_class=ArgumentDeprecationWarning,
+                since='10.7.0'
+            )
+            self._started_gen.throw(typ, value, traceback)
+            return
+
+        # New-style (single exception instance)
+        self._started_gen.throw(typ)
 
     def restart(self) -> None:
         """Restart the generator."""

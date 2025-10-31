@@ -18,6 +18,7 @@ env:
 jobs:
   pre-commit:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
@@ -32,10 +33,11 @@ jobs:
           - python-version: '3.14'
             os: ubuntu-latest
           - python-version: 3.15-dev
+            experimental: true
     steps:
       - name: set up python ${{ matrix.python-version }}
         if: "!endsWith(matrix.python-version, '-dev')"
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: set up development python ${{ matrix.python-version }}
@@ -44,7 +46,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: true
       - name: run pre-commit

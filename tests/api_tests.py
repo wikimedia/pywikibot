@@ -604,11 +604,6 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
             'limit': {'max': 10},
             'namespace': {'multi': True}
         }
-        self.site._paraminfo['query+alllinks'] = {
-            'prefix': 'al',
-            'limit': {'max': 10},
-            'namespace': {'default': 0}
-        }
         self.site._paraminfo['query+links'] = {
             'prefix': 'pl',
         }
@@ -634,21 +629,12 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
 
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
-        self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
+        self.gen = api.ListGenerator(listaction='allpages', site=self.site)
         with self.assertRaisesRegex(
             TypeError,
             (r'int\(\) argument must be a string, a bytes-like object '
              r"or (?:a real number|a number), not 'NoneType'")):
             self.gen.set_namespace(None)
-
-    def test_namespace_non_multi(self) -> None:
-        """Test ListGenerator set_namespace when non multi."""
-        self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        with self.assertRaisesRegex(
-                TypeError,
-                'alllinks module does not support multiple namespaces'):
-            self.gen.set_namespace([0, 1])
-        self.assertIsNone(self.gen.set_namespace(0))
 
     def test_namespace_multi(self) -> None:
         """Test ListGenerator set_namespace when multi."""

@@ -1,6 +1,32 @@
 Release History
 ===============
 
+10.6.0
+------
+*23 October 2025*
+
+* Fix :meth:`ItemPage.get_value_at_timestamp()<pywikibot.ItemPage.get_value_at_timestamp>`;
+  keep the rank of the claims in the loop. (:phab:`T407701`)
+* :meth:`Family.isPublic()<family.Family.isPublic>` is deprecated (:phab:`T407049`)
+* Added :func:`tools.itertools.union_generators` for sorted merging of pre-sorted iterables.
+* **Support for Python 3.8 will be discontinued**;
+  this is likely the last Pywikibot version to support it.
+* Added a Citoid Query interface with the :mod:`data.citoid` module.
+* Updated localization (L10N) files.
+* :meth:`Family.interwiki_replacements<family.Family.interwiki_replacements>` is deprecated;
+  use :attr:`Family.code_aliases<family.Family.code_aliases>` instead.
+* The first parameter of :meth:`Transliterator.transliterate
+  <userinterfaces.transliteration.Transliterator.transliterate>` is positional only
+  whereas *prev* and *succ* parameters are keyword only. The :class:`Transliterator
+  <userinterfaces.transliteration.Transliterator>` was improved.
+* Show user-agent with :mod:`version<pywikibot.scripts.version>` script (:phab:`T406458`)
+* Positional arguments of :func:`daemonize()<daemonize.daemonize>` are deprecated and must
+  be given as keyword arguments.
+* i18n updates.
+* Return :meth:`bot.BaseBot.userPut` result from :meth:`AutomaticTWSummaryBot.put_current()
+  <bot.AutomaticTWSummaryBot.put_current>` method
+
+
 10.5.0
 ------
 *21 September 2025*

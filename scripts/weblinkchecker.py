@@ -175,17 +175,6 @@ ignorelist = [
 ]
 
 
-def get_archive_url(url):
-    """Get archive URL."""
-    try:
-        return get_closest_memento_url(
-            url, timegate_uri='http://web.archive.org/web/')
-    except Exception:
-        return get_closest_memento_url(
-            url,
-            timegate_uri='http://timetravel.mementoweb.org/webcite/timegate/')
-
-
 def weblinks_from_text(
     text,
     without_bracketed: bool = False,
@@ -410,7 +399,7 @@ class History:
                 if time_since_first_found > 60 * 60 * 24 * weblink_dead_days:
                     # search for archived page
                     try:
-                        archive_url = get_archive_url(url)
+                        archive_url = get_closest_memento_url(url)
                     except Exception as e:
                         pywikibot.warning(
                             f'get_closest_memento_url({url}) failed: {e}')

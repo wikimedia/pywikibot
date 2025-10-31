@@ -1309,11 +1309,12 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[NonFile:y]]')
 
+        # No File if filename is missing
         self.assertEqual(
             textlib.replaceExcept(
                 '[[File:]]',
                 'File:', 'NonFile:', ['file'], site=self.site),
-            '[[File:]]')
+            '[[NonFile:]]')
 
         self.assertEqual(
             textlib.replaceExcept(

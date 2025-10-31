@@ -744,8 +744,8 @@ class RequireLoginMixin(TestCaseBase):
                 site.login()
 
             if not site.user():
-                raise unittest.SkipTest(
-                    f'{cls.__name__}: Not able to login to {site}')
+                raise unittest.SkipTest(f'{cls.__name__}: Not able to login '
+                                        f'{site.username()} to {site}')
 
     def setUp(self) -> None:
         """Set up the test case.

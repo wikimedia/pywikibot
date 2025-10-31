@@ -1,6 +1,21 @@
 Scripts Changelog
 =================
 
+10.7.0
+------
+
+* i18n updates
+
+misspelling
+^^^^^^^^^^^
+
+* ``-page`` option was added. (:phab:`T151540`)
+
+watchlist
+^^^^^^^^^
+
+* Several exceptions are caught during watchlist count.
+
 10.4.0
 ------
 

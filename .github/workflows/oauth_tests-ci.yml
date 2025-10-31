@@ -31,17 +31,19 @@ jobs:
             family: wpbeta
             code: en
             domain: en.wikipedia.beta.wmcloud.org
+            experimental: true
           - python-version: '3.8'
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmcloud.org
+            experimental: true
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         if: "!endsWith(matrix.python-version, '-dev')"
         with:
           python-version: ${{ matrix.python-version }}

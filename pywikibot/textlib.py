@@ -74,18 +74,25 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 (?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
 """, re.VERBOSE | re.DOTALL)
 
-# The following regex supports wikilinks anywhere after the first pipe
-# and correctly matches the end of the file link if the wikilink contains
-# [[ or ]].
-# The namespace names must be substituted into this regex.
-# e.g. FILE_LINK_REGEX % 'File'
-# or FILE_LINK_REGEX % '|'.join(site.namespaces[6])
+# Regex matching file links with optional parameters.
+#
+# Captures the filename and parameters, including nested links
+# within the parameters. The regex safely matches the closing
+# brackets even if inner wikilinks contain [[ or ]].
+# The Namespace names must be substituted into the pattern, e.g.:
+#     FILE_LINK_REGEX % 'File'
+# or: FILE_LINK_REGEX % '|'.join(site.namespaces[6])
+#
+# Don't use this regex directly; use textlib.get_regexes('file', site)`
+# instead.
+#
+# 10.7: Exclude empty filename
 FILE_LINK_REGEX = r"""
     \[\[\s*
     (?:%s)  # namespace aliases
     \s*:
     (?=(?P<filename>
-        [^]|]*
+        [^]|]+
     ))(?P=filename)
     (
         \|

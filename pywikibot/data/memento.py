@@ -1,6 +1,8 @@
 """Fix ups for memento-client package version 0.6.1.
 
 .. versionadded:: 7.4
+.. versionchanged:: 10.7
+   Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
 .. seealso:: https://github.com/mementoweb/py-memento-client#readme
 """
 #
@@ -32,6 +34,10 @@ __all__ = (
 )
 
 
+#: Default timegate; overrides the origin library setting.
+DEFAULT_TIMEGATE_BASE_URI: str = 'https://web.archive.org/web/'
+
+
 class MementoClient(OldMementoClient):
 
     """A Memento Client.
@@ -41,6 +47,8 @@ class MementoClient(OldMementoClient):
 
     .. versionchanged:: 7.4
        `timeout` is used in several methods.
+    .. versionchanged:: 10.7
+       Set default timegate to :attr`DEFAULT_TIMEGATE_BASE_URI`
 
     Basic usage:
 
@@ -50,7 +58,7 @@ class MementoClient(OldMementoClient):
     >>> mi['original_uri']
     'http://www.bbc.com/'
     >>> mi['timegate_uri']
-    'http://timetravel.mementoweb.org/timegate/http://www.bbc.com/'
+    'https://web.archive.org/web/http://www.bbc.com/'
     >>> sorted(mi['mementos'])
     ['closest', 'first', 'last', 'next', 'prev']
     >>> from pprint import pprint
@@ -67,32 +75,38 @@ class MementoClient(OldMementoClient):
      'prev': {'datetime': datetime.datetime(2009, 10, 15, 19, 7, 5),
               'uri': ['http://wayback.nli.org.il:8080/20091015190705/http://www.bbc.com/']}}
 
-    The output conforms to the Memento API format explained here:
-    http://timetravel.mementoweb.org/guide/api/#memento-json
+    The output conforms to the Memento API format but its description at
+    http://timetravel.mementoweb.org/guide/api/#memento-json is no
+    longer available
 
     .. note:: The mementos result is not deterministic. It may be
        different for the same parameters.
 
-    By default, MementoClient uses the Memento Aggregator:
-    http://mementoweb.org/depot/
-
     It is also possible to use different TimeGate, simply initialize
-    with a preferred timegate base uri. Toggle check_native_timegate to
-    see if the original uri has its own timegate. The native timegate,
-    if found will be used instead of the timegate_uri preferred. If no
-    native timegate is found, the preferred timegate_uri will be used.
+    with a preferred timegate base uri. Toggle *check_native_timegate*
+    to see if the original uri has its own timegate. The native
+    timegate, if found will be used instead of the *timegate_uri*
+    preferred. If no native timegate is found, the preferred
+    *timegate_uri* will be used.
 
     :param str timegate_uri: A valid HTTP base uri for a timegate.
-        Must start with http(s):// and end with a /.
+        Must start with http(s):// and end with a /. Default is
+        :attr:`DEFAULT_TIMEGATE_BASE_URI`
+    :param bool check_native_timegate: If True, the client will first
+        check whether the original URI has a native TimeGate. If found,
+        the native TimeGate is used instead of the preferred
+        *timegate_uri*. If False, the preferred *timegate_uri* is always
+        used. Default is True.
     :param int max_redirects: the maximum number of redirects allowed
-        for all HTTP requests to be made.
+        for all HTTP requests to be made. Default is 30.
+    :param requests.Session|None session: a Session object
     :return: A :class:`MementoClient` obj.
     """  # noqa: E501, W505
 
     def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
-        # To prevent documentation inclusion from inherited class
-        # because it is malformed.
+        if 'timegate_uri' not in kwargs and not args:
+            kwargs['timegate_uri'] = DEFAULT_TIMEGATE_BASE_URI
         super().__init__(*args, **kwargs)
 
     def get_memento_info(self, request_uri: str,
@@ -326,7 +340,7 @@ def get_closest_memento_url(url: str,
         datetime is used if none is provided.
     :param timegate_uri: A valid HTTP base uri for a timegate. Must
         start with http(s):// and end with a /. Default value is
-        http://timetravel.mementoweb.org/timegate/.
+        :attr:`DEFAULT_TIMEGATE_BASE_URI`.
     :param timeout: The timeout value for the HTTP connection. If None,
         a default value is used in :meth:`MementoClient.request_head`.
     """
