@@ -907,7 +907,7 @@ def show_help(module_name: str | None = None,
                            module.__doc__, flags=re.MULTILINE | re.DOTALL)
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
-                help_text = help_text.replace(key, value.strip())
+                help_text = help_text.replace(key, value.rstrip())
         _stdout(help_text)
 
     if show_global or module_name == 'pwb':

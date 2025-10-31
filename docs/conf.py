@@ -549,7 +549,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options,
         # add link for fixes
         if name == 'scripts.replace' and line == '&fixes-help;':
             newlines.append('                  The available fixes are '
-                            'listed in :mod:`pywikibot.fixes`.')
+                            'listed in :mod:`fixes`.')
             continue
 
         # replace cosmetic changes warning
