@@ -37,36 +37,30 @@ from pathlib import Path
 # ------- setup extra_requires ------- #
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['requests-sse>=0.5.0'],
-    'isbn': ['python-stdnum>=1.20'],
-    'Graphviz': ['pydot>=3.0.2'],
+    'eventstreams': ['requests-sse>=0.5.2'],
+    'isbn': ['python-stdnum>=2.1'],
+    'Graphviz': ['pydot>=4.0.1'],
     'Google': ['googlesearch-python >= 1.3.0'],
     'memento': ['memento_client==0.6.1'],
-    'wikitextparser': ['wikitextparser>=0.56.3'],
-    'mysql': ['PyMySQL >= 1.1.1'],
-    # vulnerability found in Pillow<8.1.2 but toolforge uses 5.4.1
+    'wikitextparser': ['wikitextparser>=0.56.4'],
+    'mysql': ['PyMySQL >= 1.1.2'],
     'Tkinter': [
-        'Pillow==10.4.0; platform_python_implementation == "PyPy" '
-        'and python_version < "3.9"',
         'Pillow>=11.1.0,<11.3.0; platform_python_implementation == "PyPy" '
         'and python_version >= "3.9" and python_version < "3.11"',
         'Pillow>=11.1.0; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
-        'Pillow==10.4.0; platform_python_implementation != "PyPy" '
-        'and python_version < "3.9"',
         'Pillow>=11.1.0,<11.3.0; platform_python_implementation != "PyPy" '
         'and python_version == "3.9"',
-        'Pillow>=11.1.0; platform_python_implementation != "PyPy" '
+        'Pillow>=12.0.0; platform_python_implementation != "PyPy" '
         'and python_version >= "3.10"',
     ],
     'mwoauth': [
-        'PyJWT != 2.10.0, != 2.10.1; python_version > "3.8"',  # T380270
-        'mwoauth!=0.3.1,>=0.2.4',
+        'PyJWT != 2.10.0, != 2.10.1',  # T380270
+        'mwoauth>=0.4.0',
     ],
     'html': ['beautifulsoup4>=4.7.1'],
     'http': [
-        'fake-useragent >= 2.0.3; python_version > "3.8"',
-        'fake-useragent == 1.5.1; python_version < "3.9"',
+        'fake-useragent >= 2.2.0',
     ],
 }
 

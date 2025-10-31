@@ -26,38 +26,39 @@ requests>=2.31.0
 # mwparserfromhell is mandatory but wikitextparser can be used instead
 # mwparserfromhell is still required for commons_information.py and patrol.py
 # wikitextparser is required for Page.authorship()
-wikitextparser>=0.56.3
+wikitextparser>=0.56.4
 
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
 # about the user
 # Due to T380270 PyJWT must be set
-PyJWT != 2.10.0, != 2.10.1; python_version > '3.8'
-mwoauth>=0.2.4,!=0.3.1
+PyJWT != 2.10.0, != 2.10.1
+mwoauth>=0.4.0
 
 # interwiki_graph.py module and category_graph.py script:
-pydot >= 3.0.2
+pydot >= 4.0.1
 
 # cosmetic_changes
-python-stdnum >= 1.20
+python-stdnum >= 2.1
 
 # GUI
-Pillow==10.4.0; platform_python_implementation == "PyPy" and python_version < "3.9"
 Pillow>=11.1.0,<11.3.0; platform_python_implementation == "PyPy" and python_version >= "3.9" and python_version < "3.11"
 Pillow>=11.1.0; platform_python_implementation == "PyPy" and python_version >= "3.11"
-Pillow==10.4.0; platform_python_implementation != "PyPy" and python_version < "3.9"
 Pillow>=11.1.0,<11.3.0; platform_python_implementation != "PyPy" and python_version == "3.9"
-Pillow>=11.1.0; platform_python_implementation != "PyPy" and python_version >= "3.10"
+Pillow>=12.0.0; platform_python_implementation != "PyPy" and python_version >= "3.10"
 
 # core pagegenerators
 googlesearch-python >= 1.3.0
-requests-sse >= 0.5.0
+requests-sse >= 0.5.2
 
 # The mysql generator in pagegenerators depends on PyMySQL
-PyMySQL >= 1.1.1
+PyMySQL >= 1.1.2
 
 # core HTML comparison parser in diff module
-beautifulsoup4>=4.7.1
+beautifulsoup4>=4.14.2
 
 # scripts/weblinkchecker.py
 memento_client==0.6.1
+
+# optional but also needed for tests
+fake-useragent >= 2.2.0

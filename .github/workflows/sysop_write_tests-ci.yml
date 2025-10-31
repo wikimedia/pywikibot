@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.9']
         site: ['wikipedia:test']
         attr: [write and not rights, write and rights, rights and not write]
     steps:

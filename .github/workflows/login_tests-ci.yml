@@ -42,30 +42,30 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        python-version: [pypy3.8, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
+        python-version: [pypy3.9, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
         site: ['wikipedia:en', 'wikisource:zh', 'wikipedia:test']
         include:
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: en
             os: ubuntu-22.04
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
             os: ubuntu-22.04
-          - python-version: '3.9'
+          - python-version: '3.10'
             site: wsbeta:en
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikidata:test
             os: ubuntu-22.04
-          - python-version: '3.10'
+          - python-version: '3.11'
             site: wiktionary:ar
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikidata:wikidata
             os: ubuntu-22.04
-          - python-version: '3.9'
+          - python-version: '3.10'
             site: wowwiki:uk
           - python-version: 3
             site: wikipedia:de
@@ -91,8 +91,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip --version
-          pip install "coverage == 7.6.1; python_version < '3.9'"
-          pip install "coverage >= 7.6.10; python_version > '3.8'"
+          pip install coverage
           pip install "tomli; python_version < '3.11'"
           pip install mwparserfromhell
           pip install packaging

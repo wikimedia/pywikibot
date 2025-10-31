@@ -23,42 +23,35 @@ jobs:
     timeout-minutes: 100
     strategy:
       fail-fast: false
-      max-parallel: 19
       matrix:
-        python-version: [pypy3.10, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: [pypy3.9, pypy3.10, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         site: ['wikipedia:en', 'wikisource:zh']
         include:
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikipedia:test
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: en
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
-          - python-version: '3.9'
-            site: wsbeta:en
-          - python-version: '3.8'
-            site: wikidata:test
           - python-version: '3.10'
+            site: wsbeta:en
+          - python-version: '3.9'
+            site: wikidata:test
+          - python-version: '3.11'
             site: wiktionary:ar
             test_no_rc: true
-          - python-version: '3.8'
-            site: wikidata:wikidata
           - python-version: '3.9'
+            site: wikidata:wikidata
+          - python-version: '3.10'
             site: wowwiki:uk
           - python-version: '3'
             site: wikipedia:de
             os: macOS-latest
-          # ubuntu-22.04 required for pypy3.8 and 3.14-dev due to T382214
-          - python-version: pypy3.8
-            site: wikipedia:en
-            os: ubuntu-22.04
-          - python-version: pypy3.8
-            site: wikisource:zh
-            os: ubuntu-22.04
+          # ubuntu-22.04 required 3.15-dev due to T382214
           - python-version: 3.15-dev
             site: wikipedia:en
             os: ubuntu-22.04

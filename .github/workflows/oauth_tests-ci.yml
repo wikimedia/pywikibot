@@ -22,17 +22,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [pypy3.8, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
+        python-version: [pypy3.9, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
         family: [wikipedia]
         code: [test]
         domain: [test.wikipedia.org]
         include:
-          - python-version: '3.8'
+          - python-version: '3.9'
             family: wpbeta
             code: en
             domain: en.wikipedia.beta.wmcloud.org
             experimental: true
-          - python-version: '3.8'
+          - python-version: '3.9'
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmcloud.org
@@ -71,13 +71,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip --version
-          pip install "coverage == 7.6.1; python_version < '3.9'"
-          pip install "coverage >= 7.6.10; python_version > '3.8'"
+          pip install coverage
           # tomli required for coverage due to T380697
           pip install "tomli; python_version < '3.11'"
           pip install mwparserfromhell
           # PyJWT added due to T380270
-          pip install "PyJWT != 2.10.0, != 2.10.1 ; python_version > '3.8'"
+          pip install "PyJWT != 2.10.0, != 2.10.1"
           pip install mwoauth
           pip install packaging
           pip install requests

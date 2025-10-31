@@ -17,7 +17,7 @@ maintainers = [
     {name = "The Pywikibot team", email = "pywikibot@lists.wikimedia.org"},
 ]
 description = "Python MediaWiki Bot Framework"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 keywords = [
     "API", "bot", "client", "framework", "mediawiki", "pwb", "pybot", "python",
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
@@ -92,7 +92,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
