@@ -30,11 +30,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ar', 'as', 'az', 'ban', 'bcl', 'be', 'bg', 'bn', 'br', 'bs', 'ca',
         'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi',
         'fo', 'fr', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it',
-        'ja', 'jv', 'ka', 'kn', 'ko', 'la', 'li', 'lij', 'lt', 'mad', 'mk',
-        'ml', 'mr', 'ms', 'mul', 'my', 'nap', 'nl', 'no', 'or', 'pa', 'pl',
-        'pms', 'pt', 'ro', 'ru', 'sa', 'sah', 'sk', 'sl', 'sr', 'su', 'sv',
-        'ta', 'tcy', 'te', 'th', 'tl', 'tr', 'uk', 'vec', 'vi', 'wa', 'yi',
-        'zh', 'zh-min-nan',
+        'ja', 'jv', 'ka', 'kn', 'ko', 'la', 'li', 'lij', 'lt', 'mad', 'min',
+        'mk', 'ml', 'mr', 'ms', 'mul', 'my', 'nap', 'nl', 'no', 'or', 'pa',
+        'pl', 'pms', 'pt', 'ro', 'ru', 'sa', 'sah', 'sk', 'sl', 'sr', 'su',
+        'sv', 'ta', 'tcy', 'te', 'th', 'tl', 'tr', 'uk', 'vec', 'vi', 'wa',
+        'yi', 'zh', 'zh-min-nan',
     }
 
     # Sites we want to edit but not count as real languages
