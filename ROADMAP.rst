@@ -1,17 +1,17 @@
-Current Release Changes
-=======================
+Release 11 (in development)
+===========================
 
-* Add support for pcmwikiquote and minwikisource. (:phab:`T408345`, :phab:`T408353`)
-* Deprecate dysfunctional :meth:`APISite.alllinks()
-  <pywikibot.site._generators.GeneratorsMixin.alllinks>`. (:phab:`T359427`, :phab:`T407708`)
-* Refactor ``replace_magicwords`` in
-  :meth:`cosmetic_changes.CosmeticChangesToolkit.translateMagicWords`. (:phab:`T396715`)
-* Deprecate old ``(type, value, traceback)`` signature in
-  :meth:`tools.collections.GeneratorWrapper.throw`. (:phab:`T340641`)
-* Replace default timetravel.mementoweb.org with web.archive.org in :mod:`data.memento` module.
-  (:phab:`T400570`, :phab:`T407694`)
-* i18n updates
+**Improvements**
+* (no changes yet)
 
+**Bugfixes**
+* (no changes yet)
+
+**Code cleanups**
+* (no changes yet)
+
+**Other breaking changes**
+* (no changes yet)
 
 Deprecations
 ============
