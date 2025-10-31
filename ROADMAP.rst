@@ -1,6 +1,7 @@
 Current Release Changes
 =======================
 
+* Add support for pcmwikiquote and minwikisource. (:phab:`T408345`, :phab:`T408353`)
 * Deprecate dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>`. (:phab:`T359427`, :phab:`T407708`)
 * Refactor ``replace_magicwords`` in
