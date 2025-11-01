@@ -45,8 +45,6 @@ if PYTHON_VERSION < (3, 9):
         Iterable,
         Iterator,
         Mapping,
-        Match,
-        Pattern,
         Sequence,
     )
 else:
@@ -59,7 +57,6 @@ else:
         Mapping,
         Sequence,
     )
-    from re import Match, Pattern
 
 if PYTHON_VERSION < (3, 9, 2):
     from typing import Callable

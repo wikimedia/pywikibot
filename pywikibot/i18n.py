@@ -39,7 +39,6 @@ from pywikibot.backports import (
     Iterable,
     Iterator,
     Mapping,
-    Match,
     Sequence,
 )
 from pywikibot.plural import plural_rule
@@ -459,7 +458,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         assert not callable(plural_rule)
         return plural_rule
 
-    def replace_plural(match: Match[str]) -> str:
+    def replace_plural(match: re.Match[str]) -> str:
         selector = match[1]
         variants = match[2]
         num = parameters[selector]

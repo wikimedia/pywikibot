@@ -208,7 +208,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Pattern, pairwise
+from pywikibot.backports import pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -298,7 +298,7 @@ def str2size(string: str) -> tuple[int, str]:
     return val, unit
 
 
-def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
+def template_title_regex(tpl_page: pywikibot.Page) -> re.Pattern:
     """Return a regex that matches to variations of the template title.
 
     It supports the transcluding variant as well as localized namespaces

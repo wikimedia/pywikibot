@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ import threading
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -380,7 +379,7 @@ class BaseSite(ComparableMixin):
         return linkfam != self.family.name or linkcode != self.code
 
     @property
-    def redirect_regex(self) -> Pattern[str]:
+    def redirect_regex(self) -> re.Pattern[str]:
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.

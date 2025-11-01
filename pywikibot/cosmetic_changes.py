@@ -64,7 +64,7 @@ from urllib.parse import urlparse, urlunparse
 
 import pywikibot
 from pywikibot import exceptions, i18n, textlib
-from pywikibot.backports import Callable, Match, Pattern
+from pywikibot.backports import Callable
 from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
@@ -199,7 +199,7 @@ class CANCEL(IntEnum):
     MATCH = 3
 
 
-def _format_isbn_match(match: Match[str], *, strict: bool = True) -> str:
+def _format_isbn_match(match: re.Match[str], *, strict: bool = True) -> str:
     """Helper function to validate and format a single matched ISBN."""
     if not stdnum_isbn:
         raise NotImplementedError(
@@ -501,7 +501,7 @@ class CosmeticChangesToolkit:
             if not cache:
                 cache[False] = True  # signal there is nothing to replace
 
-        def replace_magicword(match: Match[str]) -> str:
+        def replace_magicword(match: re.Match[str]) -> str:
             """Replace magic words in file link params, leaving captions."""
             linktext = match.group()
             if cache.get(False):
@@ -522,7 +522,7 @@ class CosmeticChangesToolkit:
             replaced = '|'.join(cache.get(p.strip(), p) for p in parts)
 
             # extract namespace
-            m = cast(Match[str],
+            m = cast(re.Match[str],
                      re.match(r'\[\[\s*(?P<namespace>[^:]+)\s*:', linktext))
 
             return f'[[{m["namespace"]}:{match["filename"]}{replaced}]]'
@@ -555,7 +555,7 @@ class CosmeticChangesToolkit:
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
-        def handleOneLink(match: Match[str]) -> str:
+        def handleOneLink(match: re.Match[str]) -> str:
             # Convert URL-encoded characters to str
             titleWithSection = url2string(match['titleWithSection'],
                                           encodings=self.site.encodings())
@@ -841,7 +841,7 @@ class CosmeticChangesToolkit:
     # from fixes.py
     def fixSyntaxSave(self, text: str) -> str:
         """Convert weblinks to wikilink, fix link syntax."""
-        def replace_link(match: Match[str]) -> str:
+        def replace_link(match: re.Match[str]) -> str:
             """Create a string to replace a single link."""
             replacement = '[['
             if re.match(
@@ -927,7 +927,7 @@ class CosmeticChangesToolkit:
 
     def fixHtml(self, text: str) -> str:
         """Replace html markups with wikitext markups."""
-        def replace_header(match: Match[str]) -> str:
+        def replace_header(match: re.Match[str]) -> str:
             """Create a header string for replacing."""
             depth = int(match[1])
             return r'{0} {1} {0}'.format('=' * depth, match[2])
@@ -987,7 +987,7 @@ class CosmeticChangesToolkit:
 
     def fixTypo(self, text: str) -> str:
         """Fix units."""
-        exceptions: list[str | Pattern[str]] = [
+        exceptions: list[str | re.Pattern[str]] = [
             'comment',
             'gallery',
             'hyperlink',
@@ -1021,7 +1021,7 @@ class CosmeticChangesToolkit:
         if self.site.code not in ['ckb', 'fa']:
             return text
 
-        exceptions: list[str | Pattern[str]] = [
+        exceptions: list[str | re.Pattern[str]] = [
             'file',
             'gallery',
             'hyperlink',

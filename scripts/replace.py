@@ -175,7 +175,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
-from pywikibot.backports import Generator, Pattern, batched
+from pywikibot.backports import Generator, batched
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars
@@ -879,8 +879,8 @@ def handle_manual() -> list[str]:
 
 
 def handle_sql(sql: str,
-               replacements: list[Pattern],
-               exceptions: list[Pattern]) -> Generator:
+               replacements: list[re.Pattern],
+               exceptions: list[re.Pattern]) -> Generator:
     """Handle default sql query.
 
     .. versionadded:: 7.0

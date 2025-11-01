@@ -18,7 +18,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import login
-from pywikibot.backports import DefaultDict, Iterable, Match
+from pywikibot.backports import DefaultDict, Iterable
 from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.comms import http
 from pywikibot.data import api
@@ -1298,7 +1298,7 @@ class APISite(
         def handle_warning(
             mod: str,
             warning: str
-        ) -> Match[str] | bool | None:
+        ) -> re.Match[str] | bool | None:
             return (mod == 'query' and re.match(
                 r'Unrecognized value for parameter [\'"]meta[\'"]: wikibase',
                 warning))

@@ -16,14 +16,7 @@ from string import digits as _decimalDigits  # noqa: N812
 from typing import TYPE_CHECKING
 
 from pywikibot import Site
-from pywikibot.backports import (
-    Any,
-    Callable,
-    Iterator,
-    Mapping,
-    Pattern,
-    Sequence,
-)
+from pywikibot.backports import Any, Callable, Iterator, Mapping, Sequence
 from pywikibot.site import BaseSite
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
@@ -406,7 +399,7 @@ _escPtrnCache2 = {}
 
 def escapePattern2(
     pattern: str
-) -> tuple[Pattern[str], str, list[decoder_type]]:
+) -> tuple[re.Pattern[str], str, list[decoder_type]]:
     """Convert a string pattern into a regex expression and cache.
 
     Allows matching of any _digitDecoders inside the string. Returns a

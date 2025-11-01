@@ -25,7 +25,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable, Match
+from pywikibot.backports import Callable
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -239,7 +239,8 @@ class Request(MutableMapping, WaitingMixin):
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler: Callable[[str, str], Match[str] | bool | None] | None = None  # noqa: E501
+        self._warning_handler: Callable[
+            [str, str], re.Match[str] | bool | None] | None = None
         self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.

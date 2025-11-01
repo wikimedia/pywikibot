@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Generator, Iterable, Pattern, Sequence
+from pywikibot.backports import Generator, Iterable, Sequence
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.itertools import filter_unique
@@ -28,9 +28,9 @@ if TYPE_CHECKING:
                              list[pywikibot.page.BasePage]]
     PATTERN_STR_OR_SEQ_TYPE = Union[
         str,
-        Pattern[str],
+        re.Pattern[str],
         Sequence[str],
-        Sequence[Pattern[str]],
+        Sequence[re.Pattern[str]],
     ]
 
 
@@ -236,7 +236,7 @@ class RegexFilter:
     """Regex filter."""
 
     @classmethod
-    def __filter_match(cls, regex: Sequence[Pattern[str]],
+    def __filter_match(cls, regex: Sequence[re.Pattern[str]],
                        string: str, quantifier: str) -> bool:
         """Return True if string matches precompiled regex list.
 
@@ -250,7 +250,7 @@ class RegexFilter:
 
     @classmethod
     def __precompile(cls, regex: PATTERN_STR_OR_SEQ_TYPE,
-                     flag: int) -> list[Pattern[str]]:
+                     flag: int) -> list[re.Pattern[str]]:
         """Precompile the regex list if needed."""
         if isinstance(regex, list):
             regex_list = regex
