@@ -1,6 +1,6 @@
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2024
+# (C) Pywikibot team, 2010-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,7 +17,6 @@ from requests import JSONDecodeError
 from requests.exceptions import RequestException
 
 import pywikibot
-from pywikibot.backports import removesuffix
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import ClientError, ServerError
 from pywikibot.tools import MediaWikiVersion
@@ -42,7 +41,7 @@ class MWSite:
         :raises RuntimeError: Version not found or version less than
             1.31
         """
-        fromurl = removesuffix(fromurl, '$1')
+        fromurl = fromurl.removesuffix('$1')
 
         r = fetch(fromurl, **kwargs)
         check_response(r)

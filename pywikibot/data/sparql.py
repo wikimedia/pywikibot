@@ -14,7 +14,7 @@ from requests import JSONDecodeError
 from requests.exceptions import Timeout
 
 from pywikibot import Site
-from pywikibot.backports import Dict, removeprefix
+from pywikibot.backports import Dict
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import Error, NoUsernameError, ServerError
@@ -239,7 +239,8 @@ class URI(SparqlNode):
         :return: ID of Wikibase object, e.g. Q1234
         """
         if self.value.startswith(self.entity_url):
-            return removeprefix(self.value, self.entity_url)
+            return self.value.removeprefix(self.entity_url)
+
         return None
 
     def __repr__(self) -> str:

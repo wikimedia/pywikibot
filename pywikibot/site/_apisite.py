@@ -20,7 +20,6 @@ import pywikibot
 from pywikibot import login
 from pywikibot.backports import DefaultDict, Iterable, Match
 from pywikibot.backports import OrderedDict as OrderedDictType
-from pywikibot.backports import removesuffix
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -228,7 +227,7 @@ class APISite(
                     if m_site['dbname'] == dbname:
                         # extract site from dbname
                         family = m_site['code']
-                        code = removesuffix(dbname, family).replace('_', '-')
+                        code = dbname.removesuffix(family).replace('_', '-')
                         if family == 'wiki':
                             family = 'wikipedia'
                         return pywikibot.Site(code, family)
@@ -1772,7 +1771,7 @@ class APISite(
 
         user_tokens = {}
         if data.get('tokens'):
-            user_tokens = {removesuffix(key, 'token'): val
+            user_tokens = {key.removesuffix('token'): val
                            for key, val in data['tokens'].items()
                            if val != '+\\'}
 

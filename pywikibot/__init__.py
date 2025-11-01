@@ -30,7 +30,7 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
-from pywikibot.backports import Callable, cache, removesuffix
+from pywikibot.backports import Callable, cache
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -111,8 +111,7 @@ def _code_fam_from_url(url: str, name: str | None = None) -> tuple[str, str]:
 
     if not matched_sites:
         if not name:  # create a name from url
-            name = urlparse(url).netloc.split('.')[-2]
-            name = removesuffix(name, 'wiki')
+            name = urlparse(url).netloc.split('.')[-2].removesuffix('wiki')
         family = AutoFamily(name, url)
         matched_sites.append((family.code, family))
 

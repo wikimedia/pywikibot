@@ -25,7 +25,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable, Match, removeprefix
+from pywikibot.backports import Callable, Match
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -945,7 +945,7 @@ but {scheme!r} is required. Please add the following code to your family file:
             return False
 
         # T154011
-        class_name = code if code == 'readonly' else removeprefix(code, iae)
+        class_name = code if code == 'readonly' else code.removeprefix(iae)
 
         del error['code']  # is added via class_name
         e = pywikibot.exceptions.APIMWError(class_name, **error)

@@ -56,12 +56,7 @@ from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import (
-    DefaultDict,
-    Mapping,
-    removeprefix,
-    removesuffix,
-)
+from pywikibot.backports import DefaultDict, Mapping
 from pywikibot.logging import error, info, warning
 
 
@@ -338,7 +333,7 @@ def get_base_dir(test_directory: str | None = None,
     base_dir = ''
     for arg in sys.argv[1:]:
         if arg.startswith('-dir:'):
-            base_dir = removeprefix(arg, '-dir:')
+            base_dir = arg.removeprefix('-dir:')
             base_dir = os.path.expanduser(base_dir)
             break
     else:
@@ -440,7 +435,7 @@ def register_families_folder(folder_path: str,
     if os.path.isdir(folder_path):
         for file_name in os.listdir(folder_path):
             if file_name.endswith(suffix):
-                family_name = removesuffix(file_name, suffix)
+                family_name = file_name.removesuffix(suffix)
                 family_files[family_name] = os.path.join(folder_path,
                                                          file_name)
         return
@@ -462,7 +457,7 @@ def register_families_folder(folder_path: str,
     for file_name in zip_file.namelist():
         if file_name.endswith(suffix):
             file_path = Path(file_name)
-            family_name = removesuffix(file_path.name, suffix)
+            family_name = file_path.name.removesuffix(suffix)
             family_files[family_name] = os.path.join(folder_path,
                                                      file_path.name)
 

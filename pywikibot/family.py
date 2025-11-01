@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, NoReturn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
+from pywikibot.backports import DefaultDict, Mapping, Sequence
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
@@ -1195,7 +1195,7 @@ def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     def scriptpath(self, code):
         """Extract the script path from the URL."""
         if self.url.path.endswith('/api.php'):
-            return removesuffix(self.url.path, '/api.php')
+            return self.url.path.removesuffix('/api.php')
 
         # AutoFamily refers to the variable set below, not the function
         # but the reference must be given here

@@ -36,7 +36,7 @@ The following parameters are supported:
    *-category* option was added.
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,7 +48,6 @@ import re
 from difflib import get_close_matches
 
 import pywikibot
-from pywikibot.backports import removeprefix
 from pywikibot.bot import (
     AutomaticTWSummaryBot,
     ConfigParserBot,
@@ -232,7 +231,7 @@ def main(*args: str) -> None:
     local_args = pywikibot.handle_args()
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        opt = removeprefix(opt, '-')
+        opt = opt.removeprefix('-')
         if opt == 'localonly':
             options[opt] = True
         elif opt == 'category':

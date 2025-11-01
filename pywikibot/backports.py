@@ -81,47 +81,6 @@ if PYTHON_VERSION < (3, 9, 2):
 else:
     from collections.abc import Callable
 
-
-# PEP 616 string methods
-if PYTHON_VERSION < (3, 9) or SPHINX_RUNNING:
-    def removeprefix(string: str, prefix: str) -> str:  # skipcq: TYP-053
-        """Remove prefix from a string or return a copy otherwise.
-
-        >>> removeprefix('TestHook', 'Test')
-        'Hook'
-        >>> removeprefix('BaseTestCase', 'Test')
-        'BaseTestCase'
-
-        .. seealso:: :python:`str.removeprefix
-           <library/stdtypes.html#str.removeprefix>`,
-           backported from Python 3.9.
-        .. versionadded:: 5.4
-        """
-        if string.startswith(prefix):
-            return string[len(prefix):]
-        return string
-
-    def removesuffix(string: str, suffix: str) -> str:  # skipcq: TYP-053
-        """Remove suffix from a string or return a copy otherwise.
-
-        >>> removesuffix('MiscTests', 'Tests')
-        'Misc'
-        >>> removesuffix('TmpDirMixin', 'Tests')
-        'TmpDirMixin'
-
-        .. seealso:: :python:`str.removesuffix
-           <library/stdtypes.html#str.removesuffix>`,
-           backported from Python 3.9.
-        .. versionadded:: 5.4
-        """
-        if string.endswith(suffix):
-            return string[:-len(suffix)]
-        return string
-else:
-    removeprefix = str.removeprefix  # type: ignore[assignment]
-    removesuffix = str.removesuffix  # type: ignore[assignment]
-
-
 if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
     from itertools import tee
 

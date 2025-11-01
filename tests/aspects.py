@@ -27,7 +27,7 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import Iterable, Iterator, removeprefix, removesuffix
+from pywikibot.backports import Iterable, Iterator
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -859,7 +859,7 @@ class MetaTestCaseClass(type):
             # sitedata['family'] may be an AutoFamily. Use str() for its name
             sitename = str(sitedata['family']) + ':' + sitedata['code']
             if func.__doc__:
-                wrapped_method.__doc__ = removesuffix(func.__doc__, '.')
+                wrapped_method.__doc__ = func.__doc__.removesuffix('.')
                 wrapped_method.__doc__ += ' on ' + sitename
             else:
                 wrapped_method.__doc__ = 'Test ' + sitename  # pragma: no cover
@@ -1185,7 +1185,7 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
             return self._mainpage
 
         maintitle = site.siteinfo['mainpage']
-        maintitle = removeprefix(maintitle, 'Special:MyLanguage/')  # T278702
+        maintitle = maintitle.removeprefix('Special:MyLanguage/')  # T278702
         mainpage = pywikibot.Page(site, maintitle)
         if not isinstance(site, DrySite) and mainpage.isRedirectPage():
             mainpage = mainpage.getRedirectTarget()  # pragma: no cover

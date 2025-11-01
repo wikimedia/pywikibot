@@ -122,7 +122,6 @@ import requests
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
-from pywikibot.backports import removeprefix
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import (
     IsRedirectPageError,
@@ -568,7 +567,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                 # use hostname as thread.name
                 hostname = urlparse.urlparse(url).hostname
                 if hostname is not None:
-                    thread.name = removeprefix(hostname, 'www.')
+                    thread.name = hostname.removeprefix('www.')
                 self.threads.append(thread)
 
     def teardown(self) -> None:
