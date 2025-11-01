@@ -56,12 +56,12 @@ from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import DefaultDict, Mapping
+from pywikibot.backports import Mapping
 from pywikibot.logging import error, info, warning
 
 
 if TYPE_CHECKING:
-    _DabComDict = DefaultDict[str, dict[str, str]]
+    _DabComDict = collections.defaultdict[str, dict[str, str]]
 
 _ValueType = TypeVar('_ValueType')
 

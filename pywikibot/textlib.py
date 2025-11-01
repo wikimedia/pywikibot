@@ -18,7 +18,6 @@ from typing import NamedTuple
 
 import pywikibot
 from pywikibot.backports import Callable, Container, Iterable
-from pywikibot.backports import OrderedDict as OrderedDictType
 from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import pairwise
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
@@ -2018,7 +2017,7 @@ def extract_templates_and_params(
     text: str,
     remove_disabled_parts: bool = False,
     strip: bool = False,
-) -> list[tuple[str, OrderedDictType[str, str]]]:
+) -> list[tuple[str, OrderedDict[str, str]]]:
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a

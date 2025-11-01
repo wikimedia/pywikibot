@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, NoReturn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import DefaultDict, Mapping, Sequence
+from pywikibot.backports import Mapping, Sequence
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
@@ -31,7 +31,7 @@ from pywikibot.tools import classproperty, deprecated
 logger = logging.getLogger('pywiki.wiki.family')
 
 if TYPE_CHECKING:
-    CrossnamespaceType = DefaultDict[str, dict[str, list[int]]]
+    CrossnamespaceType = collections.defaultdict[str, dict[str, list[int]]]
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits

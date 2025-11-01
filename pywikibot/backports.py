@@ -23,24 +23,10 @@ from typing import TYPE_CHECKING, Any
 PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
 SPHINX_RUNNING: bool = 'sphinx' in sys.modules
 
-# typing
-if PYTHON_VERSION < (3, 9):
-    from typing import DefaultDict  # type: ignore[misc]
-else:
-    from collections import (  # type: ignore[misc] # noqa: N812
-        defaultdict as DefaultDict,
-    )
-
-
-if PYTHON_VERSION < (3, 9):
-    from typing import OrderedDict
-else:
-    from collections import OrderedDict
 
 if PYTHON_VERSION < (3, 9):
     from typing import (
         Container,
-        Counter,
         Generator,
         Iterable,
         Iterator,
@@ -48,7 +34,6 @@ if PYTHON_VERSION < (3, 9):
         Sequence,
     )
 else:
-    from collections import Counter
     from collections.abc import (
         Container,
         Generator,

@@ -26,7 +26,6 @@ from typing import NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Counter as CounterType
 from pywikibot.tools import deprecated, deprecated_args, deprecated_signature
 
 
@@ -92,7 +91,7 @@ class Throttle:
         self.retry_after = 0  # set by http.request
         self.delay = 0
         self.checktime = 0.0
-        self.modules: CounterType[str] = Counter()
+        self.modules: Counter[str] = Counter()
 
         self.checkMultiplicity()
         self.set_delays()

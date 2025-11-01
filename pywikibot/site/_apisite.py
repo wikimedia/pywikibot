@@ -18,8 +18,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import login
-from pywikibot.backports import DefaultDict, Iterable
-from pywikibot.backports import OrderedDict as OrderedDictType
+from pywikibot.backports import Iterable
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -90,7 +89,7 @@ if TYPE_CHECKING:
 
 __all__ = ('APISite', )
 
-_mw_msg_cache: DefaultDict[str, dict[str, str]] = defaultdict(dict)
+_mw_msg_cache: defaultdict[str, dict[str, str]] = defaultdict(dict)
 
 
 class _OnErrorExc(NamedTuple):
@@ -963,7 +962,7 @@ class APISite(
         self,
         keys: Iterable[str],
         lang: str | None = None
-    ) -> OrderedDictType[str, str]:
+    ) -> OrderedDict[str, str]:
         """Fetch the text of a set of MediaWiki messages.
 
         The returned dict uses each key to store the associated message.
