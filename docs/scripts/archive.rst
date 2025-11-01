@@ -61,6 +61,20 @@ The program expects a generator of category titles to be used
 as suffix for creating new categories with a different base.
 
 
+create_isbn_edition
+===================
+
+**Pywikibot client to load ISBN linked data into Wikidata**
+
+Pywikibot script to get ISBN data from a digital library, and create or
+amend the related Wikidata item for edition (with the
+:samp:`P212, {ISBN number}` as unique external ID).
+
+.. versionremoved:: 11.0
+   An external version of this script can be found in the
+   `geertivp/Pywikibot <https://github.com/geertivp/Pywikibot>`_ script
+   collection. See :phab:`T398140` for details.
+
 dataextend script
 =================
 

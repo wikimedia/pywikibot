@@ -21,7 +21,6 @@ coverage:
   ignore:
     - pywikibot/daemonize.py
     - pywikibot/families/__init__.py
-    - scripts/create_isbn_edition.py
     - scripts/userscripts/
     - tests/pwb/
   notify:

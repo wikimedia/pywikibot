@@ -70,8 +70,7 @@ def list_scripts(path: str, exclude: str = '') -> list[str]:
     ]
 
 
-script_list = framework_scripts + list_scripts(scripts_path,
-                                               'create_isbn_edition')
+script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
     'category_redirect': 'q\nn\n',

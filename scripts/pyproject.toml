@@ -20,11 +20,9 @@ readme = "scripts/README.rst"
 requires-python = ">=3.9.0"
 dependencies = [
     "pywikibot >= 11.0.0",
-    "isbnlib",
     "langdetect",
     "mwparserfromhell",
     "pydot",
-    "unidecode",
 ]
 
 keywords = [

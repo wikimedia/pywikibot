@@ -9,13 +9,6 @@ claimit script
    :no-members:
    :noindex:
 
-create\_isbn\_edition script
-============================
-
-.. automodule:: scripts.create_isbn_edition
-   :no-members:
-   :noindex:
-
 harvest\_template script
 ========================
 

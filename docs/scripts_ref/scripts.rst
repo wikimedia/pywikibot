@@ -79,10 +79,6 @@ cosmetic\_changes script
 
 .. automodule:: scripts.cosmetic_changes
 
-create\_isbn\_edition script
-============================
-
-.. automodule:: scripts.create_isbn_edition
 
 data\_ingestion script
 ======================

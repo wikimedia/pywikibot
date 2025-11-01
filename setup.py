@@ -67,7 +67,6 @@ extra_deps = {
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
-    'create_isbn_edition.py': ['isbnlib', 'unidecode'],
     'weblinkchecker.py': extra_deps['memento'],
 }
 
