@@ -15,8 +15,7 @@
 from __future__ import annotations
 
 import re
-import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from pywikibot.tools import PYTHON_VERSION, SPHINX_RUNNING
 
@@ -44,8 +43,8 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         return zip(a, b)
 
 elif not TYPE_CHECKING:
-    from itertools import pairwise
-    from types import NoneType
+    from itertools import pairwise  # noqa: F401
+    from types import NoneType  # noqa: F401
 
 
 # gh-98363
