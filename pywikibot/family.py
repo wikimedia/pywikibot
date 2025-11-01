@@ -14,6 +14,7 @@ import sys
 import types
 import urllib.parse as urlparse
 import warnings
+from collections.abc import Mapping, Sequence
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
@@ -22,7 +23,6 @@ from typing import TYPE_CHECKING, NoReturn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Mapping, Sequence
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated

@@ -14,7 +14,6 @@ from itertools import chain
 from types import TracebackType
 from typing import Any, NamedTuple
 
-from pywikibot.backports import Generator as GeneratorType
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.tools import (
     PYTHON_VERSION,
@@ -258,7 +257,7 @@ class GeneratorWrapper(ABC, Generator):
 
     @property
     @abstractmethod
-    def generator(self) -> GeneratorType[Any, Any, Any]:
+    def generator(self) -> Generator[Any, Any, Any]:
         """Abstract generator property."""
         yield from ()
 
@@ -276,7 +275,7 @@ class GeneratorWrapper(ABC, Generator):
 
         :raises TypeError: generator property is not a generator
         """
-        if not isinstance(self.generator, GeneratorType):
+        if not isinstance(self.generator, Generator):
             raise TypeError('generator property is not a generator but '
                             f'{type(self.generator).__name__}')
         if not hasattr(self, '_started_gen'):

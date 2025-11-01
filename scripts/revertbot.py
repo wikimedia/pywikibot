@@ -46,7 +46,7 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Container
+from collections.abc import Container
 from pywikibot.bot import OptionHandler
 from pywikibot.date import format_date, formatYear
 from pywikibot.exceptions import APIError, Error

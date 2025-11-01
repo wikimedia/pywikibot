@@ -109,7 +109,7 @@ is already there:
    the -inverse option.
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of MIT license.
 #
@@ -124,7 +124,7 @@ import pywikibot
 from pywikibot import WbTime
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from pywikibot.backports import Generator
+from collections.abc import Generator
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
     APIError,
@@ -384,7 +384,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         site: pywikibot.site.BaseSite,
         item: pywikibot.page.ItemPage,
         field: str,
-    ) -> Generator[pywikibot.ItemPage, None, None]:
+    ) -> Generator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
 
         .. versionadded:: 7.5
@@ -415,7 +415,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     def handle_time(self, value: str,
                     site: pywikibot.site.BaseSite,
-                    *args) -> Generator[WbTime, None, None]:
+                    *args) -> Generator[WbTime]:
         """Handle 'time' claim type.
 
         .. versionadded:: 7.5
@@ -469,7 +469,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         yield WbTime.fromWikibase(out, self.repo)
 
     @staticmethod
-    def handle_string(value: str, *args) -> Generator[str, None, None]:
+    def handle_string(value: str, *args) -> Generator[str]:
         """Handle 'string' and 'external-id' claim type.
 
         .. versionadded:: 7.5
@@ -478,7 +478,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     handle_external_id = handle_string
 
-    def handle_url(self, value, *args) -> Generator[str, None, None]:
+    def handle_url(self, value, *args) -> Generator[str]:
         """Handle 'url' claim type.
 
         .. versionadded:: 7.5
@@ -491,7 +491,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
         value,
         site,
         *args,
-    ) -> Generator[pywikibot.FilePage, None, None]:
+    ) -> Generator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
         .. versionadded:: 7.5

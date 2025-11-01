@@ -20,6 +20,7 @@ import collections.abc
 import json
 import re
 import time
+from collections.abc import Callable, Iterable, Sequence
 from functools import partial
 from http import HTTPStatus
 from typing import Any
@@ -30,7 +31,7 @@ from requests.exceptions import ReadTimeout
 
 import pywikibot
 from pywikibot import textlib
-from pywikibot.backports import Callable, Iterable, Sequence, pairwise
+from pywikibot.backports import pairwise
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError

@@ -181,6 +181,7 @@ import locale
 import pickle
 import re
 import time
+from collections.abc import Generator
 from contextlib import suppress
 from datetime import timedelta
 from enum import Enum
@@ -189,7 +190,6 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Generator  # skipcq: PY-W2000
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
 
@@ -715,7 +715,7 @@ class WelcomeBot(SingleSiteBot):
         self.welcomed_users = []
 
     @property
-    def generator(self) -> Generator[pywikibot.User, None, None]:
+    def generator(self) -> Generator[pywikibot.User]:
         """Retrieve new users."""
         while True:
             if globalvar.timeoffset != 0:

@@ -57,6 +57,7 @@ or by adding a list to the given one::
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from contextlib import suppress
 from enum import IntEnum
 from typing import Any, cast
@@ -64,7 +65,6 @@ from urllib.parse import urlparse, urlunparse
 
 import pywikibot
 from pywikibot import exceptions, i18n, textlib
-from pywikibot.backports import Callable
 from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string

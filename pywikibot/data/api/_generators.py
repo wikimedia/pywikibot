@@ -12,13 +12,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable
 from contextlib import suppress
 from typing import Any
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable, Iterable
 from pywikibot.exceptions import (
     Error,
     InvalidTitleError,

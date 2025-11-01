@@ -6,8 +6,9 @@
 #
 from __future__ import annotations
 
+from collections.abc import Generator
+
 import pywikibot
-from pywikibot.backports import Generator
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -324,11 +325,7 @@ class User(Page):
         self,
         total: int | None = 500,
         **kwargs
-    ) -> Generator[
-        tuple[Page, int, pywikibot.Timestamp, str | None],
-        None,
-        None
-    ]:
+    ) -> Generator[tuple[Page, int, pywikibot.Timestamp, str | None]]:
         """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object, the revision
@@ -405,7 +402,7 @@ class User(Page):
         *,
         total: int | None = 500,
         **kwargs,
-    ) -> Generator[tuple[Page, Revision], None, None]:
+    ) -> Generator[tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
         .. versionadded:: 5.5

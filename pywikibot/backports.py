@@ -18,35 +18,12 @@ import re
 import sys
 from typing import TYPE_CHECKING, Any
 
-
-# Placed here to omit circular import in tools
-PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
-SPHINX_RUNNING: bool = 'sphinx' in sys.modules
+from pywikibot.tools import PYTHON_VERSION, SPHINX_RUNNING
 
 
-if PYTHON_VERSION < (3, 9):
-    from typing import (
-        Container,
-        Generator,
-        Iterable,
-        Iterator,
-        Mapping,
-        Sequence,
-    )
-else:
-    from collections.abc import (
-        Container,
-        Generator,
-        Iterable,
-        Iterator,
-        Mapping,
-        Sequence,
-    )
+if TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable
 
-if PYTHON_VERSION < (3, 9, 2):
-    from typing import Callable
-else:
-    from collections.abc import Callable
 
 if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
     from itertools import tee

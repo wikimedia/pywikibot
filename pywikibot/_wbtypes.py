@@ -11,14 +11,13 @@ import datetime
 import json
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from contextlib import suppress
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import exceptions
-from pywikibot.backports import Iterator
 from pywikibot.time import Timestamp
 from pywikibot.tools import (
     deprecated_signature,

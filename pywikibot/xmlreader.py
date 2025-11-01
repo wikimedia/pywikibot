@@ -28,7 +28,8 @@ try:
 except ImportError:
     from xml.etree.ElementTree import iterparse, ParseError
 
-from pywikibot.backports import Callable, Iterator
+from collections.abc import Callable, Iterator
+
 from pywikibot.tools import (
     ModuleDeprecationWrapper,
     issue_deprecation_warning,

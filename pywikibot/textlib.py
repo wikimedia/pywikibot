@@ -10,15 +10,13 @@ import itertools
 import re
 import sys
 from collections import OrderedDict
-from collections.abc import Sequence
+from collections.abc import Callable, Container, Iterable, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
 from html.parser import HTMLParser
 from typing import NamedTuple
 
 import pywikibot
-from pywikibot.backports import Callable, Container, Iterable
-from pywikibot.backports import Sequence as SequenceType
 from pywikibot.backports import pairwise
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
@@ -141,7 +139,7 @@ def to_local_digits(phrase: str | int, lang: str) -> str:
 
 
 def to_ascii_digits(phrase: str,
-                    langs: SequenceType[str] | str | None = None) -> str:
+                    langs: Sequence[str] | str | None = None) -> str:
     """Change non-ascii digits to ascii digits.
 
     .. versionadded:: 7.0
@@ -382,7 +380,7 @@ def get_regexes(
 def replaceExcept(text: str,
                   old: str | re.Pattern[str],
                   new: str | Callable[[re.Match[str]], str],
-                  exceptions: SequenceType[str | re.Pattern[str]],
+                  exceptions: Sequence[str | re.Pattern[str]],
                   caseInsensitive: bool = False,
                   allowoverlap: bool = False,
                   marker: str = '',

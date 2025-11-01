@@ -18,7 +18,7 @@ import time
 import types
 import unittest
 import warnings
-from collections.abc import Sized
+from collections.abc import Iterable, Iterator, Sized
 from contextlib import contextmanager, suppress
 from functools import wraps
 from http import HTTPStatus
@@ -27,7 +27,6 @@ from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
-from pywikibot.backports import Iterable, Iterator
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (

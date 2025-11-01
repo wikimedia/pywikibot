@@ -83,7 +83,7 @@ from pathlib import Path
 
 import pywikibot
 from pywikibot import config, i18n
-from pywikibot.backports import Generator
+from collections.abc import Generator
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.collections import GeneratorWrapper
@@ -231,7 +231,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         return page_regex, title_regex
 
     @property
-    def generator(self) -> Generator[pywikibot.Page, None, None]:
+    def generator(self) -> Generator[pywikibot.Page]:
         """Read file and yield a page with content from file.
 
         content is stored as a page attribute defined by CTX_ATTR.

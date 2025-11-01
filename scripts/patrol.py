@@ -48,13 +48,13 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
+from collections.abc import Container
 from contextlib import suppress
 
 import mwparserfromhell
 
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot.backports import Container
 from pywikibot.bot import BaseBot, suggest_help
 from pywikibot.site import Namespace
 

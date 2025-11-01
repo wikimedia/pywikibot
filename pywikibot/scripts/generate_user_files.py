@@ -17,11 +17,11 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from textwrap import fill
 from typing import NamedTuple
 
-from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
 
 

@@ -15,7 +15,7 @@ import pprint
 import re
 import sys
 import traceback
-from collections.abc import MutableMapping
+from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
@@ -25,7 +25,6 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (

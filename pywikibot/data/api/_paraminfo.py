@@ -6,12 +6,12 @@
 #
 from __future__ import annotations
 
-from collections.abc import Container, Sized
+from collections.abc import Container, Iterable, Sized
 from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, batched
+from pywikibot.backports import batched
 from pywikibot.tools import (
     classproperty,
     deprecated,

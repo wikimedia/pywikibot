@@ -26,11 +26,11 @@ Command line options:
 #
 from __future__ import annotations
 
+from collections.abc import Generator
 from itertools import chain
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import Generator
 
 
 try:

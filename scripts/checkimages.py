@@ -84,12 +84,12 @@ from __future__ import annotations
 import collections
 import re
 import time
+from collections.abc import Generator
 from itertools import zip_longest
 
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot import pagegenerators as pg
-from pywikibot.backports import Generator
 from pywikibot.bot import suggest_help
 from pywikibot.exceptions import (
     EditConflictError,

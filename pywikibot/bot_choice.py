@@ -8,11 +8,11 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
+from collections.abc import Iterable, Mapping, Sequence
 from textwrap import fill
 from typing import TYPE_CHECKING
 
 import pywikibot
-from pywikibot.backports import Iterable, Mapping, Sequence
 
 
 __all__ = (

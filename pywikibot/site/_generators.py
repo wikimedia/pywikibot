@@ -9,12 +9,13 @@ from __future__ import annotations
 import heapq
 import itertools
 import typing
+from collections.abc import Callable, Generator, Iterable
 from contextlib import suppress
 from itertools import zip_longest
 from typing import Any
 
 import pywikibot
-from pywikibot.backports import Callable, Generator, Iterable, batched
+from pywikibot.backports import batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -67,7 +68,7 @@ class GeneratorsMixin:
     def load_pages_from_pageids(
         self,
         pageids: str | Iterable[int | str],
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.Page]:
         """Return a page generator from pageids.
 
         Pages are iterated in the same order than in the underlying
@@ -131,7 +132,7 @@ class GeneratorsMixin:
         categories: bool = False,
         content: bool = True,
         quiet: bool = True,
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.Page]:
         """Return a generator to a list of preloaded pages.
 
         Pages are iterated in the same order than in the underlying
@@ -425,7 +426,7 @@ class GeneratorsMixin:
         follow_redirects: bool = False,
         total: int | None = None,
         content: bool = False,
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.Page]:
         """Yield internal wikilinks contained (or transcluded) on page.
 
         .. seealso::
@@ -875,7 +876,7 @@ class GeneratorsMixin:
         total: int | None = None,
         include_obsolete: bool = False,
         include_empty_titles: bool = False,
-    ) -> Generator[pywikibot.Link, None, None]:
+    ) -> Generator[pywikibot.Link]:
         """Yield all interlanguage links on page, yielding Link objects.
 
         .. versionchanged:: 6.2:
@@ -913,7 +914,7 @@ class GeneratorsMixin:
         page: pywikibot.Page,
         *,
         total: int | None = None,
-    ) -> Generator[str, None, None]:
+    ) -> Generator[str]:
         """Yield all external links on page, yielding URL strings.
 
         .. seealso:: :api:`Extlinks`
@@ -1021,7 +1022,7 @@ class GeneratorsMixin:
         unique: bool = False,
         fromids: bool = False,
         total: int | None = None,
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.Page]:
         """Iterate all links to pages (which need not exist) in one namespace.
 
         .. note:: In practice, links that were found on pages that have
@@ -1142,7 +1143,7 @@ class GeneratorsMixin:
     def botusers(
         self,
         total: int | None = None,
-    ) -> Generator[dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any]]:
         """Iterate bot users.
 
         Iterated values are dicts containing 'name', 'userid',
@@ -1780,7 +1781,7 @@ class GeneratorsMixin:
         content: bool = False,
         total: int | None = None,
         **kwargs,
-    ) -> Generator[dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any]]:
         """Iterate deleted revisions.
 
         Each value returned by the iterator will be a dict containing the
@@ -1853,7 +1854,7 @@ class GeneratorsMixin:
         content: bool = False,
         total: int | None = None,
         **kwargs,
-    ) -> Generator[dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any]]:
         """Yield all deleted revisions.
 
         .. seealso:: :api:`Alldeletedrevisions`
@@ -1977,7 +1978,7 @@ class GeneratorsMixin:
         revision: pywikibot.page.Revision
         | Iterable[pywikibot.page.Revision]
         | None = None,
-    ) -> Generator[dict[str, int | str], None, None]:
+    ) -> Generator[dict[str, int | str]]:
         """Return a generator of patrolled pages.
 
         .. seealso:: :api:`Patrol`
@@ -2070,8 +2071,8 @@ class GeneratorsMixin:
         namespaces: NamespaceArgType = None,
         total: int | None = None,
     ) -> (
-        Generator[tuple[pywikibot.Page, dict[str, Any]], None, None]
-        | Generator[tuple[pywikibot.Page, str, int, str, str, str], None, None]
+        Generator[tuple[pywikibot.Page, dict[str, Any]]]
+        | Generator[tuple[pywikibot.Page, str, int, str, str, str]]
     ):
         """Yield new articles (as Page objects) from recent changes.
 
@@ -2139,7 +2140,7 @@ class GeneratorsMixin:
     def longpages(
         self,
         total: int | None = None,
-    ) -> Generator[tuple[pywikibot.Page, int], None, None]:
+    ) -> Generator[tuple[pywikibot.Page, int]]:
         """Yield Pages and lengths from Special:Longpages.
 
         Yields a tuple of Page object, length(int).
@@ -2156,7 +2157,7 @@ class GeneratorsMixin:
     def shortpages(
         self,
         total: int | None = None,
-    ) -> Generator[tuple[pywikibot.Page, int], None, None]:
+    ) -> Generator[tuple[pywikibot.Page, int]]:
         """Yield Pages and lengths from Special:Shortpages.
 
         Yields a tuple of Page object, length(int).
@@ -2183,7 +2184,7 @@ class GeneratorsMixin:
     def ancientpages(
         self,
         total: int | None = None,
-    ) -> Generator[tuple[pywikibot.Page, pywikibot.Timestamp], None, None]:
+    ) -> Generator[tuple[pywikibot.Page, pywikibot.Timestamp]]:
         """Yield Pages, datestamps from Special:Ancientpages.
 
         :param total: number of pages to return

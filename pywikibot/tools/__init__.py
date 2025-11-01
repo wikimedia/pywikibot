@@ -14,6 +14,8 @@ import os
 import re
 import stat
 import subprocess
+import sys
+from collections.abc import Callable
 from contextlib import suppress
 from functools import total_ordering, wraps
 from types import TracebackType
@@ -23,7 +25,6 @@ from warnings import catch_warnings, showwarning, warn
 import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import PYTHON_VERSION, SPHINX_RUNNING, Callable
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -85,6 +86,9 @@ __all__ = (
     'compute_file_hash',
     'cached',
 )
+
+PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
+SPHINX_RUNNING: bool = 'sphinx' in sys.modules
 
 
 def is_ip_address(value: str) -> bool:

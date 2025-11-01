@@ -4,7 +4,7 @@
    from other partially external modules.
 """
 #
-# (C) Pywikibot team, 2004-2023
+# (C) Pywikibot team, 2004-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,13 +14,13 @@ import os
 import shlex
 import subprocess
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
 from sys import platform
 from textwrap import fill
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Sequence
 
 
 try:

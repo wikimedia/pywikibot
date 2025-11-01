@@ -74,7 +74,7 @@ from pathlib import Path
 
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
-from pywikibot.backports import Sequence
+from collections.abc import Sequence
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 

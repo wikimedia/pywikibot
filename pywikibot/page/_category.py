@@ -7,10 +7,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Generator
 from typing import Any
 
 import pywikibot
-from pywikibot.backports import Generator
 from pywikibot.page._page import Page
 
 
@@ -61,7 +61,7 @@ class Category(Page):
 
     def subcategories(self, *,
                       recurse: int | bool = False,
-                      **kwargs: Any) -> Generator[Category, None, None]:
+                      **kwargs: Any) -> Generator[Category]:
         """Yield all subcategories of the current category.
 
         **Usage:**
@@ -136,7 +136,7 @@ class Category(Page):
     def articles(self, *,
                  recurse: int | bool = False,
                  total: int | None = None,
-                 **kwargs: Any) -> Generator[Page, None, None]:
+                 **kwargs: Any) -> Generator[Page]:
         """Yield all articles in the current category.
 
         Yields all pages in the category that are not subcategories.
@@ -202,7 +202,7 @@ class Category(Page):
     def members(self, *,
                 recurse: int | bool = False,
                 total: int | None = None,
-                **kwargs: Any) -> Generator[Page, None, None]:
+                **kwargs: Any) -> Generator[Page]:
         """Yield all category contents (subcats, pages, and files).
 
         **Usage:**
@@ -288,7 +288,7 @@ class Category(Page):
     def newest_pages(
         self,
         total: int | None = None
-    ) -> Generator[Page, None, None]:
+    ) -> Generator[Page]:
         """Return pages in a category ordered by the creation date.
 
         If two or more pages are created at the same time, the pages are

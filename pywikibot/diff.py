@@ -9,13 +9,13 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
+from collections.abc import Iterable, Sequence
 from difflib import _format_range_unified  # type: ignore[attr-defined]
 from difflib import SequenceMatcher
 from heapq import nlargest
 from itertools import zip_longest
 
 import pywikibot
-from pywikibot.backports import Iterable, Sequence
 from pywikibot.tools import chars
 
 

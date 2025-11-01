@@ -6,19 +6,19 @@ This module includes objects:
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+from collections.abc import Iterable
 from http import HTTPStatus
 from os import PathLike
 from pathlib import Path
 from urllib.parse import urlparse
 
 import pywikibot
-from pywikibot.backports import Iterable
 from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._page import Page

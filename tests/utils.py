@@ -12,6 +12,7 @@ import sys
 import tempfile
 import unittest
 import warnings
+from collections.abc import Sequence
 from contextlib import contextmanager, suppress
 from pathlib import Path
 from subprocess import PIPE, Popen, TimeoutExpired
@@ -19,7 +20,6 @@ from typing import Any, NoReturn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Sequence
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError

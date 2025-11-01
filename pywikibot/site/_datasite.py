@@ -9,12 +9,13 @@ from __future__ import annotations
 import datetime
 import json
 import uuid
+from collections.abc import Generator, Iterable
 from contextlib import suppress
 from typing import Any
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Generator, Iterable, batched
+from pywikibot.backports import batched
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
@@ -196,7 +197,7 @@ class DataSite(APISite):
         pagelist: Iterable[pywikibot.page.WikibaseEntity
                            | pywikibot.page.Page],
         groupsize: int = 50
-    ) -> Generator[pywikibot.page.WikibaseEntity, None, None]:
+    ) -> Generator[pywikibot.page.WikibaseEntity]:
         """Yield subclasses of WikibaseEntity's with content prefilled.
 
         .. note:: Pages will be iterated in a different order than in

@@ -8,12 +8,12 @@ from __future__ import annotations
 
 import datetime
 import re
+from collections.abc import Generator, Iterable, Sequence
 from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Generator, Iterable, Sequence
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.itertools import filter_unique
@@ -51,7 +51,7 @@ def NamespaceFilterPageGenerator(
     | Namespace
     | Sequence[str | Namespace],
     site: BaseSite | None = None,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """A generator yielding pages from another generator in given namespaces.
 
     If a site is provided, the namespaces are validated using the namespaces
@@ -87,7 +87,7 @@ def NamespaceFilterPageGenerator(
 def PageTitleFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     ignore_list: dict[str, dict[str, str]],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Yield only those pages are not listed in the ignore list.
 
     :param ignore_list: family names are mapped to dictionaries in which
@@ -114,7 +114,7 @@ def RedirectFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     no_redirects: bool = True,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Yield pages from another generator that are redirects or not.
 
     :param no_redirects: Exclude redirects if True, else only include
@@ -185,7 +185,7 @@ class ItemClaimFilter:
         claim: str,
         qualifiers: dict[str, str] | None = None,
         negate: bool = False,
-    ) -> Generator[pywikibot.page.WikibasePage, None, None]:
+    ) -> Generator[pywikibot.page.WikibasePage]:
         """Yield all ItemPages which contain certain claim in a property.
 
         :param prop: property id to check
@@ -210,7 +210,7 @@ ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 def SubpageFilterGenerator(generator: Iterable[pywikibot.page.BasePage],
                            max_depth: int = 0,
                            show_filtered: bool = False
-                           ) -> Generator[pywikibot.page.BasePage, None, None]:
+                           ) -> Generator[pywikibot.page.BasePage]:
     """Generator which filters out subpages based on depth.
 
     It looks at the namespace of each page and checks if that namespace
@@ -271,7 +271,7 @@ class RegexFilter:
                     regex: PATTERN_STR_OR_SEQ_TYPE,
                     quantifier: str = 'any',
                     ignore_namespace: bool = True
-                    ) -> Generator[pywikibot.page.BasePage, None, None]:
+                    ) -> Generator[pywikibot.page.BasePage]:
         """Yield pages from another generator whose title matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
@@ -306,7 +306,7 @@ class RegexFilter:
                       generator: Iterable[pywikibot.page.BasePage],
                       regex: PATTERN_STR_OR_SEQ_TYPE,
                       quantifier: str = 'any'
-                      ) -> Generator[pywikibot.page.BasePage, None, None]:
+                      ) -> Generator[pywikibot.page.BasePage]:
         """Yield pages from another generator whose body matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier
@@ -322,7 +322,7 @@ class RegexFilter:
 def QualityFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     quality: list[int],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages according to quality levels.
 
     This is possible only for pages with content_model 'proofread-page'.
@@ -343,7 +343,7 @@ def QualityFilterPageGenerator(
 def CategoryFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     category_list: Sequence[pywikibot.page.Category],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages by categories specified.
 
     :param generator: A generator object
@@ -372,7 +372,7 @@ def EdittimeFilterPageGenerator(
     first_edit_start: datetime.datetime | None = None,
     first_edit_end: datetime.datetime | None = None,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages outside last or first edit range.
 
     :param generator: A generator object
@@ -431,7 +431,7 @@ def UserEditFilterGenerator(
     skip: bool = False,
     max_revision_depth: int | None = None,
     show_filtered: bool = False
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Generator which will yield Pages modified by username.
 
     It only looks at the last editors given by max_revision_depth. If
@@ -464,7 +464,7 @@ def WikibaseItemFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     has_item: bool = True,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """A wrapper generator used to exclude if page has a Wikibase item or not.
 
     :param generator: Generator to wrap.

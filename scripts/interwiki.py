@@ -357,6 +357,7 @@ import os
 import re
 import sys
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from contextlib import suppress
 from pathlib import Path
 from textwrap import fill
@@ -370,7 +371,6 @@ from pywikibot import (
     textlib,
     titletranslate,
 )
-from pywikibot.backports import Iterable
 from pywikibot.bot import (
     ListOption,
     OptionHandler,

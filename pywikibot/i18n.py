@@ -26,6 +26,7 @@ import os
 import pkgutil
 import re
 from collections import abc, defaultdict
+from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from pathlib import Path
@@ -34,13 +35,6 @@ from typing import Any
 
 import pywikibot
 from pywikibot import __url__, config
-from pywikibot.backports import (
-    Generator,
-    Iterable,
-    Iterator,
-    Mapping,
-    Sequence,
-)
 from pywikibot.plural import plural_rule
 
 
@@ -886,7 +880,7 @@ def twget_keys(twtitle: str) -> list[str]:
             if lang != 'qqq' and _get_translation(lang, twtitle)]
 
 
-def bundles(stem: bool = False) -> Generator[Path | str, None, None]:
+def bundles(stem: bool = False) -> Generator[Path | str]:
     """A generator which yields message bundle names or its path objects.
 
     The bundle name usually corresponds with the script name which is

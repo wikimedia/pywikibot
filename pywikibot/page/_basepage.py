@@ -9,6 +9,7 @@ from __future__ import annotations
 import itertools
 import re
 from collections import Counter
+from collections.abc import Generator, Iterable
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
@@ -18,7 +19,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import Generator, Iterable, NoneType
+from pywikibot.backports import NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
@@ -1549,7 +1550,7 @@ class BasePage(ComparableMixin):
     def linkedPages(
         self,
         **kwargs
-    ) -> Generator[pywikibot.page.BasePage, None, None]:
+    ) -> Generator[pywikibot.page.BasePage]:
         """Iterate Pages that this Page links to.
 
         Only returns pages from "normal" internal links. Embedded
@@ -1586,7 +1587,7 @@ class BasePage(ComparableMixin):
     def interwiki(
         self,
         expand: bool = True,
-    ) -> Generator[pywikibot.page.Link, None, None]:
+    ) -> Generator[pywikibot.page.Link]:
         """Yield interwiki links in the page text, excluding language links.
 
         :param expand: if True (default), include interwiki links found

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+from collections.abc import Callable
 from contextlib import suppress
 from http import HTTPStatus
 from pathlib import Path
@@ -20,7 +21,6 @@ import requests
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError

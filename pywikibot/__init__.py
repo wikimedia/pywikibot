@@ -12,6 +12,7 @@ import re
 import sys
 import threading
 import warnings
+from collections.abc import Callable
 from contextlib import suppress
 from functools import cache
 from queue import Queue
@@ -31,7 +32,6 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
-from pywikibot.backports import Callable
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,

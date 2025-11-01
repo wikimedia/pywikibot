@@ -10,13 +10,13 @@ import calendar
 import datetime
 import re
 from collections import abc, defaultdict
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from functools import singledispatch
 from string import digits as _decimalDigits  # noqa: N812
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pywikibot import Site
-from pywikibot.backports import Any, Callable, Iterator, Mapping, Sequence
 from pywikibot.site import BaseSite
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS

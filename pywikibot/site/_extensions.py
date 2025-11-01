@@ -6,10 +6,10 @@
 #
 from __future__ import annotations
 
+from collections.abc import Generator, Iterable
 from typing import TYPE_CHECKING, Protocol
 
 import pywikibot
-from pywikibot.backports import Generator, Iterable
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
@@ -52,7 +52,7 @@ class BaseSiteProtocol(Protocol):
 
     def querypage(
         self, *args, **kwargs
-    ) -> Generator[tuple[pywikibot.Page, int], None, None]:
+    ) -> Generator[tuple[pywikibot.Page, int]]:
         ...
 
 
@@ -296,7 +296,7 @@ class WikibaseClientMixin:
         total: int | None = None,
         *,
         strict: bool = False
-    ) -> Generator[pywikibot.Page, None, None]:
+    ) -> Generator[pywikibot.Page]:
         """Yield Page objects from Special:UnconnectedPages.
 
         .. warning:: The retrieved pages may be connected in meantime.

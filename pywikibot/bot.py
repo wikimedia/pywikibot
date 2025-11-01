@@ -120,7 +120,7 @@ import time
 import warnings
 import webbrowser
 from collections import Counter
-from collections.abc import Container, Generator
+from collections.abc import Callable, Container, Generator, Iterable, Sequence
 from functools import wraps
 from importlib import import_module
 from pathlib import Path
@@ -130,7 +130,6 @@ from typing import TYPE_CHECKING, Any
 import pywikibot
 import pywikibot.logging as pwb_logging
 from pywikibot import config, daemonize, i18n, version
-from pywikibot.backports import Callable, Iterable, Sequence
 from pywikibot.bot_choice import (
     AlwaysChoice,
     Choice,

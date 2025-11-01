@@ -168,14 +168,14 @@ talk about HTTP, where the typo has become part of the standard:
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import Generator, Sequence
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
 import pywikibot
 from pywikibot import editor, fixes, i18n, pagegenerators, textlib
-from pywikibot.backports import Generator, batched
+from pywikibot.backports import batched
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.exceptions import InvalidPageError, NoPageError
 from pywikibot.tools import chars

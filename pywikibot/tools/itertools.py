@@ -13,16 +13,11 @@ from __future__ import annotations
 import collections
 import heapq
 import itertools
+from collections.abc import Callable, Generator, Iterable, Iterator
 from contextlib import suppress
 from typing import Any
 
-from pywikibot.backports import (
-    Callable,
-    Generator,
-    Iterable,
-    Iterator,
-    batched,
-)
+from pywikibot.backports import batched
 from pywikibot.logging import debug
 from pywikibot.tools import deprecated
 
@@ -40,7 +35,7 @@ __all__ = (
 @deprecated('backports.batched()', since='8.2.0')
 def itergroup(iterable,
               size: int,
-              strict: bool = False) -> Generator[list[Any], None, None]:
+              strict: bool = False) -> Generator[list[Any]]:
     """Make an iterator that returns lists of (up to) size items from iterable.
 
     Example:
@@ -238,7 +233,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 return
 
 
-def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
+def roundrobin_generators(*iterables) -> Generator[Any]:
     """Yield simultaneous from each iterable.
 
     Sample:

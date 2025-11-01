@@ -10,9 +10,9 @@ import os
 import re
 import subprocess
 from collections import Counter
+from collections.abc import Sequence
 
 import pywikibot
-from pywikibot.backports import Sequence
 
 
 def _call_cmd(args: str | Sequence[str],

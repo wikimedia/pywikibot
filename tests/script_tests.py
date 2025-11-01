@@ -10,10 +10,10 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 
-from pywikibot.backports import Iterator
 from pywikibot.bot import global_args as pwb_args
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print

@@ -11,11 +11,12 @@ import logging
 import re
 import sys
 import threading
+from collections.abc import Iterable, Sequence
 from typing import Any, Literal, NoReturn, TextIO
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Iterable, RLock, Sequence, batched
+from pywikibot.backports import RLock, batched
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,

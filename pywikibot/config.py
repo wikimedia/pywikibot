@@ -47,6 +47,7 @@ import re
 import stat
 import sys
 import types
+from collections.abc import Mapping
 from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
@@ -56,7 +57,6 @@ from warnings import warn
 from zipfile import ZipFile, is_zipfile
 
 from pywikibot.__metadata__ import __version__ as pwb_version
-from pywikibot.backports import Mapping
 from pywikibot.logging import error, info, warning
 
 

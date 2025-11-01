@@ -11,6 +11,7 @@ import re
 import time
 import webbrowser
 from collections import OrderedDict, defaultdict
+from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
@@ -18,7 +19,6 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import login
-from pywikibot.backports import Iterable
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (

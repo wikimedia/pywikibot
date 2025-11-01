@@ -11,14 +11,13 @@ from collections.abc import Iterable, Mapping
 from enum import IntEnum
 from typing import Union
 
-from pywikibot.backports import Iterable as IterableType
 from pywikibot.tools import ComparableMixin, classproperty
 
 
 SingleNamespaceType = Union[int, str, 'Namespace']
 NamespaceArgType = Union[
     SingleNamespaceType,
-    IterableType[SingleNamespaceType],
+    Iterable[SingleNamespaceType],
     None,
 ]
 
