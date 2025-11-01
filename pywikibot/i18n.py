@@ -27,6 +27,7 @@ import pkgutil
 import re
 from collections import abc, defaultdict
 from contextlib import suppress
+from functools import cache
 from pathlib import Path
 from textwrap import fill
 from typing import Any
@@ -40,7 +41,6 @@ from pywikibot.backports import (
     Mapping,
     Match,
     Sequence,
-    cache,
 )
 from pywikibot.plural import plural_rule
 

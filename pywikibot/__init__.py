@@ -13,6 +13,7 @@ import sys
 import threading
 import warnings
 from contextlib import suppress
+from functools import cache
 from queue import Queue
 from time import sleep as time_sleep
 from typing import TYPE_CHECKING, Any, cast
@@ -30,7 +31,7 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
-from pywikibot.backports import Callable, cache
+from pywikibot.backports import Callable
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,

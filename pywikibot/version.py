@@ -16,13 +16,13 @@ import sys
 import sysconfig
 import time
 from contextlib import suppress
+from functools import cache
 from importlib import import_module
 from pathlib import Path
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 from pywikibot.tools import deprecated

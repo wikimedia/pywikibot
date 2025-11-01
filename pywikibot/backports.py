@@ -23,14 +23,6 @@ from typing import TYPE_CHECKING, Any
 PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
 SPHINX_RUNNING: bool = 'sphinx' in sys.modules
 
-# functools.cache
-if PYTHON_VERSION >= (3, 9):
-    from functools import cache  # type: ignore[attr-defined]
-else:
-    from functools import lru_cache as _lru_cache
-    cache = _lru_cache(None)
-
-
 # typing
 if PYTHON_VERSION < (3, 9):
     from typing import DefaultDict  # type: ignore[misc]
