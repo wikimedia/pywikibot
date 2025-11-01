@@ -11,7 +11,7 @@ from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, Iterable, Set, batched
+from pywikibot.backports import Iterable, batched
 from pywikibot.tools import (
     classproperty,
     deprecated,
@@ -37,7 +37,7 @@ class ParamInfo(Sized, Container):
     param_modules = ('list', 'meta', 'prop')
 
     _action_modules: frozenset[str]
-    _modules: Dict[str, Set[str] | Dict[str, str]]
+    _modules: dict[str, set[str] | dict[str, str]]
 
     @remove_last_args(['modules_only_mode'])
     def __init__(self,

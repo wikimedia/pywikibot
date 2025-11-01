@@ -41,16 +41,13 @@ if PYTHON_VERSION < (3, 9):
     from typing import (
         Container,
         Counter,
-        Dict,
         Generator,
         Iterable,
         Iterator,
-        List,
         Mapping,
         Match,
         Pattern,
         Sequence,
-        Set,
     )
 else:
     from collections import Counter
@@ -63,10 +60,6 @@ else:
         Sequence,
     )
     from re import Match, Pattern
-    Dict = dict  # type: ignore[misc]
-    List = list  # type: ignore[misc]
-    Set = set  # type: ignore[misc]
-
 
 if PYTHON_VERSION < (3, 9, 2):
     from typing import Callable

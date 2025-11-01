@@ -130,7 +130,7 @@ from typing import TYPE_CHECKING, Any
 import pywikibot
 import pywikibot.logging as pwb_logging
 from pywikibot import config, daemonize, i18n, version
-from pywikibot.backports import Callable, Dict, Iterable, Sequence
+from pywikibot.backports import Callable, Iterable, Sequence
 from pywikibot.bot_choice import (
     AlwaysChoice,
     Choice,
@@ -995,7 +995,7 @@ def open_webbrowser(page: pywikibot.page.BasePage) -> None:
     i18n.input('pywikibot-enter-finished-browser')
 
 
-class _OptionDict(Dict[str, Any]):
+class _OptionDict(dict[str, Any]):
 
     """The option dict which holds the options of OptionHandler.
 

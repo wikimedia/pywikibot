@@ -14,7 +14,6 @@ from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pywikibot
-from pywikibot.backports import Dict, List
 from pywikibot.exceptions import APIError
 from pywikibot.tools.collections import EMPTY_DEFAULT
 
@@ -96,22 +95,22 @@ class Siteinfo(Container):
         # query this method to actually get the version number
 
         if prop == 'general':
-            data = cast(Dict[str, Any], data)
+            data = cast(dict[str, Any], data)
             for key in 'thumblimits', 'imagelimits':
                 data[key] = list(data[key].values())
             data['magiclinks'] = [k for k, v in data['magiclinks'].items()
                                   if v]
         elif prop == 'namespaces':
-            data = cast(Dict[str, Any], data)
+            data = cast(dict[str, Any], data)
             for ns_info in data.values():
                 ns_info['*'] = ns_info['name']
         elif prop in ('languages', 'namespacealiases'):
-            data = cast(List[Dict[str, Any]], data)
+            data = cast(list[dict[str, Any]], data)
             for ns_info in data:
                 key = 'name' if 'name' in ns_info else 'alias'
                 ns_info['*'] = ns_info[key]
         elif prop == 'skins':
-            data = cast(List[Dict[str, Any]], data)
+            data = cast(list[dict[str, Any]], data)
             for ns_info in data:
                 ns_info['*'] = ns_info['name']
                 for key in 'default', 'unusable':
