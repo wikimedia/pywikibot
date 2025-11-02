@@ -2,25 +2,37 @@ Release 11 (in development)
 ===========================
 
 **Improvements**
+
 * (no changes yet)
 
 **Bugfixes**
-* (no changes yet)
+
+* Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
+  :class:`pywikibot.WbTime`
 
 **Code cleanups**
-* (no changes yet)
+
+* Several typing types were removed from :mod:`backports`.
+* The ``cache`` decorator was removed from :mod:`backports`. The :pylib:`@functools.cache()
+  <functools#functools.cache>` can be used instead. (:phab:`T401802`)
+* The functions ``removeprefix`` and ``removesuffix`` were removed from :mod:`backports`. The
+  :pylib:`stdlib methods<stdtypes.html#str.removeprefix>` can be used instead. (:phab:`T401802`)
 
 **Other breaking changes**
-* (no changes yet)
+
+* Package requirements were updated (``wikitextparser``, ``mwoauth``, ``pydot``, ``python-stdnum``,
+  ``Pillow``, ``requests-sse``, ``PyMySQL``, ``beautifulsoup4``, ``fake-useragent``)
+* Python 3.8 support was dropped. (:phab:`T401802`)
+* Remove predefined ``yu-tld`` fix in :mod`fixes`. (:phab:`T402088`)
 
 Deprecations
 ============
 
 This section lists features, methods, parameters, or attributes that are deprecated
-and scheduled for removal in future Pywikibot releases.  
+and scheduled for removal in future Pywikibot releases.
 
 Deprecated items may still work in the current release but are no longer recommended for use.
-Users should update their code according to the recommended alternatives.  
+Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
 removed in in the third subsequent major release, remaining available for the two releases in between.

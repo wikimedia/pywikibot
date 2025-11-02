@@ -263,7 +263,6 @@ Release History
 * Require ``requests >= 2.31.0`` (:phab:`T347031`).
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`.
-* See also Current Deprecations below.
 
 
 9.6.3

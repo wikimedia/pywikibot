@@ -218,7 +218,6 @@ from pywikibot.textlib import (
     to_local_digits,
 )
 from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.threading import BoundedPoolExecutor
 
 
@@ -1107,31 +1106,18 @@ def main(*args: str) -> None:
 
         botargs = tmpl, salt, force, keep, sort
         botkwargs = {'asynchronous': asynchronous}
-        futures = []  # needed for Python < 3.9
         with context as executor:
             for pg in gen:
                 if asynchronous:
-                    future = executor.submit(
-                        process_page, pg, *botargs, **botkwargs)
+                    executor.submit(process_page, pg, *botargs, **botkwargs)
 
-                    if PYTHON_VERSION < (3, 9):
-                        futures.append(future)
-
-                    if not exiting.is_set():
-                        continue
-
-                    pywikibot.info(
-                        '<<lightyellow>>Canceling pending Futures...')
-
-                    if PYTHON_VERSION < (3, 9):
-                        canceled = sum(future.cancel() for future in futures)
-                        pywikibot.info(f'{canceled} canceled')
-                    else:
+                    if exiting.is_set():
+                        pywikibot.info(
+                            '<<lightyellow>>Canceling pending Futures...')
                         executor.shutdown(cancel_futures=True)
+                        break
 
-                    break
-
-                if not process_page(pg, *botargs, **botkwargs):
+                elif not process_page(pg, *botargs, **botkwargs):
                     break
 
 

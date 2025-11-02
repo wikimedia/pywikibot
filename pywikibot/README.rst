@@ -17,17 +17,10 @@ To get started on proper usage of the bot framework, please refer to:
 **External software can be used with Pywikibot:**
   * Pydot, Pyparsing and Graphviz for use with interwiki_graph.py
   * PyMySQL to access MySQL database for use with pagegenerators.py
-  * google to access Google Web API for use with pagegenerators.py
+  * googlesearch-python to access Google Web API for use with pagegenerators.py
 
 
-Pywikibot makes use of some modules that are part of python, but that
-are not installed by default on some Linux distributions:
-
-  * python-xml (required to parse XML via SaX2)
-  * python-tkinter (optional, used by some experimental GUI stuff)
-
-
-You need to have at least Python version `3.8 <https://www.python.org/downloads/>`_
+You need to have at least Python version `3.9 <https://www.python.org/downloads/>`_
 or newer installed on your computer to be able to run any of the code in this
 package. Please refer the manual at mediawiki for further details and
 restrictions.

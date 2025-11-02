@@ -4,44 +4,35 @@ Version compatibility
 
 This page summarizes Pywikibot compatibility with Python and MediaWiki versions.
 
-Python version support
-======================
+Python and MediaWiki version support
+====================================
 
-Released Pywikibot versions support all Python versions that are actively maintained
-at the time of the release:
+Released Pywikibot versions support all actively maintained Python and MediaWiki
+versions at the time of release:
 
-=================  ===================== ====
-Pywikibot version  Python version        PyPy
-=================  ===================== ====
-10.0+              3.8–3.14              Yes
-9.0+               3.7–3.13              Yes
-8.0+               3.6.1–3.12            Yes
-7.0+               3.5.3–3.11            Yes
-4.0+               3.5–3.8               No
-3.0.20190301+      2.7.4–2.7.18, 3.4–3.8 No
-3.0.20180403+      2.7.2–2.7.18, 3.4–3.8 No
-3.0+               2.6–2.7.18, 3.3–3.8   No
-2.0                2.7, 3.3–3.5          No
-1.0                2.5–2.7               No
-=================  ===================== ====
+=================  ===================== ====  =================  ================
+Pywikibot version  Python version        PyPy  MediaWiki version  1st Release Date
+=================  ===================== ====  =================  ================
+11.0+              3.9–3.15              ✅    1.31–1.45          2025
+10.0–10.7          3.8–3.14              ✅    1.31–1.44          2025-03-01
+9.0–9.6.3          3.7–3.13              ✅    1.27–1.42          2024-03-08
+8.0–8.6            3.6.1–3.12            ✅    1.27–1.41          2023-01-21
+7.0–7.7.3          3.5.3–3.11            ✅    1.23–1.39          2022-02-26
+6.0–6.6.5          3.5–3.10              ❌    1.23–1.37          2021-03-16
+5.0–5.6            3.5–3.10              ❌    1.19–1.36          2020-10-19
+4.0–4.3            3.5–3.9               ❌    1.14–1.36          2020-08-04
+3.0.20190301+      2.7.4–2.7.18, 3.4–3.8 ❌    1.14–1.33          2019-03-01
+3.0.20180403+      2.7.2–2.7.18, 3.4–3.8 ❌    1.14–1.31          2018-04-03
+3.0.20170403+      2.6–2.7.18, 3.3–3.8   ❌    1.14–1.29          2017-04-04
+2.0                2.7, 3.3–3.5          ❌    1.14–1.25          2015-05-25
+1.0                2.5–2.7               ❌    1.2–1.24           2003–2016
+=================  ===================== ====  =================  ================
 
-`Status of Python versions <https://devguide.python.org/versions/>`__.
+.. note::
+   All versions listed refer to the **stable releases**. Early releases before
+   version 3.0 were considered "perpetual beta". The first Pywikibot package,
+   formerly known as Pywikipediabot, is also called "trunk" or a "compat" release.
 
-Mediawiki version support
-=========================
-
-Released Pywikibot versions support all MediaWiki versions that are actively maintained
-at the time of the release:
-
-=================  =================
-Pywikibot version  MediaWiki version
-=================  =================
-10.0+              1.31–1.44
-9.0+               1.27–1.42
-8.0+               1.27–1.40
-7.0+               1.23–1.38
-6.0+               1.23–1.36
-5.0+               1.19–1.36
-=================  =================
-
-`Status of MediaWiki versions <https://www.mediawiki.org/wiki/Version_lifecycle>`__.
+.. seealso::
+   - `Status of Python versions <https://devguide.python.org/versions/>`__
+   - `Status of MediaWiki versions <https://www.mediawiki.org/wiki/Version_lifecycle>`__.

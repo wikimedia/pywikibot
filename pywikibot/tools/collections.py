@@ -15,11 +15,7 @@ from types import TracebackType
 from typing import Any, NamedTuple
 
 from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    deprecated_args,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 
 __all__ = (
@@ -313,8 +309,7 @@ class GeneratorWrapper(ABC, Generator):
             self._started_gen.throw(value)
             return
 
-        if PYTHON_VERSION > (3, 8) and not (value is None
-                                            and traceback is None):
+        if value is not None or traceback is not None:
             # Old-style (type, value, traceback) signature
             issue_deprecation_warning(
                 'The (type, value, traceback) signature of throw()',

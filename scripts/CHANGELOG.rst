@@ -1,6 +1,12 @@
 Scripts Changelog
 =================
 
+11.0.0
+------
+
+* ``create_isbn_edition`` script was removed from scripts package (:phab:`T398140`)
+
+
 10.7.0
 ------
 
