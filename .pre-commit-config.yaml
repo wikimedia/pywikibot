@@ -42,8 +42,6 @@ repos:
         # list required for tab
         args: [--autofix, --indent, "\t", --no-ensure-ascii]
       - id: trailing-whitespace
-        args:
-          - --markdown-linebreak-ext=rst
         exclude: ^tests/data/
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
