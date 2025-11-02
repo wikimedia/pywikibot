@@ -182,7 +182,6 @@ import re
 from typing import Any
 
 import pywikibot
-from pywikibot.tools import ModuleDeprecationWrapper
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -731,8 +730,3 @@ class MaxlagTimeoutError(TimeoutError):
 class ApiNotAvailableError(Error):
 
     """API is not available, e.g. due to a network error or configuration."""
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'Server414Error', Client414Error, since='8.1.0')

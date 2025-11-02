@@ -19,11 +19,7 @@ from typing import TYPE_CHECKING, Any, cast
 import pywikibot
 from pywikibot import exceptions
 from pywikibot.time import Timestamp
-from pywikibot.tools import (
-    deprecated_signature,
-    issue_deprecation_warning,
-    remove_last_args,
-)
+from pywikibot.tools import deprecated_signature, issue_deprecation_warning
 
 
 if TYPE_CHECKING:
@@ -877,7 +873,6 @@ class WbTime(WbRepresentation):
 
         return type(self)(**kwargs)
 
-    @remove_last_args(['normalize'])  # since 8.2.0
     def toTimestr(self, force_iso: bool = False) -> str:
         """Convert the data to a UTC date/time string.
 
@@ -920,7 +915,6 @@ class WbTime(WbRepresentation):
                 datetime.timedelta(minutes=self.timezone)))
         return ts
 
-    @remove_last_args(['normalize'])  # since 8.2.0
     def toWikibase(self) -> dict[str, Any]:
         """Convert the data to a JSON object for the Wikibase API.
 

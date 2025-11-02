@@ -22,7 +22,6 @@ from pywikibot.comms import http
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.tools import (
     PYTHON_VERSION,
-    deprecated,
     file_mode_checker,
     normalize_username,
 )
@@ -516,16 +515,6 @@ class ClientLoginManager(LoginManager):
             raise pywikibot.exceptions.APIError(**response)
 
         raise pywikibot.exceptions.APIError(code=status, info=fail_reason)
-
-    @deprecated("site.tokens['login']", since='8.0.0')
-    def get_login_token(self) -> str | None:
-        """Fetch login token.
-
-        .. deprecated:: 8.0
-
-        :return: login token
-        """
-        return self.site.tokens['login']
 
 
 class BotPassword:

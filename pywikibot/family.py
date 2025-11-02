@@ -652,15 +652,6 @@ class Family:
             'Found multiple matches for URL "{}": {}'
             .format(url, ', '.join(str(s) for s in matched_sites)))
 
-    @deprecated('config.maximum_GET_length', since='8.0.0')
-    def maximum_GET_length(self, code):
-        """Return the maximum URL length for GET instead of POST.
-
-        .. deprecated:: 8.0
-           Use :ref:`config.maximum_GET_length<Account Settings>` instead.
-        """
-        return config.maximum_GET_length
-
     def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
         return f'{code}{self.name}'

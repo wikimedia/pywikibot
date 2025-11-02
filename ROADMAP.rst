@@ -12,6 +12,20 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* The ``get_login_token()`` method of :class:`login.ClientLoginManager`
+  was removed and can be replaces by ``login.LoginManager.site.tokens['login']``
+* The :meth:`family.Family.maximum_GET_length` method was removed in favour of the
+  :ref:`config.maximum_GET_length<Account Settings>` configuration option (:phab:`T325957`)
+* The ``exceptions.Server414Error`` exception was replaced by
+  :exc:`exceptions.Client414Error` exception
+* The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
+  *paraminfo_keys* class attribute, and its ``preloaded_modules`` property was removed
+* The ``data.api.LoginManager()`` constructor was removed in favour of the
+  :class:`login.ClientLoginManager` class
+* The `normalize` parameter was removed from the
+  :meth:`pywikibot.WbTime.toTimestr` and :meth:`pywikibot.WbTime.toWikibase`
+  methods in Pywikibot 8.2. Since Pywikibot 11, passing `normalize` as an argument
+  raises an error, because support for legacy arguments via was removed.
 * Several typing types were removed from :mod:`backports`.
 * The ``cache`` decorator was removed from :mod:`backports`. The :pylib:`@functools.cache()
   <functools#functools.cache>` can be used instead. (:phab:`T401802`)
@@ -44,25 +58,16 @@ Pending removal in Pywikibot 11
 * 10.7.0: Dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
   (:phab:`T359427`, :phab:`T407708`)
-* 10.6.0: Python 3.8 support is deprecated and will be dropped soon
 * 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
   :attr:`data.api.QueryGenerator.modules`
-* 8.4.0: The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
-  *paraminfo_keys* class attribute, and its ``preloaded_modules`` property will be removed
 * 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
   removed in favour of the *expiry* class attribute
 * 8.2.0: The :func:`tools.itertools.itergroup` function will be removed in favour of the
   :func:`backports.batched` function
-* 8.2.0: The *normalize* parameter in the :meth:`pywikibot.WbTime.toTimestr` and
-  :meth:`pywikibot.WbTime.toWikibase` methods will be removed
 * 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
   :exc:`exceptions.NoPageError` will be removed
-* 8.1.0: The ``exceptions.Server414Error`` exception is deprecated in favour of the
-  :exc:`exceptions.Client414Error` exception
 * 8.0.0: The :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated in
   favour of the ``Timestamp.replace()`` method
-* 8.0.0: The :meth:`family.Family.maximum_GET_length` method is deprecated in favour of the
-  :ref:`config.maximum_GET_length<Account Settings>` configuration option (:phab:`T325957`)
 * 8.0.0: The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
   :func:`textlib.replaceCategoryLinks` functions is deprecated in favour of ``add_only``
 * 8.0.0: The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
@@ -70,10 +75,6 @@ Pending removal in Pywikibot 11
   which is a :class:`textlib.TimeStripperPatterns` object
 * 8.0.0: The ``groups`` attribute of the :class:`textlib.TimeStripper` class is deprecated in favour
   of the :data:`textlib.TIMEGROUPS` constant
-* 8.0.0: The :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` method
-  has been replaced by ``login.ClientLoginManager.site.tokens['login']``
-* 8.0.0: The ``data.api.LoginManager()`` constructor is deprecated in favour of the
-  :class:`login.ClientLoginManager` class
 * 8.0.0: The :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is
   deprecated in favour of the :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
   attribute
