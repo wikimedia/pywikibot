@@ -183,6 +183,9 @@ Version historty:
    If ``archiveheader`` is not set, the bot now attempts to retrieve a
    localized template from Wikidata (based on known item IDs). If none is
    found, ``{{talkarchive}}`` is used as fallback.
+
+.. versionchanged:: 11.0
+   The ``-namespace`` option is now respected by ``-page`` option.
 """
 #
 # (C) Pywikibot team, 2006-2025
@@ -1063,7 +1066,7 @@ def main(*args: str) -> None:
         elif option == 'page':
             pagename = value
         elif option == 'namespace':
-            namespace = value
+            namespace = int(value)
         elif option == 'keep':
             keep = True
         elif option == 'sort':
@@ -1093,7 +1096,7 @@ def main(*args: str) -> None:
             with open(filename) as f:
                 gen = [pywikibot.Page(site, line, ns=10) for line in f]
         elif pagename:
-            gen = [pywikibot.Page(site, pagename, ns=3)]
+            gen = [pywikibot.Page(site, pagename, ns=namespace or 3)]
         else:
 
             ns = [str(namespace)] if namespace is not None else []
