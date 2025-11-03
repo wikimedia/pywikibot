@@ -181,6 +181,14 @@ class FilePage(Page):
 
         .. note:: Parameters validation and error handling left to the
            API call.
+
+        .. important::
+           Starting with MediaWiki 1.45, the file width returned may be
+           greater than or equal to the requested *url_width* due to
+           :phab:`T360589`. If you need the exact width, you must access
+           the corresponding thumbnail URL directly. See the additional
+           notes at :api:`Imageinfo`.
+
         .. seealso::
 
            * :meth:`APISite.loadimageinfo()
