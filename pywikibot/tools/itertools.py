@@ -17,53 +17,16 @@ from collections.abc import Callable, Generator, Iterable, Iterator
 from contextlib import suppress
 from typing import Any
 
-from pywikibot.backports import batched
 from pywikibot.logging import debug
-from pywikibot.tools import deprecated
 
 
 __all__ = (
     'filter_unique',
     'intersect_generators',
     'islice_with_ellipsis',
-    'itergroup',
     'roundrobin_generators',
     'union_generators',
 )
-
-
-@deprecated('backports.batched()', since='8.2.0')
-def itergroup(iterable,
-              size: int,
-              strict: bool = False) -> Generator[list[Any]]:
-    """Make an iterator that returns lists of (up to) size items from iterable.
-
-    Example:
-
-    >>> i = itergroup(range(25), 10)
-    >>> print(next(i))
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> print(next(i))
-    [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    >>> print(next(i))
-    [20, 21, 22, 23, 24]
-    >>> print(next(i))
-    Traceback (most recent call last):
-     ...
-    StopIteration
-
-    .. versionadded:: 7.6
-       The *strict* parameter.
-    .. deprecated:: 8.2
-       Use :func:`backports.batched` instead.
-
-    :param size: How many items of the iterable to get in one chunk
-    :param strict: If True, raise a ValueError if length of iterable is
-        not divisible by `size`.
-    :raises ValueError: iterable is not divisible by size
-    """
-    for group in batched(iterable, size, strict=strict):
-        yield list(group)
 
 
 def islice_with_ellipsis(iterable, *args, marker: str = '…'):
@@ -101,7 +64,7 @@ def union_generators(*iterables: Iterable[Any],
     duplicates. The input iterables must already be sorted according to
     the same *key* and direction. For descending direction, *reverse*
     must be ``True``. The generator will yield each element only once,
-    even if it appears in multiple iterables. This behaves similarly to:
+    even if it appears in multiple iterables. This behaves similarly to::
 
         sorted(set(itertools.chain(*iterables)), key=key, reverse=reverse)
 

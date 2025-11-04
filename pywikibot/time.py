@@ -17,7 +17,7 @@ import types
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.tools import PYTHON_VERSION, classproperty, deprecated
+from pywikibot.tools import PYTHON_VERSION, classproperty
 
 
 __all__ = (
@@ -217,15 +217,6 @@ class Timestamp(datetime.datetime):
                 return handler(timestr)
 
         raise ValueError(f'time data {timestr!r} does not match any format.')
-
-    @deprecated('replace method', since='8.0.0')  # type: ignore[misc]
-    def clone(self) -> Timestamp:
-        """Clone this instance.
-
-        .. deprecated:: 8.0
-           Use :meth:`replace` method instead.
-        """
-        return self.replace()
 
     @classproperty
     def ISO8601Format(cls) -> str:  # noqa: N802

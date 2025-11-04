@@ -12,6 +12,9 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* The ``Timestamp.clone()`` method was removed in favour of the ``Timestamp.replace()`` method
+* The ``tools.itertools.itergroup`` function was removed in favour of the
+  :func:`backports.batched` or :pylib:`itertools.batched<itertools#itertools.batched>` function.
 * The ``get_login_token()`` method of :class:`login.ClientLoginManager`
   was removed and can be replaces by ``login.LoginManager.site.tokens['login']``
 * The :meth:`family.Family.maximum_GET_length` method was removed in favour of the
@@ -62,12 +65,8 @@ Pending removal in Pywikibot 11
   :attr:`data.api.QueryGenerator.modules`
 * 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
   removed in favour of the *expiry* class attribute
-* 8.2.0: The :func:`tools.itertools.itergroup` function will be removed in favour of the
-  :func:`backports.batched` function
 * 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
   :exc:`exceptions.NoPageError` will be removed
-* 8.0.0: The :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated in
-  favour of the ``Timestamp.replace()`` method
 * 8.0.0: The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
   :func:`textlib.replaceCategoryLinks` functions is deprecated in favour of ``add_only``
 * 8.0.0: The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
