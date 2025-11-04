@@ -12,6 +12,19 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* ``load_tokens`` method of :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` was
+  removed; ``clear`` method can be used instead.
+* No longer support legacy API tokens of MediaWiki 1.23 and older. (:phab:`270380`, :phab:`306637`)
+* ``use_hard_category_redirect`` Site and Family properties were removed. (:phab:`T348953`)
+* The *all* parameter of :meth:`APISite.get_tokens()<pywikibot.site._apisite.APISite.get_tokens>``
+  was removed; use an empty string instead.
+* ``APISite.validate_tokens()`` method was removed.
+* ``APISite.messages()`` method was removed in favour of the
+  :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>` attribute
+* ``Page.editTime()`` method was removed; :attr:`Page.latest_revision.timestamp
+  <page.BasePage.latest_revision>` attribute can be used instead
+* ``data.api.QueryGenerator.continuekey`` was be removed in favour of
+  :attr:`data.api.QueryGenerator.modules`
 * The ``Timestamp.clone()`` method was removed in favour of the ``Timestamp.replace()`` method
 * The ``tools.itertools.itergroup`` function was removed in favour of the
   :func:`backports.batched` or :pylib:`itertools.batched<itertools#itertools.batched>` function.
@@ -61,8 +74,6 @@ Pending removal in Pywikibot 11
 * 10.7.0: Dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
   (:phab:`T359427`, :phab:`T407708`)
-* 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
-  :attr:`data.api.QueryGenerator.modules`
 * 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
   removed in favour of the *expiry* class attribute
 * 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
@@ -74,11 +85,6 @@ Pending removal in Pywikibot 11
   which is a :class:`textlib.TimeStripperPatterns` object
 * 8.0.0: The ``groups`` attribute of the :class:`textlib.TimeStripper` class is deprecated in favour
   of the :data:`textlib.TIMEGROUPS` constant
-* 8.0.0: The :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is
-  deprecated in favour of the :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
-  attribute
-* 8.0.0: The :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be
-  replaced by the :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>` attribute
 
 
 Pending removal in Pywikibot 12

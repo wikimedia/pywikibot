@@ -949,15 +949,6 @@ class APISite(
         """
         return group.lower() in self.userinfo['groups']
 
-    @deprecated("userinfo['messages']", since='8.0.0')
-    def messages(self) -> bool:
-        """Return true if the user has new messages, and false otherwise.
-
-        .. deprecated:: 8.0
-           Replaced by :attr:`userinfo['messages']<userinfo>`.
-        """
-        return self.userinfo['messages']
-
     def mediawiki_messages(
         self,
         keys: Iterable[str],
@@ -1698,19 +1689,7 @@ class APISite(
         page._redirtarget = target
         return page._redirtarget
 
-    @deprecated(since='8.0.0')
-    def validate_tokens(self, types: list[str]) -> list[str]:
-        """Validate if requested tokens are acceptable.
-
-        Valid tokens may depend on mw version.
-
-        .. deprecated:: 8.0
-        """
-        data = self._paraminfo.parameter('query+tokens', 'type')
-        assert data is not None
-        return [token for token in types if token in data['type']]
-
-    def get_tokens(self, types: list[str], *args, **kwargs) -> dict[str, str]:
+    def get_tokens(self, types: list[str]) -> dict[str, str]:
         r"""Preload one or multiple tokens.
 
         **Usage**
@@ -1737,10 +1716,10 @@ class APISite(
         need a specific token. Use :attr:`tokens` property instead.
 
         .. versionchanged:: 8.0
-           ``all`` parameter is deprecated. Use an empty list for
+           *all* parameter is deprecated. Use an empty list for
            ``types`` instead.
-        .. note:: ``args`` and ``kwargs`` are not used for deprecation
-           warning only.
+        .. versionchanged:: 11.0
+           *all* parameter was removed.
         .. seealso:: :api:`Tokens`
 
         :param types: the types of token (e.g., "csrf", "login", "patrol").
@@ -1748,16 +1727,7 @@ class APISite(
             API documentation for full list of types.
         :return: a dict with retrieved valid tokens.
         """
-        # deprecate 'all' parameter
-        if args or kwargs:
-            issue_deprecation_warning("'all' parameter",
-                                      "empty list for 'types' parameter",
-                                      since='8.0.0')
-            load_all = kwargs.get('all', args[0] if args else False)
-        else:
-            load_all = False
-
-        if not types or load_all is not False:
+        if not types:  # load all
             pdata = self._paraminfo.parameter('query+tokens', 'type')
             assert pdata is not None
             types = pdata['type']

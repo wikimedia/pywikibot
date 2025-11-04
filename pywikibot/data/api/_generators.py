@@ -26,7 +26,6 @@ from pywikibot.exceptions import (
     UnsupportedPageError,
 )
 from pywikibot.site import Namespace
-from pywikibot.tools import deprecated
 from pywikibot.tools.collections import GeneratorWrapper
 
 
@@ -377,12 +376,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             self.resultkey = self.modules[0]
 
         self._add_slots()
-
-    @property
-    @deprecated('modules', since='8.4.0')
-    def continuekey(self) -> list[str]:
-        """Return deprecated continuekey which is self.modules."""
-        return self.modules
 
     def _add_slots(self) -> None:
         """Add slots to params if the site supports multi-content revisions.

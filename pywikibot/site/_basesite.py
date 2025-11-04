@@ -95,19 +95,6 @@ class BaseSite(ComparableMixin):
         self._locked_pages: set[str] = set()
 
     @property
-    @deprecated(since='8.5.0')
-    def use_hard_category_redirects(self) -> bool:
-        """Hard redirects are used for this site.
-
-        Originally create as property for future use for a proposal to
-        replace category redirect templates with hard redirects. This
-        was never implemented and is not used inside the framework.
-
-        .. deprecated:: 8.5
-        """
-        return False
-
-    @property
     @cached
     def throttle(self):
         """Return this Site's throttle.

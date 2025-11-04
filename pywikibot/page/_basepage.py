@@ -780,16 +780,6 @@ class BasePage(ComparableMixin):
 
         return None
 
-    @deprecated('latest_revision.timestamp', since='8.0.0')
-    def editTime(self) -> pywikibot.Timestamp:
-        """Return timestamp of last revision to page.
-
-        .. deprecated:: 8.0
-           Use :attr:`latest_revision.timestamp<latest_revision>`
-           instead.
-        """
-        return self.latest_revision.timestamp  # type: ignore[attr-defined]
-
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 

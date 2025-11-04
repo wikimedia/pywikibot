@@ -474,11 +474,10 @@ class TestPageObject(DefaultSiteTestCase):
 
         with suppress_warnings(
             r'pywikibot\.page\._basepage.BasePage\.\w+ is deprecated since '
-            r'release [89]\.[03]\.0; use latest_revision\..+ instead\.',
+            r'release 9\.3\.0; use latest_revision\..+ instead\.',
                 FutureWarning):
             self.assertIsInstance(mainpage.userName(), str)
             self.assertIsInstance(mainpage.isIpEdit(), bool)
-            self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
 
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
