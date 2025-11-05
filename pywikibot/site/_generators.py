@@ -1403,13 +1403,12 @@ class GeneratorsMixin:
                namespaces will be fetched from the API and will be
                filtered later during iteration.
 
-        :param start: Only iterate entries from and after this Timestamp
-        :param end: Only iterate entries up to and through this
-            Timestamp
-        :param reverse: If True, iterate oldest entries first (default:
-            newest)
-        :param tag: Only iterate entries tagged with this tag
-        :param total: Maximum number of events to iterate
+        :param start: The timestamp to start enumerating from.
+        :param end: The timestamp to end enumerating at.
+        :param reverse: If ``True``, enumerate the oldest entries first.
+            In this case, *start* must be earlier than *end*.
+        :param tag: only iterate entries tagged with this tag
+        :param total: maximum number of events to iterate
 
         :raises KeyError: The namespace identifier was not resolved
         :raises TypeError: The namespace identifier has an inappropriate
