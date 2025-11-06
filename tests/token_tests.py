@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for tokens."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,20 +33,16 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
 
     def test_tokens(self) -> None:
         """Test tokens."""
-        redirected_tokens = ['edit', 'move', 'delete']
-        for ttype in [*redirected_tokens, 'patrol', 'deleteglobalaccount']:
+        for ttype in 'patrol', 'deleteglobalaccount':
             self.assertIsInstance(self.site.tokens[ttype], str)
             self.assertIn(ttype, self.site.tokens)  # test __contains__
-            if ttype in redirected_tokens:
-                self.assertEqual(self.site.tokens[ttype],
-                                 self.site.tokens['csrf'])
-                self._do_test_warning_filename = False
-                self.assertDeprecationParts(f'Token {ttype!r}', "'csrf'")
 
     def test_invalid_token(self) -> None:
         """Test invalid token."""
-        with self.assertRaises(KeyError):
-            self.site.tokens['invalidtype']
+        redirected_tokens = ['edit', 'move', 'delete']
+        for ttype in [*redirected_tokens, 'invalidtype']:
+            with self.assertRaises(KeyError):
+                self.site.tokens['invalidtype']
 
 
 class TokenTestBase(TestCaseBase):
