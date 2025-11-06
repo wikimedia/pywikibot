@@ -679,6 +679,15 @@ class Subject(interwiki_graph.Subject):
         # default site for -localonly option
         self.site = pywikibot.Site()
 
+    @staticmethod
+    def is_not_redirect(page):
+        """Check whether *page* is not a redirect page.
+
+        .. versionadded:: 11.0
+        """
+        return page.exists() and not (page.isRedirectPage()
+                                      or page.isCategoryRedirect())
+
     def getFoundDisambig(self, site):
         """Return the first disambiguation found.
 
@@ -703,10 +712,7 @@ class Subject(interwiki_graph.Subject):
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
-                if page.exists() \
-                   and not page.isDisambig() \
-                   and not page.isRedirectPage() \
-                   and not page.isCategoryRedirect():
+                if self.is_not_redirect(page) and not page.isDisambig():
                     return page
         return None
 
@@ -724,9 +730,7 @@ class Subject(interwiki_graph.Subject):
                 # do.
                 if self.origin \
                    and page.namespace() == self.origin.namespace() \
-                   and page.exists() \
-                   and not page.isRedirectPage() \
-                   and not page.isCategoryRedirect():
+                   and self.is_not_redirect(page):
                     return page
         return None
 
@@ -1021,13 +1025,13 @@ class Subject(interwiki_graph.Subject):
 
     def askForHints(self, counter) -> None:
         """Ask for hints to other sites."""
-        if (not self.workonme  # we don't work on it anyway
+        if (
+            not self.workonme  # we don't work on it anyway
             or not self.untranslated and not self.conf.askhints
             or self.hintsAsked
             or not self.origin
-            or not self.origin.exists()
-            or self.origin.isRedirectPage()
-                or self.origin.isCategoryRedirect()):
+            or not self.is_not_redirect(self.origin)
+        ):
             return
 
         self.hintsAsked = True
