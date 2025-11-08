@@ -1105,7 +1105,7 @@ class TestPageUserAction(DefaultSiteTestCase):
         rv = userpage.watch(expiry='5 seconds')
         self.assertTrue(rv)
         self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
-        time.sleep(10)
+        time.sleep(15)
         self.assertNotIn(userpage, userpage.site.watched_pages(**wp_params))
 
 
