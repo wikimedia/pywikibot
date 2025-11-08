@@ -37,6 +37,7 @@ from pywikibot.exceptions import (
     LockedPageError,
     NoCreateError,
     NoPageError,
+    NoSiteLinkError,
     NoUsernameError,
     PageCreatedConflictError,
     PageDeletedConflictError,
@@ -1373,13 +1374,16 @@ class APISite(
 
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)
+
         try:
             page_title = dp.getSitelink(self)
-        except NoPageError:
+        except (NoPageError, NoSiteLinkError):
             return None
+
         page = pywikibot.Page(self, page_title)
         if page.namespace() == Namespace.CATEGORY:
             page = pywikibot.Category(page)
+
         return page
 
     def nice_get_address(self, title: str) -> str:

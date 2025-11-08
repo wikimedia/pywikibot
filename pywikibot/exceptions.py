@@ -408,20 +408,23 @@ class InconsistentTitleError(PageLoadRelatedError):
         super().__init__(page)
 
 
-class NoSiteLinkError(PageLoadRelatedError, NoPageError):
+class NoSiteLinkError(PageLoadRelatedError):
 
     """ItemPage has no sitelink to the given site.
 
     .. versionadded:: 8.1
     .. deprecated:: 8.1
-       :exc:`NoPageError` dependency.
+       This exception depends on :exc:`NoPageError` but it will be
+       removed.
+    .. versionremoved:: 11.0
+       Dependency on :exc:`NoPageError` was removed.
     """
 
     def __init__(self, page: pywikibot.page.ItemPage, dbname: str) -> None:
         """Initializer.
 
-        :param page: ItemPage that caused the exception
-        :param dbname: site identifier of the queried sitelink
+        :param page: ItemPage that caused the exception.
+        :param dbname: site identifier of the queried sitelink.
         """
         self.message = f'Item {{}} has no sitelink to {dbname!r}'
         super().__init__(page)

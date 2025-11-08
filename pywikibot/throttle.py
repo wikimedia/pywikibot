@@ -115,26 +115,6 @@ class Throttle:
            compatibility.
         """
 
-    @property
-    @deprecated('expiry', since='8.4.0')
-    def dropdelay(self):
-        """Ignore processes that have not made a check in this many seconds.
-
-        .. deprecated:: 8.4
-           use *expiry* instead.
-        """
-        return self.expiry
-
-    @property
-    @deprecated('expiry', since='8.4.0')
-    def releasepid(self):
-        """Free the process id after this many seconds.
-
-        .. deprecated:: 8.4
-           use *expiry* instead.
-        """
-        return self.expiry
-
     @staticmethod
     def _module_hash(module=None) -> str:
         """Convert called module name to a hash."""

@@ -10,7 +10,7 @@ import itertools
 import re
 import sys
 from collections import OrderedDict
-from collections.abc import Callable, Container, Iterable, Sequence
+from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
 from html.parser import HTMLParser
@@ -21,13 +21,7 @@ from pywikibot.backports import pairwise
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    deprecated,
-    deprecated_args,
-    first_lower,
-    first_upper,
-)
+from pywikibot.tools import ModuleDeprecationWrapper, first_lower, first_upper
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
@@ -1509,14 +1503,17 @@ def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
     return removeLanguageLinks(text, site, marker)
 
 
-@deprecated_args(addOnly='add_only')  # since 8.0
 def replaceLanguageLinks(oldtext: str,
-                         new: dict,
+                         new: Mapping[pywikibot.site.BaseSite,
+                                      pywikibot.Page | pywikibot.Link],
                          site: pywikibot.site.BaseSite | None = None,
                          add_only: bool = False,
                          template: bool = False,
                          template_subpage: bool = False) -> str:
     """Replace inter-language links in the text with a new set of links.
+
+    .. versionchanged:: 8.0
+       *addOnly* was renamed to *add_only*.
 
     :param oldtext: The text that needs to be modified.
     :param new: A dict with the Site objects as keys, and Page or Link
@@ -1840,12 +1837,14 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     return text
 
 
-@deprecated_args(addOnly='add_only')  # since 8.0
 def replaceCategoryLinks(oldtext: str,
                          new: Iterable,
                          site: pywikibot.site.BaseSite | None = None,
                          add_only: bool = False) -> str:
     """Replace all existing category links with new category links.
+
+    .. versionchanged:: 8.0
+       *addOnly* was renamed to *add_only*.
 
     :param oldtext: The text that needs to be replaced.
     :param new: Should be a list of Category objects or strings
@@ -2285,66 +2284,6 @@ class TimeStripper:
 
         self.tzinfo = TZoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
-
-    @property
-    @deprecated('patterns.time', since='8.0.0')
-    def ptimeR(self):
-        """Deprecated time pattern attribute.
-
-        .. deprecated:: 8.0
-           use pattern.time instead
-        """
-        return self.patterns.time
-
-    @property
-    @deprecated('patterns.tzinfo', since='8.0.0')
-    def ptimeznR(self):
-        """Deprecated tzinfo pattern attribute.
-
-        .. deprecated:: 8.0
-           use patterns.tzinfo instead
-        """
-        return self.patterns.tzinfo
-
-    @property
-    @deprecated('patterns.year', since='8.0.0')
-    def pyearR(self):
-        """Deprecated year pattern attribute.
-
-        .. deprecated:: 8.0
-           use patterns.year instead
-        """
-        return self.patterns.year
-
-    @property
-    @deprecated('patterns.month', since='8.0.0')
-    def pmonthR(self):
-        """Deprecated month pattern attribute.
-
-        .. deprecated:: 8.0
-           use patterns.month instead
-        """
-        return self.patterns.month
-
-    @property
-    @deprecated('patterns.day', since='8.0.0')
-    def pdayR(self):
-        """Deprecated day pattern attribute.
-
-        .. deprecated:: 8.0
-           use patterns.day instead
-        """
-        return self.patterns.day
-
-    @property
-    @deprecated('textlib.TIMEGROUPS', since='8.0.0')
-    def groups(self):
-        """Deprecated groups attribute.
-
-        .. deprecated:: 8.0
-           use textlib.TIMEGROUPS instead
-        """
-        return TIMEGROUPS
 
     def _last_match_and_replace(self,
                                 txt: str,

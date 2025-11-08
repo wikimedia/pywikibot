@@ -12,6 +12,17 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
+  :exc:`exceptions.NoPageError` was removed
+* The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class was
+  removed in favour of the *expiry* class attribute.
+* The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
+  the :class:`textlib.TimeStripper` class was removed in favour of the ``patterns`` attribute,
+  which is a :class:`textlib.TimeStripperPatterns` object.
+* The ``groups`` attribute of the :class:`textlib.TimeStripper` was removed in favour
+  of the :data:`textlib.TIMEGROUPS` constant.
+* The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
+  :func:`textlib.replaceCategoryLinks` was dropped in favour of ``add_only``.
 * ``load_tokens`` method of :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` was
   removed; ``clear`` method can be used instead.
 * No longer support legacy API tokens of MediaWiki 1.23 and older. (:phab:`270380`, :phab:`306637`)
@@ -74,17 +85,6 @@ Pending removal in Pywikibot 11
 * 10.7.0: Dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
   (:phab:`T359427`, :phab:`T407708`)
-* 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
-  removed in favour of the *expiry* class attribute
-* 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
-  :exc:`exceptions.NoPageError` will be removed
-* 8.0.0: The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
-  :func:`textlib.replaceCategoryLinks` functions is deprecated in favour of ``add_only``
-* 8.0.0: The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
-  the :class:`textlib.TimeStripper` class are deprecated in favour of the ``patterns`` attribute,
-  which is a :class:`textlib.TimeStripperPatterns` object
-* 8.0.0: The ``groups`` attribute of the :class:`textlib.TimeStripper` class is deprecated in favour
-  of the :data:`textlib.TIMEGROUPS` constant
 
 
 Pending removal in Pywikibot 12
