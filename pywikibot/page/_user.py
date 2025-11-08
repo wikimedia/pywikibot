@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator
+from typing import Any
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -102,7 +103,7 @@ class User(Page):
         """
         return is_ip_network(self.username)
 
-    def getprops(self, force: bool = False) -> dict:
+    def getprops(self, force: bool = False) -> dict[str, Any]:
         """Return a properties about the user.
 
         .. versionchanged:: 9.0
@@ -111,7 +112,9 @@ class User(Page):
         :param force: if True, forces reloading the data from API
         """
         if force and hasattr(self, '_userprops'):
+            self._userprops: dict[str, Any]
             del self._userprops
+
         if not hasattr(self, '_userprops'):
             self._userprops = next(self.site.users([self.username]))
             if self.isAnonymous() or self.is_CIDR():
@@ -120,6 +123,7 @@ class User(Page):
                 if r:
                     self._userprops['blockedby'] = r['by']
                     self._userprops['blockreason'] = r['reason']
+
         return self._userprops
 
     def registration(self,

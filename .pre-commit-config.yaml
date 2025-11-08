@@ -131,7 +131,7 @@ repos:
             comms/eventstreams|
             data/(api/(__init__|_optionset)|citoid|memento|wikistats)|
             families/[a-z][a-z\d]+_family|
-            page/(__init__|_decorators|_page|_revision)|
+            page/(__init__|_decorators|_page|_revision|_user)|
             pagegenerators/(__init__|_filters)|
             scripts/(?:i18n/)?__init__|
             site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|
