@@ -1,5 +1,9 @@
 """Superset Query interface.
 
+.. attention::
+   This module only works with a *client login* (including 2FA).
+   It does **not** work with BotPassword or OAuth accounts.
+
 .. versionadded:: 9.2
 """
 #
