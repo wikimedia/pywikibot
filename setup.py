@@ -45,14 +45,12 @@ extra_deps = {
     'wikitextparser': ['wikitextparser>=0.56.4'],
     'mysql': ['PyMySQL >= 1.1.2'],
     'Tkinter': [
-        'Pillow>=11.1.0,<11.3.0; platform_python_implementation == "PyPy" '
-        'and python_version >= "3.9" and python_version < "3.11"',
-        'Pillow>=11.1.0; platform_python_implementation == "PyPy" '
-        'and python_version >= "3.11"',
-        'Pillow>=11.1.0,<11.3.0; platform_python_implementation != "PyPy" '
+        'Pillow==10.4.0; platform_python_implementation == "PyPy" '
         'and python_version == "3.9"',
-        'Pillow>=12.0.0; platform_python_implementation != "PyPy" '
-        'and python_version >= "3.10"',
+        'Pillow==11.3.0; platform_python_implementation == "PyPy" '
+        'and python_version == "3.10"',
+        'Pillow>=10.4.0; platform_python_implementation != "PyPy" '
+        'or python_version >= "3.11"',
     ],
     'mwoauth': [
         'PyJWT != 2.10.0, != 2.10.1',  # T380270
