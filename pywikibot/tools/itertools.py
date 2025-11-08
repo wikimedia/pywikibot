@@ -13,7 +13,7 @@ from __future__ import annotations
 import collections
 import heapq
 import itertools
-from collections.abc import Callable, Generator, Iterable, Iterator
+from collections.abc import Callable, Generator, Hashable, Iterable, Iterator
 from contextlib import suppress
 from typing import Any
 
@@ -152,6 +152,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     # Item is cached to check that it is found n_gen times
     # before being yielded.
+    cache: collections.defaultdict[Hashable, collections.Counter[int]]
     cache = collections.defaultdict(collections.Counter)
     n_gen = len(iterables)
 
