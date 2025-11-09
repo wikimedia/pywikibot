@@ -1,6 +1,6 @@
 """Helper function which holds data from unicodedata library."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -273,7 +273,7 @@ _first_upper_exception = _first_upper_exception_dict.get
 # codepoint it takes longer especially when working with UCS2. The lists also
 # differ between Python versions which can be avoided by this static list.
 #
-# This frozenset was created using Python 3.14 (Unicode version 16.0.0):
+# This frozenset was created using Python 3.15 (Unicode version 17.0.0):
 # list(c for c in (chr(i) for i in range(sys.maxunicode))
 #      if unicodedata.category(c) == 'Cf')
 _category_cf = frozenset([
