@@ -32,7 +32,7 @@ The entire suite of tests may be run in the following ways from the root directo
 
 ::
 
-    pip install pytest
+    pip install "pytest != 9.0.0"
     pytest
 
 **tox**

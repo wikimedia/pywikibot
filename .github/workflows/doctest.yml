@@ -51,7 +51,7 @@ jobs:
           pip install mwparserfromhell
           pip install packaging
           pip install PyMySQL
-          pip install pytest
+          pip install "pytest != 9.0.0"
           pip install requests-sse
           pip install wikitextparser
       - name: Generate user files
