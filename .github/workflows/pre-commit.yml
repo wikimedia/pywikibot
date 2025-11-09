@@ -17,6 +17,7 @@ env:
 
 jobs:
   pre-commit:
+    timeout-minutes: 10
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
     strategy:
@@ -35,15 +36,10 @@ jobs:
           - python-version: 3.15-dev
     steps:
       - name: set up python ${{ matrix.python-version }}
-        if: "!endsWith(matrix.python-version, '-dev')"
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: set up development python ${{ matrix.python-version }}
-        if: endsWith(matrix.python-version, '-dev')
-        uses: deadsnakes/action@v3.2.0
-        with:
-          python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
       - name: checkout
         uses: actions/checkout@v5
         with:
@@ -53,4 +49,3 @@ jobs:
         env:
           SKIP: copyright
         timeout-minutes: 5
-    timeout-minutes: 100

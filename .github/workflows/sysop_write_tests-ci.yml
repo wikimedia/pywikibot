@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 100
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -54,7 +55,7 @@ jobs:
       - name: Sysop and write tests with pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 90
+        timeout-minutes: 25
         env:
           PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0 }}
         run: |

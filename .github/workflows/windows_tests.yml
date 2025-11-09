@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 100
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
           architecture: ${{ matrix.python-arch }}
       - name: Install dependencies
         shell: powershell
@@ -67,7 +68,7 @@ jobs:
       - name: Test with unittest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 90
+        timeout-minutes: 40
         env:
           PYTHONIOENCODING: utf-8
         run: |

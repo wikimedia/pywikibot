@@ -44,16 +44,9 @@ jobs:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
-        if: "!endsWith(matrix.python-version, '-dev')"
         with:
           python-version: ${{ matrix.python-version }}
-
-      # use deadsnakes/action for development releases
-      - name: Set up development Python ${{ matrix.python-version }}
-        uses: deadsnakes/action@v3.2.0
-        if: endsWith(matrix.python-version, '-dev')
-        with:
-          python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
       - name: Get token name
         env:
           _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
