@@ -220,8 +220,9 @@ def _print_requirements(requirements,
     else:
         format_string = '\nA package necessary for {} is {}.'
     print(format_string.format(script or 'pywikibot', variant))
-    print('Please update required module{} with:\n\n'
-          .format('s' if len(requirements) > 1 else ''))
+    print('Please {} required module{} with:\n\n'
+          .format('install' if variant == 'missing' else 'update',
+                  's' if len(requirements) > 1 else ''))
 
     for requirement in requirements:
         print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
@@ -237,7 +238,11 @@ def check_modules(script: str | None = None) -> bool:
     :return: True if all dependencies are installed
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    from packaging.requirements import Requirement
+    try:
+        from packaging.requirements import Requirement
+    except ModuleNotFoundError:
+        _print_requirements(['packaging'], None, 'missing')
+        sys.exit()
 
     from setup import script_deps
 
@@ -288,6 +293,9 @@ def check_modules(script: str | None = None) -> bool:
 
     return not missing_requirements
 
+
+if not check_modules():
+    sys.exit()
 
 filename, script_args, global_args, environ = handle_args(*sys.argv)
 
