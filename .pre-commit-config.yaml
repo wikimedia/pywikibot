@@ -63,14 +63,14 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.3
+    rev: v0.14.4
     hooks:
       - id: ruff-check
         alias: ruff
         args:
           - --fix
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
+    rev: v3.21.1
     hooks:
       - id: pyupgrade
         args:
@@ -87,7 +87,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: isort
         exclude: ^pwb\.py$
