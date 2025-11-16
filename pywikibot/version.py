@@ -348,12 +348,17 @@ def package_versions(
                 path = _file
 
             info['path'] = path
-            assert path not in paths, (
-                f'Path {path} of the package {name} is in defined paths as '
-                f'{paths[path]}'
-            )
+            if path in paths:
+                msg = (
+                    f'Path {path} of the package {name} is already in defined '
+                    f'paths as {paths[path]}'
+                )
+                if sys.version_info.releaselevel == 'final':
+                    raise RuntimeError(msg)
 
-            paths[path] = name
+                pywikibot.debug(msg)
+            else:
+                paths[path] = name
 
         if '__version__' in package.__dict__:
             info['ver'] = package.__version__
