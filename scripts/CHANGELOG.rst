@@ -6,6 +6,12 @@ Scripts Changelog
 
 * ``create_isbn_edition`` script was removed from scripts package (:phab:`T398140`)
 
+archivebot
+^^^^^^^^^^
+
+* respect the ``-namespace`` option with ``-page`` option (:phab:`T409016`)
+
+
 
 10.7.0
 ------

@@ -3,11 +3,17 @@ Release 11 (in development)
 
 **Improvements**
 
-* (no changes yet)
+* Show a friendly install message with :mod:`pwb<pywikibot.scripts.wrapper>` wrapper
+  when mandatory packages are missing (:phab:`T409662`)
+* Update `tools._unidata.__category_cf` dict for :func:`tools.chars.contains_invisible` and
+  :func:`tools.chars.replace_invisible` to unicode version 17.0.0
+* Update Docker files to Python 3.12 (:phab:`T408997`)
 
 **Bugfixes**
 
-* Handle 'lockmanager-fail-conflict' API error as retryable (:phab:`T396984`)
+* Handle `lockmanager-fail-conflict` API error in :meth:`data.api.Request.submit` as retryable
+  (:phab:`T396984`)
+* Prevent login loop in :mod:`data.superset` with unsupported auth methods (:phab:`T408287`)
 * Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
   :class:`pywikibot.WbTime`
 
