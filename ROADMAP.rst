@@ -7,6 +7,7 @@ Release 11 (in development)
 
 **Bugfixes**
 
+* Handle 'lockmanager-fail-conflict' API error as retryable (:phab:`T396984`)
 * Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
   :class:`pywikibot.WbTime`
 

@@ -1151,6 +1151,10 @@ but {scheme!r} is required. Please add the following code to your family file:
                 self.wait()
                 continue
 
+            if code == 'lockmanager-fail-conflict':  # T396984
+                self.wait()
+                continue
+
             if code in ('search-title-disabled', 'search-text-disabled'):
                 prefix = 'gsr' if 'gsrsearch' in self._params else 'sr'
                 del self._params[prefix + 'what']
