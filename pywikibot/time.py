@@ -170,8 +170,6 @@ class Timestamp(datetime.datetime):
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
             ts = ts.astimezone(datetime.timezone.utc).replace(tzinfo=None)
-            # TODO: why pytest in py37 fails without this?
-            ts = cls._from_datetime(ts)
 
         return ts
 
