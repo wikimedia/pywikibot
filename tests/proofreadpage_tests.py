@@ -73,6 +73,41 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(str(attr), "fromsection='A123'")
         self.assertEqual(attr.value, 'A123')
 
+    def test_tag_attr_str_with_spaces(self) -> None:
+        """Test TagAttr for str value with spaces."""
+        attr = TagAttr('index', 'Sample index with more than two words.pdf')
+        self.assertEqual(
+            repr(attr),
+            "TagAttr('index', '\"Sample index with more than two words.pdf\"')"
+        )
+        self.assertEqual(
+            str(attr), 'index="Sample index with more than two words.pdf"')
+        self.assertEqual(
+            attr.value, 'Sample index with more than two words.pdf')
+
+    def test_tag_attr_str_with_multiple_spaces(self) -> None:
+        """Test TagAttr for str value with multiple spaces."""
+        attr = TagAttr('index', 'Sample index with   multiple   spaces.pdf')
+        self.assertEqual(
+            repr(attr),
+            "TagAttr('index', '\"Sample index with   multiple   spaces.pdf\"')"
+        )
+        self.assertEqual(
+            str(attr), 'index="Sample index with   multiple   spaces.pdf"')
+        self.assertEqual(
+            attr.value, 'Sample index with   multiple   spaces.pdf')
+
+        tag = PagesTagParser()
+        tag.index = 'Sample index with more than two words.pdf'
+        tag.ffrom = 5
+        tag.to = '6'
+        tag.fromsection = '"chapter XVI"'
+        self.assertEqual(
+            str(tag),
+            '<pages index="Sample index with more than two words.pdf" '
+            'from=5 to=6 fromsection="chapter XVI" />'
+        )
+
     def test_tag_attr_exceptions(self) -> None:
         """Test TagAttr for Exceptions."""
         with self.assertRaisesRegex(ValueError, 'has wrong quotes'):
@@ -109,6 +144,11 @@ class TestPagesTagParser(TestCase):
         tp.step = 3
         self.assertEqual(str(tp), """<pages from=1 to='3' step=3 />""")
         self.assertIn('step', tp)
+
+        text = """Text: <pages index="Index.pdf"   from="1" />"""
+        tp = PagesTagParser(text)
+        self.assertEqual(tp.index, 'Index.pdf')
+        self.assertEqual(tp.ffrom, 1)
 
     def test_pages_tag_parser_exceptions(self) -> None:
         """Test PagesTagParser Exceptions."""

@@ -141,6 +141,11 @@ class TagAttr:
             if (value.startswith('"') != value.endswith('"')
                     or value.startswith("'") != value.endswith("'")):
                 raise ValueError(f'{value=!s} has wrong quotes.')
+
+            # Add quotes if value contains spaces and is not already quoted
+            if ' ' in value and not value.startswith(('"', "'")):
+                self._orig_value = json.dumps(value, ensure_ascii=False)
+
             value = value.strip('"\'')
             value = int(value) if value.isdigit() else value
 
@@ -325,7 +330,7 @@ class PagesTagParser(collections.abc.Container):
             attr, _, value = attribute.partition('=')
             if attr == 'from':
                 attr = 'f' + attr
-            setattr(self, attr, value)
+            setattr(self, attr, value.strip())
 
     @classmethod
     def get_descriptors(cls):
