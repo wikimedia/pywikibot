@@ -6,6 +6,9 @@
 .. versionchanged:: 8.0
    let user the choice which section to be copied.
    Also EXTERNAL EDITOR SETTINGS section can be copied.
+.. versionchanged:: 10.7.1
+   Default ``PASS_BASENAME`` was changed from ``user-password.py`` to
+   ``user-password.cfg``
 """
 #
 # (C) Pywikibot team, 2010-2025
@@ -55,7 +58,7 @@ if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = 'iso-8859-1'
 
 USER_BASENAME = 'user-config.py'
-PASS_BASENAME = 'user-password.py'
+PASS_BASENAME = 'user-password.cfg'
 
 
 def change_base_dir():

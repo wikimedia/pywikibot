@@ -30,7 +30,7 @@ class TestGenerateUserFiles(TestCase):
     def test_base_names(self) -> None:
         """Test basename constants."""
         self.assertEndsWith(guf.USER_BASENAME, '.py')
-        self.assertEndsWith(guf.PASS_BASENAME, '.py')
+        self.assertEndsWith(guf.PASS_BASENAME, '.cfg')
 
     def test_config_test(self) -> None:
         """Test config text strings."""
