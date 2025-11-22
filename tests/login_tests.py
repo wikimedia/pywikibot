@@ -10,6 +10,8 @@ e.g. used to test password-file based login.
 #
 from __future__ import annotations
 
+import builtins
+import uuid
 from collections import defaultdict
 from io import StringIO
 from pathlib import Path
@@ -186,6 +188,42 @@ class TestPasswordFile(DefaultDrySiteTestCase):
             ('~FakeUsername', BotPassword('~FakeSuffix', '~FakePassword'))
             """, '~FakePassword')
         self.assertEqual(obj.login_name, '~FakeUsername@~FakeSuffix')
+
+    def test_eval_security(self) -> None:
+        """Test security that password file does not use eval() function."""
+        # Test file will will be created for Python 3.10-3.13
+        # due to self.stat patch in setUp().
+        no_file = (3, 9) < PYTHON_VERSION < (3, 14)
+
+        builtins.exploit_value = False
+        exploit_code = (
+            "__import__('builtins').__dict__"
+            ".__setitem__('exploit_value', True)"
+        )
+        if not no_file:
+            exploit_filename = f'pwb_rce_{uuid.uuid4().hex[:8]}.txt'
+            exploit_file = Path(exploit_filename)
+            exploit_code = (
+                f"__import__('pathlib').Path('{exploit_filename}').touch() or "
+                + exploit_code
+            )
+
+        with self.subTest(test='Test ValueError'), \
+             self.assertRaisesRegex(ValueError,
+                                    'Invalid password line format'):
+            self._test_pwfile(f"""
+                ('en', 'wikipedia', 'victim', {exploit_code})
+                """, None)
+
+        with self.subTest(test='Test value was modified'):
+            self.assertFalse(exploit_value)  # noqa: F821
+
+        if not no_file:
+            with self.subTest(test='Test file exists'):
+                self.assertFalse(exploit_file.exists())
+
+            # cleanup file (should never happen)
+            exploit_file.unlink(missing_ok=True)
 
 
 if __name__ == '__main__':

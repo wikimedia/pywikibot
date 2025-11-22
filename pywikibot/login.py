@@ -10,6 +10,7 @@ import datetime
 import os
 import re
 import webbrowser
+from ast import literal_eval
 from enum import IntEnum
 from pathlib import Path
 from textwrap import fill
@@ -31,6 +32,8 @@ try:
     import mwoauth
 except ImportError as e:
     mwoauth = e
+
+TEST_RUNNING = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 
 
 class _PasswordFileWarning(UserWarning):
@@ -201,7 +204,7 @@ class LoginManager:
         will be used, so default usernames should occur above specific
         usernames.
 
-        .. note:: For BotPasswords the password should be given as a
+        .. note:: For BotPasswords the password should be given like a
            :class:`BotPassword` object.
 
         The file must be either encoded in ASCII or UTF-8.
@@ -214,10 +217,17 @@ class LoginManager:
          ('my_username', BotPassword('my_suffix', 'my_password'))
 
         .. versionchanged:: 10.2
-           raises ValueError instead of AttributeError if password_file
-               is not set
+           Raises ValueError instead of AttributeError if password_file
+               is not set.
+        .. versionchanged:: 10.7.1
+           Due to vulnerability issue the password lines are no longer
+           evaluated as Python source but parsed as literals.
+           Raises ValueError if an exception occurs while evaluating a
+           password line.
 
-        :raises ValueError: `password_file` is not set in the user-config.py
+
+        :raises ValueError: `password_file` is not set in the
+            ``user-config.py`` or entries are critical malformed
         :raises FileNotFoundError: password file does not exist
         """
         if config.password_file is None:
@@ -246,15 +256,24 @@ class LoginManager:
 
         lines = password_path.read_text('utf-8').splitlines()
         line_len = len(lines)
-
         for n, line in enumerate(reversed(lines)):
-            if not line.strip() or line.startswith('#'):
+            line = line.strip()
+            if not line or line.startswith('#'):
                 continue
 
+            # sanity check
+            if (line.count(',') > 3 or len(line) > 250) and not TEST_RUNNING:
+                raise ValueError('Password line too long or too complex')
+
+            botpassword = 'BotPassword' in line
+            if botpassword:
+                line = line.replace('BotPassword', '')
+
             try:
-                entry = eval(line)
-            except SyntaxError:
-                entry = None
+                entry = literal_eval(line)
+            except Exception:
+                # catch the exceptions to not leak passwords to console or logs
+                raise ValueError('Invalid password line format') from None
 
             if not isinstance(entry, tuple):
                 warn(f'Invalid tuple in line {line_len - n}',
@@ -266,6 +285,9 @@ class LoginManager:
                      f'to 4, {entry_len} given ({entry})',
                      _PasswordFileWarning, stacklevel=2)
                 continue
+
+            if botpassword:
+                entry = (entry[0], BotPassword(*entry[1]))
 
             code, family, username, password = (
                 self.site.code, self.site.family.name)[:4 - entry_len] + entry
