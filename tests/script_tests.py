@@ -39,7 +39,7 @@ def check_script_deps(script_name) -> bool:
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
             if not has_module(package_name):
-                return False
+                return False  # pragma: no cover
     return True
 
 

@@ -114,7 +114,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         """Test detection of proofwiki.org site."""
         if os.getenv('GITHUB_ACTIONS'):
             self.skipTest('Skip test on github due to T331223')
-        self.assertSite('http://proofwiki.org/wiki/$1')
+        self.assertSite('http://proofwiki.org/wiki/$1')  # pragma: no cover
 
     def test_non_standard_version_sites(self) -> None:
         """Test detection of non standard MediaWiki sites."""
