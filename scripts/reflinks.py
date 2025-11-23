@@ -104,6 +104,7 @@ stop_page = {
     'en': 'User:DumZiBoT/EditThisPageToStopMe',
     'pl': 'Wikipedysta:MastiBot/EditThisPageToStopMe',
     'ru': 'User:Rubinbot/EditThisPageToStopMe',
+    'uk': 'Користувач:MonxBot/EditThisPageToStopMe',
     'ur': 'صارف:Shuaib-bot/EditThisPageToStopMe',
     'zh': 'User:Sz-iwbot',
 }
@@ -123,6 +124,7 @@ deadLinkTag = {
     'pl': '[%s] {{Martwy link}}',
     'ru': '[%s] {{Недоступная ссылка}}',
     'sr': '[%s] {{dead link}}',
+    'uk': '[%s] {{Недоступне посилання}}',
     'ur': '[%s] {{مردہ ربط}}',
 }
 
