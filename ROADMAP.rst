@@ -14,8 +14,6 @@ Release 11 (in development)
 * Handle `lockmanager-fail-conflict` API error in :meth:`data.api.Request.submit` as retryable
   (:phab:`T396984`)
 * Prevent login loop in :mod:`data.superset` with unsupported auth methods (:phab:`T408287`)
-* Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
-  :class:`pywikibot.WbTime`
 
 **Code cleanups**
 
