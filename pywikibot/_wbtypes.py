@@ -14,7 +14,7 @@ import re
 from collections.abc import Mapping
 from contextlib import suppress
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import pywikibot
 from pywikibot import exceptions
@@ -28,7 +28,7 @@ from pywikibot.tools import (
 
 
 if TYPE_CHECKING:
-    from typing import Union, cast
+    from typing import Union
 
     from pywikibot.site import APISite, BaseSite, DataSite
 

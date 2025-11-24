@@ -1,15 +1,9 @@
 Current Release Changes
 =======================
 
-* Add support for pcmwikiquote and minwikisource. (:phab:`T408345`, :phab:`T408353`)
-* Deprecate dysfunctional :meth:`APISite.alllinks()
-  <pywikibot.site._generators.GeneratorsMixin.alllinks>`. (:phab:`T359427`, :phab:`T407708`)
-* Refactor ``replace_magicwords`` in
-  :meth:`cosmetic_changes.CosmeticChangesToolkit.translateMagicWords`. (:phab:`T396715`)
-* Deprecate old ``(type, value, traceback)`` signature in
-  :meth:`tools.collections.GeneratorWrapper.throw`. (:phab:`T340641`)
-* Replace default timetravel.mementoweb.org with web.archive.org in :mod:`data.memento` module.
-  (:phab:`T400570`, :phab:`T407694`)
+* Fix vulnerability in password parsing (:phab:`T410753`)
+* Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
+  :class:`pywikibot.WbTime`
 * i18n updates
 
 
@@ -17,10 +11,10 @@ Deprecations
 ============
 
 This section lists features, methods, parameters, or attributes that are deprecated
-and scheduled for removal in future Pywikibot releases.  
+and scheduled for removal in future Pywikibot releases.
 
 Deprecated items may still work in the current release but are no longer recommended for use.
-Users should update their code according to the recommended alternatives.  
+Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
 removed in in the third subsequent major release, remaining available for the two releases in between.
