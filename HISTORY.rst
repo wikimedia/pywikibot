@@ -1,6 +1,13 @@
 Release History
 ===============
 
+10.7.2
+------
+*28 November 2025*
+
+* Add support for tokwiki (:phab:`T404569`)
+
+
 10.7.1
 ------
 *24 November 2025*
