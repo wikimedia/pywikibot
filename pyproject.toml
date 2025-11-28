@@ -1,5 +1,5 @@
 [build-system]
-requires = ["packaging", "setuptools", "wheel"]
+requires = ["packaging", "setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
@@ -23,12 +23,12 @@ keywords = [
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
     "wiki", "wikibase", "wikidata", "wikimedia", "wikipedia",
 ]
-license = {text = "MIT License"}
+license =  "MIT"
+license-files = ["LICENSE"]
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: Afrikaans",
     "Natural Language :: Arabic",
     "Natural Language :: Basque",
