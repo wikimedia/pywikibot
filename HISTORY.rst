@@ -1,6 +1,16 @@
 Release History
 ===============
 
+10.7.1
+------
+*24 November 2025*
+
+* Fix vulnerability in password parsing (:phab:`T410753`)
+* Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
+  :class:`pywikibot.WbTime`
+* i18n updates
+
+
 10.7.0
 ------
 *31 October 2025*

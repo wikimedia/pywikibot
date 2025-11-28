@@ -57,10 +57,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'simple', 'sk', 'skr', 'sl', 'sm', 'smn', 'sn', 'so', 'sq', 'sr',
         'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'syl', 'szl', 'szy', 'ta',
         'tay', 'tcy', 'tdd', 'te', 'tet', 'tg', 'th', 'ti', 'tig', 'tk', 'tl',
-        'tly', 'tn', 'to', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw', 'ty',
-        'tyv', 'udm', 'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls',
-        'vo', 'wa', 'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za',
-        'zea', 'zgh', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
+        'tly', 'tn', 'to', 'tok', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw',
+        'ty', 'tyv', 'udm', 'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi',
+        'vls', 'vo', 'wa', 'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo',
+        'za', 'zea', 'zgh', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 'zu',
     }
 
     # Sites we want to edit but not count as real languages

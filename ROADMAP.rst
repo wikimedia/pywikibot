@@ -1,10 +1,7 @@
 Current Release Changes
 =======================
 
-* Fix vulnerability in password parsing (:phab:`T410753`)
-* Import ``typing.cast`` in :mod:`_wbtypes` module to prevent ``NameError`` in
-  :class:`pywikibot.WbTime`
-* i18n updates
+* Add support for tokwiki (:phab:`T404569`)
 
 
 Deprecations
