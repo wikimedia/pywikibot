@@ -3,6 +3,7 @@ Release 11 (in development)
 
 **Improvements**
 
+* Provide a security policy with Pywikibot (:phab:`T410753`)
 * Show a friendly install message with :mod:`pwb<pywikibot.scripts.wrapper>` wrapper
   when mandatory packages are missing (:phab:`T409662`)
 * Update `tools._unidata.__category_cf` dict for :func:`tools.chars.contains_invisible` and
@@ -17,6 +18,9 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* Dysfunctional :meth:`APISite.alllinks()
+  <pywikibot.site._generators.GeneratorsMixin.alllinks>` was removed.
+  (:phab:`T359427`, :phab:`T407708`)
 * The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
   :exc:`exceptions.NoPageError` was removed
 * The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class was
@@ -82,14 +86,6 @@ Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
 removed in in the third subsequent major release, remaining available for the two releases in between.
-
-
-Pending removal in Pywikibot 11
--------------------------------
-
-* 10.7.0: Dysfunctional :meth:`APISite.alllinks()
-  <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
-  (:phab:`T359427`, :phab:`T407708`)
 
 
 Pending removal in Pywikibot 12
