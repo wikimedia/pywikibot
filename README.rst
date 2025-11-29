@@ -143,7 +143,7 @@ Roadmap
 
 .. include:: ROADMAP.rst
 
-Release history
+Release history.
 ===============
 
 See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
