@@ -1,5 +1,6 @@
 throttle.ctrl
 user-*.py
+user-*.cfg
 *.bak
 *.lwp
 *.pyc
