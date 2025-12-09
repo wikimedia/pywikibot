@@ -287,7 +287,7 @@ class LoginManager:
                 continue
 
             if botpassword:
-                entry = (entry[0], BotPassword(*entry[1]))
+                entry = (*entry[:-1], BotPassword(*entry[-1]))
 
             code, family, username, password = (
                 self.site.code, self.site.family.name)[:4 - entry_len] + entry
