@@ -1,7 +1,8 @@
 Current Release Changes
 =======================
 
-* Add support for tokwiki (:phab:`T404569`)
+* Fix extracting password line (:phab:`T412074`)
+* Add generated password file to gitignore list (:phab:`T411966`, :phab:`T410753`)
 
 
 Deprecations
