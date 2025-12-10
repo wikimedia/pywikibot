@@ -262,7 +262,7 @@ class LoginManager:
                 continue
 
             # sanity check
-            if (line.count(',') > 3 or len(line) > 250) and not TEST_RUNNING:
+            if (line.count(', ') > 4 or len(line) > 250) and not TEST_RUNNING:
                 raise ValueError('Password line too long or too complex')
 
             botpassword = 'BotPassword' in line

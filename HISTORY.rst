@@ -1,6 +1,13 @@
 Release History
 ===============
 
+10.7.4
+------
+*10 December 2025*
+
+* Fix extracting password line (:phab:`T412191`)
+
+
 10.7.3
 ------
 *10 December 2025*
