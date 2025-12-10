@@ -1,8 +1,7 @@
 Current Release Changes
 =======================
 
-* Fix extracting password line (:phab:`T412074`)
-* Add generated password file to gitignore list (:phab:`T411966`, :phab:`T410753`)
+* Fix extracting password line (:phab:`T412191`)
 
 
 Deprecations

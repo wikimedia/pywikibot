@@ -1,6 +1,14 @@
 Release History
 ===============
 
+10.7.3
+------
+*10 December 2025*
+
+* Fix extracting password line (:phab:`T412074`)
+* Add generated password file to gitignore list (:phab:`T411966`, :phab:`T410753`)
+
+
 10.7.2
 ------
 *28 November 2025*
