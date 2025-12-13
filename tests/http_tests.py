@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import re
+import unittest
 import warnings
 from contextlib import suppress
 from http import HTTPStatus
@@ -19,9 +20,9 @@ import pywikibot
 from pywikibot import config
 from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
-from pywikibot.tools import PYTHON_VERSION, suppress_warnings
-from tests import join_images_path
-from tests.aspects import HttpbinTestCase, TestCase, require_modules, unittest
+from pywikibot.tools import PYTHON_VERSION, THREADING_FREE, suppress_warnings
+from tests import join_images_path, utils
+from tests.aspects import HttpbinTestCase, TestCase, require_modules
 
 
 class HttpTestCase(TestCase):
@@ -84,6 +85,7 @@ class TestGetAuthenticationConfig(TestCase):
                 self.assertEqual(http.get_authentication(url), auth)
 
 
+@utils.expected_failure_if(THREADING_FREE)  # T412603
 class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""

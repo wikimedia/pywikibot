@@ -68,6 +68,7 @@ __all__ = (
     # other tools
     'PYTHON_VERSION',
     'SPHINX_RUNNING',
+    'THREADING_FREE',
     'as_filename',
     'is_ip_address',
     'is_ip_network',
@@ -89,6 +90,11 @@ __all__ = (
 
 PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
 SPHINX_RUNNING: bool = 'sphinx' in sys.modules
+THREADING_FREE: bool
+if PYTHON_VERSION >= (3, 13):
+    THREADING_FREE = not sys._is_gil_enabled()
+else:
+    THREADING_FREE = False
 
 
 def is_ip_address(value: str) -> bool:
