@@ -191,16 +191,17 @@ class TestPasswordFile(DefaultDrySiteTestCase):
 
     def test_eval_security(self) -> None:
         """Test security that password file does not use eval() function."""
-        # Test file will will be created for Python 3.10-3.13
-        # due to self.stat patch in setUp().
-        no_file = (3, 9) < PYTHON_VERSION < (3, 14)
+        # File-based checks are limited to Python 3.9 only.
+        # On newer versions, self.stat patching in setUp() fails,
+        # making the file appear to exist.
+        use_file = PYTHON_VERSION[:2] == (3, 9)
 
         builtins.exploit_value = False
         exploit_code = (
             "__import__('builtins').__dict__"
             ".__setitem__('exploit_value', True)"
         )
-        if not no_file:
+        if use_file:
             exploit_filename = f'pwb_rce_{uuid.uuid4().hex[:8]}.txt'
             exploit_file = Path(exploit_filename)
             exploit_code = (
@@ -218,7 +219,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         with self.subTest(test='Test value was modified'):
             self.assertFalse(exploit_value)  # noqa: F821
 
-        if not no_file:
+        if use_file:
             with self.subTest(test='Test file exists'):
                 self.assertFalse(exploit_file.exists())
 
