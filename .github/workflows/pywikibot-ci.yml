@@ -51,6 +51,15 @@ jobs:
           - python-version: '3'
             site: wikipedia:de
             os: macOS-latest
+          - python-version: 3.13t
+            site: wikipedia:test
+            experimental: true
+          - python-version: 3.14t
+            site: wikipedia:test
+            experimental: true
+          - python-version: 3.15t
+            site: wikipedia:test
+            experimental: true
           # ubuntu-22.04 required 3.15-dev due to T382214
           - python-version: 3.15-dev
             site: wikipedia:en
