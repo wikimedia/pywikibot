@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2024
+# (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 from unittest.mock import patch
 
 import pywikibot
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUserError
-from tests.aspects import DefaultSiteTestCase, TestCase, unittest
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class TestUserClass(TestCase):

@@ -7,12 +7,13 @@
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 
 import pywikibot
 from pywikibot.backports import NoneType
 from pywikibot.exceptions import Error
-from tests.aspects import DefaultSiteTestCase, TestCase, unittest
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 WARN_SELF_CALL = (r'Referencing this attribute like a function '

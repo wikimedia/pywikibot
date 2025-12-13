@@ -11,6 +11,7 @@ e.g. used to test password-file based login.
 from __future__ import annotations
 
 import builtins
+import unittest
 import uuid
 from collections import defaultdict
 from io import StringIO
@@ -20,7 +21,7 @@ from unittest import mock
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
 from pywikibot.tools import PYTHON_VERSION
-from tests.aspects import DefaultDrySiteTestCase, unittest
+from tests.aspects import DefaultDrySiteTestCase
 
 
 class FakeFamily:

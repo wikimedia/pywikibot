@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import bot, config, i18n
 from pywikibot.exceptions import TranslationError
-from tests.aspects import DefaultSiteTestCase, PwbTestCase, TestCase, unittest
+from tests.aspects import DefaultSiteTestCase, PwbTestCase, TestCase
 
 
 class Site:

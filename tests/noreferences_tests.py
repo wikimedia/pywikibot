@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Test noreferences bot module."""
 #
-# (C) Pywikibot team, 2018-2022
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import unittest
+
 import pywikibot
 from scripts.noreferences import NoReferencesBot
-from tests.aspects import TestCase, unittest
+from tests.aspects import TestCase
 
 
 class TestAddingReferences(TestCase):

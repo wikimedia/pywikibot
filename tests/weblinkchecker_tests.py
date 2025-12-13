@@ -7,11 +7,12 @@
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 
 import pywikibot
 from scripts.weblinkchecker import WeblinkCheckerRobot
-from tests.aspects import TestCase, unittest
+from tests.aspects import TestCase
 
 
 class TestWeblinkchecker(TestCase):
