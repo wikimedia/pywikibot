@@ -117,6 +117,8 @@ jobs:
         timeout-minutes: 45
         env:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+          # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
+          PYTHON_GIL: ${{ endsWith(matrix.python-version, 't') && '0' || '1' }}
         run: |
           python pwb.py version
           if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then
