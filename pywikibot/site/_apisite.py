@@ -779,6 +779,15 @@ class APISite(
             del self.userinfo
         return 'blockinfo' in self.userinfo
 
+    def is_partial_blocked(self, force: bool = False) -> bool:
+        """Return True if the logged-in user is partially blocked.
+
+        .. versionadded:: 11.0
+        """
+        if force:
+            del self.userinfo
+        return 'partial' in self.userinfo.get('blockinfo', {})
+
     def is_locked(self,
                   user: str | int | None = None,
                   force: bool = False) -> bool:

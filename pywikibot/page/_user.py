@@ -159,6 +159,32 @@ class User(Page):
         """
         return 'blockedby' in self.getprops(force)
 
+    def is_partial_blocked(self, force: bool = False) -> bool:
+        """Return True if this user is partially blocked, False otherwise.
+
+        .. versionadded:: 11.0
+        """
+        return 'blockpartial' in self.getprops(force)
+
+    def get_block_info(self, force: bool = False) -> dict[str, Any] | None:
+        """Return a dictionary of block information if the user is blocked.
+
+        Returns None if the user is not blocked.
+        The returned dictionary contains keys like:
+        - blockid
+        - blockedby
+        - blockreason
+        - blockexpiry
+        - blockpartial (only if partial block)
+
+        .. versionadded:: 11.0
+        """
+        props = self.getprops(force)
+        if 'blockid' not in props:
+            return None
+
+        return {k: v for k, v in props.items() if k.startswith('block')}
+
     def is_locked(self, force: bool = False) -> bool:
         """Determine whether the user is currently locked globally.
 
