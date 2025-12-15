@@ -148,17 +148,6 @@ Release history
 
 See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
 
-Current Development
-===================
-
-The following features are available in the development version and will be
-included in the next release:
-
-* Add ``is_partial_blocked()`` method to ``User`` and ``APISite`` classes to detect partial blocks
-* Add ``get_block_info()`` method to ``User`` class to retrieve detailed block information including block ID, reason, expiry, and restrictions
-
-See `T412613 <https://phabricator.wikimedia.org/T412613>`_ for details.
-
 Contributing
 ============
 

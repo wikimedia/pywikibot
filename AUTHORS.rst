@@ -76,14 +76,17 @@ D
     David Wood
     David-Sarah Hopwood
     dennisroczek
+    DerIch27
     Denny Vrandecic
-    DMaggot
     Didicodes
+    Dikkulah
     Diwanshu Mittal
+    DMaggot
     Dmytro Dziuma
     Dr03ramos
     Draco flavus
     DrTrigon
+    Dumbledore
     Dvorapa
 
 E
@@ -227,6 +230,7 @@ M
     mjbmr
     mloc-gci
     Mohamed Magdy
+    MonAx the Developer
     Mpaa
     murfel
     MuhammadShuaib
@@ -321,6 +325,7 @@ T
 
 
     Tacsipacsi
+    Tbodt
     Tejashxv
     Tgr
     TheRogueMule
@@ -360,6 +365,7 @@ W
 
 
     Warddr
+    WASP-Outis
     Wieland Hoffmann
     Wikihermit
     Wikipedian

@@ -766,12 +766,15 @@ class APISite(
         """Return True when logged in user is blocked.
 
         To check whether a user can perform an action,
-        the method has_right should be used.
+        the method :meth:`has_right` should be used.
 
-        .. seealso:: :api:`Userinfo`
+        .. seealso::
+           - :meth:`is_partial_blocked`
+           - :meth:`User.is_blocked()<pywikibot.User.is_blocked>`
+           - :attr:`userinfo`
 
-        .. versionadded:: 7.0
-           The `force` parameter
+        .. versionchanged:: 7.0
+           The *force* parameter was added.
 
         :param force: Whether the cache should be discarded.
         """
@@ -779,10 +782,18 @@ class APISite(
             del self.userinfo
         return 'blockinfo' in self.userinfo
 
-    def is_partial_blocked(self, force: bool = False) -> bool:
+    def is_partial_blocked(self, *, force: bool = False) -> bool:
         """Return True if the logged-in user is partially blocked.
 
+        .. seealso::
+           - :meth:`is_blocked`
+           - :meth:`User.is_partial_blocked()
+             <pywikibot.User.is_partial_blocked>`
+           - :attr:`userinfo`
+
         .. versionadded:: 11.0
+
+        :param force: if True, forces reloading the data from API
         """
         if force:
             del self.userinfo
@@ -792,6 +803,10 @@ class APISite(
                   user: str | int | None = None,
                   force: bool = False) -> bool:
         """Return True when given user is locked globally.
+
+        .. seealso::
+           - :meth:`is_blocked`
+           - :attr:`globaluserinfo`
 
         .. versionadded:: 7.0
 

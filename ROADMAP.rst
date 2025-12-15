@@ -3,6 +3,16 @@ Release 11 (in development)
 
 **Improvements**
 
+* Add :meth:`User.is_partial_blocked()<pywikibot.User.is_partial_blocked>` and methods
+  :meth:`APISite.is_partial_blocked()<pywikibot.site._apisite.APISite.is_partial_blocked>` to detect
+  partial blocks (:phab:`T412613`)
+* Add :meth:`get_block_info()<pywikibot.User.get_block_info>` method to :class:`pywikibot.User`
+  class to retrieve detailed block information including block ID, reason, expiry, and restrictions
+  (:phab:`T412613`)
+* Java based GraalPy is supported but Pillow cannot be used (:phab:`T412739`)
+* Free threading Python is supported with some restrictions
+  (:phab:`T408131`, :phab:`T412605`, :phab:`T412624`)
+* i18n updates
 * Provide a security policy with Pywikibot (:phab:`T410753`)
 * Show a friendly install message with :mod:`pwb<pywikibot.scripts.wrapper>` wrapper
   when mandatory packages are missing (:phab:`T409662`)

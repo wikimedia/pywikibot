@@ -150,6 +150,10 @@ class User(Page):
     def is_blocked(self, force: bool = False) -> bool:
         """Determine whether the user is currently blocked.
 
+        .. seealso::
+           - :meth:`is_partial_blocked`
+           - :meth:`get_block_info`
+
         .. versionchanged:: 7.0
            renamed from :meth:`isBlocked` method
         .. versionchanged:: 9.0
@@ -159,25 +163,39 @@ class User(Page):
         """
         return 'blockedby' in self.getprops(force)
 
-    def is_partial_blocked(self, force: bool = False) -> bool:
+    def is_partial_blocked(self, *, force: bool = False) -> bool:
         """Return True if this user is partially blocked, False otherwise.
 
+        .. seealso::
+           - :meth:`get_block_info`
+           - :meth:`APISite.is_partial_blocked()
+             <pywikibot.site._apisite.APISite.is_partial_blocked>`
+
         .. versionadded:: 11.0
+
+        :param force: if True, forces reloading the data from API
         """
         return 'blockpartial' in self.getprops(force)
 
-    def get_block_info(self, force: bool = False) -> dict[str, Any] | None:
+    def get_block_info(self, *, force: bool = False) -> dict[str, Any] | None:
         """Return a dictionary of block information if the user is blocked.
 
         Returns None if the user is not blocked.
         The returned dictionary contains keys like:
+
         - blockid
         - blockedby
         - blockreason
         - blockexpiry
         - blockpartial (only if partial block)
 
+        .. seealso::
+           - :meth:`getprops`
+           - :meth:`is_partial_blocked`
+
         .. versionadded:: 11.0
+
+        :param force: if True, forces reloading the data from API
         """
         props = self.getprops(force)
         if 'blockid' not in props:
