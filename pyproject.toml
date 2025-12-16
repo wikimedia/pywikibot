@@ -23,7 +23,7 @@ keywords = [
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
     "wiki", "wikibase", "wikidata", "wikimedia", "wikipedia",
 ]
-license =  "MIT"
+license = "MIT"
 license-files = ["LICENSE"]
 classifiers=[
     "Development Status :: 5 - Production/Stable",
