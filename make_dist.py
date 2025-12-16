@@ -30,7 +30,7 @@ scripts    The pywikibot-scripts repository to build
 
 Usage::
 
-    [pwb] make_dist [repo] [options]
+    python -B -m [pwb] make_dist [repo] [options]
 
 .. version-added:: 7.3
 .. version-changed:: 7.4
@@ -64,13 +64,14 @@ import shutil
 import sys
 from contextlib import suppress
 from dataclasses import dataclass, field
-from importlib import import_module
+from importlib.util import find_spec
 from pathlib import Path
 from subprocess import check_call, run
 
 from pywikibot import __version__, error, info, input_yn, warning
 
 
+MODULE, COMMAND = range(2)
 pip = f'{sys.executable} -m pip'
 
 
@@ -103,13 +104,11 @@ class SetupBase(abc.ABC):
         """Delete old dist folders.
 
         .. version-added:: 7.5
+        .. version-changed:: 11.5
+           Use pyclean for cleanup.
         """
         info('<<lightyellow>>Removing old dist folders... ', newline=False)
-        shutil.rmtree(self.folder / 'build', ignore_errors=True)
-        shutil.rmtree(self.folder / 'dist', ignore_errors=True)
-        shutil.rmtree(self.folder / 'pywikibot.egg-info', ignore_errors=True)
-        shutil.rmtree(self.folder / 'pywikibot_scripts.egg-info',
-                      ignore_errors=True)
+        check_call('pyclean . -v --debris')
         info('<<lightyellow>>done')
 
     @abc.abstractmethod
@@ -120,34 +119,51 @@ class SetupBase(abc.ABC):
     def cleanup(self) -> None:
         """Cleanup copied files."""
 
+    @staticmethod
+    def _check_module(module: str, module_type: int) -> bool:
+        """Return whether a module or CLI command is available.
+
+        .. version-added: 11.5
+
+        :param module: Module or command name.
+        :param module_type: Type of module, either MODULE or COMMAND.
+        :return: Whether the module or command is available.
+        :raises ValueError: Invalid module type.
+        """
+        if module_type == MODULE:
+            return find_spec(module) is not None
+        if module_type == COMMAND:
+            return shutil.which(module) is not None
+
+        raise ValueError(f'Invalid module type: {module_type}')
+
     def run(self) -> bool:
         """Run the installer script.
 
         :return: True if no error occurs, else False
         """
+        tools = (
+            ('build', MODULE),
+            ('pyclean', COMMAND),
+            ('twine', MODULE),
+        )
+        for tool, tool_type in tools:
+            if not self._check_module(tool, tool_type):
+                if not self.upgrade:
+                    error(f'<<lightred>>{tool} not found')
+                    info('<<lightblue>>You may use -upgrade option to install')
+                    return False
+
+                info(f'<<lightyellow>>Install or upgrade {tool}')
+                check_call(f'{pip} install {tool}', shell=True)
+            elif self.upgrade:
+                check_call(f'{pip} install --upgrade {tool}', shell=True)
+
         if self.local or self.remote or self.clear:
             self.clear_old_dist()
             if self.clear:
                 return True
 
-        if self.upgrade:  # pragma: no cover
-            check_call(f'{pip} install --upgrade pip', shell=True)
-            for module in ('build', 'twine'):
-                info(f'<<lightyellow>>Install or upgrade {module}')
-                try:
-                    import_module(module)
-                except ModuleNotFoundError:
-                    check_call(f'{pip} install {module}', shell=True)
-                else:
-                    check_call(f'{pip} install --upgrade {module}', shell=True)
-        else:
-            for module in ('build', 'twine'):
-                try:
-                    import_module(module)
-                except ModuleNotFoundError as e:
-                    error(f'<<lightred>>{e}')
-                    info('<<lightblue>>You may use -upgrade option to install')
-                    return False
         return self.build()  # pragma: no cover
 
     def build(self) -> bool:  # pragma: no cover

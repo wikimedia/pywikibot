@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import sys
 import unittest
+from unittest.mock import patch
 
 import make_dist
 from pywikibot import __version__
@@ -54,11 +55,12 @@ class TestMakeDist(TestCase):
         else:
             self.assertEqual(msg, '')
 
-    def test_main(self) -> None:
+    @patch.object(make_dist.SetupBase, '_check_module', return_value=False)
+    def test_main(self, mock) -> None:
         """Test main result."""
         saved_argv = sys.argv
         sys.argv = [*saved_argv, '-clear']
-        self.assertTrue(make_dist.main())
+        self.assertFalse(make_dist.main())
 
         try:
             import build  # noqa: autoflake
