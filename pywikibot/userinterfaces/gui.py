@@ -4,11 +4,10 @@ Useful for editing the contents of an article.
 
 .. note:: idlelib, tkinter and pillow modules are required.
 
-.. warning::
-   With Pillow 10.0, 10.1 no wheels for 32-bit Python on Windows are
-   supported. Pillow 10.2 supports it again. Either you have to update
-   your Python using a 64-bit version or you have to
-   :command:`pip install "pillow>8.1.1,!=10.0,!=10.1"`.
+.. caution::
+   Pillow probably cannot be installed with GraalPy. PyPy 3.9 needs
+   Pillow 10.4.0, PyPy 3.10 needs Pillow 11.3.0. CPython and other
+   Python versions needs Pillow >= 10.4.0 to use this module.
 
 .. seealso:: :mod:`editor`
 """

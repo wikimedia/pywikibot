@@ -16,12 +16,13 @@ on the number of concurrent bot instances, and optional lag-aware delays.
 #
 from __future__ import annotations
 
+import hashlib
 import itertools
 import threading
 import time
 from collections import Counter
 from contextlib import suppress
-from hashlib import blake2b
+from platform import python_implementation
 from typing import NamedTuple
 
 import pywikibot
@@ -116,12 +117,24 @@ class Throttle:
         """
 
     @staticmethod
-    def _module_hash(module=None) -> str:
-        """Convert called module name to a hash."""
+    def _module_hash(module: str | None = None) -> str:
+        """Convert called module name to a hash.
+
+        .. versionchanged:: 11.0
+           Set hashlib constructor *usedforsecurity* argument to ``False``
+           because the hash is not used in a security context. Use ``md5``
+           hash algorithm for GraalPy implementation instead of
+           ``blake2b``.
+        """
         if module is None:
             module = pywikibot.calledModuleName()
         module = module.encode()
-        hashobj = blake2b(module, digest_size=2)
+
+        if python_implementation() == 'GraalVM':
+            hashobj = hashlib.md5(module, usedforsecurity=False)
+            return hashobj.hexdigest()[:4]
+
+        hashobj = hashlib.blake2b(module, digest_size=2, usedforsecurity=False)
         return hashobj.hexdigest()
 
     def _read_file(self, raise_exc: bool = False):
