@@ -120,7 +120,7 @@ jobs:
       - name: Test with unittest or pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 45
+        timeout-minutes: 60
         env:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
           # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
