@@ -405,7 +405,8 @@ def async_manager(block=True) -> None:
 def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
     """Put a request on the queue, and start the daemon if necessary."""
     if not _putthread.is_alive():
-        with page_put_queue.mutex, suppress(AssertionError, RuntimeError):
+        # ignore RuntimeError if start() is called more than once
+        with page_put_queue.mutex, suppress(RuntimeError):
             _putthread.start()
     page_put_queue.put((request, args, kwargs))
 
