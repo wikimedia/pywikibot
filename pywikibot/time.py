@@ -1,6 +1,6 @@
 """Time handling module.
 
-.. version-added:: 7.5
+.. versionadded:: 7.5
 """
 #
 # (C) Pywikibot team, 2007-2025
@@ -28,7 +28,7 @@ __all__ = (
     'TZoneFixedOffset'
 )
 
-#: .. version-added:: 7.5
+#: .. versionadded:: 7.5
 MW_KEYS = types.MappingProxyType({
     's': 'seconds',
     'h': 'hours',
@@ -67,7 +67,7 @@ class Timestamp(datetime.datetime):
     this is more reliable than using :meth:`Timestamp.utcnow` or
     :meth:`Timestamp.nowutc`.
 
-    .. version-changed:: 7.5
+    .. versionchanged:: 7.5
        moved to :mod:`time` module
     """
 
@@ -88,8 +88,8 @@ class Timestamp(datetime.datetime):
         - ISO8601 format: ``YYYY-MM-DD[T ]HH:MM:SS[Z|±HH[MM[SS[.ffffff]]]]``
         - POSIX format: seconds from Unix epoch ``S{1,13}[.ffffff]]``
 
-        .. version-added:: 7.5
-        .. version-changed:: 8.0
+        .. versionadded:: 7.5
+        .. versionchanged:: 8.0
            raises *TypeError* instead of *ValueError*.
 
         :param ts: Timestamp, datetime.datetime or str
@@ -109,7 +109,7 @@ class Timestamp(datetime.datetime):
     def _from_datetime(dt: datetime.datetime) -> Timestamp:
         """Convert a datetime.datetime timestamp to a Timestamp object.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         return Timestamp(dt.year, dt.month, dt.day, dt.hour,
                          dt.minute, dt.second, dt.microsecond,
@@ -121,7 +121,7 @@ class Timestamp(datetime.datetime):
 
         Mediwiki timestamp format: YYYYMMDDHHMMSS
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         RE_MW = r'\d{14}'  # noqa: N806
         m = re.fullmatch(RE_MW, timestr)
@@ -139,7 +139,7 @@ class Timestamp(datetime.datetime):
         ISO8601 format:
         ``YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]``
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
@@ -179,7 +179,7 @@ class Timestamp(datetime.datetime):
 
         POSIX format: ``SECONDS[.ffffff]]``
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?'  # noqa: N806
         m = re.fullmatch(RE_POSIX, timestr)
@@ -202,7 +202,7 @@ class Timestamp(datetime.datetime):
     def _from_string(cls, timestr: str) -> Timestamp:
         """Convert a string to a Timestamp object.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         handlers = [
             cls._from_mw,
@@ -261,9 +261,9 @@ class Timestamp(datetime.datetime):
                             strict: bool = False) -> Timestamp:
         """Convert a MediaWiki internal timestamp to a Timestamp object.
 
-        .. version-changed:: 3.0
+        .. versionchanged:: 3.0
            create a Timestamp if only year, month and day are given.
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            the *strict* parameter was added which discards missing
            element tolerance.
 
@@ -319,21 +319,21 @@ class Timestamp(datetime.datetime):
 
         See Note in datetime.timestamp().
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         return self.replace(tzinfo=datetime.timezone.utc).timestamp()
 
     def posix_timestamp_format(self) -> str:
         """Convert object to a POSIX timestamp format.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         return f'{self.posix_timestamp():.6f}'
 
     def __repr__(self) -> str:
         """Unify repr string between CPython and Pypy (T325905).
 
-        .. version-added:: 8.0
+        .. versionadded:: 8.0
         """
         s = super().__repr__()
         return f'{type(self).__name__}{s[s.find("("):]}'
@@ -365,7 +365,7 @@ class Timestamp(datetime.datetime):
            aware Timestamps/datetimes (i.e. missing or having timezone).
            A TypeError will be raised in such cases.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
         .. seealso::
            - :python:`datetime.now()
              <library/datetime.html#datetime.datetime.now>`
@@ -411,7 +411,7 @@ class Timestamp(datetime.datetime):
         .. hint::
            This method might be deprecated later.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
         .. seealso::
            :python:`datetime.utcnow()
            <library/datetime.html#datetime.datetime.utcnow>`

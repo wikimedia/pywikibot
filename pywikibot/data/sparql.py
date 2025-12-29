@@ -29,7 +29,7 @@ class SparqlQuery(WaitingMixin):
 
     This class allows to run SPARQL queries against any SPARQL endpoint.
 
-    .. version-changed:: 8.4
+    .. versionchanged:: 8.4
        inherited from :class:`data.WaitingMixin` which provides a
        :meth:`data.WaitingMixin.wait` method.
     """
@@ -130,10 +130,10 @@ class SparqlQuery(WaitingMixin):
     def query(self, query: str, headers: dict[str, str] | None = None):
         """Run SPARQL query and return parsed JSON result.
 
-        .. version-changed:: 8.5
+        .. versionchanged:: 8.5
            :exc:`exceptions.NoUsernameError` is raised if the response
            looks like the user is not logged in.
-        .. version-changed:: 9.6
+        .. versionchanged:: 9.6
            retry on internal server error (500).
 
         :param query: Query text

@@ -105,7 +105,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            all parameters are keyword arguments only. Additional
            parameters are supported. The order of subcategories are
            yielded was changed. The old order was
@@ -162,7 +162,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            all parameters are keyword arguments only.
 
         :param recurse: if not False or 0, also iterate articles in
@@ -227,7 +227,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            all parameters are keyword arguments only. Additional
            parameters are supported.
 

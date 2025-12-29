@@ -149,7 +149,7 @@ class AliasesDict(BaseDataDict):
     def normalizeData(cls, data: dict) -> dict:
         """Helper function to expand data into the Wikibase API structure.
 
-        .. version-changed:: 7.7
+        .. versionchanged:: 7.7
            raises TypeError if *data* value is not a list.
 
         :param data: Data to normalize

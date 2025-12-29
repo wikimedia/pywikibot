@@ -1,6 +1,6 @@
 """Non-interactive interface that stores output.
 
-.. version-added:: 6.4
+.. versionadded:: 6.4
 """
 #
 # (C) Pywikibot team, 2021-2025
@@ -23,7 +23,7 @@ class UI(ABUIC):
 
     """Collects output into an unseen buffer.
 
-    .. version-added:: 6.4
+    .. versionadded:: 6.4
     """
 
     def __init__(self) -> None:

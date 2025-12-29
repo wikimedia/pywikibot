@@ -1,6 +1,6 @@
 """Module providing several layers of data access to the wiki."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2023
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ class WaitingMixin:
 
     """A mixin to implement wait cycles.
 
-    .. version-added:: 8.4
+    .. versionadded:: 8.4
 
     :ivar int max_retries: Maximum number of times to retry an API
         request before quitting. Defaults to ``config.max_retries`` if

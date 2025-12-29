@@ -42,13 +42,13 @@ will use the login information if it is present.
 To log out, throw away the ``*.lwp`` file that is created in the data
 subdirectory.
 
-.. version-changed:: 7.4
+.. versionchanged:: 7.4
    moved to :mod:`pywikibot.scripts` folder.
-.. version-changed:: 7.7
+.. versionchanged:: 7.7
    *-async* option was added.
-.. version-changed:: 10.2
+.. versionchanged:: 10.2
    wildcard site codes in ``usernames`` dict are supported.
-.. version-changed:: 10.3
+.. versionchanged:: 10.3
    the -cookies option
 """
 #

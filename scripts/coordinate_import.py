@@ -42,7 +42,7 @@ The following command line parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2013-2025
+# (C) Pywikibot team, 2013-2024
 #
 # Distributed under the terms of MIT license.
 #
@@ -61,7 +61,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
     """A bot to import coordinates to Wikidata.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        CoordImportRobot is a ConfigParserBot
     """
 

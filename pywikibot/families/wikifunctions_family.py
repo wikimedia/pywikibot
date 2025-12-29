@@ -1,9 +1,9 @@
 """Family module for Wikifunction.
 
-.. version-added:: 8.4
+.. versionadded:: 8.4
 """
 #
-# (C) Pywikibot team, 2023-2025
+# (C) Pywikibot team, 2023
 #
 # Distributed under the terms of the MIT license.
 #

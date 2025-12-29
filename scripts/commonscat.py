@@ -240,7 +240,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
 
     """Commons categorisation bot.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        CommonscatBot is a ConfigParserBot
     """
 

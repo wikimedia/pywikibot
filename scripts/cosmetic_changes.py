@@ -31,7 +31,7 @@ The following generators and filters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2022
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,7 @@ class CosmeticChangesBot(AutomaticTWSummaryBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            skip if InvalidPageError is raised
         """
         cc_toolkit = CosmeticChangesToolkit(self.current_page,

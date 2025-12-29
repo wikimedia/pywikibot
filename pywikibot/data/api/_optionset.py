@@ -37,7 +37,7 @@ class OptionSet(MutableMapping):
 
         If a site is given, the module and param must be given too.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            *dict* parameter was renamed to *data*.
 
         :param site: The associated site

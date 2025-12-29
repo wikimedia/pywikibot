@@ -58,7 +58,7 @@ class Family(family.FandomFamily):
     def categories_last(cls):
         """Property listing site keys for categories at last position.
 
-        .. version-deprecated:: 10.3
+        .. deprecated:: 10.3
            use :meth:`site.has_extension('CategorySelect')
            <pywikibot.site._apisite.APISite.has_extension>` instead
         """

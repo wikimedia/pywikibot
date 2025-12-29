@@ -20,15 +20,15 @@ descriptions:
     python pwb.py unlink "Foo bar" -namespace:0 -namespace:6
 
 
-.. version-changed:: 6.0
+.. versionchanged:: 6.0
    script was archived.
-.. version-changed:: 7.0
+.. versionchanged:: 7.0
    script was deleted.
-.. version-changed:: 9.4
+.. versionchanged:: 9.4
    script was recovered.
 """
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #

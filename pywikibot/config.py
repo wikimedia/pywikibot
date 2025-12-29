@@ -26,9 +26,9 @@ utility methods to build paths relative to base_dir:
  - datafilepath
  - shortpath
 
-.. version-changed:: 6.2
+.. versionchanged:: 6.2
    config2 was renamed to config
-.. version-changed:: 8.0
+.. versionchanged:: 8.0
    Editor settings has been revised. *editor* variable is None by
    default. Editor detection functions were moved to :mod:`editor`.
 """
@@ -281,7 +281,7 @@ def user_home_path(path: str) -> str:
 def get_user_config_file() -> str:
     """Return user config file name.
 
-    .. version-added:: 7.7
+    .. versionadded:: 7.7
     """
     for arg in sys.argv[1:]:
         opt, _, value = arg.partition(':')
@@ -313,7 +313,7 @@ def get_base_dir(test_directory: str | None = None,
     Set `PYWIKIBOT_NO_USER_CONFIG=1` to disable loading user config file
     (`user-config.py`) or install Pywikibot as a site-package.
 
-    .. version-changed:: 7.7
+    .. versionchanged:: 7.7
        Added the *config_file* parameter.
 
     :param test_directory: Assume that a user config file exists in this
@@ -415,7 +415,7 @@ def register_families_folder(folder_path: str,
                              not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
        The *not_exists_ok* parameter
 
     :param folder_path: The path of a folder containing family files.

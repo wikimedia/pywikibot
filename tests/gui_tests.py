@@ -61,10 +61,10 @@ class TestTkinter(TestCase):
 def setUpModule() -> None:
     """Skip tests if tkinter or PIL is not installed.
 
-    .. version-changed:: 7.7
+    .. versionchanged:: 7.7
        skip test if ``PYWIKIBOT_TEST_GUI`` environment variable is not
        set.
-    .. version-changed:: 9.5
+    .. versionchanged:: 9.5
        :envvar:`PYWIKIBOT_TEST_GUI` environment variable was removed.
        ``pytest`` with ``pytest-xvfb `` extension is required for this
        tests on github actions.

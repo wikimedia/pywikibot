@@ -77,7 +77,7 @@ def union_generators(*iterables: Iterable[Any],
     >>> list(union_generators([4, 3, 2, 1], [5, 4, 3], [6, 2], reverse=True))
     [6, 5, 4, 3, 2, 1]
 
-    .. version-added:: 10.6
+    .. versionadded:: 10.6
 
     .. note::
        All input iterables must be sorted consistently. *reverse* must
@@ -116,19 +116,19 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     ['m', 'i', 's', 's', 'i']
 
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
 
-    .. version-changed:: 5.0
+    .. versionchanged:: 5.0
        Avoid duplicates (:phab:`T263947`).
 
-    .. version-changed:: 6.4
+    .. versionchanged:: 6.4
        ``genlist`` was renamed to ``iterables``; consecutive iterables
        are to be used as iterables parameters or '*' to unpack a list
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        Reimplemented without threads which is up to 10'000 times faster
 
-    .. version-changed:: 9.0
+    .. versionchanged:: 9.0
        Iterable elements may consist of lists or tuples
        ``allow_duplicates`` is a keyword-only argument
 
@@ -205,8 +205,8 @@ def roundrobin_generators(*iterables) -> Generator[Any]:
     >>> tuple(roundrobin_generators('ABC', range(5)))
     ('A', 0, 'B', 1, 'C', 2, 3, 4)
 
-    .. version-added:: 3.0
-    .. version-changed:: 6.4
+    .. versionadded:: 3.0
+    .. versionchanged:: 6.4
        A sentinel variable is used to determine the end of an iterable
        instead of None.
 
@@ -248,7 +248,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     .. warning:: This is not thread safe.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
 
     :param iterable: the source iterable
     :type iterable: collections.abc.Iterable

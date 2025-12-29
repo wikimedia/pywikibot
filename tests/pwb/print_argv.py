@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Script that forms part of pwb_tests.
 
-.. version-added:: 7.0
+.. versionadded:: 7.0
 """
 #
-# (C) Pywikibot team, 2021-2025
+# (C) Pywikibot team, 2021
 #
 # Distributed under the terms of the MIT license.
 #

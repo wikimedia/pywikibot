@@ -763,7 +763,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                                ident: str = '==') -> str:
         """Create a reference section and insert it into the given text.
 
-        .. version-changed:: 9.1
+        .. versionchanged:: 9.1
            raise :exc:`exceptions.TranslationError` if script is not
            localized for the current site.
 
@@ -802,7 +802,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Run the bot.
 
-        .. version-changed:: 9.1
+        .. versionchanged:: 9.1
            print error message and close :attr:`bot.BaseBot.generator`
            if :exc:`exceptions.TranslationError` was raised.
         """

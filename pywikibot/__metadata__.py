@@ -1,6 +1,6 @@
 """Pywikibot metadata file.
 
-.. version-added:: 4.0
+.. versionadded:: 4.0
 """
 #
 # (C) Pywikibot team, 2020-2025
@@ -12,6 +12,6 @@ from __future__ import annotations
 from time import strftime
 
 
-__version__ = '11.0.0.dev7'
+__version__ = '11.0.0.dev8'
 __url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
 __copyright__ = f'2003-{strftime("%Y")}, Pywikibot team'

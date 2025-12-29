@@ -1,6 +1,6 @@
 """Local pre-commit hooks for CI tests.
 
-.. version-added:: 10.3
+.. versionadded:: 10.3
 """
 #
 # (C) Pywikibot team, 2025

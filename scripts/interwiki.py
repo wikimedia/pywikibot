@@ -342,7 +342,7 @@ To run the script on all pages on a language, run it with option
 ``-start:!``, and if it takes so long that you have to break it off, use
 ``-continue`` next time.
 
-.. version-changed:: 10.4
+.. versionchanged:: 10.4
    The ``-localonly`` option now restricts page processing to the
    default site only, instead of the origin page.
 """
@@ -683,7 +683,7 @@ class Subject(interwiki_graph.Subject):
     def is_not_redirect(page):
         """Check whether *page* is not a redirect page.
 
-        .. version-added:: 11.0
+        .. versionadded:: 11.0
         """
         return page.exists() and not (page.isRedirectPage()
                                       or page.isCategoryRedirect())

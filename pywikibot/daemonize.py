@@ -89,7 +89,7 @@ def daemonize(*,
     Only works on POSIX compatible operating systems. The process will
     fork to the background and return control to terminal.
 
-    .. version-changed:: 10.6
+    .. versionchanged:: 10.6
        raises NotImplementedError instead of AttributeError if daemonize
        is not available for the given platform. Parameters must be given
        as keyword-only arguments.

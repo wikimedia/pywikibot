@@ -114,6 +114,6 @@ plural_rules.update(
 def plural_rule(lang: str) -> PluralRule:
     """Return the plural rule for a given lang.
 
-    .. version-added:: 4.3
+    .. versionadded:: 4.3
     """
     return plural_rules.get(lang, plural_rules['_default'])

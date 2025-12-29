@@ -37,4 +37,4 @@
                 aliases['yue'] = 'zh-yue'
                 cls.code_aliases = aliases
 
-         .. version-added:: 8.3
+         .. versionadded:: 8.3

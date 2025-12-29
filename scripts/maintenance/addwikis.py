@@ -14,12 +14,12 @@ Example:
     and ``baz`` to wikisource.
 
 
-.. version-added:: 9.2
-.. version-changed:: 10.4
+.. versionadded:: 9.2
+.. versionchanged:: 10.4
    The options ``-h``, ``-help`` and ``--help`` display the help message.
-.. version-deprecated:: 10.4
+.. deprecated:: 10.4
    The ``help`` option
-.. version-changed:: 11.0
+.. versionchanged:: 11.0
    Multiple families can be given with one run.
 """
 #

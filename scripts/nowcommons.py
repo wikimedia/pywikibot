@@ -42,7 +42,7 @@ Example
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -187,7 +187,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
     """Bot to delete migrated files.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        NowCommonsDeleteBot is a ConfigParserBot
     """
 

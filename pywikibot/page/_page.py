@@ -133,7 +133,7 @@ class Page(BasePage, WikiBlameMixin):
     ) -> None:
         """Change the page's text to point to the redirect page.
 
-        .. version-changed:: 9.3
+        .. versionchanged:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
 
         :param target_page: target of the redirect, this argument is
@@ -188,7 +188,7 @@ class Page(BasePage, WikiBlameMixin):
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
 
         .. seealso:: :meth:`pywikibot.ItemPage.get_best_claim`
 

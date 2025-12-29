@@ -1,6 +1,6 @@
 """Object representing interface to toolforge tools.
 
-.. version-added:: 7.7
+.. versionadded:: 7.7
 """
 #
 # (C) Pywikibot team, 2022-2025
@@ -22,7 +22,7 @@ class WikiBlameMixin:
 
     """Page mixin for main authorship.
 
-    .. version-added:: 7.7
+    .. versionadded:: 7.7
     """
 
     #: Supported wikipedia site codes
@@ -59,7 +59,7 @@ class WikiBlameMixin:
         >>> auth.most_common(1)
         [('DrTrigon', 37)]
 
-        .. version-deprecated:: 9.3
+        .. deprecated:: 9.3
            use :meth:`authorship` instead.
         .. seealso:: :meth:`authorship` for further informations
 
@@ -99,10 +99,10 @@ class WikiBlameMixin:
         .. important:: Only implemented for pages in Main, Project,
            Category and Template namespaces and only wikipedias of
            :attr:`WIKIBLAME_CODES` are supported.
-        .. version-added:: 9.3
+        .. versionadded:: 9.3
            XTools is used to retrieve authors. This method replaces
            :meth:`main_authors`.
-        .. version-changed:: 10.1
+        .. versionchanged:: 10.1
            WikiHistory is used to retrieve authors due to :phab:`T392694`.
 
         Here are the differences between these two implementations:
@@ -111,7 +111,7 @@ class WikiBlameMixin:
 
            .. tab:: WikiHistory
 
-              .. version-added:: 10.1
+              .. versionadded:: 10.1
 
               - Implemented from version 7.7 until 9.2 (with
                 :meth:`main_authors` method) and from 10.1.
@@ -131,7 +131,7 @@ class WikiBlameMixin:
 
            .. tab:: XTools
 
-              .. version-removed:: 10.1
+              .. versionremoved:: 10.1
 
               - Implemented from version 9.3 until 10.0.
               - Only Main namespace is supported.

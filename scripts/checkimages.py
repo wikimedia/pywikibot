@@ -71,7 +71,7 @@ take the right parameter:
     Text=     This is the template that the bot will use when it will
               report the image's problem.
 
-.. version-changed:: 8.4
+.. versionchanged:: 8.4
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
 #
@@ -410,7 +410,7 @@ DUPLICATES_REGEX = {
 CATEGORIES_WITH_LICENSES = 'Q4481876', 'Q7451504'
 """Category items with the licenses; subcategories may contain other licenses.
 
-.. version-changed:: 7.2
+.. versionchanged:: 7.2
    uses wikibase items instead of category titles.
 """
 
@@ -782,7 +782,7 @@ class CheckImagesBot:
     ) -> pywikibot.FilePage:
         """Get tuples of image and time, return the most used or oldest image.
 
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            itertools.zip_longest is used to stop `using_pages` as soon as
            possible.
 
@@ -1105,7 +1105,7 @@ class CheckImagesBot:
     def load_licenses(self) -> set[pywikibot.Page]:
         """Load the list of the licenses.
 
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            return a set instead of a list for quicker lookup.
         """
         pywikibot.info('\nLoading the allowed licenses...\n')

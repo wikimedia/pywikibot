@@ -20,7 +20,7 @@ by default:
 -usertemplate:  [str] Use a custom template to warn the uploader.
 """
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,7 +76,7 @@ class UnusedFilesBot(SingleSiteBot,
 
     """Unused files bot.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        UnusedFilesBot is a ConfigParserBot
     """
 

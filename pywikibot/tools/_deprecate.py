@@ -15,7 +15,7 @@ args[0] to see if it callable. Therefore, a decorator must not accept
 only one arg, and that arg be a callable, as it will be detected as
 a deprecator without any arguments.
 
-.. version-changed:: 6.4
+.. versionchanged:: 6.4
    deprecation decorators moved to _deprecate submodule
 """
 #
@@ -53,7 +53,7 @@ class _NotImplementedWarning(RuntimeWarning):
 
     """Feature that is no longer implemented.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
     """
 
 
@@ -83,7 +83,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
 def manage_wrapping(wrapper, obj) -> None:
     """Add attributes to wrapper and wrapped functions.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
     """
     wrapper.__doc__ = obj.__doc__
     wrapper.__name__ = obj.__name__
@@ -111,7 +111,7 @@ def manage_wrapping(wrapper, obj) -> None:
 def get_wrapper_depth(wrapper):
     """Return depth of wrapper function.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
     """
     return wrapper.__wrapped__.__wrappers__ + (1 - wrapper.__depth__)
 
@@ -178,9 +178,9 @@ def add_full_name(obj):
 def _build_msg_string(instead: str | None, since: str | None) -> str:
     """Build a deprecation warning message format string.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        `since`parameter must be a release number, not a timestamp.
 
     :param instead: suggested replacement for the deprecated object
@@ -203,10 +203,10 @@ def issue_deprecation_warning(name: str,
                               since: str | None = None) -> None:
     """Issue a deprecation warning.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        *since* parameter must be a release number, not a timestamp.
 
-    .. version-changed:: 8.2
+    .. versionchanged:: 8.2
        *warning_class* and *since* are keyword-only parameters.
 
     :param name: the name of the deprecated object
@@ -226,7 +226,7 @@ def issue_deprecation_warning(name: str,
 def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        `since` keyword must be a release number, not a timestamp.
 
     :keyword str instead: if provided, will be used to specify the
@@ -339,7 +339,7 @@ def deprecate_arg(old_arg: str, new_arg: str | None = None):
     reserved words even for future Python releases and to prevent syntax
     errors.
 
-    .. version-changed:: 9.2
+    .. versionchanged:: 9.2
        bool type of *new_arg* is no longer supported.
 
     :param old_arg: old keyword
@@ -359,12 +359,12 @@ def deprecated_args(**arg_pairs: str | None):
         def my_function(bar='baz'): pass
         # replaces 'foo' keyword by 'bar' and ignores 'baz' keyword
 
-    .. version-changed:: 3.0.20200703
+    .. versionchanged:: 3.0.20200703
        show a FutureWarning if the *arg_pairs* value is True; don't show
        a warning if the value is an empty string.
-    .. version-changed:: 6.4
+    .. versionchanged:: 6.4
        show a FutureWarning for renamed arguments
-    .. version-changed:: 9.2
+    .. versionchanged:: 9.2
        bool type argument is no longer supported.
 
     :param arg_pairs: Each entry points to the new argument name. If an
@@ -497,10 +497,10 @@ def deprecated_signature(since: str = ''):
        keyword-only arguments must match the order of the old positional
        parameters; otherwise, argument assignment may fail.
 
-    .. version-added:: 9.2
-    .. version-changed:: 10.4
+    .. versionadded:: 9.2
+    .. versionchanged:: 10.4
        Raises ``ValueError`` if method has a ``*args`` parameter.
-    .. version-changed:: 10.6
+    .. versionchanged:: 10.6
        Renamed from ``deprecate_positionals``. Adds handling of
        positional-only parameters and emits warnings if they are passed
        as keyword arguments.
@@ -697,10 +697,10 @@ def redirect_func(target, *,
     It also acts like marking that function deprecated and copies all
     parameters.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        *since* parameter must be a release number, not a timestamp.
 
-    .. version-changed:: 8.2
+    .. versionchanged:: 8.2
        All parameters except *target* are keyword-only parameters.
 
     :param target: The targeted function which is to be executed.
@@ -777,7 +777,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
                             future_warning: bool = True) -> None:
         """Add the name to the local deprecated names dict.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            ``since`` parameter must be a release number, not a timestamp.
 
         :param name: The name of the deprecated class or variable. It may not
