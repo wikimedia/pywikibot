@@ -1,6 +1,6 @@
 """File containing all standard fixes.
 
-.. versionremoved:: 11.0
+.. version-removed:: 11.0
    The ``yu-tld`` predefined fix was removed.
 """
 #

@@ -17,18 +17,18 @@ class Notification:
 
     """A notification issued by the Echo extension.
 
-    .. versionchanged:: 3.0.20190204
+    .. version-changed:: 3.0.20190204
        The ``id`` attribute was renamed to ``event_id``, and its type
        changed from ``str`` to ``int``.
 
-    .. deprecated:: 3.0.20190204
+    .. version-deprecated:: 3.0.20190204
        The ``id`` attribute was retained temporarily for backward
        compatibility, but is deprecated and scheduled for removal.
 
-    .. versionremoved:: 7.0
+    .. version-removed:: 7.0
        The ``id`` attribute was removed.
 
-    .. versionchanged:: 10.3
+    .. version-changed:: 10.3
        The class is now defined using the ``@dataclass`` decorator to
        simplify internal initialization and improve maintainability.
     """

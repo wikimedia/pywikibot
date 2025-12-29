@@ -58,7 +58,7 @@ class DataSite(APISite):
         support that entity type either.
 
         .. seealso:: https://www.mediawiki.org/wiki/Wikibase/Federation
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
 
         :raises ValueError: when invalid entity type was provided
         """
@@ -244,7 +244,7 @@ class DataSite(APISite):
         This is used specifically because we can cache the value for a
         much longer time (near infinite).
 
-        .. versionadded:: 9.5
+        .. version-added:: 9.5
 
         :raises NoWikibaseEntityError: *prop* does not exist
         """
@@ -274,7 +274,7 @@ class DataSite(APISite):
     def getPropertyType(self, prop):
         """Obtain the type of a property.
 
-        .. deprecated:: 9.5
+        .. version-deprecated:: 9.5
            Use :meth:`get_property_type` instead.
         """
         try:
@@ -294,7 +294,7 @@ class DataSite(APISite):
            ``item`` if dict with API parameters was passed to *entity*
            parameter.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* keyword argument was added
 
         :param entity: Page to edit, or dict with API parameters
@@ -360,7 +360,7 @@ class DataSite(APISite):
                  tags: str | None = None) -> None:
         """Add a claim.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
 
         :param entity: Entity to modify
@@ -397,7 +397,7 @@ class DataSite(APISite):
                           tags: str | None = None):
         """Set the claim target to the value of the provided claim target.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
 
         :param claim: The source of the claim target value
@@ -439,7 +439,7 @@ class DataSite(APISite):
                    tags: str | None = None):
         """Save the whole claim to the wikibase site.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
 
         :param claim: The claim to save
@@ -482,9 +482,9 @@ class DataSite(APISite):
                    tags: str | None = None):
         """Create/Edit a source.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            deprecated *baserevid* parameter was removed
 
         :param claim: A Claim object to add the source to.
@@ -542,9 +542,9 @@ class DataSite(APISite):
                       tags: str | None = None):
         """Create/Edit a qualifier.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            deprecated *baserevid* parameter was removed
 
         :param claim: A Claim object to add the qualifier to
@@ -591,9 +591,9 @@ class DataSite(APISite):
                      tags: str | None = None):
         """Remove claims.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            deprecated *baserevid* parameter was removed
 
         :param claims: Claims to be removed
@@ -628,9 +628,9 @@ class DataSite(APISite):
                       tags: str | None = None):
         """Remove sources.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            deprecated `baserevid` parameter was removed
 
         :param claim: A Claim object to remove the sources from
@@ -662,9 +662,9 @@ class DataSite(APISite):
                           tags: str | None = None):
         """Remove qualifiers.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            deprecated `baserevid` parameter was removed
 
         :param claim: A Claim object to remove the qualifier from
@@ -694,7 +694,7 @@ class DataSite(APISite):
                    bot: bool = True) -> dict:
         """Link two pages together.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
 
         :param page1: First page to link
@@ -725,7 +725,7 @@ class DataSite(APISite):
                    tags: str | None = None) -> dict:
         """Merge two items together.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            *tags* parameter was added
 
         :param from_item: Item to merge from
@@ -836,7 +836,7 @@ class DataSite(APISite):
                    validate: bool = False) -> list[Any]:
         """Send data values to the wikibase parser for interpretation.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         .. seealso:: `wbparsevalue API
            <https://www.wikidata.org/w/api.php?action=help&modules=wbparsevalue>`_
 

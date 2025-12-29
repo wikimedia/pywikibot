@@ -117,7 +117,7 @@ def to_local_digits(phrase: str | int, lang: str) -> str:
        languages, and that it returns an unchanged string if an
        unsupported language is given.
 
-    .. versionchanged:: 7.5
+    .. version-changed:: 7.5
        always return a string even `phrase` is an int.
 
     :param phrase: The phrase to convert to localized numerical
@@ -136,8 +136,8 @@ def to_ascii_digits(phrase: str,
                     langs: Sequence[str] | str | None = None) -> str:
     """Change non-ascii digits to ascii digits.
 
-    .. versionadded:: 7.0
-    .. versionchanged:: 10.3
+    .. version-added:: 7.0
+    .. version-changed:: 10.3
        this function was renamed from to_latin_digits.
 
     :param phrase: The phrase to convert to ascii numerical.
@@ -161,8 +161,8 @@ def to_ascii_digits(phrase: str,
 def case_escape(case: str, string: str, *, underscore: bool = False) -> str:
     """Return an escaped regex pattern which depends on 'first-letter' case.
 
-    .. versionadded:: 7.0
-    .. versionchanged:: 8.4
+    .. version-added:: 7.0
+    .. version-changed:: 8.4
        Added the optional *underscore* parameter.
 
     :param case: if `case` is 'first-letter', the regex contains an
@@ -225,7 +225,7 @@ class MultiTemplateMatchBuilder:
 def ignore_case(string: str) -> str:
     """Return a case-insensitive pattern for the string.
 
-    .. versionchanged:: 7.2
+    .. version-changed:: 7.2
        `_ignore_case` becomes a public method
     """
     return ''.join(
@@ -313,7 +313,7 @@ def get_regexes(
 ) -> list[re.Pattern[str]]:
     """Fetch compiled regexes.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        ``_get_regexes`` becomes a public function.
        *keys* may be a single string; *site* is optional.
 
@@ -509,7 +509,7 @@ def removeDisabledParts(text: str,
     * includeonly tags
     * source and syntaxhighlight tags
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        the order of removals will correspond to the tags argument
        if provided as an ordered collection (list, tuple)
 
@@ -563,7 +563,7 @@ def removeHTMLParts(text: str,
 
     .. caution:: Tag names must be given in lowercase.
 
-    .. versionchanged:: 10.3
+    .. version-changed:: 10.3
        The *removetags* parameter was added. Refactored to use
        :class:`GetDataHTML` and its ``__call__`` method. tag attributes
        will be kept.
@@ -637,10 +637,10 @@ class GetDataHTML(HTMLParser):
 
     .. caution:: Tag names must be given in lowercase.
 
-    .. versionchanged:: 9.2
+    .. version-changed:: 9.2
        No longer a context manager
 
-    .. versionchanged:: 10.3
+    .. version-changed:: 10.3
        Public class now. Added support for removals of tag contents.
 
     .. seealso::
@@ -708,7 +708,7 @@ class GetDataHTML(HTMLParser):
         listed in *removetags* begin a skip block, and their content
         will be excluded from the output.
 
-        .. versionchanged:: 10.3
+        .. version-changed:: 10.3
            Keep tag attributes.
 
         :param tag: The tag name (e.g., "div", "script") converted to
@@ -819,7 +819,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
     function which returns a Link instance and copies the value which should
     remaining.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        `site` parameter is mandatory
 
     :param text: the text in which to replace links
@@ -1043,7 +1043,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
 def add_text(text: str, add: str, *, site=None) -> str:
     """Add text to a page content above categories and interwiki.
 
-    .. versionadded:: 6.4
+    .. version-added:: 6.4
 
     :param text: The page content to add text to.
     :param add: Text to add.
@@ -1091,7 +1091,7 @@ class Section(NamedTuple):
 
     """A namedtuple as part of :class:`Content` describing a page section.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        ``_Section`` becomes a public class.
     """
 
@@ -1102,7 +1102,7 @@ class Section(NamedTuple):
     def level(self) -> int:
         """Return the section level.
 
-        .. versionadded:: 8.2
+        .. version-added:: 8.2
         """
         m = HEAD_PATTERN.match(self.title)
         return len(m[1])
@@ -1111,7 +1111,7 @@ class Section(NamedTuple):
     def heading(self) -> str:
         """Return the section title without equal signs.
 
-        .. versionadded:: 8.2
+        .. version-added:: 8.2
         """
         level = self.level
         return self.title[level:-level].strip()
@@ -1124,7 +1124,7 @@ class SectionList(list):
     Introduced for handling lists of sections with custom lookup by
     :attr:`Section.heading` and :attr:`level<Section.level>`.
 
-    .. versionadded:: 10.4
+    .. version-added:: 10.4
     """
 
     def __contains__(self, value: object) -> bool:
@@ -1216,7 +1216,7 @@ class Content(NamedTuple):
 
     """A namedtuple as result of :func:`extract_sections` holding page content.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        ``_Content`` becomes a public class.
     """
 
@@ -1230,7 +1230,7 @@ class Content(NamedTuple):
 
         The first main title is anything enclosed within triple quotes.
 
-        .. versionadded:: 8.2
+        .. version-added:: 8.2
         """
         m = TITLE_PATTERN.search(self.header)
         return m[1].strip() if m else ''
@@ -1331,11 +1331,11 @@ def extract_sections(
 
     .. note:: sections and text from templates are not extracted but
        embedded as plain text.
-    .. versionadded:: 3.0
-    .. versionchanged:: 8.2
+    .. version-added:: 3.0
+    .. version-changed:: 8.2
        The :class:`Content` and :class:`Section` class have additional
        properties.
-    .. versionchanged:: 10.4
+    .. version-changed:: 10.4
        Added custom ``index()``, ``count()`` and ``in`` operator support
        for :attr:`Content.sections`.
 
@@ -1512,7 +1512,7 @@ def replaceLanguageLinks(oldtext: str,
                          template_subpage: bool = False) -> str:
     """Replace inter-language links in the text with a new set of links.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        *addOnly* was renamed to *add_only*.
 
     :param oldtext: The text that needs to be modified.
@@ -1843,7 +1843,7 @@ def replaceCategoryLinks(oldtext: str,
                          add_only: bool = False) -> str:
     """Replace all existing category links with new category links.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        *addOnly* was renamed to *add_only*.
 
     :param oldtext: The text that needs to be replaced.
@@ -2046,7 +2046,7 @@ def extract_templates_and_params(
     :param strip: If enabled, strip arguments and values of templates.
     :return: list of template name and params
 
-    .. versionchanged:: 6.1
+    .. version-changed:: 6.1
        *wikitextparser* package is supported; either *wikitextparser* or
        *mwparserfromhell* is strictly recommended.
     """
@@ -2195,7 +2195,7 @@ class TimeStripperPatterns(NamedTuple):
 
     Attribute order is important to avoid mismatch when searching.
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     time: re.Pattern[str]
@@ -2209,7 +2209,7 @@ class TimeStripper:
 
     """Find timestamp in page and return it as pywikibot.Timestamp object.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        *group* attribute is a set instead of a list.
        *patterns* is a :class:`TimeStripperPatterns` namedtuple instead
        of a list.
@@ -2348,7 +2348,7 @@ class TimeStripper:
         All the following items must be matched, otherwise None is
         returned: -. year, month, hour, time, day, minute, tzinfo
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            HTML parts are removed from line
 
         :return: A timestamp found on the given line

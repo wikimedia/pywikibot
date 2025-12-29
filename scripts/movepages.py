@@ -36,7 +36,7 @@ Furthermore, the following command line parameters are supported:
                 ``-pairsfile:filename``
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,7 +61,7 @@ class MovePagesBot(CurrentPageBot):
 
     """Page move bot.
 
-    .. versionchanged:: 7.2
+    .. version-changed:: 7.2
        `movesubpages` option was added
     """
 

@@ -47,7 +47,7 @@ class ThreadedGenerator(threading.Thread):
     >>> data
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     def __init__(self, group=None, target=None, name: str = 'GeneratorThread',
@@ -135,7 +135,7 @@ class ThreadList(list):
        for x in range(20):
            pool.append(threading.Thread(target=work))
 
-    .. versionchanged:: 10.0
+    .. version-changed:: 10.0
        the unintentional and undocumented *args* parameter was removed.
 
     .. seealso:: :class:`BoundedPoolExecutor`
@@ -183,7 +183,7 @@ class BoundedPoolExecutor(futures.Executor):
     block further items on :meth:`submit` calls to be added to workers
     queue if the *max_bound* limit is reached.
 
-    .. versionadded:: 10.0
+    .. version-added:: 10.0
 
     .. seealso::
        - :pylib:`concurrent.futures.html#executor-objects`

@@ -57,7 +57,7 @@ class DjVuTextBot(SingleSiteBot):
 
     Works only on sites with Proofread Page extension installed.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CheckerBot is a ConfigParserBot
     """
 

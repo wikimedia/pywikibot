@@ -27,28 +27,28 @@ Usage::
 
     [pwb] make_dist [repo] [options]
 
-.. versionadded:: 7.3
-.. versionchanged:: 7.4
+.. version-added:: 7.3
+.. version-changed:: 7.4
 
    - updates pip, setuptools, wheel and twine packages first
    - installs pre-releases over stable versions
    - also creates built distribution together with source distribution
    - *-upgrade* option was added
 
-.. versionchanged:: 7.5
+.. version-changed:: 7.5
 
    - *clear* option was added
    - *nodist* option was added
 
-.. versionchanged:: 8.1
+.. version-changed:: 8.1
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
-.. versionchanged:: 8.2
+.. version-changed:: 8.2
    Build frontend was changed from setuptools to build. ``-upgrade``
    option also installs packages if necessary.
 
-.. versionchanged:: 9.4
+.. version-changed:: 9.4
    The pywikibot-scripts distribution can be created.
 """
 #
@@ -75,8 +75,8 @@ class SetupBase(abc.ABC):
 
     """Setup distribution base class.
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 8.1
+    .. version-added:: 8.0
+    .. version-changed:: 8.1
        *dataclass* is used.
     """
 
@@ -95,7 +95,7 @@ class SetupBase(abc.ABC):
     def clear_old_dist(self) -> None:  # pragma: no cover
         """Delete old dist folders.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         info('<<lightyellow>>Removing old dist folders... ', newline=False)
         shutil.rmtree(self.folder / 'build', ignore_errors=True)
@@ -146,7 +146,7 @@ class SetupBase(abc.ABC):
     def build(self) -> bool:  # pragma: no cover
         """Build the packages.
 
-        .. versionadded:: 9.3
+        .. version-added:: 9.3
         """
         self.copy_files()
         info('<<lightyellow>>Build package')
@@ -178,7 +178,7 @@ class SetupPywikibot(SetupBase):
 
     """Setup for Pywikibot distribution.
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     build_opt = ''  # defaults to current directory
@@ -221,7 +221,7 @@ class SetupScripts(SetupBase):
 
     """Setup pywikibot-scripts distribution.
 
-    .. versionadded:: 9.4
+    .. version-added:: 9.4
     """
 
     build_opt = '-w'  # only wheel (yet)

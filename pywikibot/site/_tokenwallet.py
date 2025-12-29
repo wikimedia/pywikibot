@@ -34,7 +34,7 @@ class TokenWallet(Container):
     def __getitem__(self, key: str) -> str:
         """Get token value for the given key.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            Support of legacy API tokens was dropped.
         """
         if self.site.user() is None and key != 'login':
@@ -77,7 +77,7 @@ class TokenWallet(Container):
         >>> repr(site.tokens)
         "TokenWallet(pywikibot.Site('wikipedia:test'))"
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            Provide a string which looks like a valid Python expression.
         """
         user = f', user={self._currentuser!r}' if self._currentuser else ''
@@ -87,7 +87,7 @@ class TokenWallet(Container):
     def clear(self) -> None:
         """Clear the self._tokens cache. Tokens are reloaded when needed.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         self._tokens.clear()
 
@@ -111,7 +111,7 @@ class TokenWallet(Container):
 
            r._params['token'] = r.site.tokens.update_tokens(r._params['token'])
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
 
         :param tokens: A list of token types that need to be updated.
         :return: A list of updated tokens corresponding to the given

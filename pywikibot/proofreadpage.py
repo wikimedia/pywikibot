@@ -122,7 +122,7 @@ class TagAttr:
     >>> a.value
     'A123'
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     def __init__(self, attr, value) -> None:
@@ -168,7 +168,7 @@ class TagAttrDesc:
 
     """A descriptor tag.
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     def __init__(self) -> None:
@@ -253,8 +253,8 @@ class PagesTagParser(collections.abc.Container):
     >>> 'step' in tp
     False
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 8.1
+    .. version-added:: 8.0
+    .. version-changed:: 8.1
        *text* parameter is defaulted to ``'<pages />'``.
     """
 
@@ -801,7 +801,7 @@ class ProofreadPage(pywikibot.Page):
     def _url_image_lt_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         :return: file url of the scan ProofreadPage or None.
 
@@ -838,7 +838,7 @@ class ProofreadPage(pywikibot.Page):
     def _url_image_ge_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         :return: file url of the scan of ProofreadPage or None.
         :raises ValueError: in case of no image found for scan
@@ -969,9 +969,9 @@ class ProofreadPage(pywikibot.Page):
         .. warning:: It is the user's responsibility to reset quality
            level accordingly.
 
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            default for *ocr_tool* is `wmfOCR`.
-        .. versionremoved:: 9.2
+        .. version-removed:: 9.2
            `phetools` support is not available anymore.
 
         :param ocr_tool: 'wmfOCR' or 'googleOCR'; default is 'wmfOCR'
@@ -1258,7 +1258,7 @@ class IndexPage(pywikibot.Page):
 
         Range is [start ... end], extremes included.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            The *content* parameter was removed
 
         :param start: first page, defaults to 1

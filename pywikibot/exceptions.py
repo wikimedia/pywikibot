@@ -159,15 +159,15 @@ UserWarning: warnings targeted at users
   - ArgumentDeprecationWarning: command line argument problems
   - FamilyMaintenanceWarning: missing information in family definition
 
-.. versionchanged:: 6.0
+.. version-changed:: 6.0
    exceptions were renamed and are ending with "Error".
 
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    All Pywikibot Error exceptions must be imported from
    ``pywikibot.exceptions``. Deprecated exceptions identifiers were
    removed.
 
-.. versionchanged:: 8.1
+.. version-changed:: 8.1
    ``Server414Error`` class is deprecated; use :class:`Client414Error`
    instead.
 """
@@ -286,7 +286,7 @@ class PageRelatedError(Error):
     This class should be used when the Exception concerns a particular
     Page, and when a generic message can be written once for all.
 
-    .. versionchanged:: 10.5
+    .. version-changed:: 10.5
        A pageid is accepted with the first parameter
     """
 
@@ -381,7 +381,7 @@ class NoRenameTargetError(PageRelatedError):
 
     """Expected rename target user not found.
 
-    .. versionadded:: 9.4
+    .. version-added:: 9.4
     """
 
     message = 'Rename target user of {} not found.'
@@ -412,11 +412,11 @@ class NoSiteLinkError(PageLoadRelatedError):
 
     """ItemPage has no sitelink to the given site.
 
-    .. versionadded:: 8.1
-    .. deprecated:: 8.1
+    .. version-added:: 8.1
+    .. version-deprecated:: 8.1
        This exception depends on :exc:`NoPageError` but it will be
        removed.
-    .. versionremoved:: 11.0
+    .. version-removed:: 11.0
        Dependency on :exc:`NoPageError` was removed.
     """
 
@@ -507,7 +507,7 @@ class InvalidPageError(PageLoadRelatedError):
 
     """Missing page history.
 
-    .. versionadded:: 6.2
+    .. version-added:: 6.2
     """
 
     message = 'Page {} is invalid.'
@@ -617,7 +617,7 @@ class ClientError(Error):
 
     """Got unexpected server response due to client issue.
 
-    .. versionadded:: 8.1
+    .. version-added:: 8.1
     """
 
 
@@ -625,7 +625,7 @@ class Client414Error(ClientError):
 
     """Server returned with HTTP 414 code.
 
-    .. versionadded:: 8.1
+    .. version-added:: 8.1
     """
 
 

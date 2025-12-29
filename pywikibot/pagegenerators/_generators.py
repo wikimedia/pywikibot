@@ -52,7 +52,7 @@ def AllpagesPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all titles in a single namespace.
 
-    .. deprecated:: 10.0
+    .. version-deprecated:: 10.0
        The *includeredirects* parameter; use *filterredir* instead.
     .. seealso:: :meth:`APISite.allpages()
        <pywikibot.site._generators.GeneratorsMixin.allpages>`
@@ -112,7 +112,7 @@ def PrefixingPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Prefixed Page generator.
 
-    .. deprecated:: 10.0
+    .. version-deprecated:: 10.0
        The *includeredirects* parameter; use *filterredir* instead.
 
     :param prefix: The prefix of the pages.
@@ -225,13 +225,13 @@ def RecentChangesPageGenerator(
     For keyword parameters refer :meth:`APISite.recentchanges()
     <pywikibot.site._generators.GeneratorsMixin.recentchanges>`.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        The YieldType depends on namespace. It can be
        :class:`pywikibot.Page<pywikibot.page.Page>`,
        :class:`pywikibot.User<pywikibot.page.User>`,
        :class:`pywikibot.FilePage<pywikibot.page.FilePage>` or
        :class:`pywikibot.Category<pywikibot.page.Category>`.
-    .. versionchanged:: 9.4
+    .. version-changed:: 9.4
        Ignore :class:`pywikibot.FilePage<pywikibot.page.FilePage>` if it
        raises a :exc:`ValueError` during upcast e.g. due to an invalid
        file extension.
@@ -282,7 +282,7 @@ def UnconnectedPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all unconnected pages to a Wikibase repository.
 
-    .. versionchanged::
+    .. version-changed::
        The *strict* parameter was added.
 
     :param site: Site for generator results.
@@ -820,7 +820,7 @@ def SearchPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     r"""Yield pages from the MediaWiki internal search engine.
 
-    .. versionchanged:: 10.0
+    .. version-changed:: 10.0
        Keyword arguments *content*, *sort* and *where* was added.
 
     .. seealso:: :meth:`site.search()
@@ -884,9 +884,9 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
     generator prints a warning for each query.
 
     .. seealso:: https://policies.google.com/terms
-    .. versionchanged:: 7.6
+    .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
-    .. versionchanged:: 10.1
+    .. version-changed:: 10.1
        ``googlesearch-python`` package is needed instead of ``google``,
        see :phab:`T387618` for further informations. The *total*
        parameter was added. The *query* parameter is positional only.
@@ -933,7 +933,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
         .. important:: These note are from 2014 and have not been
            reviewed or updated since then.
 
-        .. versionchanged:: 10.1
+        .. version-changed:: 10.1
            *query* is positional only; *kwargs* parameter was added.
 
         :param query: the text to search for.
@@ -957,9 +957,9 @@ generator GoogleSearchPageGenerator depends on package
     def generator(self) -> Generator[pywikibot.page.Page]:
         """Yield results from :meth:`queryGoogle` query.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            changed from iterator method to generator property
-        .. versionchanged:: 10.1
+        .. version-changed:: 10.1
            use :meth:`site.protocol
            <pywikibot.site._basesite.BaseSite.protocol>` to get the base
            URL. Also filter duplicates.
@@ -994,7 +994,7 @@ generator GoogleSearchPageGenerator depends on package
         :class:`pagegenerators.GeneratorFactory` to circumvent call of
         :func:`itertools.islice` filter for this generator.
 
-        .. versionadded:: 10.1
+        .. version-added:: 10.1
         """
         self.limit = value
 
@@ -1087,7 +1087,7 @@ def SupersetPageGenerator(query: str,
         FROM page
         LIMIT 10
 
-    .. versionadded:: 9.2
+    .. version-added:: 9.2
 
     :param query: the SQL query string.
     :param site: Site for generator results.
@@ -1163,7 +1163,7 @@ class XMLDumpPageGenerator(abc.Iterator):  # type: ignore[type-arg]
 
     """Xml iterator that yields Page objects.
 
-    .. versionadded:: 7.2
+    .. version-added:: 7.2
        the `content` parameter
 
     :param filename: filename of XML dump
@@ -1351,8 +1351,8 @@ class PetScanPageGenerator(GeneratorWrapper):
     """Queries PetScan to generate pages.
 
     .. seealso:: https://petscan.wmflabs.org/
-    .. versionadded:: 3.0
-    .. versionchanged:: 7.6
+    .. version-added:: 3.0
+    .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
@@ -1421,7 +1421,7 @@ class PetScanPageGenerator(GeneratorWrapper):
     def query(self) -> Generator[dict[str, Any]]:
         """Query PetScan.
 
-        .. versionchanged:: 7.4
+        .. version-changed:: 7.4
            raises :class:`APIError` if query returns an error message.
 
         :raises ServerError: Either ReadTimeout or server status error
@@ -1450,7 +1450,7 @@ class PetScanPageGenerator(GeneratorWrapper):
     def generator(self) -> Generator[pywikibot.page.Page]:
         """Yield results from :meth:`query`.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            changed from iterator method to generator property
         """
         for raw_page in self.query():
@@ -1463,7 +1463,7 @@ class PagePilePageGenerator(GeneratorWrapper):
     """Queries PagePile to generate pages.
 
     .. seealso:: https://pagepile.toolforge.org/
-    .. versionadded:: 9.0
+    .. version-added:: 9.0
     """
 
     def __init__(self, id: int) -> None:

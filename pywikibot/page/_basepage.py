@@ -363,7 +363,7 @@ class BasePage(ComparableMixin):
          ...
         pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
 
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            :exc:`exceptions.SectionError` is raised if the
            :meth:`section` does not exists
         .. seealso:: :attr:`text` property
@@ -403,7 +403,7 @@ class BasePage(ComparableMixin):
 
         Not existing pages are considered loaded.
 
-        .. versionadded:: 7.6
+        .. version-added:: 7.6
         """
         return not self.exists() or self._latest_cached_revision() is not None
 
@@ -443,7 +443,7 @@ class BasePage(ComparableMixin):
     ) -> pywikibot.page.Revision:
         """Return an old revision of this page.
 
-        .. versionadded:: 9.6
+        .. version-added:: 9.6
         .. seealso:: :meth:`getOldVersion`
 
 
@@ -459,7 +459,7 @@ class BasePage(ComparableMixin):
     def getOldVersion(self, oldid, force: bool = False) -> str:
         """Return text of an old revision of this page.
 
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            The unused parameter *get_redirect* was removed.
         .. seealso:: :meth:`get_revision`
 
@@ -624,7 +624,7 @@ class BasePage(ComparableMixin):
     def get_parsed_page(self, force: bool = False) -> str:
         """Retrieve parsed text (via action=parse) and cache it.
 
-        .. versionchanged:: 7.1
+        .. version-changed:: 7.1
            `force` parameter was added;
            `_get_parsed_page` becomes a public method
 
@@ -645,7 +645,7 @@ class BasePage(ComparableMixin):
                 intro: bool = True) -> str:
         """Retrieve an extract of this page.
 
-        .. versionadded:: 7.1
+        .. version-added:: 7.1
 
         :param variant: The variant of extract, either 'plain' for plain
             text, 'html' for limited HTML (both excludes templates and
@@ -746,7 +746,7 @@ class BasePage(ComparableMixin):
     def userName(self) -> str:
         """Return name or IP address of last user to edit page.
 
-        .. deprecated:: 9.3
+        .. version-deprecated:: 9.3
            Use :attr:`latest_revision.user<latest_revision>`
            instead.
         """
@@ -756,7 +756,7 @@ class BasePage(ComparableMixin):
     def isIpEdit(self) -> bool:
         """Return True if last editor was unregistered.
 
-        .. deprecated:: 9.3
+        .. version-deprecated:: 9.3
            Use :attr:`latest_revision.anon<latest_revision>`
            instead.
         """
@@ -817,7 +817,7 @@ class BasePage(ComparableMixin):
         A static redirect must be a valid redirect, and contain the magic
         word __STATICREDIRECT__.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            __STATICREDIRECT__ can be transcluded
 
         :param force: Bypass local caching
@@ -1072,7 +1072,7 @@ class BasePage(ComparableMixin):
         :param total: maximum number of redirects to retrieve in total
         :param content: load the current content of each redirect
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
         """
         return self.site.page_redirects(
             self,
@@ -1278,15 +1278,15 @@ class BasePage(ComparableMixin):
              **kwargs) -> None:
         """Save the current contents of page's text to the wiki.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            boolean *watch* parameter is deprecated
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            *botflag* parameter was renamed to *bot*.
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            edits cannot be marked as bot edits if the bot account has no
            ``bot`` right. Therefore a ``None`` argument for *bot*
            parameter was dropped.
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            boolean *watch* parameter is desupported
 
         .. hint:: Setting up :manpage:`OAuth` or :manpage:`BotPassword
@@ -1426,11 +1426,11 @@ class BasePage(ComparableMixin):
         For new code, using :meth:`save` is preferred; also ee that
         method docs for all parameters not listed here.
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
            The `show_diff` parameter
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            *botflag* parameter was renamed to *bot*.
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            edits cannot be marked as bot edits if the bot account has no
            ``bot`` right. Therefore a ``None`` argument for *bot*
            parameter was dropped.
@@ -1457,7 +1457,7 @@ class BasePage(ComparableMixin):
     ) -> bool:
         """Add or remove this page from the bot account's watchlist.
 
-        .. versionchanged:: 10.4.0
+        .. version-changed:: 10.4.0
            Added the *expiry* parameter to specify watch expiry time.
            Positional parameters are deprecated; all parameters must be
            passed as keyword arguments.
@@ -1524,7 +1524,7 @@ class BasePage(ComparableMixin):
 
         .. note:: This discards content saved to self.text.
 
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            *botflag* parameter was renamed to *bot*.
         """
         if not self.exists():
@@ -1550,9 +1550,9 @@ class BasePage(ComparableMixin):
         For the parameters refer
         :py:mod:`APISite.pagelinks<pywikibot.site.APISite.pagelinks>`
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
            the `follow_redirects` keyword argument.
-        .. versionremoved:: 10.0
+        .. version-removed:: 10.0
            the positional arguments.
 
         .. seealso::
@@ -1663,12 +1663,12 @@ class BasePage(ComparableMixin):
         method caches the result. If *namespaces* is used, all pages are
         retrieved and cached but the result is filtered.
 
-        .. versionchanged:: 2.0
+        .. version-changed:: 2.0
            a list of :class:`pywikibot.Page` is returned instead of a
            list of template titles. The given pages may have namespaces
            different from TEMPLATE namespace. *get_redirect* parameter
            was removed.
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            *namespaces* parameter was added; all parameters must be given
            as keyword arguments.
 
@@ -1711,8 +1711,8 @@ class BasePage(ComparableMixin):
         but they can be yielded from the cache of a previous
         :meth:`templates` call.
 
-        .. versionadded:: 2.0
-        .. versionchanged:: 9.2
+        .. version-added:: 2.0
+        .. version-changed:: 9.2
            *namespaces* parameter was added; all parameters except
            *total* must be given as keyword arguments.
 
@@ -1756,10 +1756,10 @@ class BasePage(ComparableMixin):
     ) -> Iterable[pywikibot.Page]:
         """Iterate categories that the article is in.
 
-        .. versionchanged:: 2.0
+        .. version-changed:: 2.0
            *with_sort_key* parameter is not supported and a
            NotImplementedError is raised if set.
-        .. versionchanged:: 9.6
+        .. version-changed:: 9.6
            *with_sort_key* parameter is supported.
         .. seealso:: :meth:`Site.pagecategories()
            <pywikibot.site._generators.GeneratorsMixin.pagecategories>`
@@ -1832,7 +1832,7 @@ class BasePage(ComparableMixin):
                           ignore_section: bool = True) -> pywikibot.Page:
         """Return a Page object for the target this Page redirects to.
 
-        .. versionadded:: 9.3
+        .. version-added:: 9.3
            *ignore_section* parameter
 
         .. seealso::
@@ -1977,7 +1977,7 @@ class BasePage(ComparableMixin):
              movesubpages: bool = True) -> pywikibot.page.Page:
         """Move this page to a new title.
 
-        .. versionchanged:: 7.2
+        .. version-changed:: 7.2
            The *movesubpages* parameter was added
 
         :param newtitle: The new page title.
@@ -1998,7 +1998,7 @@ class BasePage(ComparableMixin):
     def rollback(self, **kwargs: Any) -> dict[str, int | str]:
         """Roll back this page to the version before the last edit by a user.
 
-        .. versionadded:: 10.5
+        .. version-added:: 10.5
 
         .. seealso::
            :meth:`Site.rollbackpage()
@@ -2050,7 +2050,7 @@ class BasePage(ComparableMixin):
     ) -> int:
         """Delete the page from the wiki. Requires administrator status.
 
-        .. versionchanged:: 7.1
+        .. version-changed:: 7.1
            keyword only parameter *deletetalk* was added.
 
         :param reason: The edit summary for the deletion, or rationale
@@ -2120,7 +2120,7 @@ class BasePage(ComparableMixin):
     def has_deleted_revisions(self) -> bool:
         """Return True if the page has deleted revisions.
 
-        .. versionadded:: 4.2
+        .. version-added:: 4.2
         """
         if not hasattr(self, '_has_deleted_revisions'):
             gen = self.site.deletedrevs(self, total=1, prop=['ids'])
@@ -2307,7 +2307,7 @@ class BasePage(ComparableMixin):
                         show_diff: bool = False) -> bool:
         """Remove page from oldCat and add it to newCat.
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
            The `show_diff` parameter
 
         :param old_cat: category to be removed

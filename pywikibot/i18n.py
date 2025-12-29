@@ -416,7 +416,7 @@ def _get_bundle(lang: str, dirname: str) -> dict[str, str]:
 
     For internal use, don't use it directly.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     filename = f'{dirname}/{lang}.json'
     try:
@@ -565,11 +565,11 @@ def translate(code: str | pywikibot.site.BaseSite,
 
     For PLURAL support have a look at the :func:`twtranslate` function.
 
-    .. versionchanged:: 2.0
+    .. version-changed:: 2.0
        *parameter* other than a mapping (or None) is deprecated.
-    .. versionchanged:: 6.2
+    .. version-changed:: 6.2
        ValueError is raised if *parameter* is not a mapping.
-    .. versionchanged:: 10.2
+    .. version-changed:: 10.2
        TypeError instead of ValueError is raised if *parameter* is not a
        mapping.
 
@@ -662,7 +662,7 @@ def get_bot_prefix(
     .. note:: If *source* is a str and ``config.bot_prefix`` is set to
        None, it cannot be determined whether the current user is a bot
        account. In this cas the prefix will be returned.
-    .. versionadded:: 8.1
+    .. version-added:: 8.1
 
     :param source: When it's a site it's using the lang attribute and otherwise
         it is using the value directly.
@@ -746,10 +746,10 @@ def twtranslate(
     ... ) % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
-    .. versionchanged:: 8.1
+    .. version-changed:: 8.1
        the *bot_prefix* parameter was added.
 
-    .. versionchanged:: 10.5
+    .. version-changed:: 10.5
        *fallback_prompt* is now returned whenever no translation is found,
        including unknown keys in existing packages.
 
@@ -907,7 +907,7 @@ def bundles(stem: bool = False) -> Generator[Path | str]:
     >>> path.parent.as_posix()
     'scripts/i18n'
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
 
     :param stem: yield the Path.stem if True and the Path object otherwise
     """
@@ -945,7 +945,7 @@ def known_languages() -> list[str]:
                    langs.add(fname.stem)
         return sorted(langs)
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     return sorted(
         {fname.stem for dirpath in bundles() for fname in dirpath.iterdir()

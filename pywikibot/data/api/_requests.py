@@ -136,10 +136,10 @@ class Request(MutableMapping, WaitingMixin):
     >>> sorted(data['query'])
     ['namespaces', 'userinfo']
 
-    .. versionchanged:: 8.4
+    .. version-changed:: 8.4
        inherited from :class:`WaitingMixin`.
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        *keys* and *items* methods return a view object instead a list
     """
 
@@ -405,7 +405,7 @@ class Request(MutableMapping, WaitingMixin):
     def iteritems(self):
         """Implement dict interface.
 
-        .. deprecated:: 9.0
+        .. version-deprecated:: 9.0
            Use ``items()`` instead.
         """
         return iter(self.items())
@@ -681,10 +681,10 @@ class Request(MutableMapping, WaitingMixin):
                       paramstring) -> tuple:
         """Get or post a http request with exception handling.
 
-        .. versionchanged:: 8.2
+        .. version-changed:: 8.2
            change the scheme if the previous request didn't have json
            content.
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            no wait cycles for :exc:`ImportError` and :exc:`NameError`.
 
         :return: a tuple containing requests.Response object from
@@ -745,7 +745,7 @@ class Request(MutableMapping, WaitingMixin):
     def _json_loads(self, response) -> dict | None:
         """Return a dict from requests.Response.
 
-        .. versionchanged:: 8.2
+        .. version-changed:: 8.2
            show a warning to add a ``protocol()`` method to the family
            file if suitable.
 
@@ -841,9 +841,9 @@ but {scheme!r} is required. Please add the following code to your family file:
     def _handle_warnings(self, result: dict[str, Any]) -> bool:
         """Handle warnings; return True to retry request, False to resume.
 
-        .. versionchanged:: 7.2
+        .. version-changed:: 7.2
            Return True to retry the current request and False to resume.
-        .. versionchanged:: 10.5
+        .. version-changed:: 10.5
            Handle warnings of formatversion 2.
 
         .. seealso:: :api:`Errors and warnings`
@@ -888,7 +888,7 @@ but {scheme!r} is required. Please add the following code to your family file:
         Return True to retry the request, False to resume and None if
         the warning is not handled.
 
-        .. versionadded:: 7.2
+        .. version-added:: 7.2
 
         :meta public:
         """
@@ -1007,7 +1007,7 @@ but {scheme!r} is required. Please add the following code to your family file:
 
         Also reset last API error with wait cycles.
 
-        .. versionadded:: 9.0
+        .. version-added:: 9.0
 
         :param delay: Minimum time in seconds to wait. Overwrites
             ``retry_wait`` variable if given. The delay doubles each
@@ -1019,10 +1019,10 @@ but {scheme!r} is required. Please add the following code to your family file:
     def submit(self) -> dict:
         """Submit a query and parse the response.
 
-        .. versionchanged:: 8.0.4
+        .. version-changed:: 8.0.4
            in addition to *readapidenied* also try to login when API
            response is *notloggedin*.
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            Raise :exc:`exceptions.APIError` if the same error comes
            twice in a row within the loop.
 
@@ -1201,7 +1201,7 @@ class CachedRequest(Request):
 
     """Cached request.
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        timestamp with timezone is used to determine expiry.
     """
 
@@ -1232,9 +1232,9 @@ class CachedRequest(Request):
 
         The directory will be created if it does not already exist.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            return a `pathlib.Path` object.
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            remove Python main version from directory name
 
         :return: base directory path for cache entries
@@ -1250,10 +1250,10 @@ class CachedRequest(Request):
     def _make_dir(dir_name: str | Path) -> Path:
         """Create directory if it does not exist already.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            Only `FileExistsError` is ignored but other OS exceptions can
            be still raised
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            use *dir_name* as str or `pathlib.Path` object but always
            return a Path object.
 
@@ -1298,7 +1298,7 @@ class CachedRequest(Request):
     def _cachefile_path(self) -> Path:
         """Create the cachefile path.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            return a `pathlib.Path` object.
 
         :meta public:

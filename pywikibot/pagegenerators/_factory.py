@@ -132,7 +132,7 @@ class GeneratorFactory:
 
         Otherwise the value is undefined and gives None.
 
-        .. versionadded:: 7.3
+        .. version-added:: 7.3
         """
 
     def _validate_options(self,
@@ -203,9 +203,9 @@ class GeneratorFactory:
 
         Only call this after all arguments have been parsed.
 
-        .. versionchanged:: 7.3
+        .. version-changed:: 7.3
            set the instance variable :attr:`is_preloading` to True or False.
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            if ``limit`` option is set and multiple generators are given,
            pages are yieded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
@@ -373,7 +373,7 @@ class GeneratorFactory:
     ) -> Iterable[pywikibot.page.BasePage] | None:
         """Parse the -logevent argument information.
 
-        .. deprecated:: 9.2
+        .. version-deprecated:: 9.2
            the *start* parameter as total amount of pages.
 
         :param logtype: A valid logtype
@@ -928,7 +928,7 @@ class GeneratorFactory:
     def _handle_redirect(self, value: str) -> Literal[True]:
         """Handle `-redirect` argument.
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
         """
         if not value:
             # True by default
@@ -939,7 +939,7 @@ class GeneratorFactory:
     def _handle_pagepile(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-pagepile` argument.
 
-        .. versionadded:: 9.0
+        .. version-added:: 9.0
         """
         if not value.isnumeric():
             raise ValueError(
@@ -949,8 +949,8 @@ class GeneratorFactory:
     def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.
 
-        .. versionadded:: 6.0
-        .. versionchanged:: 7.3
+        .. version-added:: 6.0
+        .. version-changed:: 7.3
            Prioritize -namespaces options to solve problems with several
            generators like -newpages/-random/-randomredirect/-linter
         """
@@ -969,7 +969,7 @@ class GeneratorFactory:
         can try parsing the argument. Call getCombinedGenerator() after all
         arguments have been parsed to get the final output generator.
 
-        .. versionadded:: 6.0
+        .. version-added:: 6.0
            renamed from ``handleArg``
 
         :param arg: Pywikibot argument consisting of -name:value

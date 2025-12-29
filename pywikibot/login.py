@@ -122,7 +122,7 @@ class LoginManager:
     def __repr__(self) -> str:
         """Return representation string for LoginManager.
 
-        .. versionadded:: 10.0
+        .. version-added:: 10.0
         """
         return f'{type(self).__name__}(user={self.username!r})'
 
@@ -216,10 +216,10 @@ class LoginManager:
          ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
          ('my_username', BotPassword('my_suffix', 'my_password'))
 
-        .. versionchanged:: 10.2
+        .. version-changed:: 10.2
            Raises ValueError instead of AttributeError if password_file
                is not set.
-        .. versionchanged:: 10.7.1
+        .. version-changed:: 10.7.1
            Due to vulnerability issue the password lines are no longer
            evaluated as Python source but parsed as literals.
            Raises ValueError if an exception occurs while evaluating a
@@ -362,10 +362,10 @@ class ClientLoginManager(LoginManager):
 
     """Supply login_to_site method to use API interface.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        2FA login was enabled. LoginManager was moved from :mod:`data.api`
        to :mod:`login` module and renamed to *ClientLoginManager*.
-    .. versionchanged:: 10.2
+    .. version-changed:: 10.2
        Secondary authentication via email was enabled.
     .. seealso::
        - https://www.mediawiki.org/wiki/Extension:OATHAuth
@@ -421,9 +421,9 @@ class ClientLoginManager(LoginManager):
         Note, this doesn't do anything with cookies. The http module
         takes care of all the cookie stuff. Throws exception on failure.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            2FA login was implemented.
-        .. versionchanged:: 10.2
+        .. version-changed:: 10.2
            Secondary authentication via email was implemented.
 
         :raises RuntimeError: Unexpected API login response key or
@@ -658,7 +658,7 @@ class OauthLoginManager(LoginManager):
             Implemented to discard user interaction token fetching,
             usually for tests.
 
-            .. versionadded:: 10.0
+            .. version-added:: 10.0
         """
         return self._access_token
 
@@ -671,7 +671,7 @@ class OauthLoginManager(LoginManager):
     def identity(self) -> dict[str, Any] | None:
         """Get identifying information about a user via an authorized token.
 
-        .. versionchanged:: 9.6
+        .. version-changed:: 9.6
            *leeway* parameter for ``mwoauth.identify`` function was
            increased to 30.0 seconds.
         """
