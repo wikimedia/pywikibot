@@ -32,6 +32,7 @@ from pywikibot._wbtypes import (
     WbTime,
     WbUnknown,
 )
+from pywikibot.backports import RLock
 from pywikibot.bot import (
     Bot,
     CurrentPageBot,
@@ -353,8 +354,8 @@ def _flush(stop: bool = True) -> None:
 
     exit_queue = None
     if _putthread is not threading.current_thread():
-        while _putthread.is_alive() and not (page_put_queue.empty()
-                                             and page_put_queue_busy.empty()):
+        while _putthread.is_alive() and (not page_put_queue.empty()
+                                         or _page_put_queue_busy.locked()):
             try:
                 _putthread.join(1)
             except KeyboardInterrupt:
@@ -393,13 +394,14 @@ def async_manager(block=True) -> None:
     while True:
         if not block and page_put_queue.empty():
             break
+
         (request, args, kwargs) = page_put_queue.get(block)
-        page_put_queue_busy.put(None)
-        if request is None:
-            break
-        request(*args, **kwargs)
-        page_put_queue.task_done()
-        page_put_queue_busy.get()
+
+        with _page_put_queue_busy:
+            if request is None:
+                break
+            request(*args, **kwargs)
+            page_put_queue.task_done()
 
 
 def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
@@ -408,14 +410,16 @@ def async_request(request: Callable, *args: Any, **kwargs: Any) -> None:
         # ignore RuntimeError if start() is called more than once
         with page_put_queue.mutex, suppress(RuntimeError):
             _putthread.start()
+
     page_put_queue.put((request, args, kwargs))
 
 
 #: Queue to hold pending requests
 page_put_queue: Queue = Queue(_config.max_queue_size)
 
-# queue to signal that async_manager is working on a request. See T147178.
-page_put_queue_busy: Queue = Queue(_config.max_queue_size)
+# RLock to signal that async_manager is working on a request. See T147178.
+_page_put_queue_busy: RLock = RLock()
+
 # set up the background thread
 _putthread = threading.Thread(target=async_manager,
                               name='Put-Thread',  # for debugging purposes

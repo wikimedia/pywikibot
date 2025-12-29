@@ -3,6 +3,7 @@ Release 11 (in development)
 
 **Improvements**
 
+* Use :class:`backports.RLock` instead of Queue to signal async_manager activity (:phab:`T147178`)
 * Add :meth:`User.is_partial_blocked()<pywikibot.User.is_partial_blocked>` and methods
   :meth:`APISite.is_partial_blocked()<pywikibot.site._apisite.APISite.is_partial_blocked>` to detect
   partial blocks (:phab:`T412613`)
@@ -28,6 +29,7 @@ Release 11 (in development)
 
 **Code cleanups**
 
+* The undocumented ``page_put_queue_busy`` was removed without deprecation period.
 * Dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` was removed.
   (:phab:`T359427`, :phab:`T407708`)
