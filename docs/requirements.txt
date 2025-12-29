@@ -1,7 +1,7 @@
 # This is a PIP requirements file for building Sphinx documentation of Pywikibot
 # ../requirements.txt is also needed.
 # Note: Python 3.11 is required for sphinx 8.2
-sphinx >= 8.2.3
+sphinx == 8.2.3
 rstcheck >=6.2.5
 sphinxext-opengraph >= 0.13.0
 sphinx-copybutton >= 0.5.2
