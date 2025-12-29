@@ -468,6 +468,8 @@ numfig = True
 show_authors = True
 todo_include_todos = True
 autodoc_typehints = 'description'
+autodoc_use_legacy_class_based = True  # T413563
+
 # autosectionlabel_prefix_document = True
 suppress_warnings = ['autosectionlabel.*']
 toc_object_entries_show_parents = 'hide'
