@@ -200,7 +200,7 @@ class APISite(
     ) -> BaseSite:
         """Create a site from a database name using the sitematrix.
 
-        .. version-changed:: 8.3.3
+        .. versionchanged:: 8.3.3
            changed from classmethod to staticmethod.
 
         :param dbname: database name
@@ -305,7 +305,7 @@ class APISite(
     def simple_request(self, **kwargs: Any) -> api.Request:
         """Create a request by defining all kwargs as parameters.
 
-        .. version-added:: 7.1
+        .. versionadded:: 7.1
            `_simple_request` becomes a public method
         """
         return self._request_class({'parameters': kwargs}).create_simple(
@@ -342,9 +342,9 @@ class APISite(
     ) -> None:
         """Log the user in if not already logged in.
 
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            lazy load cookies when logging in. This was dropped in 8.0.4
-        .. version-changed:: 8.0.4
+        .. versionchanged:: 8.0.4
            the *cookie_only* parameter was added and cookies are loaded
            whenever the site is initialized.
 
@@ -487,8 +487,8 @@ class APISite(
     def file_extensions(self) -> list[str]:
         """File extensions enabled on the wiki.
 
-        .. version-added:: 8.4
-        .. version-changed:: 9.2
+        .. versionadded:: 8.4
+        .. versionchanged:: 9.2
            also include extensions from the image repository
         """
         ext = self.siteinfo.get('fileextensions')
@@ -500,7 +500,7 @@ class APISite(
     def maxlimit(self) -> int:
         """Get the maximum limit of pages to be retrieved.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
         """
         parameter = self._paraminfo.parameter('query+info', 'prop')
         assert parameter is not None
@@ -587,7 +587,7 @@ class APISite(
         .. seealso::
            - :class:`tools.collections.RateLimit` for RateLimit examples.
            - :api:`Ratelimit`
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
 
         :param action: action which might be limited
         :return: RateLimit tuple with ``group``, ``hits`` and ``seconds``
@@ -648,7 +648,7 @@ class APISite(
         - :meth:`logged_in` to verify the user is loggend in to a site
 
         .. seealso:: :api:`Userinfo`
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            Use API formatversion 2.
 
         :return: A dict with the following keys and values:
@@ -683,7 +683,7 @@ class APISite(
     def userinfo(self) -> None:
         """Delete cached userinfo.
 
-        .. version-added:: 5.5
+        .. versionadded:: 5.5
         """
         if hasattr(self, '_userinfo'):
             del self._userinfo
@@ -693,7 +693,7 @@ class APISite(
                            force: bool = False) -> dict[str, Any]:
         """Retrieve globaluserinfo from site and cache it.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
 
         :param user: The user name or user ID whose global info is
             retrieved. Defaults to the current user.
@@ -747,7 +747,7 @@ class APISite(
         To get globaluserinfo for a given user or user ID use
         :meth:`get_globaluserinfo` method instead
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
         return self.get_globaluserinfo()
 
@@ -755,7 +755,7 @@ class APISite(
     def globaluserinfo(self) -> None:
         """Delete cached globaluserinfo of current user.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
         """
         username = self.username()
         assert username is not None
@@ -770,7 +770,7 @@ class APISite(
 
         .. seealso:: :api:`Userinfo`
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
            The `force` parameter
 
         :param force: Whether the cache should be discarded.
@@ -784,7 +784,7 @@ class APISite(
                   force: bool = False) -> bool:
         """Return True when given user is locked globally.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
 
         :param user: The user name or user ID. Defaults to the current
             user.
@@ -832,9 +832,9 @@ class APISite(
         Replaces the ``$1`` placeholder from MediaWiki with a
         Python-compatible ``{}``.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
 
-        .. version-changed:: 10.3
+        .. versionchanged:: 10.3
            raises ValueError instead of AttributeError if "$1"
            placeholder is missing.
 
@@ -853,7 +853,7 @@ class APISite(
         Letters that can follow a wikilink and are regarded as part of
         this link. This depends on the linktrail setting in LanguageXx.php
 
-        .. version-added:: 7.3
+        .. versionadded:: 7.3
 
         :return: The linktrail regex.
         """
@@ -1155,7 +1155,7 @@ class APISite(
            :meth:`BaseSite.redirects()
            <pywikibot.site._basesite.BaseSite.redirects>`
 
-        .. version-added:: 8.4
+        .. versionadded:: 8.4
         """
         return [s.lstrip('#') for s in self.getmagicwords('redirect')]
 
@@ -1357,7 +1357,7 @@ class APISite(
         >>> page is None
         True
 
-        .. version-changed:: 7.7
+        .. versionchanged:: 7.7
            No longer raise NotimplementedError if used with a Wikibase
            site.
 
@@ -1398,7 +1398,7 @@ class APISite(
         If optional argument *all_ns* is true, return all recognized
         values for this namespace.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            *all* parameter was renamed to *all_ns*.
 
         :param num: Namespace constant.
@@ -1490,9 +1490,9 @@ class APISite(
 
         .. note:: Parameters validation and error handling left to the
            API call.
-        .. version-changed:: 8.2
+        .. versionchanged:: 8.2
            *mediatype* and *bitdepth* properties were added.
-        .. version-changed:: 8.6.
+        .. versionchanged:: 8.6.
            Added *timestamp* parameter.
            Metadata are loaded only if *history* is False.
         .. seealso:: :api:`Imageinfo`
@@ -1588,7 +1588,7 @@ class APISite(
     ) -> pywikibot.page.Page:
         """Return page object for the redirect target of page.
 
-        .. version-added:: 9.3
+        .. versionadded:: 9.3
            *ignore_section* parameter
 
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
@@ -1719,10 +1719,10 @@ class APISite(
         You should not call this method directly, especially if you only
         need a specific token. Use :attr:`tokens` property instead.
 
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            *all* parameter is deprecated. Use an empty list for
            ``types`` instead.
-        .. version-changed:: 11.0
+        .. versionchanged:: 11.0
            *all* parameter was removed.
         .. seealso:: :api:`Tokens`
 
@@ -1780,7 +1780,7 @@ class APISite(
         '1c8...9d3+\\'
         >>> del site.tokens  # another variant to clear the cache
 
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            ``tokens`` attribute became a property to enable deleter.
         .. warning:: A deprecation warning is shown if the token name is
            outdated, see :api:`Tokens (action)`.
@@ -1797,7 +1797,7 @@ class APISite(
     def get_parsed_page(self, page: BasePage) -> str:
         """Retrieve parsed text of the page using action=parse.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            raises KeyError instead of AssertionError
 
         .. seealso::
@@ -1865,7 +1865,7 @@ class APISite(
         If more than one target id is provided, the same action is taken for
         all of them.
 
-        .. version-added:: 6.0
+        .. versionadded:: 6.0
 
         :param targettype: Type of target. One of "archive", "filearchive",
             "logging", "oldimage", "revision".
@@ -2385,7 +2385,7 @@ class APISite(
 
         .. seealso:: :api:`Move`
 
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            The `movesubpages` parameter was added
 
         :param page: the Page to be moved (must exist)
@@ -2496,7 +2496,7 @@ class APISite(
         will revert the last edit(s) made by the specified user on the
         given page.
 
-        .. version-changed:: 10.5
+        .. versionchanged:: 10.5
            Added *pageid* as alternative to *page* (one must be given).
            *markbot* defaults to True if the rollbacker is a bot and not
            explicitly given. The method now returns a dictionary with
@@ -2628,16 +2628,16 @@ class APISite(
         To delete a specific version of an image the oldimage identifier
         must be provided.
 
-        .. version-added:: 6.1
+        .. versionadded:: 6.1
            renamed from `deletepage`
 
-        .. version-changed:: 6.1
+        .. versionchanged:: 6.1
            keyword only parameter `oldimage` was added.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            keyword only parameter `deletetalk` was added.
 
-        .. version-changed:: 8.1
+        .. versionchanged:: 8.1
            raises :exc:`exceptions.NoPageError` if page does not exist.
 
         :param page: Page to be deleted or its pageid.
@@ -2717,10 +2717,10 @@ class APISite(
 
         .. seealso:: :api:`Undelete`
 
-        .. version-added:: 6.1
+        .. versionadded:: 6.1
            renamed from `undelete_page`
 
-        .. version-changed:: 6.1
+        .. versionchanged:: 6.1
            `fileids` parameter was added,
            keyword argument required for `revisions`.
 
@@ -2770,7 +2770,7 @@ class APISite(
         >>> sorted(site.protection_types())
         ['create', 'edit', 'move', 'upload']
 
-        .. version-deprecated:: 10.5
+        .. deprecated:: 10.5
            Use :attr:`restrictions[types]<restrictions>` instead.
 
         :return: protection types available
@@ -2787,7 +2787,7 @@ class APISite(
         >>> sorted(site.protection_levels())
         ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
 
-        .. version-deprecated:: 10.5
+        .. deprecated:: 10.5
            Use :attr:`restrictions[levels]<restrictions>` instead.
 
         :return: protection levels available
@@ -2807,7 +2807,7 @@ class APISite(
         >>> sorted(r['levels'])
         ['', 'autoconfirmed', ... 'sysop', 'templateeditor']
 
-        .. version-added:: 10.5
+        .. versionadded:: 10.5
         .. seealso:: :meth:`page_restrictions`
 
         :return: dict with keys 'types', 'levels', 'cascadinglevels' and
@@ -2978,7 +2978,7 @@ class APISite(
     ) -> bool:
         """Add or remove pages from watchlist.
 
-        .. version-changed:: 10.4.0
+        .. versionchanged:: 10.4.0
            Added the *expiry* parameter to specify watch expiry time.
            Passing *unwatch* as a positional parameter is deprecated;
            it must be passed as keyword argument.
@@ -3122,10 +3122,10 @@ class APISite(
 
         Either source_filename or source_url, but not both, must be provided.
 
-        .. version-changed:: 6.0
+        .. versionchanged:: 6.0
            keyword arguments required for all parameters except `filepage`
 
-        .. version-changed:: 6.2:
+        .. versionchanged:: 6.2:
            asynchronous upload is used if `asynchronous` parameter is set.
 
         For keyword arguments refer :class:`pywikibot.site._upload.Uploader`

@@ -32,7 +32,7 @@ class Siteinfo(Container):
 
     All values of the 'general' property  are directly available.
 
-    .. version-changed:: 10.5
+    .. versionchanged:: 10.5
        formatversion 2 is used for API calls.
 
     .. admonition:: Compatibility note
@@ -50,7 +50,7 @@ class Siteinfo(Container):
 
        :code:`'thumblimits': [120, 150, 180, 200, 220, 250, 300, 400]`
 
-    .. version-deprecated:: 10.5
+    .. deprecated:: 10.5
        Accessing the fallback '*' keys in 'languages', 'namespaces',
        'namespacealiases', and 'skins' properties are deprecated and
        will be removed in a future release of Pywikibot.
@@ -70,7 +70,7 @@ class Siteinfo(Container):
     def clear(self) -> None:
         """Clear all cached siteinfo properties.
 
-        .. version-added:: 7.1
+        .. versionadded:: 7.1
         """
         self._cache.clear()
 
@@ -81,7 +81,7 @@ class Siteinfo(Container):
 
         Modifies *data* in place.
 
-        .. version-changed:: 10.5
+        .. versionchanged:: 10.5
            Modify *data* for formatversion 1 compatibility and easier
            to use lists.
 
@@ -333,7 +333,7 @@ class Siteinfo(Container):
     def is_cached(self, key: str) -> bool:
         """Return whether the value is cached.
 
-        .. version-added:: 7.1
+        .. versionadded:: 7.1
         """
         try:
             self._get_cached(key)
@@ -349,7 +349,7 @@ class Siteinfo(Container):
         like `key in container`.Only string keys are valid. Non-string
         keys always return False.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            Previous implementation only checked for cached keys.
 
         :param key: The key to check for presence. Should be a string.

@@ -96,7 +96,7 @@ def read_project() -> str:
     ``configparser`` is used. Therefore the tomlfile must be readable as
     config file until the first comment.
 
-    .. version-added:: 9.0
+    .. versionadded:: 9.0
     """
     if sys.version_info >= (3, 11):
         import tomllib

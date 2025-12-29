@@ -135,10 +135,10 @@ For transwikiimport script and even to access the ``Special:Import``
 page the appropriate flag on the account must be set, usually
 administrator, transwiki importer or importer.
 
-.. version-added:: 8.2
+.. versionadded:: 8.2
 """
 #
-# (C) Pywikibot team, 2023-2025
+# (C) Pywikibot team, 2023-2024
 #
 # Distributed under the terms of the MIT license.
 #

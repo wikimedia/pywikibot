@@ -6,7 +6,7 @@ The XmlDump class reads a pages_current XML dump (like the ones offered on
 https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 
-.. version-changed:: 7.7
+.. versionchanged:: 7.7
    *defusedxml* is used in favour of *xml.etree* if present to prevent
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
@@ -61,7 +61,7 @@ class Headers(NamedTuple):
 
     """Represent the common info of a page.
 
-    .. version-added:: 9.0
+    .. versionadded:: 9.0
     """
 
     title: str
@@ -76,7 +76,7 @@ class RawRev(NamedTuple):
 
     """Represent a raw revision.
 
-    .. version-added:: 9.0
+    .. versionadded:: 9.0
     """
 
     headers: Headers
@@ -91,11 +91,11 @@ class XmlDump:
     Reads the local file at initialization,
     parses it, and offers access to the resulting XmlEntries via a generator.
 
-    .. version-added:: 7.2
+    .. versionadded:: 7.2
        the `on_error` parameter
-    .. version-changed:: 7.2
+    .. versionchanged:: 7.2
        `allrevisions` parameter must be given as keyword parameter
-    .. version-changed:: 9.0
+    .. versionchanged:: 9.0
        `allrevisions` parameter is deprecated due to :phab:`T340804`,
        `revisions` parameter was introduced as replacement.
        `root` attribute was removed.
@@ -173,7 +173,7 @@ class XmlDump:
     def parse(self) -> Iterator[XmlEntry]:
         """Generator using ElementTree iterparse function.
 
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            if a ParseError occurs it can be handled by the callable
            given with `on_error` parameter of this instance.
         """
@@ -212,7 +212,7 @@ class XmlDump:
     def _parse_only_first_found(self, elem: Element) -> Iterator[XmlEntry]:
         """Parser that yields the first revision found.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
         """
         raw_revs = self._fetch_revs(elem)
         try:
@@ -231,7 +231,7 @@ class XmlDump:
     def _parse_only_earliest(self, elem: Element) -> Iterator[XmlEntry]:
         """Parser that yields only the earliest revision.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
         """
         raw_revs = self._fetch_revs(elem, with_id=True)
         raw_rev = min(raw_revs, default=None, key=lambda rev: rev.revid)
@@ -247,7 +247,7 @@ class XmlDump:
     def _fetch_revs(self, elem: Element, with_id=False) -> Iterator[RawRev]:
         """Yield all revisions in a page.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
         """
         uri = self.uri
         headers = self._headers(elem)
@@ -262,7 +262,7 @@ class XmlDump:
         Returns strings representing user groups allowed to edit and
         to move a page, where None means there are no restrictions.
 
-        .. version-added:: 9.0
+        .. versionadded:: 9.0
            replaces deprecated ``parseRestrictions`` function.
         """
         if not restrictions:

@@ -149,7 +149,7 @@ A pagegenerators option can be given with *move* and *remove* action:
 The sample above would remove 'Hydraulics' category from all pages which
 are also in 'Pneumatics' category.
 
-.. version-changed:: 8.0
+.. versionchanged:: 8.0
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
 #
@@ -583,7 +583,7 @@ class CategoryMoveRobot(CategoryPreprocess):
 
     Per default the operation applies to pages and subcategories.
 
-    .. version-added:: 8.0
+    .. versionadded:: 8.0
        The ``generator`` parameter.
     """
 
@@ -730,7 +730,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         - _change()
         - _delete()
 
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            if a page generator is given to the bot, the intersection
            with :func:`pagegenerators.CategorizedPageGenerator` or
            :func:`pagegenerators.SubCategoriesPageGenerator` is used.
@@ -1345,7 +1345,7 @@ class CategoryTreeRobot:
             robot = CategoryTreeRobot(
                 'Physics', db, 'physics_tree.txt', max_depth=5)
 
-    .. version-changed:: 10.4
+    .. versionchanged:: 10.4
        *max_depth* is keyword only.
 
     :param cat_title: The category that serves as the root of the
@@ -1397,7 +1397,7 @@ class CategoryTreeRobot:
         given category *cat*, up to the depth specified by
         ``self.max_depth``. This method is recursive.
 
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            *parent* is keyword only.
 
         Example:
@@ -1482,7 +1482,7 @@ class CleanBot(Bot):
        - :wiki:`WP:SUBCAT`
        - :wiki:`WP:DIFFUSE`
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
 
     update_options = {

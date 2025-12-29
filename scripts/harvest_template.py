@@ -105,7 +105,7 @@ is already there:
 .. note:: This script is a
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
-.. version-added:: 7.5
+.. versionadded:: 7.5
    the -inverse option.
 """
 #
@@ -168,7 +168,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     """A bot to add Wikidata claims.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        HarvestRobot is a ConfigParserBot
     """
 
@@ -242,7 +242,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              link_text: str) -> pywikibot.ItemPage | None:
         """Find the ItemPage target for a given link text.
 
-        .. version-changed:: 7.5
+        .. versionchanged:: 7.5
            Only follow the redirect target if redirect page has no
            wikibase item.
         """
@@ -323,7 +323,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     field_item: tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         field, value = field_item
         field = field.strip()
@@ -387,7 +387,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     ) -> Generator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         value = value.replace('{{!}}', '|')
         prop, options = self.fields[field]
@@ -418,7 +418,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     *args) -> Generator[WbTime]:
         """Handle 'time' claim type.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         value = value.replace('{{!}}', '|')
         value = value.replace('&nbsp;', ' ')
@@ -472,7 +472,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_string(value: str, *args) -> Generator[str]:
         """Handle 'string' and 'external-id' claim type.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         yield value.strip()
 
@@ -481,7 +481,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_url(self, value, *args) -> Generator[str]:
         """Handle 'url' claim type.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         for match in self.linkR.finditer(value):
             yield match['url']
@@ -494,7 +494,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     ) -> Generator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
-        .. version-added:: 7.5
+        .. versionadded:: 7.5
         """
         repo = site.image_repository()
         image = pywikibot.FilePage(repo, value)

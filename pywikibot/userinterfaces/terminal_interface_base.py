@@ -60,7 +60,7 @@ class UI(ABUIC):
 
     """Base for terminal user interfaces.
 
-    .. version-changed:: 6.2:
+    .. versionchanged:: 6.2:
        subclassed from
        :py:obj:`userinterfaces._interface_base.ABUIC`
     """
@@ -73,7 +73,7 @@ class UI(ABUIC):
         This caches the std-streams locally so any attempts to
         monkey-patch the streams later will not work.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            memorize original streams
         """
         # for Windows GUI they can be None under some conditions
@@ -164,7 +164,7 @@ class UI(ABUIC):
         against the frozen streams, and then write to the (potentially
         redirected) `sys.stderr` or `sys.stdout` stream.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            instead of writing to `target_stream`, dispatch to
            `sys.stderr` or `sys.stdout`.
         """
@@ -242,7 +242,7 @@ class UI(ABUIC):
         in cache. They will be printed with next unlocked output call or
         at termination time.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            Forward text to cache and flush if output is not locked.
         """
         self.cache_output(text, targetStream=targetStream)
@@ -252,7 +252,7 @@ class UI(ABUIC):
     def flush(self) -> None:
         """Output cached text.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
         """
         with self.lock:
             for args, kwargs in self.cache:
@@ -262,7 +262,7 @@ class UI(ABUIC):
     def cache_output(self, *args, **kwargs) -> None:
         """Put text to cache.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
         """
         with self.lock:
             self.cache.append((args, kwargs))
@@ -274,7 +274,7 @@ class UI(ABUIC):
         terminal, it will be replaced with a question mark or by a
         transliteration.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
            ``UI.output()`` was renamed to ``UI.stream_output()``
         """
         if config.transliterate:
@@ -418,7 +418,7 @@ class UI(ABUIC):
         not be sensible when the option supports multiple values as
         it'll return an ambiguous index.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            Raise ValueError if no *default* value is given with *force*;
            raise ValueError if *force* is True and *default* value is
            invalid; raise TypeError if *default* value is neither str

@@ -23,7 +23,7 @@ class Uploader:
 
     """Uploader class to upload a file to the wiki.
 
-    .. version-added:: 7.1
+    .. versionadded:: 7.1
 
     :param site: The current site to work on
     :param filepage: a FilePage object from which the wiki-name of the

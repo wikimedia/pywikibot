@@ -35,7 +35,7 @@ language to be used can be set as follows:
 #. fallback is `'en'` for English if all other options fails
 
 .. note:: The preferred language code must follow ISO 639.
-.. version-added:: 7.0
+.. versionadded:: 7.0
    Added to site-package distribution
 .. seealso::
    * :manpage:`i18n` Manual

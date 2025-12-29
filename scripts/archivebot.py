@@ -168,23 +168,23 @@ Options (may be omitted):
 
 Version historty:
 
-.. version-changed:: 7.6
+.. versionchanged:: 7.6
    Localized variables for the ``archive`` parameter are supported.
    ``User:MiszaBot/config`` is the default template. The ``-keep`` option
    was added.
 
-.. version-changed:: 7.7
+.. versionchanged:: 7.7
    ``-sort`` and ``-async`` options were added.
 
-.. version-changed:: 8.2
+.. versionchanged:: 8.2
    KeyboardInterrupt support added when using the ``-async`` option.
 
-.. version-changed:: 10.3
+.. versionchanged:: 10.3
    If ``archiveheader`` is not set, the bot now attempts to retrieve a
    localized template from Wikidata (based on known item IDs). If none is
    found, ``{{talkarchive}}`` is used as fallback.
 
-.. version-changed:: 11.0
+.. versionchanged:: 11.0
    The ``-namespace`` option is now respected by ``-page`` option.
 """
 #
@@ -410,7 +410,7 @@ class DiscussionPage(pywikibot.Page):
     def __getattr__(self, name):
         """Lazy load page if archives, header or threads attribute is missing.
 
-        .. version-added:: 8.1
+        .. versionadded:: 8.1
         """
         if name in ('archives', 'header', 'threads'):
             self.load_page()
@@ -423,7 +423,7 @@ class DiscussionPage(pywikibot.Page):
     ) -> pywikibot.Timestamp | None:
         """Calculate the maximum of two timestamps but allow None as value.
 
-        .. version-added:: 7.6
+        .. versionadded:: 7.6
         """
         if ts1 is None:
             return ts2
@@ -443,9 +443,9 @@ class DiscussionPage(pywikibot.Page):
         If no such localized template is found, it falls back to the
         default ``{{talkarchive}}`` template.
 
-        .. version-added:: 10.2
+        .. versionadded:: 10.2
 
-        .. version-changed:: 10.3
+        .. versionchanged:: 10.3
            Returns ``{{talkarchive}}`` by default if no localized
            template is found.
 
@@ -464,10 +464,10 @@ class DiscussionPage(pywikibot.Page):
     def load_page(self) -> None:
         """Load the page to be archived and break it up into threads.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            If `-keep` option is given run through all threads and set
            the current timestamp to the previous if the current is lower.
-        .. version-changed:: 7.7
+        .. versionchanged:: 7.7
            Load unsigned threads using timestamp of the next thread.
         """
         self.header = ''
@@ -547,7 +547,7 @@ class DiscussionPage(pywikibot.Page):
         (characters). This corresponds to MediaWiki's definition
         of page size.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            return 0 if archive page neither exists nor has threads
            (:phab:`T313886`).
         """
@@ -563,7 +563,7 @@ class DiscussionPage(pywikibot.Page):
                asynchronous: bool = False) -> None:
         """Recombine threads and save page.
 
-        .. version-changed:: 10.0
+        .. versionchanged:: 10.0
            the *asynchronous* parameter was added.
         """
         if sort_threads:
@@ -590,7 +590,7 @@ class PageArchiver:
                  asynchronous: bool = False) -> None:
         """Initializer.
 
-        .. version-changed:: 10.0
+        .. versionchanged:: 10.0
            The *asynchronous* parameter was added.
 
         :param page: a page object to be archived
@@ -635,7 +635,7 @@ class PageArchiver:
     def info(self, msg: str = '') -> None:
         """Forward text to cache if asynchronous is activated.
 
-        .. version-added:: 10.0
+        .. versionadded:: 10.0
         """
         if self.asynchronous:
             self.output.append(msg)
@@ -645,7 +645,7 @@ class PageArchiver:
     def flush(self) -> None:
         """Flush the cache.
 
-        .. version-added:: 10.0
+        .. versionadded:: 10.0
         """
         pywikibot.info('\n'.join(self.output))
         self.output.clear()
@@ -892,7 +892,7 @@ class PageArchiver:
     def run(self) -> None:
         """Process a single DiscussionPage object.
 
-        .. version-changed:: 10.0
+        .. versionchanged:: 10.0
            save the talk page in asynchronous mode if ``-async`` option
            was given but archive pages are saved in synchronous mode.
         """
@@ -966,10 +966,10 @@ def process_page(page, *args: Any, asynchronous: bool = False) -> bool:
     :return: Return True to continue with the next page, False to break
         the loop.
 
-    .. version-added:: 7.6
-    .. version-changed:: 7.7
+    .. versionadded:: 7.6
+    .. versionchanged:: 7.7
        pass an unspecified number of arguments to the bot using ``*args``
-    .. version-changed:: 10.0
+    .. versionchanged:: 10.0
        *asynchronous* parameter was added.
     """
     global outlock

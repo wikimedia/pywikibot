@@ -99,7 +99,7 @@ class NoTitleError(Exception):
     def __init__(self, offset: int, source: str | None = None) -> None:
         """Initializer.
 
-        .. version-changed:: 10.7
+        .. versionchanged:: 10.7
            *source* was added; a message was passed to Exception super
            class.
         """
@@ -190,7 +190,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
 
     """Generator class, responsible for reading the file.
 
-    .. version-changed:: 7.6
+    .. versionchanged:: 7.6
        subclassed from :class:`pywikibot.tools.collections.GeneratorWrapper`
     """
 
@@ -236,7 +236,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
 
         content is stored as a page attribute defined by CTX_ATTR.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            changed from iterator method to generator property
         """
         pywikibot.info(f"\n\nReading '{self.filename}'...")

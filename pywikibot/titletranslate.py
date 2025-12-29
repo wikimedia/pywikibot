@@ -23,7 +23,7 @@ def translate(
     entries such as "all:" or "xyz:" or "20:" are first built from the
     page title of 'page' and then listed.
 
-    .. version-changed:: 9.6
+    .. versionchanged:: 9.6
        Raise ``RuntimeError`` instead of ``AssertionError`` if neither
        *page* nor *site* parameter is given.
 

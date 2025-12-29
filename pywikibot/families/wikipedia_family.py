@@ -229,7 +229,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __post_init__(cls) -> None:
         """Add 'yue' code alias due to :phab:`T341960`.
 
-        .. version-added:: 8.3
+        .. versionadded:: 8.3
         """
         aliases = cls.code_aliases.copy()
         aliases['yue'] = 'zh-yue'

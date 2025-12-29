@@ -1,6 +1,6 @@
 """Pywikibot metadata file.
 
-.. version-added:: 4.0
+.. versionadded:: 4.0
 """
 #
 # (C) Pywikibot team, 2020-2025

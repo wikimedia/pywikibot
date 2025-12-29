@@ -134,11 +134,11 @@ class GeneratorsMixin:
         pagelist. In case of duplicates in a groupsize batch, return the
         first entry.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            *content* parameter was added.
-        .. version-changed:: 7.7
+        .. versionchanged:: 7.7
            *categories* parameter was added.
-        .. version-changed:: 8.1
+        .. versionchanged:: 8.1
            *groupsize* is maxlimit by default. *quiet* parameter was
            added. No longer show the "Retrieving pages from site"
            message by default.
@@ -354,7 +354,7 @@ class GeneratorsMixin:
 
         .. seealso:: :api:`Redirects`
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
 
         :param page: The Page to get redirects for.
         :param filter_fragments: If True, only return redirects with fragments.
@@ -459,7 +459,7 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate categories to which page belongs.
 
-        .. version-added:: 9.6
+        .. versionadded:: 9.6
            the *with_sort_key* parameter.
 
         .. seealso::
@@ -581,9 +581,9 @@ class GeneratorsMixin:
         - :meth:`pywikibot.Category.members`
         - :meth:`pywikibot.Category.subcategories`
 
-        .. version-changed:: 4.0
+        .. versionchanged:: 4.0
            parameters except *category* are keyword arguments only.
-        .. version-changed:: 8.0
+        .. versionchanged:: 8.0
            raises TypeError instead of Error if no Category is specified
         .. seealso:: :api:`Categorymembers`
 
@@ -874,7 +874,7 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Link]:
         """Yield all interlanguage links on page, yielding Link objects.
 
-        .. version-changed:: 6.2:
+        .. versionchanged:: 6.2:
            `include_empty_titles` parameter was added.
 
         .. seealso:: :api:`Langlinks`
@@ -1291,7 +1291,7 @@ class GeneratorsMixin:
         """Iterate Pages that contain links to the given FilePage.
 
         .. seealso:: :api:`Imageusage`
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            all parameters except `image` are keyword only.
 
         :param image: the image to search for (FilePage need not exist on
@@ -1400,7 +1400,7 @@ class GeneratorsMixin:
     ) -> Iterable[dict[str, Any]]:
         """Iterate recent changes.
 
-        .. version-changed:: 10.1
+        .. versionchanged:: 10.1
            *page* parameter was added.
 
         .. seealso:: :api:`RecentChanges`
@@ -1492,13 +1492,13 @@ class GeneratorsMixin:
         Note that this may include non-existing Pages if the wiki's
         database table contains outdated entries.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            Default of `where` parameter has been changed from 'text' to
            None. The behaviour depends on the installed search engine
            which is 'text' on CirrusSearch'.
            raises APIError instead of Error if searchstring is not set
            or what parameter is wrong.
-        .. version-changed:: 10.0
+        .. versionchanged:: 10.0
            The *sort* parameter was added.
 
         .. seealso:: :api:`Search`
@@ -1833,7 +1833,7 @@ class GeneratorsMixin:
         random.
 
         .. seealso:: :api:`Random`
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            Raises ``TypeError`` instead of ``AssertionError`` if
            *redirects* is invalid.
 
@@ -2022,7 +2022,7 @@ class GeneratorsMixin:
         API.
 
         .. seealso:: :api:`Querypage`
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            Raises ``ValueError`` instead of ``AssertionError`` if
            *special_page* is invalid.
 
@@ -2274,7 +2274,7 @@ class GeneratorsMixin:
         :py:obj:`APISite.allpages`, while it uses for 'create' the
         'query+protectedtitles' module.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            *type* parameter was renamed to *protect_type*.
 
         .. seealso:: :api:`Protectedtitles`
@@ -2330,7 +2330,7 @@ class GeneratorsMixin:
         .. note:: ``watched_pages`` is a restartable generator. See
            :class:`tools.collections.GeneratorWrapper` for its usage.
         .. seealso:: :api:`Watchlistraw`
-        .. version-added:: 8.1
+        .. versionadded:: 8.1
            the *with_talkpage* parameter.
 
         :param force: Reload watchlist

@@ -183,7 +183,7 @@ class ProofreadPageMixin:
         Load URLs to images for a given page in the "Page:" namespace.
         No effect for pages in other namespaces.
 
-        .. version-added:: 8.6
+        .. versionadded:: 8.6
 
         .. seealso:: :api:`imageforpage`
         """
@@ -302,7 +302,7 @@ class WikibaseClientMixin:
         .. warning:: The retrieved pages may be connected in meantime.
            To avoid this, use *strict* parameter to check.
 
-        .. version-changed::
+        .. versionchanged::
            The *strict* parameter was added.
 
         :param total: Maximum number of pages to return, or ``None`` for
@@ -435,7 +435,7 @@ class TextExtractsMixin:
 
     """APISite mixin for TextExtracts extension.
 
-    .. version-added:: 7.1
+    .. versionadded:: 7.1
     """
 
     @need_extension('TextExtracts')

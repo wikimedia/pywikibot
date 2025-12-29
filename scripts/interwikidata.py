@@ -30,7 +30,7 @@ Furthermore, the following command line parameters are supported:
    default.
 """
 
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,7 +59,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     """The bot for interwiki.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        IWBot is a ConfigParserBot
     """
 

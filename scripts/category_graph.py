@@ -40,7 +40,7 @@ Extended example with style settings:
     fillcolor=green] edge[style=dashed penwidth=3]'
 
 
-.. version-added:: 8.0
+.. versionadded:: 8.0
 """
 #
 # (C) Pywikibot team, 2022-2025

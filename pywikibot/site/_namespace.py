@@ -49,7 +49,7 @@ class BuiltinNamespace(IntEnum):
     def canonical(self) -> str:
         """Canonical form of MediaWiki built-in namespace.
 
-        .. version-added:: 7.1
+        .. versionadded:: 7.1
         """
         name = '' if self == 0 else self.name.capitalize().replace('_', ' ')
         return name.replace('Mediawiki', 'MediaWiki')
@@ -59,7 +59,7 @@ class MetaNamespace(ABCMeta):
 
     """Metaclass for Namespace attribute settings.
 
-    .. version-added:: 9.0
+    .. versionadded:: 9.0
     """
 
     def __new__(cls, name, bases, dic):
@@ -86,7 +86,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
     If only one of canonical_name and custom_name are available, both
     properties will have the same value.
 
-    .. version-changed:: 9.0
+    .. versionchanged:: 9.0
        metaclass from :class:`MetaNamespace`
     """
 
@@ -149,7 +149,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
     def canonical_namespaces(cls) -> dict[int, str]:
         """Return the canonical forms of MediaWiki built-in namespaces.
 
-        .. version-changed:: 7.1
+        .. versionchanged:: 7.1
            implemented as classproperty using BuiltinNamespace IntEnum.
         """
         return {item.value: item.canonical for item in BuiltinNamespace}
@@ -188,7 +188,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
 
         This method is implemented to be independent from __len__ method.
 
-        .. version-added:: 7.0
+        .. versionadded:: 7.0
 
         :return: Always return True like generic object class.
         """

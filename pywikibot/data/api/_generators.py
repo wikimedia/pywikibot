@@ -1,6 +1,6 @@
 """Objects representing API/Query generators.
 
-.. version-changed:: 7.6
+.. versionchanged:: 7.6
    All Objects were changed from Iterable object to a Generator object.
    They are subclassed from :class:`tools.collections.GeneratorWrapper`
 """
@@ -53,9 +53,9 @@ class APIGeneratorBase(ABC):
     Subclasses can override :meth:`filter_item` for more complex
     filtering logic.
 
-    .. version-changed:: 7.6
+    .. versionchanged:: 7.6
        Renamed from _RequestWrapper.
-    .. version-changed:: 10.4
+    .. versionchanged:: 10.4
        Introduced :attr:`filter_func` and :meth:`filter_item` for
        instance-level item filtering.
     """
@@ -69,7 +69,7 @@ class APIGeneratorBase(ABC):
         Returns the instance-specific filter if set, otherwise the
         class-level default (None by default).
 
-        .. version-added:: 10.4
+        .. versionadded:: 10.4
 
         :return: Callable that accepts an item and returns True to
             yield, False to skip; or None to disable filtering
@@ -80,7 +80,7 @@ class APIGeneratorBase(ABC):
     def filter_func(self, func: Callable[[Any], bool] | None):
         """Set a filter function to apply to items before yielding.
 
-        .. version-added:: 10.4
+        .. versionadded:: 10.4
 
         :param func: Callable that accepts an item and returns True to
             yield, False to skip; or None to disable filtering
@@ -93,7 +93,7 @@ class APIGeneratorBase(ABC):
         By default, applies :attr:`filter_func` if set. Returns True if
         no filter is set.
 
-        .. version-added:: 10.4
+        .. versionadded:: 10.4
 
         :param item: The item to check
         :return: True if the item should be yielded, False otherwise
@@ -120,8 +120,8 @@ class APIGeneratorBase(ABC):
     def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
 
-        .. version-added:: 7.1
-        .. version-changed:: 7.6
+        .. versionadded:: 7.1
+        .. versionchanged:: 7.6
            become an abstract method
         """
         raise NotImplementedError
@@ -136,7 +136,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
     automatically. If the limit attribute is set, the iterator will stop
     after iterating that many values.
 
-    .. version-changed:: 7.6
+    .. versionchanged:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
@@ -219,9 +219,9 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         Applies :meth:`filter_item()<APIGeneratorBase.filter_item>` to
         each item before yielding.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            Changed from iterator method to generator property
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            Applies `filter_item` for instance-level filtering.
 
         :yield: Items from the MediaWiki API, filtered by `filter_item()`
@@ -275,7 +275,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     list of pages or links. See the API documentation for specific query
     options.
 
-    .. version-changed:: 7.6
+    .. versionchanged:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
@@ -548,12 +548,12 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     def continue_update(self) -> None:
         """Update query with continue parameters.
 
-        .. version-added:: 3.0
-        .. version-changed:: 4.0
+        .. versionadded:: 3.0
+        .. versionchanged:: 4.0
            explicit return a bool value to be used in :meth:`generator`
-        .. version-changed:: 6.0
+        .. versionchanged:: 6.0
            always return *False*
-        .. version-changed:: 8.4
+        .. versionchanged:: 8.4
            return *None* instead of *False*.
         """
         for key, value in self.data[self.continue_name].items():
@@ -634,7 +634,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         passes :meth:`filter_item() <APIGeneratorBase.filter_item>` and
         respects namespaces and the generator's limit.
 
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            Applies `filter_item()` for instance-level filtering.
 
         :param resultdata: List or iterable of raw API items
@@ -679,9 +679,9 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         Continues response as needed until limit (if any) is reached.
         Each item is already filtered by `_extract_results()`.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            Changed from iterator method to generator property
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            Items are filtered via :meth:`filter_item()
            <APIGeneratorBase.filter_item>` inside :meth:`_extract_results`.
 
@@ -771,7 +771,7 @@ class PageGenerator(QueryGenerator):
         Required and optional parameters are as for ``Request``, except
         that ``action=query`` is assumed and generator is required.
 
-        .. version-changed:: 9.1
+        .. versionchanged:: 9.1
            retrieve the same imageinfo properties as in
            :meth:`APISite.loadimageinfo()
            <pywikibot.site._apisite.APISite.loadimageinfo>` with default
@@ -813,11 +813,11 @@ class PageGenerator(QueryGenerator):
         This can be overridden in subclasses to return a different type
         of object.
 
-        .. version-changed:: 9.5
+        .. versionchanged:: 9.5
            No longer raise :exc:`exceptions.UnsupportedPageError` but
            return a generic :class:`pywikibot.Page` object. The exception
            is raised when getting the content for example.
-        .. version-changed:: 9.6
+        .. versionchanged:: 9.6
            Upcast to :class:`page.FilePage` if *pagedata* has
            ``imageinfo`` contents even if the file extension is invalid.
         """
@@ -852,7 +852,7 @@ class PropertyGenerator(QueryGenerator):
     dict for each page queried via a titles= or ids= parameter (which
     must be supplied when instantiating this class).
 
-    .. version-changed:: 10.4
+    .. versionchanged:: 10.4
        Supports instance-level filtering via :attr:`filter_func
        <APIGenerator.filter_func>` / :meth:`filter_item()
        <APIGenerator.filter_item`.
@@ -881,10 +881,10 @@ class PropertyGenerator(QueryGenerator):
     def generator(self):
         """Yield results from the API, including previously retrieved dicts.
 
-        .. version-changed:: 7.6
+        .. versionchanged:: 7.6
            Changed from iterator method to generator property.
 
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            Items are filtered via :meth:`filter_item()
            <APIGenerator.filter_item` inside :meth:`_extract_results`.
            Previously retrieved dicts in `_previous_dicts` are also
@@ -915,7 +915,7 @@ class PropertyGenerator(QueryGenerator):
     def _fully_retrieved_data_dicts(self, resultdata):
         """Yield items of self._previous_dicts that are not in resultdata.
 
-        .. version-changed:: 10.4
+        .. versionchanged:: 10.4
            Applies :meth:`filter_item()<APIGenerator.filter_item` to
            previously stored dicts.
 
@@ -1064,7 +1064,7 @@ def _update_categories(page, categories) -> None:
 def _update_langlinks(page, langlinks) -> None:
     """Update page langlinks.
 
-    .. version-added:: 9.3
+    .. versionadded:: 9.3
        only add a language link if it is found in the family file.
 
     :meta public:

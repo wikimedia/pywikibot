@@ -21,7 +21,7 @@ where action can be one of these
                deletion if there is no speedy deletion template
                available.
 
-               .. version-changed:: 10.3
+               .. versionchanged:: 10.3
                   only tries to fix if the namspace of the source page
                   is equal to the destination page.
 
@@ -238,7 +238,7 @@ class RedirectGenerator(OptionHandler):
     ) -> Generator[tuple[str, int | None, str, str | None]]:
         r"""Return a generator that yields tuples of data about redirect Pages.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            only yield tuple if type of redirect is not 1 (normal redirect)
 
         The description of returned tuple items is as follows:

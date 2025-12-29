@@ -4,7 +4,7 @@
    Breaking changes may be made at any time, and the module is not
    subject to deprecation requirements.
 
-.. version-changed:: 10.0
+.. versionchanged:: 10.0
    This module is 'private'.
 """
 #
@@ -36,7 +36,7 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
         .. seealso:: :python:`itertools.pairwise
            <library/itertools.html#itertools.pairwise>`,
            backported from Python 3.10.
-        .. version-added:: 7.6
+        .. versionadded:: 7.6
         """
         a, b = tee(iterable)
         next(b, None)
@@ -81,8 +81,8 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
         .. seealso:: :python:`itertools.batched
            <library/itertools.html#itertools.batched>`,
            backported from Python 3.12.
-        .. version-added:: 8.2
-        .. version-changed:: 9.0
+        .. versionadded:: 8.2
+        .. versionchanged:: 9.0
            Added *strict* option, backported from Python 3.13
 
         :param n: How many items of the iterable to get in one chunk
@@ -148,8 +148,8 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
         >>> lock.locked()
         False
 
-        .. version-added:: 6.2
-        .. version-changed:: 10.2
+        .. versionadded:: 6.2
+        .. versionchanged:: 10.2
            moved from :mod:`tools.threading` to :mod:`backports`.
         .. note:: Passing any arguments has no effect and has been
            deprecated since Python 3.14 and was removed in Python 3.15.
@@ -187,7 +187,7 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
         def count(self):
             """Return number of acquired locks.
 
-            .. version-deprecated:: 10.2
+            .. deprecated:: 10.2
             """
             with self._block:
                 counter = re.search(r'count=(\d+) ', repr(self))

@@ -1132,9 +1132,9 @@ class Transliterator:
                       prev: str = '-', succ: str = '-') -> str:
         """Transliterate the character.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            *next* parameter was renamed to *succ*.
-        .. version-changed:: 10.6
+        .. versionchanged:: 10.6
            *char* argument is positional only; *prev* and *succ*
            arguments are keyword only.
 

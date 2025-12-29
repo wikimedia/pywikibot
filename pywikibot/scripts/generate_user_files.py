@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Script to create user-config.py. Other file names are not supported.
 
-.. version-changed:: 7.0
+.. versionchanged:: 7.0
    moved to pywikibot.scripts folder.
-.. version-changed:: 8.0
+.. versionchanged:: 8.0
    let user the choice which section to be copied.
    Also EXTERNAL EDITOR SETTINGS section can be copied.
-.. version-changed:: 10.7.1
+.. versionchanged:: 10.7.1
    Default ``PASS_BASENAME`` was changed from ``user-password.py`` to
    ``user-password.cfg``
 """
@@ -265,7 +265,7 @@ def parse_sections() -> list:
 def copy_sections(force: bool = False, default: str = 'n') -> str | None:
     """Take config sections and copy them to user-config.py.
 
-    .. version-changed:: 8.0
+    .. versionchanged:: 8.0
        *force* and *default* options were added.
 
     :param force: Copy all sections if force is True
@@ -299,7 +299,7 @@ def input_sections(variant: str,
                    default: str = 'n') -> list[str]:
     """Ask for settings to copy.
 
-    .. version-added:: 8.0
+    .. versionadded:: 8.0
 
     :param variant: Variant of the setting section. Either 'framework'
         or 'scripts'

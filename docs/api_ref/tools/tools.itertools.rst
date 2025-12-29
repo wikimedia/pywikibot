@@ -10,9 +10,9 @@
 
    Make an iterator that returns lists of (up to) *size* items from *iterable*.
 
-   .. version-added:: 7.6
+   .. versionadded:: 7.6
       The *strict* parameter.
-   .. version-deprecated:: 8.2
+   .. deprecated:: 8.2
       Use :func:`backports.batched` instead.
-   .. version-removed:: 11.0
+   .. versionremoved:: 11.0
       This function was removed; use :pylib:`itertools.batched<itertools#itertools.batched>` instead.

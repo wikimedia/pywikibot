@@ -22,13 +22,13 @@ Example::
 This will create the file mywiki_family.py in families folder of your
 base directory.
 
-.. version-changed:: 7.0
+.. versionchanged:: 7.0
    moved to pywikibot.scripts folder; create family files in families
    folder of your base directory instead of pywikibot/families.
-.. version-changed:: 8.1
+.. versionchanged:: 8.1
    [s]trict can be given for <dointerwiki> parameter to ensure that
    sites are from the given domain.
-.. version-changed:: 8.4
+.. versionchanged:: 8.4
    If the url scheme is missing, ``https`` will be used.
 """
 #
@@ -171,7 +171,7 @@ class FamilyFileGenerator:
     def getlangs(self, w) -> None:
         """Determine site code of a family.
 
-        .. version-changed:: 8.1
+        .. versionchanged:: 8.1
            with [e]dit the interwiki list can be given delimited by
            space or comma or both. With [s]trict only sites with the
            same domain are collected. A [h]elp answer was added to show

@@ -47,17 +47,17 @@ class Family:
     Families are immutable and initializer is unsupported. Any class
     modification should go to :meth:`__post_init__` class method.
 
-    .. version-changed:: 3.0
+    .. versionchanged:: 3.0
        the family class is immutable. Having an ``__init__`` initializer
        method a ``NotImplementedWarning`` will be given.
-    .. version-changed:: 8.0
+    .. versionchanged:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
        attributes where removed.
-    .. version-changed:: 8.2
+    .. versionchanged:: 8.2
        :attr:`obsolete` setter was removed.
-    .. version-changed:: 8.3
+    .. versionchanged:: 8.3
        Having an initializer method a ``FutureWarning`` will be given.
-    .. version-changed:: 9.0
+    .. versionchanged:: 9.0
        raises RuntimeError if an initializer method was found;
        :meth:`__post_init__` classmethod should be used instead.
     """
@@ -316,7 +316,7 @@ class Family:
     .. warning:: This attribute is used within ``re.sub()`` method. Use
        escape sequence if necessary
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
 
     _families: dict[str, Family] = {}
@@ -326,7 +326,7 @@ class Family:
     def categories_last(cls) -> list[str]:
         """Categories come after interwiki links for the given site codes.
 
-        .. version-deprecated:: 10.3
+        .. deprecated:: 10.3
            use :meth:`site.has_extension('CategorySelect')
            <pywikibot.site._apisite.APISite.has_extension>` instead
         """
@@ -430,14 +430,14 @@ class Family:
     def get_edit_restricted_templates(self, code):
         """Return tuple of edit restricted templates.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
         return self.edit_restricted_templates.get(code, ())
 
     def get_archived_page_templates(self, code):
         """Return tuple of archived page templates.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
         return self.archived_page_templates.get(code, ())
 
@@ -461,7 +461,7 @@ class Family:
         May be overridden to return 'http'. Other protocols are not
         supported.
 
-        .. version-changed:: 8.2
+        .. versionchanged:: 8.2
            ``https`` is returned instead of ``http``.
 
         :param code: language code
@@ -472,7 +472,7 @@ class Family:
     def verify_SSL_certificate(self, code: str) -> bool:
         """Return whether a HTTPS certificate should be verified.
 
-        .. version-added:: 5.3
+        .. versionadded:: 5.3
            renamed from ignore_certificate_error
 
         :param code: language code
@@ -550,14 +550,14 @@ class Family:
     def eventstreams_host(self, code) -> NoReturn:
         """Hostname for EventStreams.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
         raise NotImplementedError('This family does not support EventStreams')
 
     def eventstreams_path(self, code) -> NoReturn:
         """Return path for EventStreams.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
         raise NotImplementedError('This family does not support EventStreams')
 
@@ -592,10 +592,10 @@ class Family:
         applies and then iterates over :attr:`Family.codes` to actually
         determine which code applies.
 
-        .. version-changed:: 10.0
+        .. versionchanged:: 10.0
            *url* parameter does not have to contain a api/query/script
            path
-        .. version-changed:: 10.3
+        .. versionchanged:: 10.3
            accept a trailing slash in *url* after domain.
 
         :param url: the URL which may contain a ``$1``. If it's missing
@@ -698,7 +698,7 @@ class Family:
     def isPublic(self, code) -> bool:
         """Check the wiki require logging in before viewing it.
 
-        .. version-deprecated:: 10.6
+        .. deprecated:: 10.6
         """
         return True
 
@@ -753,9 +753,9 @@ class Family:
         xx: now should get code yy:, add {'xx':'yy'} to
         :attr:`code_aliases`.
 
-        .. version-deprecated:: 10.6
+        .. deprecated:: 10.6
            Use :attr:`code_aliases` directly instead.
-        .. version-changed:: 8.2
+        .. versionchanged:: 8.2
            changed from dict to invariant mapping.
         """
         return types.MappingProxyType(cls.code_aliases)
@@ -767,7 +767,7 @@ class Family:
         Codes that should be removed, usually because the site has been
         taken down.
 
-        .. version-changed:: 8.2
+        .. versionchanged:: 8.2
            changed from list to invariant frozenset.
         """
         return frozenset(cls.removed_wikis + cls.closed_wikis)
@@ -834,7 +834,7 @@ class FandomFamily(Family):
 
     """Common features of Fandom families.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
        renamed from WikiaFamily
     """
 
@@ -857,7 +857,7 @@ class WikimediaFamily(Family):
 
     """Class for all wikimedia families.
 
-    .. version-changed:: 8.0
+    .. versionchanged:: 8.0
        :attr:`knows_codes` attribute was added.
     """
 
@@ -1023,7 +1023,7 @@ class WikimediaFamily(Family):
 
         They should be roughly sorted by size.
 
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            Sorting order is retrieved via :mod:`wikistats` for each call.
 
         :raises NotImplementedError: Family is not member of
@@ -1069,7 +1069,7 @@ class WikibaseFamily(Family):
 
     """A base class for a Wikibase Family.
 
-    .. version-added:: 8.2
+    .. versionadded:: 8.2
     """
 
     def interface(self, code) -> str:
@@ -1106,7 +1106,7 @@ class DefaultWikibaseFamily(WikibaseFamily):
     .. warning:: Possibly you have to adjust the repository site in
        :meth:`WikibaseFamily.entity_sources` to get the valid entity.
 
-    .. version-added:: 8.2
+    .. versionadded:: 8.2
     """
 
     @property

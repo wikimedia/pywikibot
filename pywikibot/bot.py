@@ -55,7 +55,7 @@ Additionally there is the :class:`AutomaticTWSummaryBot` which
 subclasses :class:`CurrentPageBot` and automatically defines the summary
 when :meth:`put_current` is used.
 
-.. version-deprecated:: 9.2
+.. deprecated:: 9.2
    The functions
    :func:`critical()<pywikibot.logging.critical>`
    :func:`debug()<pywikibot.logging.debug>`
@@ -74,7 +74,7 @@ when :meth:`put_current` is used.
    within this module. Import them directly. These functions can also be
    used as :mod:`pywikibot` members.
 
-.. version-removed:: 10.0
+.. versionremoved:: 10.0
    The bot classes :class:`RedirectPageBot` and
    :class:`NoRedirectPageBot` are deprecated. Use
    :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
@@ -291,7 +291,7 @@ def set_interface(module_name: str) -> None:
     Calls :func:`init_handlers` to re-initialize if we were already
     initialized with another UI.
 
-    .. version-added:: 6.4
+    .. versionadded:: 6.4
     """
     global ui
 
@@ -322,7 +322,7 @@ def handler_namer(name: str) -> str:
     >>> handler_namer('add_text.log.1')
     'add_text.1.log'
 
-    .. version-added:: 6.5
+    .. versionadded:: 6.5
     """
     path, qualifier = name.rsplit('.', 1)
     root, ext = os.path.splitext(path)
@@ -369,7 +369,7 @@ def init_handlers() -> None:
     use :func:`pywikibot.info()<pywikibot.logging.info>` function and
     other functions from :mod:`pywikibot.logging` module.
 
-    .. version-changed:: 6.2
+    .. versionchanged:: 6.2
        Different logfiles are used if multiple processes of the same
        script are running.
     """
@@ -468,7 +468,7 @@ def writelogheader() -> None:
 
     This may help the user to track errors or report bugs.
 
-    .. version-changed:: 9.0
+    .. versionchanged:: 9.0
        ignore milliseconds with timestamp.
     """
     _log(f'\n=== Pywikibot framework v{pywikibot.__version__} --'
@@ -541,7 +541,7 @@ add_init_routine(init_handlers)
 def initialize_handlers(function):
     """Make sure logging system has been initialized.
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -670,7 +670,7 @@ def calledModuleName() -> str:
     docstring and because the module name will be used for the filename
     of the log.
 
-    .. version-changed:: 10.0
+    .. versionchanged:: 10.0
        Detect unittest and pytest run and return the test module.
     """
     mod = pywikibot.argvu[0]
@@ -724,17 +724,17 @@ def handle_args(args: Iterable[str] | None = None,
           be used even if the `handle_args` method is used within the
           script.
 
-    .. version-changed:: 5.2
+    .. versionchanged:: 5.2
        *-site* global option was added
-    .. version-changed:: 7.1
+    .. versionchanged:: 7.1
        *-cosmetic_changes* and *-cc* may be set directly instead of
        toggling the value. Refer :func:`tools.strtobool` for valid values.
-    .. version-changed:: 7.7
+    .. versionchanged:: 7.7
        *-config* global option was added.
-    .. version-changed:: 8.0
+    .. versionchanged:: 8.0
        Short site value can be given if site code is equal to family
        like ``-site:meta``.
-    .. version-changed:: 8.1
+    .. versionchanged:: 8.1
        ``-nolog`` option also discards command.log.
 
     :param args: Command line arguments. If None,
@@ -879,9 +879,9 @@ def show_help(module_name: str | None = None,
               show_global: bool = False) -> None:
     """Show help for the Bot.
 
-    .. version-changed:: 4.0
+    .. versionchanged:: 4.0
        Renamed from showHelp() to show_help().
-    .. version-changed:: 8.0
+    .. versionchanged:: 8.0
        Do not show version changes.
     """
     if not module_name:
@@ -987,7 +987,7 @@ def writeToCommandLogFile() -> None:
 def open_webbrowser(page: pywikibot.page.BasePage) -> None:
     """Open the web browser displaying the page and wait for input.
 
-    .. version-changed:: 10.1
+    .. versionchanged:: 10.1
        No longer follow a redirect.
     """
     webbrowser.open(f'{page.full_url()}?redirect=no')
@@ -998,7 +998,7 @@ class _OptionDict(dict[str, Any]):
 
     """The option dict which holds the options of OptionHandler.
 
-    .. version-added:: 4.1
+    .. versionadded:: 4.1
     """
 
     def __init__(self, classname: str, options: dict[str, Any]) -> None:
@@ -1118,7 +1118,7 @@ class BaseBot(OptionHandler):
 
     For bot options handling refer :class:`OptionHandler` class above.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        A :attr:`counter` instance variable is provided.
     """
 
@@ -1127,7 +1127,7 @@ class BaseBot(OptionHandler):
     True to use disambigs only, set it to False to skip disambigs. If None both
     are processed.
 
-    .. version-added:: 7.2
+    .. versionadded:: 7.2
     """
 
     use_redirects: bool | None = None
@@ -1144,7 +1144,7 @@ class BaseBot(OptionHandler):
 
            use_redirects = True
 
-    .. version-added:: 7.2
+    .. versionadded:: 7.2
     """
 
     available_options = {
@@ -1156,7 +1156,7 @@ class BaseBot(OptionHandler):
     use it if the bot class is to be derived but use
     `self.available_options.update(<dict>)` initializer in such case.
 
-    .. version-added:: 6.4
+    .. versionadded:: 6.4
     """
 
     _current_page: pywikibot.page.BasePage | None = None
@@ -1185,8 +1185,8 @@ class BaseBot(OptionHandler):
 
             self.counter['delete'] += 1
 
-        .. version-added:: 7.0
-        .. version-changed:: 7.3
+        .. versionadded:: 7.0
+        .. versionchanged:: 7.3
            Your additional counters are also printed during :meth:`exit`
         """
 
@@ -1205,15 +1205,15 @@ class BaseBot(OptionHandler):
                 print('generator was emtpty')
 
         .. note:: An empty generator returns True.
-        .. version-added:: 3.0
-        .. version-changed:: 7.4
+        .. versionadded:: 3.0
+        .. versionchanged:: 7.4
            renamed to `generator_completed` to become a public attribute.
         """
 
         self.treat_page_type: Any = pywikibot.page.BasePage
         """Instance variable to hold the default page type used by :meth:`run`.
 
-        .. version-added:: 6.1
+        .. versionadded:: 6.1
         """
 
     @property
@@ -1373,9 +1373,9 @@ class BaseBot(OptionHandler):
         .. note:: Do not overwrite it by subclasses; :meth:`teardown`
            should be used instead.
 
-        .. version-changed:: 7.3
+        .. versionchanged:: 7.3
            Statistics are printed for all entries in :attr:`counter`
-        .. version-changed:: 9.0
+        .. versionchanged:: 9.0
            Print execution time with days, hours, minutes and seconds.
         """
         self.teardown()
@@ -1438,9 +1438,9 @@ class BaseBot(OptionHandler):
     def skip_page(self, page: pywikibot.page.BasePage) -> bool:
         """Return whether treat should be skipped for the page.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
 
-        .. version-changed:: 7.2
+        .. versionchanged:: 7.2
            use :attr:`use_redirects` to handle redirects,
            use :attr:`use_disambigs` to handle disambigs
 
@@ -1482,13 +1482,13 @@ class BaseBot(OptionHandler):
         Invoked by :meth:`run` before running through :attr:`generator`
         loop.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
 
     def teardown(self) -> None:
         """Some cleanups after :meth:`run` operation. Invoked by :meth:`exit`.
 
-        .. version-added:: 3.0
+        .. versionadded:: 3.0
         """
 
     def run(self) -> None:
@@ -1534,16 +1534,16 @@ class BaseBot(OptionHandler):
                finally:
                    self.exit()
 
-        .. version-changed:: 3.0
+        .. versionchanged:: 3.0
            ``skip`` counter was added.; call :meth:`setup` first.
-        .. version-changed:: 6.0
+        .. versionchanged:: 6.0
            upcast :attr:`generator` to a ``Generator`` type to enable
            ``generator.close()`` method.
-        .. version-changed:: 6.1
+        .. versionchanged:: 6.1
            Objects from :attr:`generator` may be different from
            :class:`pywikibot.Page` but the type must be registered in
            :attr:`treat_page_type`.
-        .. version-changed:: 9.2
+        .. versionchanged:: 9.2
            leave method gracefully if :attr:`generator` is None using
            :func:`suggest_help` function.
 
@@ -1759,7 +1759,7 @@ class MultipleSitesBot(BaseBot):
     The bot should accommodate for that case and not store site specific
     information on only one site.
 
-    .. version-changed:: 6.2
+    .. versionchanged:: 6.2
        Site attribute has been dropped.
     """
 
@@ -1786,7 +1786,7 @@ class ConfigParserBot(BaseBot):
     2. `script.ini options` settings
     3. command line arguments
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
     """
 
     INI = 'scripts.ini'
@@ -1916,7 +1916,7 @@ class AutomaticTWSummaryBot(CurrentPageBot):
 
         For parameters see :meth:`CurrentPageBot.put_current`
 
-        .. version-changed:: 10.6
+        .. versionchanged:: 10.6
            return whether the page was saved successfully
         """
         if not kwargs.get('summary'):

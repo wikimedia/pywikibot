@@ -13,7 +13,7 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
 
     """Family class for Wikimedia Commons.
 
-    .. version-changed:: 6.5
+    .. versionchanged:: 6.5
        :meth:`family.WikibaseFamily.interface` was changed  to
        :class:`DataSite<pywikibot.site._datasite.DataSite>` to enable
        structured data.

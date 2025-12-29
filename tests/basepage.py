@@ -16,7 +16,7 @@ class ABCTestCaseMeta(ABCMeta, type(TestCase)):
 
     """Enable abstract methods in TestCase-based base classes.
 
-    .. version-added:: 10.3
+    .. versionadded:: 10.3
     """
 
 
@@ -38,7 +38,7 @@ class BasePageTestBase(TestCase, metaclass=ABCTestCaseMeta):
     def setup_page(self) -> None:
         """Subclasses must implement this to assign self._page.
 
-        .. version-added:: 10.3
+        .. versionadded:: 10.3
         """
 
 

@@ -694,7 +694,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     def treat(self, page) -> None:
         """Work on each page retrieved from generator.
 
-        .. version-changed:: 10.1
+        .. versionchanged:: 10.1
            After the browser call, the script affects the possibly
            changed text.
         """
@@ -813,14 +813,14 @@ EXC_KEYS = {
 }
 """Dictionary to convert exceptions command line options to exceptions keys.
 
-.. version-added:: 7.0
+.. versionadded:: 7.0
 """
 
 
 def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
     """Handle exceptions args to ignore pages which contain certain texts.
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
     exceptions = {key: [] for key in EXC_KEYS.values()}
     local_args = []
@@ -836,8 +836,8 @@ def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
 def handle_pairsfile(filename: str) -> list[str] | None:
     """Handle -pairsfile argument.
 
-    .. version-added:: 7.0
-    .. version-changed:: 9.2
+    .. versionadded:: 7.0
+    .. versionchanged:: 9.2
        replacement patterns are printed it they are incomplete.
     """
     if not filename:
@@ -865,7 +865,7 @@ def handle_pairsfile(filename: str) -> list[str] | None:
 def handle_manual() -> list[str]:
     """Handle manual input.
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
     pairs = []
     old = pywikibot.input('Please enter the text that should be replaced:')
@@ -883,7 +883,7 @@ def handle_sql(sql: str,
                exceptions: list[re.Pattern]) -> Generator:
     """Handle default sql query.
 
-    .. version-added:: 7.0
+    .. versionadded:: 7.0
     """
     if not sql:
         where_clause = 'WHERE ({})'.format(' OR '.join(
@@ -915,7 +915,7 @@ def main(*args: str) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    .. version-changed:: 9.2
+    .. versionchanged:: 9.2
        replacement patterns are printed it they are incomplete.
 
     :param args: command line arguments

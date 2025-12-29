@@ -30,9 +30,9 @@ The following parameters are supported:
    don't want the default values you can add any option you want to
    change to that settings file below the [delinker] section like.
 
-.. version-added:: 7.2
+.. versionadded:: 7.2
    This script is completely rewritten from compat branch.
-.. version-changed:: 9.4
+.. versionchanged:: 9.4
    *-category* option was added.
 """
 #

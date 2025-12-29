@@ -790,7 +790,7 @@ class WelcomeBot(SingleSiteBot):
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped.
 
-        .. version-changed:: 7.0
+        .. versionchanged:: 7.0
            also skip if user is locked globally
         """
         if user.is_blocked() or user.is_locked():

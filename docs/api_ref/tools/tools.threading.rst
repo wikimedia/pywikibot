@@ -6,5 +6,5 @@
 
 .. autoclass:: RLock
 
-   .. version-deprecated:: 10.2
+   .. deprecated:: 10.2
       use :mod:`backports.RLock` instead

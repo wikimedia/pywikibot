@@ -185,7 +185,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     """Bot to remove stale protection templates from unprotected pages.
 
-    .. version-changed:: 7.0
+    .. versionchanged:: 7.0
        CheckerBot is a ConfigParserBot
     """
 

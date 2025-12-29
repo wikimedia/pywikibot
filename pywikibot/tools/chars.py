@@ -98,7 +98,7 @@ def url2string(title: str,
     For a single *encodings* string this function is equivalent to
     :samp:`urllib.parse.unquote(title, encodings, errors='strict')`
 
-    .. version-changed:: 8.4
+    .. versionchanged:: 8.4
        Ignore *LookupError* and try other encodings.
 
     .. seealso:: :python:`urllib.parse.unquote

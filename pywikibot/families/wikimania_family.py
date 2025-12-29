@@ -1,9 +1,9 @@
 """Family module for Wikimania wikis.
 
-.. version-added:: 3.0
+.. versionadded:: 3.0
 """
 #
-# (C) Pywikibot team, 2017-2025
+# (C) Pywikibot team, 2017-2024
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikimania wikis.
 
-    .. version-added:: 3.0
+    .. versionadded:: 3.0
     """
 
     name = 'wikimania'
