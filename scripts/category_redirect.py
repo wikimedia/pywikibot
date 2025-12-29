@@ -35,7 +35,7 @@ Usage:
    can be set within a settings file which is scripts.ini by default.
 """
 #
-# (C) Pywikibot team, 2008-2023
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,10 +79,10 @@ class CategoryRedirectBot(
 
     """Page category update bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CategoryRedirectBot is a ConfigParserBot
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        A logentry is written to <userpage>/category_edit_requests if a
        page cannot be moved
     """

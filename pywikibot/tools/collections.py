@@ -63,7 +63,7 @@ class SizedKeyCollection(Collection):
         >>> list(data)
         []
 
-    .. versionadded:: 6.1
+    .. version-added:: 6.1
     """
 
     def __init__(self, keyattr: str) -> None:
@@ -144,7 +144,7 @@ class CombinedError(KeyError, IndexError):
 
     """An error that gets caught by both KeyError and IndexError.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
 
@@ -159,8 +159,8 @@ class EmptyDefault(str, Mapping):
     Accessing a value via __getitem__ will result in a combined KeyError and
     IndexError.
 
-    .. versionadded:: 3.0
-    .. versionchanged:: 6.2
+    .. version-added:: 3.0
+    .. version-changed:: 6.2
        ``empty_iterator()`` was removed in favour of ``iter()``.
     """
 
@@ -185,8 +185,8 @@ class DequeGenerator(Iterator, collections.deque):
 
     """A generator that allows items to be added during generating.
 
-    .. versionadded:: 3.0
-    .. versionchanged:: 6.1
+    .. version-added:: 3.0
+    .. version-changed:: 6.1
        Provide a representation string.
     """
 
@@ -212,7 +212,7 @@ class GeneratorWrapper(ABC, Generator):
     <reference/expressions.html#generator.close>` mixin method and it can
     be used as Iterable and Iterator as well.
 
-    .. versionadded:: 7.6
+    .. version-added:: 7.6
 
     Example:
 
@@ -290,10 +290,10 @@ class GeneratorWrapper(ABC, Generator):
         <reference/expressions.html#generator.throw>` for various
         parameter usage.
 
-        .. versionchanged:: 10.7
+        .. version-changed:: 10.7
            The *val* and *tb* parameters were renamed to *value* and
            *traceback*.
-        .. deprecated:: 10.7
+        .. version-deprecated:: 10.7
            The ``(type, value, traceback)`` signature is deprecated; use
            single-arg signature ``throw(value)`` instead.
 
@@ -364,7 +364,7 @@ class RateLimit(NamedTuple):
     >>> newlimit.ratio
     inf
 
-    .. versionadded:: 9.0
+    .. version-added:: 9.0
     """
 
     group: str = 'unknown'

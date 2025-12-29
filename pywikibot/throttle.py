@@ -102,7 +102,7 @@ class Throttle:
     def next_multiplicity(self) -> float:
         """Factor to scale delay time based on upcoming request size.
 
-        .. deprecated:: 10.3.0
+        .. version-deprecated:: 10.3.0
         """
         return 1.0
 
@@ -111,7 +111,7 @@ class Throttle:
     def next_multiplicity(self, value: float) -> None:
         """Setter for delay scaling factor for the next request.
 
-        .. deprecated:: 10.3.0
+        .. version-deprecated:: 10.3.0
            This property has no effect and is retained for backward
            compatibility.
         """
@@ -120,7 +120,7 @@ class Throttle:
     def _module_hash(module: str | None = None) -> str:
         """Convert called module name to a hash.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            Set hashlib constructor *usedforsecurity* argument to ``False``
            because the hash is not used in a security context. Use ``md5``
            hash algorithm for GraalPy implementation instead of
@@ -175,7 +175,7 @@ class Throttle:
     def checkMultiplicity(self) -> None:
         """Count running processes for site and set process_multiplicity.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            process is not written to throttle.ctrl file if site is empty.
         """
         global pid
@@ -227,7 +227,7 @@ class Throttle:
     ) -> None:
         """Set the nominal delays in seconds.
 
-        .. deprecated:: 10.3.0
+        .. version-deprecated:: 10.3.0
            Use :meth:`set_delays` instead.
         """
         self.set_delays(delay=delay, writedelay=writedelay, absolute=absolute)
@@ -242,7 +242,7 @@ class Throttle:
 
         Defaults to config values.
 
-        .. versionadded:: 10.3.0
+        .. version-added:: 10.3.0
            Renamed from :meth:`setDelays`.
         """
         with self.lock:
@@ -261,7 +261,7 @@ class Throttle:
     def getDelay(self, write: bool = False) -> float:
         """Return the current delay, adjusted for active processes.
 
-        .. deprecated:: 10.3.0
+        .. version-deprecated:: 10.3.0
            Use :meth:`get_delay` instead.
         """
         return self.get_delay(write=write)
@@ -274,7 +274,7 @@ class Throttle:
         time has already passed since the last access — use
         :meth:`waittime` for that.
 
-        .. versionadded:: 10.3.0
+        .. version-added:: 10.3.0
            Renamed from :meth:`getDelay`.
 
         :param write: Whether the operation is a write (uses writedelay).
@@ -342,10 +342,10 @@ class Throttle:
         This method blocks the calling thread if the minimum delay has
         not yet elapsed since the last read or write operation.
 
-        .. versionchanged:: 10.3.0
+        .. version-changed:: 10.3.0
            The *write* parameter is now keyword-only.
 
-        .. deprecated:: 10.3.0
+        .. version-deprecated:: 10.3.0
            The *requestsize* parameter has no effect and will be removed
            in a future release.
 

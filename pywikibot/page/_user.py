@@ -95,7 +95,7 @@ class User(Page):
     def is_CIDR(self) -> bool:  # noqa: N802
         """Determine if the input refers to a range of IP addresses.
 
-        .. versionadded:: 9.0
+        .. version-added:: 9.0
         .. seealso::
            - :meth:`isRegistered`
            - :meth:`isAnonymous`
@@ -106,7 +106,7 @@ class User(Page):
     def getprops(self, force: bool = False) -> dict[str, Any]:
         """Return a properties about the user.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            detect range blocks
 
         :param force: if True, forces reloading the data from API
@@ -150,9 +150,9 @@ class User(Page):
     def is_blocked(self, force: bool = False) -> bool:
         """Determine whether the user is currently blocked.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            renamed from :meth:`isBlocked` method
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            can also detect range blocks.
 
         :param force: if True, forces reloading the data from API
@@ -162,7 +162,7 @@ class User(Page):
     def is_locked(self, force: bool = False) -> bool:
         """Determine whether the user is currently locked globally.
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
 
         :param force: if True, forces reloading the data from API
         """
@@ -409,7 +409,7 @@ class User(Page):
     ) -> Generator[tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
-        .. versionadded:: 5.5
+        .. version-added:: 5.5
 
         :param total: Limit results to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
@@ -477,7 +477,7 @@ class User(Page):
            * :meth:`BasePage.moved_target`
            * :meth:`BasePage.getRedirectTarget`
 
-        .. versionadded:: 9.4
+        .. version-added:: 9.4
 
         :raises NoRenameTargetError: user was not renamed
         """

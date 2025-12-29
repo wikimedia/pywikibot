@@ -14,7 +14,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wiktionary.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        ``alphabetic_sv`` attribute was removed; ``interwiki_putfirst``
        attribute was removed and default setting from parent class is
        used.
@@ -96,7 +96,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __post_init__(cls) -> None:
         """Add 'zh-yue' code alias due to :phab:`T341960`.
 
-        .. versionadded:: 8.3
+        .. version-added:: 8.3
         """
         aliases = cls.code_aliases.copy()
         aliases['zh-yue'] = 'yue'

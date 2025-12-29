@@ -335,7 +335,7 @@ _romanNumbers = [
 def intToRomanNum(i: int) -> str:
     """Convert integer to roman numeral.
 
-    .. versionchanged:: 9.5
+    .. version-changed:: 9.5
        negative *i* is no longer accepted but 31 is a valid value.
 
     :raises IndexError: Roman value *i* is nont in range 0..31
@@ -348,7 +348,7 @@ def intToRomanNum(i: int) -> str:
 def romanNumToInt(v: str) -> int:
     """Convert roman numeral to integer.
 
-    .. versionchanged:: 9.5
+    .. version-changed:: 9.5
        ``XXXI`` can be converted.
     """
     return _romanNumbers.index(v)
@@ -469,7 +469,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
 
         lambda v: dh(v, 'pattern string', encf, decf)
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        *filter* parameter was renamed to *filter_func*
 
     :param encf: Converts from an integer parameter to another integer

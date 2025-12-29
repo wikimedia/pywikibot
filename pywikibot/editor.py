@@ -39,7 +39,7 @@ class TextEditor:
 
     """Text editor.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        Editor detection functions were moved from :mod:`config`.
     """
 

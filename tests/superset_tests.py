@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for superset module.
 
-.. versionadded:: 9.2
+.. version-added:: 9.2
 """
 #
 # (C) Pywikibot team, 2024-2025

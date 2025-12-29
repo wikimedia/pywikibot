@@ -32,7 +32,7 @@
 
          Return tuple of edit restricted templates.
 
-         .. versionadded:: 3.0
+         .. version-added:: 3.0
          .. seealso:: :meth:`family.Family.get_edit_restricted_templates`
 
          :rtype: tuple[str, ...]
@@ -42,7 +42,7 @@
 
          Return tuple of edit restricted templates.
 
-         .. versionadded:: 3.0
+         .. version-added:: 3.0
          .. seealso:: :meth:`family.Family.get_archived_page_templates`
 
          :rtype: tuple[str, ...]
@@ -65,7 +65,7 @@
          May be overridden to return 'http'. Other protocols are not
          supported.
 
-         .. versionchanged:: 8.2
+         .. version-changed:: 8.2
             ``https`` is returned instead of ``http``.
          .. seealso:: :meth:`family.Family.protocol`
 
@@ -107,11 +107,11 @@
       Using *namespace* option different from ``0``
       needs a lot of time on Wikidata site.
 
-   .. deprecated:: 10.7
+   .. version-deprecated:: 10.7
       This method is dysfunctional and should no longer be used. It
       will be removed in Pywikibot 11.
 
-   .. versionremoved:: 11.0
+   .. version-removed:: 11.0
       This method was dysfunctional and removed, see the following tickets for details:
       :phab:`T359427`, :phab:`T364617` and :phab:`T407708`
 

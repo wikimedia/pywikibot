@@ -6,7 +6,7 @@
    its contents.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -649,7 +649,7 @@ class SiteLink(BaseLink):
 
       - badges: Any badges associated with the sitelink
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     # Components used for __repr__

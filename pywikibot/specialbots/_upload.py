@@ -48,7 +48,7 @@ class UploadRobot(BaseBot):
        bot.post_processor = summarize
        bot.run()
 
-    .. versionadded:: 9.1
+    .. version-added:: 9.1
     """
 
     def __init__(self, url: list[str] | str, *,
@@ -68,9 +68,9 @@ class UploadRobot(BaseBot):
                  **kwargs) -> None:
         """Initializer.
 
-        .. versionchanged:: 6.2
+        .. version-changed:: 6.2
            asynchronous upload is used if *asynchronous* parameter is set
-        .. versionchanged:: 6.4
+        .. version-changed:: 6.4
            *force_if_shared* parameter was added
 
         :param url: path to url or local file, or list of urls or paths
@@ -239,7 +239,7 @@ class UploadRobot(BaseBot):
     def process_filename(self, file_url: str) -> str | None:
         """Return base filename portion of *file_url*.
 
-        .. versionchanged:: 10.2
+        .. version-changed:: 10.2
            no longer shows the description if UploadRobot's parameter
            *verify_description* is set to False.
 
@@ -394,7 +394,7 @@ class UploadRobot(BaseBot):
         If the upload fails, ask the user whether to try again or not.
         If the user chooses not to retry, return None.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            If 'copyuploadbaddomain' API error occurred in first step,
            download the file and upload it afterwards
 
@@ -473,7 +473,7 @@ class UploadRobot(BaseBot):
     def run(self) -> None:
         """Run bot.
 
-        .. versionchanged:: 9.1
+        .. version-changed:: 9.1
            count uploads.
         """
         if self.skip_run():

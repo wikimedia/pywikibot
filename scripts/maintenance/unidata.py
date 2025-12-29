@@ -7,10 +7,10 @@ This script is for updating ``_first_upper_exception_dict``.
    a superse of the older version and should be enough. But this is not
    tested completely.
 
-.. versionadded:: 8.4
+.. version-added:: 8.4
 """
 #
-# (C) Pywikibot team, 2018-2024
+# (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #

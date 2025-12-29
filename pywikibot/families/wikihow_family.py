@@ -1,9 +1,9 @@
 """Family module for wikiHow wiki.
 
-.. versionadded:: 3.0
+.. version-added:: 3.0
 """
 #
-# (C) Pywikibot team, 2020-2024
+# (C) Pywikibot team, 2020-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,7 +17,7 @@ class Family(family.SubdomainFamily):
 
     """Family class for wikiHow Wiki.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     name = 'wikihow'

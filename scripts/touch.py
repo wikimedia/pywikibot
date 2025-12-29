@@ -23,7 +23,7 @@ Command-line arguments:
 &params;
 """
 #
-# (C) Pywikibot team, 2009-2024
+# (C) Pywikibot team, 2009-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -88,7 +88,7 @@ class PurgeBot(MultipleSitesBot):
     def treat(self, page) -> None:
         """Purge the given page.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            Enable batch purge using :meth:`APISite.purgepages()
            <pywikibot.site._apisite.APISite.purgepages>`
         """
@@ -100,7 +100,7 @@ class PurgeBot(MultipleSitesBot):
     def teardown(self) -> None:
         """Purge remaining pages if no KeyboardInterrupt was made.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         if self.generator_completed:
             with suppress(KeyboardInterrupt):
@@ -112,8 +112,8 @@ class PurgeBot(MultipleSitesBot):
     def purgepages(self, flush=False) -> None:
         """Purge a bulk of page if rate limit exceeded.
 
-        .. versionadded:: 8.0
-        .. versionchanged:: 9.0
+        .. version-added:: 8.0
+        .. version-changed:: 9.0
            :meth:`site.APISite.ratelimit()
            <pywikibot.site._apisite.APISite.ratelimit>` method is used
            to determine bulk length and delay.

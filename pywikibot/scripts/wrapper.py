@@ -32,14 +32,14 @@ for tests to set the default site (see :phab:`T216825`)::
     python pwb.py -lang:de bot_tests -v
 
 .. seealso:: :mod:`pwb` entry point
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    pwb wrapper was added to the Python site package lib.
-.. versionchanged:: 7.7
+.. version-changed:: 7.7
    pwb wrapper is able to set ``PYWIKIBOT_TEST_...`` environment variables,
    see :ref:`Environment variables`.
-.. versionchanged:: 8.0
+.. version-changed:: 8.0
    renamed to wrapper.py.
-.. versionchanged:: 9.4
+.. version-changed:: 9.4
    enable external scripts via entry points.
 """
 #
@@ -116,7 +116,7 @@ def check_pwb_versions(package: str) -> None:
 def run_python_file(filename: str, args: list[str], package=None) -> None:
     """Run a python file as if it were the main program on the command line.
 
-    .. versionchanged:: 7.7
+    .. version-changed:: 7.7
        Set and restore ``PYWIKIBOT_TEST_...`` environment variables.
 
     :param filename: The path to the file to execute, it need not be a
@@ -178,7 +178,7 @@ def handle_args(
 ) -> tuple[str, list[str], list[str], list[str]]:
     """Handle args and get filename.
 
-    .. versionchanged:: 7.7
+    .. version-changed:: 7.7
        Catch ``PYWIKIBOT_TEST_...`` environment variables.
 
     :return: filename, script args, local pwb args, environment variables
@@ -391,11 +391,11 @@ def find_alternates(filename, script_paths):
 def find_filename(filename):
     """Search for the filename in the given script paths.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        Search users_scripts_paths in config.base_dir
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        Add config.base_dir to search path
-    .. versionchanged:: 9.4
+    .. version-changed:: 9.4
        Search in entry point paths
     """
     from pywikibot import config
@@ -474,7 +474,7 @@ def find_filename(filename):
 def execute() -> bool:
     """Parse arguments, extract filename and run the script.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
        renamed from :func:`main`
     """
     global filename
@@ -541,7 +541,7 @@ def execute() -> bool:
 def main() -> None:
     """Script entry point. Print doc if necessary.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        previous implementation was renamed to :func:`execute`
     """
     if not check_modules():
@@ -554,7 +554,7 @@ def main() -> None:
 def run() -> None:  # pragma: no cover
     """Site package entry point. Print doc if necessary.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     global site_package
     site_package = True

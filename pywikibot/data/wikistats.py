@@ -25,7 +25,7 @@ class WikiStats:
     The methods accept a Pywikibot family name as the WikiStats table name,
     mapping the names before calling the WikiStats API.
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        tables are cached globally instead by instances.
     """
 

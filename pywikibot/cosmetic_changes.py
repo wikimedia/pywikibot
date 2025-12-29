@@ -179,7 +179,7 @@ used like a pipe link but sorts the page in front of the alphabetical
 order. This dict is used in
 :meth:`CosmeticChangesToolkit.standardizePageFooter`.
 
-.. versionadded:: 9.3
+.. version-added:: 9.3
 """
 
 
@@ -190,7 +190,7 @@ class CANCEL(IntEnum):
     If an error occurred and either skips the page or the method
     or a single match. ALL raises the exception.
 
-    .. versionadded:: 6.3
+    .. version-added:: 6.3
     """
 
     ALL = 0
@@ -230,7 +230,7 @@ class CosmeticChangesToolkit:
 
     """Cosmetic changes toolkit.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        `from_page()` method was removed
     """
 
@@ -239,12 +239,12 @@ class CosmeticChangesToolkit:
                  ignore: IntEnum = CANCEL.ALL) -> None:
         """Initializer.
 
-        .. versionchanged:: 5.2
+        .. version-changed:: 5.2
            instantiate the CosmeticChangesToolkit from a page object;
            only allow keyword arguments except for page parameter;
            `namespace` and `pageTitle` parameters are deprecated
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            `namespace` and `pageTitle` parameters were removed
 
         :param page: the Page object containing the text to be modified
@@ -349,7 +349,7 @@ class CosmeticChangesToolkit:
         2. additional information depending on the local site policy
         3. interwiki
 
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            uses :attr:`main_sortkey` to determine the sort key for the
            main article within a category. If the main article has a
            sort key already, it will not be changed any longer.
@@ -415,7 +415,7 @@ class CosmeticChangesToolkit:
     def translateAndCapitalizeNamespaces(self, text: str) -> str:
         """Use localized namespace names.
 
-        .. versionchanged:: 7.4
+        .. version-changed:: 7.4
            No longer expect a specific namespace alias for File:
         """
         # arz uses English stylish codes
@@ -546,7 +546,7 @@ class CosmeticChangesToolkit:
           without using a pipe, if possible
         * Capitalize the article title of the link, if appropriate
 
-        .. versionchanged:: 8.4
+        .. version-changed:: 8.4
            Convert URL-encoded characters if a link is an interwiki link
            or different from main namespace.
 

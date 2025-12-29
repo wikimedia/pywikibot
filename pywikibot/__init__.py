@@ -170,16 +170,16 @@ def Site(code: str | None = None,  # noqa: N802
     .. warning:: Never create a site object via interface class directly.
        Always use this factory method.
 
-    .. versionchanged:: 5.6
+    .. version-changed:: 5.6
        If a family file does not fit the given *url*, an
        :class:`family.AutoFamily` is used to create the site.
-    .. versionchanged:: 7.3
+    .. version-changed:: 7.3
        Short creation if site code is equal to family name like
        `Site('commons')`, `Site('meta')` or `Site('wikidata')`.
-    .. versionchanged:: 10.0
+    .. version-changed:: 10.0
        *url* does not have to contain an api, requests or script path
        any longer.
-    .. versionchanged:: 10.3
+    .. version-changed:: 10.3
        accept a trailing slash in *url* after domain.
 
     :param code: language code (override config.mylang)

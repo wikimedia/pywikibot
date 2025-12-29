@@ -1,9 +1,9 @@
 """Family module for Wikispore.
 
-.. versionadded:: 4.1
+.. version-added:: 4.1
 """
 #
-# (C) Pywikibot team, 2020-2023
+# (C) Pywikibot team, 2020-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,7 +16,7 @@ class Family(family.Family):
 
     """Family class for Wikispore.
 
-    .. versionadded:: 4.1
+    .. version-added:: 4.1
     """
 
     name = 'wikispore'

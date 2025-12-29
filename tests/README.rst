@@ -136,7 +136,7 @@ Environment variables
   write operations successfully.  These **will** write to the wikis, and they
   should always only write to 'test' wikis.
 
-  .. versionchanged:: 9.2
+  .. version-changed:: 9.2
      Enabling them will also enable 'edit failure' tests which attempt to write
      to the wikis and **should** fail. If there is a bug in pywikibot or
      MediaWiki, these tests **may** actually perform a write operation.
@@ -145,10 +145,10 @@ Environment variables
 
     PYWIKIBOT_TEST_WRITE=1
 
-.. versionremoved:: 9.2
+.. version-removed:: 9.2
    The :envvar:`PYWIKIBOT_TEST_WRITE_FAIL` environment variable; use
    :envvar:`PYWIKIBOT_TEST_WRITE` instead.
-.. versionremoved:: 9.5
+.. version-removed:: 9.5
    The :envvar:`PYWIKIBOT_TEST_GUI` environment variable.
 
 Instead of setting the environment by the os (or `os.environ` as well) you can use the :mod:`pwb`

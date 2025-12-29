@@ -79,7 +79,7 @@ class WbRepresentation(abc.ABC):
     def __repr__(self) -> str:
         """String representation of this object.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Parameters are shown as representations instead of plain
            strings.
 
@@ -126,7 +126,7 @@ class Coordinate(WbRepresentation):
     ) -> None:
         """Represent a geo coordinate.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            The parameters after `lat` and `lon` are now keyword-only.
 
         :param lat: Latitude coordinate
@@ -332,7 +332,7 @@ class Coordinate(WbRepresentation):
         A successful lookup is stored as an internal value to avoid the
         need for repeated lookups.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            The *lazy_load* parameter is now keyword-only.
 
         :param repo: the Wikibase site for the globe, if different from
@@ -472,11 +472,11 @@ class WbTime(WbRepresentation):
            the equality operator will return false if the timezone is
            different.
 
-        .. deprecated:: 10.0
+        .. version-deprecated:: 10.0
            *precision* value 'millenia' is deprecated; 'millennium' must
            be used instead.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            The parameters except timestamp values are now keyword-only.
            A TypeError is raised if *year* is not an int. Previously, a
            ValueError was raised if *year* was None.
@@ -561,7 +561,7 @@ class WbTime(WbRepresentation):
         This value should *only* be used for comparisons, and its value
         may change without warning.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
 
         :return: An integer roughly representing the number of seconds
             since January 1, 0000 AD, adjusted for leap years.
@@ -597,7 +597,7 @@ class WbTime(WbRepresentation):
     def __lt__(self, other: object) -> bool:
         """Compare if self is less than other.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() < other._getSecondsAdjusted()
@@ -606,7 +606,7 @@ class WbTime(WbRepresentation):
     def __le__(self, other: object) -> bool:
         """Compare if self is less equals other.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() <= other._getSecondsAdjusted()
@@ -615,7 +615,7 @@ class WbTime(WbRepresentation):
     def __gt__(self, other: object) -> bool:
         """Compare if self is greater than other.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() > other._getSecondsAdjusted()
@@ -624,7 +624,7 @@ class WbTime(WbRepresentation):
     def __ge__(self, other: object) -> bool:
         """Compare if self is greater equals other.
 
-        .. versionadded:: 8.0
+        .. version-added:: 8.0
         """
         if isinstance(other, WbTime):
             return self._getSecondsAdjusted() >= other._getSecondsAdjusted()
@@ -641,7 +641,7 @@ class WbTime(WbRepresentation):
         with == with a time at 15:00 UTC, but would return true with
         this method.
 
-        .. versionadded:: 9.0
+        .. version-added:: 9.0
         """
         return self._getSecondsAdjusted() == other._getSecondsAdjusted()
 
@@ -669,7 +669,7 @@ class WbTime(WbRepresentation):
         - Time is always in UTC and ends with ``Z``.
         - Example: ``+0000000000123456-01-01T00:00:00Z``.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            The parameters except *datetimestr* are now keyword-only.
 
         :param datetimestr: Timestamp string to parse
@@ -713,9 +713,9 @@ class WbTime(WbRepresentation):
     ) -> WbTime:
         """Create a new WbTime object from a pywikibot.Timestamp.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            Added *copy_timezone* parameter.
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            The parameters except *timestamp* are now keyword-only.
 
 
@@ -749,7 +749,7 @@ class WbTime(WbRepresentation):
         The rounding is performed towards positive infinity for positive
         years and towards negative infinity for negative years.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param year: The year as an integer.
         :return: The first year of the millennium containing the given
@@ -772,7 +772,7 @@ class WbTime(WbRepresentation):
         The rounding is performed towards positive infinity for positive
         years and towards negative infinity for negative years.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param year: The year as an integer.
         :return: The first year of the century containing the given year.
@@ -793,7 +793,7 @@ class WbTime(WbRepresentation):
         Unlike millennium or century normalization, this always
         truncates towards zero.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param year: The year as an integer.
         :return: The first year of the decade containing the given year.
@@ -811,7 +811,7 @@ class WbTime(WbRepresentation):
         This is used for very coarse historical precision levels, where
         the time unit represents a power-of-ten number of years.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param year: The year as an integer.
         :param precision: The precision level (Wikibase int value).
@@ -879,9 +879,9 @@ class WbTime(WbRepresentation):
         .. seealso:: :meth:`fromTimestr` for differences between output
            with and without *force_iso* parameter.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            *normalize* parameter was added.
-        .. versionchanged:: 8.2
+        .. version-changed:: 8.2
            *normalize* parameter was removed due to :phab:`T340495` and
            :phab:`T57755`
 
@@ -898,7 +898,7 @@ class WbTime(WbRepresentation):
     def toTimestamp(self, timezone_aware: bool = False) -> Timestamp:
         """Convert the data to a pywikibot.Timestamp.
 
-        .. versionchanged:: 8.0.1
+        .. version-changed:: 8.0.1
            *timezone_aware* parameter was added.
 
         :param timezone_aware: Whether the timezone should be passed to
@@ -918,9 +918,9 @@ class WbTime(WbRepresentation):
     def toWikibase(self) -> dict[str, Any]:
         """Convert the data to a JSON object for the Wikibase API.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            *normalize* parameter was added.
-        .. versionchanged:: 8.2
+        .. version-changed:: 8.2
            *normalize* parameter was removed due to :phab:`T340495` and
            :phab:`T57755`
 
@@ -1304,8 +1304,8 @@ class WbUnknown(WbRepresentation):
 
     This data type is just a json container
 
-    .. versionadded:: 3.0
-    .. versionchanged:: 9.4
+    .. version-added:: 3.0
+    .. version-changed:: 9.4
        *warning* parameter was added
     """
 
@@ -1324,7 +1324,7 @@ class WbUnknown(WbRepresentation):
     def toWikibase(self) -> dict[str, Any]:
         """Return the JSON object for the Wikibase API.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            a waning message given by the warning attribute is shown once.
 
         :return: Wikibase JSON

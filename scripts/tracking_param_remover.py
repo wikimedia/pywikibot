@@ -10,7 +10,7 @@ Furthermore, the following command line parameters are supported:
 
 -always           Don't prompt for each removal
 
-.. versionadded:: 10.3
+.. version-added:: 10.3
 """
 #
 # (C) Pywikibot team, 2025

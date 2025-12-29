@@ -100,7 +100,7 @@ else:
 def is_ip_address(value: str) -> bool:
     """Check if a value is a valid IPv4 or IPv6 address.
 
-    .. versionadded:: 6.1
+    .. version-added:: 6.1
        Was renamed from ``is_IP()``.
     .. seealso:: :func:`is_ip_network`
 
@@ -116,7 +116,7 @@ def is_ip_address(value: str) -> bool:
 def is_ip_network(value: str) -> bool:
     """Check if a value is a valid range of IPv4 or IPv6 addresses.
 
-    .. versionadded:: 9.0
+    .. version-added:: 9.0
     .. seealso:: :func:`is_ip_address`
 
     :param value: value to check
@@ -131,9 +131,9 @@ def is_ip_network(value: str) -> bool:
 def has_module(module: str, version: str | None = None) -> bool:
     """Check if a module can be imported.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
 
-    .. versionchanged:: 6.1
+    .. version-changed:: 6.1
        Dependency of distutils was dropped because the package will be
        removed with Python 3.12.
     """
@@ -170,7 +170,7 @@ class classproperty:  # noqa: N801
 
     Foo.bar gives 'baz'.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     def __init__(self, cls_method) -> None:
@@ -206,7 +206,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     Those suppressed warnings that do not match the parameters will be
     raised shown upon exit.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     def __init__(
@@ -271,7 +271,7 @@ class ComparableMixin(abc.ABC):
 
     """Mixin class to allow comparing to other objects which are comparable.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     @abc.abstractmethod
@@ -280,7 +280,7 @@ class ComparableMixin(abc.ABC):
 
         This ensures that ``_cmpkey`` method is defined in subclass.
 
-        .. versionadded:: 8.1.2
+        .. version-added:: 8.1.2
         """
 
     def __lt__(self, other):
@@ -318,7 +318,7 @@ def first_lower(string: str) -> str:
     >>> first_lower('Hello World')
     'hello World'
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
     return string[:1].lower() + string[1:]
 
@@ -333,7 +333,7 @@ def first_upper(string: str) -> str:
     >>> first_upper('hello World')
     'Hello World'
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     .. note:: MediaWiki doesn't capitalize some characters the same way
        as Python. This function tries to be close to MediaWiki's
        capitalize function in title.php. See :phab:`T179115` and
@@ -372,7 +372,7 @@ def as_filename(string: str, repl: str = '_') -> str:
     ...
     ValueError: Invalid repl parameter '?'
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
 
     :param string: the string to be modified
     :param repl: the replacement character
@@ -401,7 +401,7 @@ def strtobool(val: str) -> bool:
     ...
     ValueError: invalid truth value 'aye'
 
-    .. versionadded:: 7.1
+    .. version-added:: 7.1
 
     :param val: True values are 'y', 'yes', 't', 'true', 'on', and '1';
         false values are 'n', 'no', 'f', 'false', 'off', and '0'.
@@ -418,7 +418,7 @@ def strtobool(val: str) -> bool:
 def normalize_username(username) -> str | None:
     """Normalize the username.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
     if not username:
         return None
@@ -447,9 +447,9 @@ class MediaWikiVersion:
 
     Any other suffixes are considered invalid.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
 
-    .. versionchanged:: 6.1
+    .. version-changed:: 6.1
        Dependency of distutils was dropped because the package will be
        removed with Python 3.12.
     """
@@ -516,7 +516,7 @@ class MediaWikiVersion:
     def __repr__(self) -> str:
         """Return version number representation, mainly used by tests.
 
-        .. versionadded:: 10.0
+        .. version-added:: 10.0
         """
         return f"'{self}'"
 
@@ -553,7 +553,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     The compression is either selected via the magic number or file
     ending.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
 
     :param filename: The filename.
     :param use_extension: Use the file extension instead of the magic
@@ -652,7 +652,7 @@ def merge_unique_dicts(*args, **kwargs):
     also possible to define an additional dict using the keyword
     arguments.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
     args = [*list(args), dict(kwargs)]
     conflicts = set()
@@ -675,7 +675,7 @@ def file_mode_checker(
 ) -> None:
     """Check file mode and update it, if needed.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
 
     :param filename: filename path
     :param mode: requested file mode
@@ -707,8 +707,8 @@ def compute_file_hash(filename: str | os.PathLike,
 
     Result is expressed as hexdigest().
 
-    .. versionadded:: 3.0
-    .. versionchanged:: 8.2
+    .. version-added:: 3.0
+    .. version-changed:: 8.2
        *sha* may be  also a hash constructor, or a callable that returns
        a hash object.
 
@@ -766,7 +766,7 @@ def cached(*arg: Callable) -> Any:
     .. note:: A property must be decorated on top of the property method
        below other decorators. This decorator must not be used with
        functions.
-    .. versionadded:: 7.3
+    .. version-added:: 7.3
 
     :raises TypeError: decorator must be used without arguments
     """

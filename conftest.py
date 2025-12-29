@@ -1,6 +1,6 @@
 """Configuration file for pytest.
 
-.. versionadded:: 10.3
+.. version-added:: 10.3
 """
 #
 # (C) Pywikibot team, 2025

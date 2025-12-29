@@ -21,7 +21,7 @@ To enable access via cookies, assign cookie handling class::
 
     session.cookies = http.cookie_jar
 
-.. versionchanged:: 8.0
+.. version-changed:: 8.0
    Cookies are lazy loaded when logging to site.
 """
 #
@@ -67,8 +67,8 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
 
     """CookieJar which create the filename and checks file permissions.
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 10.2
+    .. version-added:: 8.0
+    .. version-changed:: 10.2
        use `threading.Lock` in :meth:`load` and :meth`save` to be thread
        safe.
     """
@@ -119,7 +119,7 @@ session.cookies = cookie_jar
 def flush() -> None:  # pragma: no cover
     """Close the session object. This is called when the module terminates.
 
-    .. versionchanged:: 8.1
+    .. version-changed:: 8.1
        log the traceback and show the exception value in the critical
        message
     """
@@ -264,7 +264,7 @@ def request(site: pywikibot.site.BaseSite,
     The optional uri is a relative uri from site base uri including the
     document root '/'.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        a *protocol* parameter can be given which is passed to the
        :meth:`family.Family.base_url` method.
 
@@ -472,7 +472,7 @@ CHARSET_RE = re.compile(
 def get_charset_from_content_type(content_type: str) -> str | None:
     """Get charset from the content-type header.
 
-    .. versionadded:: 7.3
+    .. version-added:: 7.3
     """
     m = CHARSET_RE.search(content_type)
     if not m:
@@ -522,7 +522,7 @@ def _decide_encoding(response: requests.Response,
                      charset: str | None = None) -> str | None:
     """Detect the response encoding.
 
-    .. versionchanged:: 10.1
+    .. version-changed:: 10.1
        retrieve charset from `Accept-Charset` list which may look like
        `'ISO-8859-1,utf-8;q=0.7,*;q=0.7'`.
 

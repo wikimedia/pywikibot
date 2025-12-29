@@ -13,10 +13,10 @@ This script supports the following command line parameters:
 .. note:: This script is a
    :class:`ConfigParserBot<bot.ConfigParserBot>`. All options can be set
    within a settings file which is scripts.ini by default.
-.. versionadded:: 3.0.20180108
+.. version-added:: 3.0.20180108
 """
 #
-# (C) Pywikibot team, 2017-2024
+# (C) Pywikibot team, 2017-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,7 +36,7 @@ class DownloadDumpBot(Bot, ConfigParserBot):
 
     """Download dump bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        DownloadDumpBot is a ConfigParserBot
     """
 

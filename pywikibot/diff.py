@@ -641,7 +641,7 @@ def get_close_matches_ratio(
     >>> get_close_matches_ratio('Pywikibot', p, n=2, cutoff=0, ignorecase=True)
     [(0.4444444444444444, 'Wikipedia'), (0.42857142857142855, 'Robot')]
 
-    .. versionadded:: 9.4
+    .. version-added:: 9.4
     .. note:: Most code is incorporated from Python software under the
        `PSF`_ license.
 

@@ -39,7 +39,7 @@ class ParamInfo(Sized, Container):
                  preloaded_modules: set[str] | None = None) -> None:
         """Initializer.
 
-        .. deprecated:: 8.4
+        .. version-deprecated:: 8.4
            the *modules_only_mode* parameter
 
         :param preloaded_modules: API modules to preload
@@ -283,7 +283,7 @@ class ParamInfo(Sized, Container):
 
         For duplicate paths, the value will be False.
 
-        .. versionchanged:: 8.4
+        .. version-changed:: 8.4
            ``normalize_paraminfo`` became a staticmethod.
         """
         result_data = {}

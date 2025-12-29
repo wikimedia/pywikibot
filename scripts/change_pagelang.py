@@ -20,7 +20,7 @@ Furthermore, the following command line parameters are supported:
 .. note:: This script is a
    :class:`ConfigParserBot<bot.ConfigParserBot>`. All options can be set
    within a settings file which is scripts.ini by default.
-.. versionadded:: 5.1
+.. version-added:: 5.1
 """
 #
 # (C) Pywikibot team, 2018-2025
@@ -43,7 +43,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
 
     """Change page language bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        ChangeLangBot is a ConfigParserBot
     """
 

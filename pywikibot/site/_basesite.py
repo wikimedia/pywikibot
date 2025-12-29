@@ -185,7 +185,7 @@ class BaseSite(ComparableMixin):
     def __getattr__(self, name: str):
         """Delegate undefined methods calls to the Family object.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            Only delegate to public Family methods which have ``code`` as
            first parameter.
         """
@@ -225,7 +225,7 @@ class BaseSite(ComparableMixin):
     def languages(self) -> list[str]:
         """Return list of all valid site codes for this site's Family.
 
-        .. deprecated:: 9.6
+        .. version-deprecated:: 9.6
            Use :meth:`codes` instead.
         """
         return sorted(self.codes)
@@ -234,7 +234,7 @@ class BaseSite(ComparableMixin):
     def codes(self) -> set[str]:
         """Return set of all valid site codes for this site's Family.
 
-        .. versionadded:: 9.6
+        .. version-added:: 9.6
         .. seealso:: :attr:`family.Family.codes`
         """
         return set(self.family.langs.keys())
@@ -274,7 +274,7 @@ class BaseSite(ComparableMixin):
     def redirect(self) -> str:
         """Return a default redirect tag for the site.
 
-        .. versionchanged:: 8.4
+        .. version-changed:: 8.4
            return a single generic redirect tag instead of a list of
            tags. For the list use :meth:`redirects` instead.
         """
@@ -284,7 +284,7 @@ class BaseSite(ComparableMixin):
         """Return list of generic redirect tags for the site.
 
         .. seealso:: :meth:`redirect` for the default redirect tag.
-        .. versionadded:: 8.4
+        .. version-added:: 8.4
         """
         return ['REDIRECT']
 
@@ -375,7 +375,7 @@ class BaseSite(ComparableMixin):
         arbitrary stuff, then a wikilink. The wikilink may contain a
         label, although this is not useful.
 
-        .. versionadded:: 8.4
+        .. version-added:: 8.4
            moved from class:`APISite<pywikibot.site._apisite.APISite>`
         """
         tags = '|'.join(self.redirects())
