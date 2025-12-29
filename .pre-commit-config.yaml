@@ -63,7 +63,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.9
+    rev: v0.14.10
     hooks:
       - id: ruff-check
         alias: ruff
@@ -92,7 +92,7 @@ repos:
       - id: isort
         exclude: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.72.0
+    rev: v0.72.2
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
@@ -111,7 +111,7 @@ repos:
           - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.0
+    rev: v1.19.1
     hooks:
       - id: mypy
         args:
