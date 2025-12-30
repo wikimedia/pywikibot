@@ -1,0 +1,78 @@
+---
+# Run Pywikibot tests with a variety of Python versions
+name: Pywikibot CI
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYWIKIBOT_TEST_RUNNING: 1
+  PYWIKIBOT_USERNAME: Pywikibot-test
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+    continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [graalpy-24.1, graalpy-25.0]
+        site: ['wikipedia:test']
+        os: ['windows-latest', 'macOS-latest', 'ubuntu-latest']
+        experimental: [True]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip --version
+          pip install "beautifulsoup4>=4.7.1"
+          pip install "mwparserfromhell>=0.5.2"
+          pip install packaging
+          pip install "requests>=2.31.0"
+          pip install "wikitextparser>=0.56.4"
+          pip install "pytest >= 9.0.1"
+      - name: Install setuptools
+        if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
+        run: pip install setuptools
+      - name: Generate user files
+        run: |
+          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
+      - name: Test with unittest or pytest
+        id: ci_test
+        continue-on-error: true
+        timeout-minutes: 60
+        env:
+          PYTHONIOENCODING: utf-8
+          PYWIKIBOT_TEST_NO_RC: 1
+        run: |
+          python pwb.py version
+          coverage run -m pytest
+      - name: Show coverage statistics
+        run: |
+          coverage combine || true
+          coverage report
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Check on failure
+        if: steps.ci_test.outcome == 'failure'
+        run: |
+          # Print public IP of runner
+          curl -s https://api.ipify.org
+          exit 1
