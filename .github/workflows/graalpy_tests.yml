@@ -1,6 +1,6 @@
 ---
-# Run Pywikibot tests with a variety of Python versions
-name: Pywikibot CI
+# Run GraalPy tests with a variety of GraalPy versions and os
+name: GraalPy Tests
 
 on:
   push:
