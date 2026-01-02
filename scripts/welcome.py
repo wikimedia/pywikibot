@@ -171,7 +171,7 @@ Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
 aren't badwords at all but can be used for some bad-nickname.
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -192,6 +192,7 @@ import pywikibot
 from pywikibot import config, i18n
 from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
+from pywikibot.tools import cached
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -253,8 +254,7 @@ WELCOME = {
         'hr': '{{subst:dd}} %s',
         'hu': '{{subst:Üdvözlet|%s}}\n',
         'id': '{{subst:sdbot2}}\n%s',
-        'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s'
-              '<!-- fine template di benvenuto -->',
+        'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
         'ja': '{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
         'ka': '{{ახალი მომხმარებელი}}--%s',
         'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
@@ -368,31 +368,31 @@ BAD_PAGE = {
     }
 }
 
-timeselected = ' ~~~~~'  # Defining the time used after the signature
+TIMESELECTED = ' ~~~~~'  # Defining the time used after the signature
 
 # The text for reporting a possibly bad username
 # e.g. *[[Talk_page:Username|Username]]).
 REPORT_TEXT = {
-    'commons': '\n*{{user3|%s}}' + timeselected,
+    'commons': '\n*{{user3|%s}}' + TIMESELECTED,
     'wikipedia': {
-        'am': '\n*[[User talk:%s]]' + timeselected,
-        'ar': '\n*{{user13|%s}}' + timeselected,
-        'bs': '\n{{Korisnik|%s}}' + timeselected,
-        'ckb': '\n*{{بەستەرەکانی بەکارھێنەر|%s}} ' + timeselected,
-        'da': '\n*[[Bruger Diskussion:%s]] ' + timeselected,
-        'de': '\n*[[Benutzer Diskussion:%s]] ' + timeselected,
-        'en': '\n*{{Userlinks|%s}} ' + timeselected,
-        'fa': '\n*{{کاربر|%s}}' + timeselected,
-        'fr': '\n*{{u|%s}} ' + timeselected,
-        'ga': '\n*[[Plé úsáideora:%s]] ' + timeselected,
+        'am': '\n*[[User talk:%s]]' + TIMESELECTED,
+        'ar': '\n*{{user13|%s}}' + TIMESELECTED,
+        'bs': '\n{{Korisnik|%s}}' + TIMESELECTED,
+        'ckb': '\n*{{بەستەرەکانی بەکارھێنەر|%s}} ' + TIMESELECTED,
+        'da': '\n*[[Bruger Diskussion:%s]] ' + TIMESELECTED,
+        'de': '\n*[[Benutzer Diskussion:%s]] ' + TIMESELECTED,
+        'en': '\n*{{Userlinks|%s}} ' + TIMESELECTED,
+        'fa': '\n*{{کاربر|%s}}' + TIMESELECTED,
+        'fr': '\n*{{u|%s}} ' + TIMESELECTED,
+        'ga': '\n*[[Plé úsáideora:%s]] ' + TIMESELECTED,
         'it': '\n{{Reported|%s|',
-        'ja': '\n*{{User2|%s}}' + timeselected,
-        'nl': '\n*{{linkgebruiker%s}} ' + timeselected,
-        'no': '\n*{{bruker|%s}} ' + timeselected,
-        'pdc': '\n*[[Benutzer Diskussion:%s]] ' + timeselected,
-        'sq': '\n*[[User:%s]] ' + timeselected,
-        'sr': '\n*{{Корисник|%s}}' + timeselected,
-        'zh': '\n*{{User|%s}}' + timeselected
+        'ja': '\n*{{User2|%s}}' + TIMESELECTED,
+        'nl': '\n*{{linkgebruiker%s}} ' + TIMESELECTED,
+        'no': '\n*{{bruker|%s}} ' + TIMESELECTED,
+        'pdc': '\n*[[Benutzer Diskussion:%s]] ' + TIMESELECTED,
+        'sq': '\n*[[User:%s]] ' + TIMESELECTED,
+        'sr': '\n*{{Корисник|%s}}' + TIMESELECTED,
+        'zh': '\n*{{User|%s}}' + TIMESELECTED
     }
 }
 # Set where you load your list of signatures that the bot will load if you use
@@ -490,18 +490,49 @@ class Global:
     quiet = False            # Users without contributions aren't displayed
 
 
-def get_welcome_text(site: pywikibot.site.BaseSite) -> str:
-    """Check that site is managed by the script and return the message.
+globalvar = Global()
 
+
+def get_welcome_text(site: pywikibot.site.BaseSite, *, sign: str = '') -> str:
+    """Return the fully composed welcome text for the given site.
+
+    .. versionchanged:: 11.0
+       *sign* parameteer was added, return the fully composed welcome text.
+
+    :param site: The target site where the script is running.
+    :param sign: Signature to use. Required if random_sign is enabled
+        and the site is not excluded.
     :raises KeyError: site is not in WELCOME dict
+    :raises ValueError: If random_sign is enabled but no signature is provided.
+    :return: The complete welcome text for the site.
     """
-    msg = i18n.translate(site, WELCOME)
-    if not msg:
+    welcome_text = i18n.translate(site, WELCOME)
+    if not welcome_text:
         script = pywikibot.calledModuleName()
         welcome = 'welcome.' if script != 'welcome' else ''
         raise KeyError(f'{script}.py is not localized for site {site} in '
                        f'{welcome}WELCOME dict.')
-    return msg
+
+    if globalvar.random_sign:
+        if site.family.name != 'wikinews':
+            if not sign:
+                raise ValueError(
+                    'sign parameter must be provided when random_sign is '
+                    'enabled'
+                )
+            welcome_text = welcome_text % sign
+
+        if site.sitename != 'wiktionary:it':
+            welcome_text += TIMESELECTED
+
+    elif site.sitename != 'wikinews:it':
+        welcome_text = welcome_text % globalvar.default_sign
+
+    final_text = i18n.translate(site, FINAL_NEW_TEXT_ADDITIONS)
+    if final_text:
+        welcome_text += final_text
+
+    return welcome_text
 
 
 class WelcomeBot(SingleSiteBot):
@@ -511,7 +542,6 @@ class WelcomeBot(SingleSiteBot):
     def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
-        self.welcome_text = get_welcome_text(self.site)
         self.bname: dict[str, str] = {}
 
         self.welcomed_users: list[str] = []
@@ -520,7 +550,7 @@ class WelcomeBot(SingleSiteBot):
         if not self.log_name:
             globalvar.make_welcome_log = False
         if globalvar.random_sign:
-            self.define_sign(True)
+            self.define_sign()
 
     def bad_name_filer(self, name, force: bool = False) -> bool:
         """Check for bad names."""
@@ -748,31 +778,18 @@ class WelcomeBot(SingleSiteBot):
                            f'rerun. {strfstr}')
             pywikibot.sleep(globalvar.time_recur)
 
-    def define_sign(self, force: bool = False) -> list[str]:
-        """Setup signature."""
-        if hasattr(self, '_random_signature') and not force:
-            return self._random_signature
+    @cached
+    def define_sign(self) -> list[str]:
+        """Setup signature.
 
+        .. versionchanged:: 11.0
+           The unused *force* parameter was removed.
+        """
         sign_text = ''
         creg = re.compile(r'^\* ?(.*?)$', re.MULTILINE)
-        if not globalvar.sign_file_name:
-            sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
-            if not sign_page_name:
-                self.show_status(Msg.WARN)
-                pywikibot.info(f"{self.site} doesn't allow random signature,"
-                               ' force disable.')
-                globalvar.random_sign = False
-                return []
 
-            sign_page = pywikibot.Page(self.site, sign_page_name)
-            if sign_page.exists():
-                pywikibot.info('Loading signature list...')
-                sign_text = sign_page.get()
-            else:
-                pywikibot.info('The signature list page does not exist, '
-                               'random signature will be disabled.')
-                globalvar.random_sign = False
-        else:
+        if globalvar.sign_file_name:
+            # Read from local file
             filename = pywikibot.config.datafilepath(globalvar.sign_file_name)
             try:
                 f = open(filename, encoding=config.console_encoding)
@@ -784,8 +801,28 @@ class WelcomeBot(SingleSiteBot):
 
             sign_text = f.read()
             f.close()
-        self._random_signature = creg.findall(sign_text)
-        return self._random_signature
+        else:
+            # Read from wiki page
+            sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
+            if sign_page_name:
+                sign_page = pywikibot.Page(self.site, sign_page_name)
+                if sign_page.exists():
+                    pywikibot.info('Loading signature list...')
+                    sign_text = sign_page.get()
+                else:
+                    pywikibot.info('The signature list page does not exist, '
+                                   'random signature will be disabled.')
+            else:
+                self.show_status(Msg.WARN)
+                pywikibot.info(f"{self.site} doesn't allow random signature,"
+                               ' force disable.')
+
+        # Extract signatures
+        signs = creg.findall(sign_text)
+        if not signs:
+            globalvar.random_sign = False
+
+        return signs
 
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped.
@@ -832,19 +869,11 @@ class WelcomeBot(SingleSiteBot):
             self.collect_bad_accounts(user.username)
             return
 
-        welcome_text = self.welcome_text
-        if globalvar.random_sign:
-            if self.site.family.name != 'wikinews':
-                welcome_text = welcome_text % choice(self.define_sign())
-            if self.site.sitename != 'wiktionary:it':
-                welcome_text += timeselected
-        elif self.site.sitename != 'wikinews:it':
-            welcome_text = welcome_text % globalvar.default_sign
-
-        final_text = i18n.translate(self.site, FINAL_NEW_TEXT_ADDITIONS)
-        if final_text:
-            welcome_text += final_text
+        signs = self.define_sign()
+        welcome_text = get_welcome_text(self.site,
+                                        sign=choice(signs) if signs else '')
         welcome_comment = i18n.twtranslate(self.site, 'welcome-welcome')
+
         try:
             # append welcomed, welcome_count++
             ustp.put(welcome_text, welcome_comment, minor=False)
@@ -920,9 +949,6 @@ def load_word_function(raw) -> list[str]:
     return list_loaded
 
 
-globalvar = Global()
-
-
 def _handle_offset(val) -> None:
     """Handle -offset arg."""
     if not val:
@@ -986,7 +1012,7 @@ def handle_args(args) -> None:
         elif arg == '-sign':
             globalvar.default_sign = val or pywikibot.input(
                 'Which signature to use?')
-            globalvar.default_sign += timeselected
+            globalvar.default_sign += TIMESELECTED
         elif arg == '-limit':
             globalvar.query_limit = int(
                 val if val.isdigit() else pywikibot.input(

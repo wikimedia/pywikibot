@@ -75,7 +75,7 @@ take the right parameter:
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -696,7 +696,7 @@ class CheckImagesBot:
 
         if curr_text is None:
             try:
-                curr_text = get_welcome_text(self.site) % '~~~~'
+                curr_text = get_welcome_text(self.site)
             except KeyError:
                 curr_text = ''
 
