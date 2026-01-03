@@ -18,6 +18,8 @@
 .. automodule:: pywikibot.site._basesite
 
    .. autoclass:: BaseSite
+      :members:
+      :special-members: __getattr__
 
       .. method:: category_redirects(fallback: str = '_default')
 

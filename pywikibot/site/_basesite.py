@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -185,21 +185,38 @@ class BaseSite(ComparableMixin):
     def __getattr__(self, name: str):
         """Delegate undefined methods calls to the Family object.
 
+        Only public :class:`Family instance methods are delegated.
+
+        A method is considered delegatable if:
+        - it is a bound instance method of Family,
+        - it is public (name does not start with '_'),
+        - its first logical parameter is *code*.
+
+        .. note::
+           For performance reasons, the method signature is inspected
+           via the method's ``__code__`` object instead of
+           ``inspect.signature()``. This avoids expensive generic
+           introspection in this hot path and is safe because Family
+           methods are guaranteed to be pure Python.
+
         .. versionchanged:: 9.0
            Only delegate to public Family methods which have ``code`` as
            first parameter.
+        .. versionchanged:: 11.0
+           Use direct ``__code__`` inspection instead of
+           ``inspect.signature()`` to significantly improve attribute
+           access performance.
         """
         if not name.startswith('_'):
             obj = getattr(self.family, name, None)
             if inspect.ismethod(obj):
-                params = inspect.signature(obj).parameters
-                if params:
-                    parameter = next(iter(params))
-                    if parameter == 'code':
-                        method = functools.partial(obj, self.code)
-                        if hasattr(obj, '__doc__'):
-                            method.__doc__ = obj.__doc__
-                        return method
+                code = obj.__code__
+                params = code.co_varnames[:code.co_argcount]
+                if len(params) > 1 and params[1] == 'code':
+                    method = functools.partial(obj, self.code)
+                    if hasattr(obj, '__doc__'):
+                        method.__doc__ = obj.__doc__
+                    return method
 
         raise AttributeError(f'{type(self).__name__} instance has no '
                              f'attribute {name!r}') from None
