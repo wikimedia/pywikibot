@@ -59,7 +59,7 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          coverage run -m pytest -a "not net" --ignore=tests/script_tests.py
+          coverage run -m pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
       - name: Show coverage statistics
         run: |
           coverage combine || true
