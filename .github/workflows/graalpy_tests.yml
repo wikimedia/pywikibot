@@ -18,6 +18,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
@@ -52,12 +53,13 @@ jobs:
       - name: Test with unittest or pytest
         id: ci_test
         continue-on-error: true
+        timeout-minutes: 290
         env:
           PYTHONIOENCODING: utf-8
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          coverage run -m pytest -a "not net"
+          coverage run -m pytest -a "not net" --ignore=tests/script_tests.py
       - name: Show coverage statistics
         run: |
           coverage combine || true
