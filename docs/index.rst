@@ -54,8 +54,10 @@ Contents
    scripts/index
    global_options
    faq
+   getting_started_contributors
    getting_help
    SECURITY
+   
 
 .. toctree::
    :maxdepth: 1
