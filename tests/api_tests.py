@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,6 +23,12 @@ from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
 from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase, TestCase
 from tests.utils import FakeLoginManager
+
+
+SET_NAMESPACE_TYPE_MSG = (
+    r'int\(\) argument must be a string, a bytes-like object '
+    r"or (?:a real number|a number), not '?NoneType'?"
+)
 
 
 class TestApiFunctions(DefaultSiteTestCase):
@@ -630,10 +636,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
         self.gen = api.ListGenerator(listaction='allpages', site=self.site)
-        with self.assertRaisesRegex(
-            TypeError,
-            (r'int\(\) argument must be a string, a bytes-like object '
-             r"or (?:a real number|a number), not 'NoneType'")):
+        with self.assertRaisesRegex(TypeError, SET_NAMESPACE_TYPE_MSG):
             self.gen.set_namespace(None)
 
     def test_namespace_multi(self) -> None:
@@ -672,10 +675,7 @@ class TestDryListGenerator(TestCase):
 
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
-        with self.assertRaisesRegex(
-            TypeError,
-            (r'int\(\) argument must be a string, a bytes-like object '
-             r"or (?:a real number|a number), not 'NoneType'")):
+        with self.assertRaisesRegex(TypeError, SET_NAMESPACE_TYPE_MSG):
             self.gen.set_namespace(None)
 
     def test_namespace_zero(self) -> None:
