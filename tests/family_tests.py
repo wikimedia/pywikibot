@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -137,12 +137,12 @@ class TestFamily(TestCase):
         family = Family.load('wikipedia')
         with self.assertRaisesRegex(
                 AttributeError,
-                "'mappingproxy' object has no attribute 'update'"):
+                "'<?mappingproxy.*' object has no attribute 'update'"):
             family.obsolete.update({})
 
         with self.assertRaisesRegex(
                 TypeError,
-                "'mappingproxy' object does not support item assignment"):
+                "'<?mappingproxy.*' object does not support item assignment"):
             family.obsolete['a'] = 'b'
 
         with self.assertRaisesRegex(
