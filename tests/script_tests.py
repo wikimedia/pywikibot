@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import os
 import sys
 import unittest
 from collections.abc import Iterator
@@ -21,7 +20,6 @@ from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
-ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
 # login script should be the first to test

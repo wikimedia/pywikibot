@@ -1,6 +1,6 @@
 """Library to log the bot in to a wiki account."""
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -243,9 +243,8 @@ class LoginManager:
             password_path = Path(config.password_file)
 
         # ignore this check when running tests
-        if os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '0' \
-           and (not password_path.is_file(**params)
-                or password_path.is_symlink()):
+        if not TEST_RUNNING and (not password_path.is_file(**params)
+                                 or password_path.is_symlink()):
             raise FileNotFoundError(
                 f'Password file {password_path.name} does not exist in '
                 f'{password_path.parent}'
