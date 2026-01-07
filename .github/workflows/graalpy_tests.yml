@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 300
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -28,7 +28,7 @@ jobs:
         experimental: [True]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
@@ -39,21 +39,21 @@ jobs:
       - name: Install dependencies
         run: |
           pip --version
-          pip install "beautifulsoup4>=4.7.1"
-          pip install "mwparserfromhell>=0.5.2"
+          pip install beautifulsoup4
+          pip install mwparserfromhell
           pip install packaging
-          pip install "requests>=2.31.0"
-          pip install "wikitextparser>=0.56.4"
-          pip install "pytest >= 9.0.1"
+          pip install requests
+          pip install wikitextparser
+          pip install pytest
           pip install pytest-attrib
-          pip install "coverage>=7.11.0"
+          pip install coverage
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
       - name: Test with unittest or pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 290
+        timeout-minutes: 110
         env:
           PYTHONIOENCODING: utf-8
           PYWIKIBOT_TEST_NO_RC: 1
