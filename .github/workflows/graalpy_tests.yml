@@ -50,7 +50,7 @@ jobs:
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
-      - name: Test with unittest or pytest
+      - name: Test with pytest
         id: ci_test
         continue-on-error: true
         timeout-minutes: 110
@@ -59,7 +59,14 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          coverage run -m pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
+          TEST_CMD="pytest -k 'not TestDate' -a 'not net' --ignore=tests/script_tests.py"
+          if [[ "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            echo "Running tests without coverage (GraalPy 25 on Ubuntu)"
+            $TEST_CMD
+          else
+            echo "Running tests with coverage"
+            coverage run -m $TEST_CMD
+          fi
       - name: Show coverage statistics
         run: |
           coverage combine || true
