@@ -20,7 +20,7 @@
 .. warning:: do not upload a development release to pypi.
 """
 #
-# (C) Pywikibot team, 2009-2025
+# (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ from pathlib import Path
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['requests-sse>=0.5.2'],
-    'isbn': ['python-stdnum>=2.1'],
+    'isbn': ['python-stdnum>=2.2'],
     'Graphviz': ['pydot>=4.0.1'],
     'Google': ['googlesearch-python >= 1.3.0'],
     'memento': ['memento_client==0.6.1'],
@@ -50,15 +50,18 @@ extra_deps = {
         'and python_version == "3.9"',
         'Pillow==11.3.0; platform_python_implementation == "PyPy" '
         'and python_version == "3.10"',
-        'Pillow>=10.4.0; platform_python_implementation != "GraalVM" '
-        'and (platform_python_implementation == "CPython" '
-        'or python_version >= "3.11")',
+        'Pillow==12.1.0; platform_python_implementation == "PyPy" '
+        'and python_version >= "3.11"',
+        'Pillow==11.3.0; platform_python_implementation == "CPython" '
+        'and python_version == "3.9"',
+        'Pillow>=12.1.0; platform_python_implementation == "CPython" '
+        'and  python_version >= "3.10"',
     ],
     'mwoauth': [
         'PyJWT != 2.10.0, != 2.10.1',  # T380270
         'mwoauth>=0.4.0',
     ],
-    'html': ['beautifulsoup4>=4.7.1'],
+    'html': ['beautifulsoup4>=4.14.3'],
     'http': [
         'fake-useragent >= 2.2.0',
     ],
@@ -76,9 +79,9 @@ extra_deps.update({'scripts': [i for k, v in script_deps.items() for i in v]})
 # ------- setup install_requires ------- #
 # packages which are mandatory
 dependencies = [
-    'mwparserfromhell>=0.5.2',
-    'packaging',
-    'requests>=2.31.0',
+    'mwparserfromhell>=0.7.2',
+    'packaging>=25.0',
+    'requests>=2.32.3',
 ]
 
 

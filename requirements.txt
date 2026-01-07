@@ -1,4 +1,4 @@
-# This is a PIP 6+ requirements file for using Pywikibot and scripts
+# This is a PIP requirements file for using Pywikibot and scripts
 #
 # All dependencies can be installed using:
 # $ sudo pip install -r requirements.txt
@@ -18,9 +18,9 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory dependencies, others are optional
-mwparserfromhell>=0.5.2
-packaging
-requests>=2.31.0
+mwparserfromhell>=0.7.2
+packaging>=25.0
+requests>=2.32.3
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead
@@ -29,8 +29,6 @@ requests>=2.31.0
 wikitextparser>=0.56.4
 
 # OAuth support
-# mwoauth 0.2.4 is needed because it supports getting identity information
-# about the user
 # Due to T380270 PyJWT must be set
 PyJWT != 2.10.0, != 2.10.1
 mwoauth>=0.4.0
@@ -39,13 +37,15 @@ mwoauth>=0.4.0
 pydot >= 4.0.1
 
 # cosmetic_changes
-python-stdnum >= 2.1
+python-stdnum >= 2.2
 
 # GUI
 # Pillow cannot be installed with GraalPy
 Pillow==10.4.0; platform_python_implementation == "PyPy" and python_version == "3.9"
 Pillow==11.3.0; platform_python_implementation == "PyPy" and python_version == "3.10"
-Pillow>=10.4.0; platform_python_implementation != "GraalVM" and (platform_python_implementation == "CPython" or python_version >= "3.11")
+Pillow==12.1.0; platform_python_implementation == "PyPy" and python_version >= "3.11"
+Pillow==11.3.0; platform_python_implementation == "CPython" and python_version == "3.9"
+Pillow>=12.1.0; platform_python_implementation == "CPython" and  python_version >= "3.10"
 
 # core pagegenerators
 googlesearch-python >= 1.3.0
@@ -55,7 +55,7 @@ requests-sse >= 0.5.2
 PyMySQL >= 1.1.2
 
 # core HTML comparison parser in diff module
-beautifulsoup4>=4.14.2
+beautifulsoup4>=4.14.3
 
 # scripts/weblinkchecker.py
 memento_client==0.6.1

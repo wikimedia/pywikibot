@@ -82,8 +82,9 @@ Release 11 (in development)
 
 **Other breaking changes**
 
-* Package requirements were updated (``wikitextparser``, ``mwoauth``, ``pydot``, ``python-stdnum``,
-  ``Pillow``, ``requests-sse``, ``PyMySQL``, ``beautifulsoup4``, ``fake-useragent``)
+* Package requirements were updated (``beautifulsoup4``, ``fake-useragent``, ``mwoauth``,
+  ``mwparserfromhell``, ``packaging``, ``Pillow``, ``pydot``, ``PyMySQL``, ``python-stdnum``,
+  ``requests``, ``requests-sse``, ``wikitextparser``)
 * Python 3.8 support was dropped. (:phab:`T401802`)
 * Remove predefined ``yu-tld`` fix in :mod:`fixes`. (:phab:`T402088`)
 
