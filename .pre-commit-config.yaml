@@ -92,7 +92,7 @@ repos:
       - id: isort
         exclude: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.72.2
+    rev: v0.74.1
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)

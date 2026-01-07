@@ -19,7 +19,7 @@ a deprecator without any arguments.
    deprecation decorators moved to _deprecate submodule
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
 
     :param obj: An object being decorated
     :type obj: object
-    :param stacklevel: level to use
+    :param stacklevel: Stack level to use
     """
     if hasattr(obj, '__full_name__'):
         return
@@ -209,12 +209,14 @@ def issue_deprecation_warning(name: str,
     .. versionchanged:: 8.2
        *warning_class* and *since* are keyword-only parameters.
 
-    :param name: the name of the deprecated object
-    :param instead: suggested replacement for the deprecated object
-    :param depth: depth + 1 will be used as stacklevel for the warnings
-    :param warning_class: a warning class (category) to be used,
+    :param name: The name of the deprecated object
+    :param instead: Suggested replacement for the deprecated object
+    :param depth: *depth* + 1 will be used as stacklevel for the
+        warnings
+    :param warning_class: A warning class (category) to be used,
         defaults to FutureWarning
-    :param since: a version string when the method or function was deprecated
+    :param since: A version string when the method or function was
+        deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
