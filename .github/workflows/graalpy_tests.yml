@@ -59,13 +59,12 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          TEST_CMD="pytest -k 'not TestDate' -a 'not net' --ignore=tests/script_tests.py"
           if [[ "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             echo "Running tests without coverage (GraalPy 25 on Ubuntu)"
-            $TEST_CMD
+            pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
           else
             echo "Running tests with coverage"
-            coverage run -m $TEST_CMD
+            coverage run -m pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
           fi
       - name: Show coverage statistics
         run: |
