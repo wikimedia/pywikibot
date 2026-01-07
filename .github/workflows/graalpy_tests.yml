@@ -52,6 +52,7 @@ jobs:
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
       - name: Test with pytest
         id: ci_test
+        shell: bash
         continue-on-error: true
         timeout-minutes: 110
         env:
