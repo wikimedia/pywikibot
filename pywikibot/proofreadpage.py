@@ -168,7 +168,15 @@ class TagAttrDesc:
 
     """A descriptor tag.
 
+    Implements a data descriptor for attributes of <pages /> tags
+    (used in :class:`PagesTagParser`). Provides controlled access
+    to a single attribute value via a WeakKeyDictionary to store
+    per-instance da
+
     .. versionadded:: 8.0
+    .. versionchanged:: 11.0
+       Never use None as key in WeakKeyDictionary. Class-level access
+       returns the descriptor itself.
     """
 
     def __init__(self) -> None:
@@ -179,10 +187,27 @@ class TagAttrDesc:
         self.public_name = name
 
     def __get__(self, obj, objtype=None):
+        """Retrieve the value of the attribute for a given instance.
+
+        .. versionchanged:: 11.0
+           If *obj* is None (e.g., when accessed via the class rather
+           than an instance), return the descriptor itself instead of
+           attempting to use None as a key in the WeakKeyDictionary.
+
+        :param obj: Instance of the class that owns this descriptor, or
+            None if accessed via the class.
+        :param objtype: Type of the class (unused).
+        :return: The attribute value for the instance, or the descriptor
+            itself if accessed via the class.
+        """
+        if obj is None:
+            return self
+
         attr = self.attrs.get(obj)
         return attr.value if attr is not None else None
 
     def __set__(self, obj, value) -> None:
+        """Set attribute value for the given instance."""
         attr = self.attrs.get(obj)
         if attr is not None:
             attr.value = value
@@ -190,6 +215,7 @@ class TagAttrDesc:
             self.attrs[obj] = TagAttr(self.public_name, value)
 
     def __delete__(self, obj):
+        """Delete attribute for the given instance."""
         self.attrs.pop(obj, None)
 
 
