@@ -57,7 +57,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
-    'sphinx.ext.linkcode',
+    # 'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
@@ -516,7 +516,7 @@ extlinks = {
 }
 
 
-def linkcode_resolve(domain, info) -> str | None:
+def xlinkcode_resolve(domain, info) -> str | None:
     """Provide external Phabricator links for @property objects only.
 
     This function uses ``sphinx.ext.linkcode`` and is a workaround for
@@ -659,7 +659,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options,
     lines[:] = newlines
 
 
-def setup(app) -> None:
+def xsetup(app) -> None:
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_docstring_fixups)
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
