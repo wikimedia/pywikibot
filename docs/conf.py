@@ -35,6 +35,7 @@ from pathlib import Path
 # Ignoring them.
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter('ignore', category=DeprecationWarning)
 
 repo_dir = Path(__file__).resolve().parents[1]
 sys.path = [str(repo_dir), str(repo_dir / 'pywikibot')] + sys.path
@@ -47,14 +48,12 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '8.2.3'
+needs_sphinx = '9.1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_copybutton',
-    'sphinx_tabs.tabs',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
@@ -62,9 +61,10 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx_copybutton',
+    'sphinx_tabs.tabs',
     'sphinxext.opengraph',
 ]
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
