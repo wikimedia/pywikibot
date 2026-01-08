@@ -1,6 +1,6 @@
 """Objects representing a base object for a MediaWiki page."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2055,13 +2055,13 @@ class BasePage(ComparableMixin):
 
         :param reason: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
-        :param deletetalk: Also delete the talk page, if it exists.
         :param prompt: If true, prompt user for confirmation before deleting.
         :param mark: If true, and user does not have sysop rights, place a
             speedy-deletion request on the page instead. If false, non-sysops
             will be asked before marking pages for deletion.
         :param automatic_quit: show also the quit option, when asking
             for confirmation.
+        :param deletetalk: Also delete the talk page, if it exists.
 
         :return: the function returns an integer, with values as follows:
             value    meaning
@@ -2283,6 +2283,8 @@ class BasePage(ComparableMixin):
              <pywikibot.site._apisite.APISite.protect>`
            - :meth:`applicable_protections`
 
+        :param reason: Reason for the action, default is None and will
+            set an empty string.
         :param protections: A dict mapping type of protection to
             protection level of that type. Allowed protection types for
             a page can be retrieved by :meth:`applicable_protections`.
@@ -2291,8 +2293,6 @@ class BasePage(ComparableMixin):
 
             Example: :code:`{'move': 'sysop', 'edit': 'autoconfirmed'}`
 
-        :param reason: Reason for the action, default is None and will
-            set an empty string.
         """
         protections = protections or {}  # protections is converted to {}
         reason = reason or ''  # None is converted to ''

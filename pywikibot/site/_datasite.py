@@ -442,8 +442,8 @@ class DataSite(APISite):
            *tags* parameter was added
 
         :param claim: The claim to save
-        :param bot: Whether to mark the edit as a bot edit
         :param summary: Edit summary
+        :param bot: Whether to mark the edit as a bot edit
         :param tags: Change tags to apply to the revision
         :raises NoPageError: missing the the snak value
         :raises NotImplementedError: ``claim.isReference`` or
@@ -782,10 +782,10 @@ class DataSite(APISite):
     def set_redirect_target(self, from_item, to_item, bot: bool = True):
         """Make a redirect to another item.
 
-        :param to_item: Title of target item.
-        :type to_item: pywikibot.ItemPage
         :param from_item: Title of the item to be redirected.
         :type from_item: pywikibot.ItemPage
+        :param to_item: Title of target item.
+        :type to_item: pywikibot.ItemPage
         :param bot: Whether to mark the edit as a bot edit
         """
         params = {

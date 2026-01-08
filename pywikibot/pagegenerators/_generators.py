@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -508,9 +508,10 @@ def UserContributionsGenerator(username: str,
                                ) -> Iterable[pywikibot.page.Page]:
     """Yield unique pages edited by user:username.
 
-    :param total: Maximum number of pages to retrieve in total
+    :param username: user name
     :param namespaces: list of namespace numbers to fetch contribs from
     :param site: Site for generator results.
+    :param total: Maximum number of pages to retrieve in total
     """
     if site is None:
         site = pywikibot.Site()

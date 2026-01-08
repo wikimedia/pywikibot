@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -556,12 +556,12 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     .. versionadded:: 3.0
 
     :param filename: The filename.
-    :param use_extension: Use the file extension instead of the magic
-        number to determine the type of compression (default True). Must
-        be True when writing or appending.
     :param mode: The mode in which the file should be opened. It may
         either be 'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the
         file in binary mode. It defaults to 'rb'.
+    :param use_extension: Use the file extension instead of the magic
+        number to determine the type of compression (default True). Must
+        be True when writing or appending.
     :raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     :raises FileNotFoundError: When the filename doesn't exist and it

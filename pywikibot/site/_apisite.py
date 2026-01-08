@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2009,6 +2009,8 @@ class APISite(
         :param minor: if True (default), mark edit as minor
         :param notminor: if True, override account preferences to mark
             edit as non-minor
+        :param bot: if True and bot right is given, mark edit with bot
+            flag
         :param recreate: if True (default), create new page even if this
             title has previously been deleted
         :param createonly: if True, raise an error if this title already
@@ -2025,8 +2027,6 @@ class APISite(
             * nochange --- don't change the watchlist
 
             If None (default), follow bot account's default settings
-        :param bot: if True and bot right is given, mark edit with bot
-            flag
 
         :keyword str text: Overrides Page.text
         :keyword int | str section: Edit an existing numbered section or
@@ -3073,14 +3073,14 @@ class APISite(
         """Purge the server's cache for one or multiple pages.
 
         :param pages: list of Page objects
-        :param redirects: Automatically resolve redirects.
-        :param converttitles: Convert titles to other variants if
-            necessary. Only works if the wiki's content language
-            supports variant conversion.
         :param forcelinkupdate: Update the links tables.
         :param forcerecursivelinkupdate: Update the links table, and
             update the links tables for any page that uses this page as
             a template.
+        :param converttitles: Convert titles to other variants if
+            necessary. Only works if the wiki's content language
+            supports variant conversion.
+        :param redirects: Automatically resolve redirects.
         :return: True if API returned expected response; False otherwise
         """
         req = self.simple_request(action='purge', titles=list(set(pages)))

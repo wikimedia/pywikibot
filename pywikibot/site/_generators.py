@@ -1,6 +1,6 @@
 """Objects representing API generators to MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1253,10 +1253,10 @@ class GeneratorsMixin:
         :param url: The URL to search for (with or without the protocol
             prefix); this may include a '*' as a wildcard, only at the start
             of the hostname
-        :param namespaces: list of namespace numbers to fetch contribs from
-        :param total: Maximum number of pages to retrieve in total
         :param protocol: protocol to search for, http and https by default.
                 Full list shown on Special:LinkSearch wikipage
+        :param namespaces: list of namespace numbers to fetch contribs from
+        :param total: Maximum number of pages to retrieve in total
         """
         if url is not None:
             found_protocol, _, url = url.rpartition('://')
@@ -1695,15 +1695,15 @@ class GeneratorsMixin:
         .. seealso:: :api:`Deletedrevisions`
 
         :param titles: The page titles to check for deleted revisions
-        :keyword revids: Get revisions by their ID
-
-        .. note:: either titles or revids must be set but not both
-
         :param start: Iterate revisions starting at this Timestamp
         :param end: Iterate revisions ending at this Timestamp
         :param reverse: Iterate oldest revisions first (default: newest)
         :param content: If True, retrieve the content of each revision
         :param total: number of revisions to retrieve
+        :keyword revids: Get revisions by their ID
+
+        .. note:: either titles or revids must be set but not both
+
         :keyword user: List revisions by this user
         :keyword excludeuser: Exclude revisions by this user
         :keyword tag: Only list revision tagged with this tag
