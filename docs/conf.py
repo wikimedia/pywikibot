@@ -35,7 +35,6 @@ from pathlib import Path
 # Ignoring them.
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter('ignore', category=DeprecationWarning)
 
 repo_dir = Path(__file__).resolve().parents[1]
 sys.path = [str(repo_dir), str(repo_dir / 'pywikibot')] + sys.path
@@ -470,9 +469,13 @@ numfig = True
 show_authors = True
 todo_include_todos = True
 autodoc_typehints = 'description'
+autodoc_use_legacy_class_based = True  # T413563
 
 # autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = [
+    'autosectionlabel.*',
+    'sphinx.ext.napoleon.RemovedInSphinx11Warning',
+]
 toc_object_entries_show_parents = 'hide'
 
 # Napoleon settings
