@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 120
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -54,14 +54,14 @@ jobs:
         id: ci_test
         shell: bash
         continue-on-error: true
-        timeout-minutes: 110
+        timeout-minutes: 25
         env:
           PYTHONIOENCODING: utf-8
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          if [[ "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            echo "Running tests without coverage (GraalPy 25 on Ubuntu)"
+          if [[ "${{ matrix.os }}" == "windows-latest" || ( "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ) ]]; then
+            echo "Running tests without coverage"
             pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
           else
             echo "Running tests with coverage"
