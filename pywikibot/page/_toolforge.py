@@ -10,9 +10,11 @@
 from __future__ import annotations
 
 import collections
+import pickle
 import re
 import urllib.parse
 from http import HTTPStatus
+from pathlib import Path
 from typing import Any
 from warnings import warn
 
@@ -30,12 +32,6 @@ class WikiBlameMixin:
     #: Supported wikipedia site codes
     WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
 
-    #: Supported WikiWho API language codes
-    WIKIWHO_CODES = (
-        'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl',
-        'pt', 'tr', 'zh'
-    )
-
     def _check_wh_supported(self) -> None:
         """Check if WikiHistory is supported."""
         if self.site.family.name != 'wikipedia':
@@ -52,45 +48,6 @@ class WikiBlameMixin:
 
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
-
-    def _check_wikiwho_supported(self) -> None:
-        """Check if WikiWho API is supported.
-
-        .. versionadded:: 11.0
-
-        :raise NotImplementedError: unsupported site, language, or namespace
-        :raise NoPageError: page does not exist
-        """
-        if self.site.family.name != 'wikipedia':
-            raise NotImplementedError(
-                'WikiWho API is implemented for wikipedia family only')
-
-        if (code := self.site.code) not in self.WIKIWHO_CODES:
-            raise NotImplementedError(
-                f'WikiWho API is not implemented for wikipedia:{code}')
-
-        if (ns := self.namespace()) != 0:
-            raise NotImplementedError(
-                f'WikiWho API is not implemented for {ns} namespace')
-
-        if not self.exists():
-            raise pywikibot.exceptions.NoPageError(self)
-
-    def _build_wikiwho_url(self, endpoint: str) -> str:
-        """Build WikiWho API URL for the given endpoint.
-
-        .. versionadded:: 11.0
-
-        :param endpoint: API endpoint (all_content, rev_content,
-            edit_persistence)
-        :return: Complete API URL
-        """
-        article_title = self.title(with_ns=False, with_section=False)
-        encoded_title = urllib.parse.quote(article_title, safe='')
-        base_url = 'https://wikiwho-api.wmcloud.org'
-        url = (f'{base_url}/{self.site.code}/api/v1.0.0-beta/{endpoint}/'
-               f'{encoded_title}/')
-        return url
 
     @deprecated('authorsship', since='9.3.0')
     @deprecated_args(onlynew=None)  # since 9.2.0
@@ -255,11 +212,70 @@ class WikiBlameMixin:
 
         return {user: (chars, percent) for user, chars, percent in result}
 
-    def get_annotations(self) -> dict[str, Any]:
+
+class WikiWhoMixin:
+
+    """Page mixin for WikiWho authorship data with optimized pickle storage.
+
+    WikiWho provides token-level provenance and authorship information.
+    This implementation uses an optimized subdirectory structure for pickle
+    caching to avoid filesystem performance issues with millions of files.
+
+    .. versionadded:: 11.0
+    """
+
+    #: Supported WikiWho API language codes
+    WIKIWHO_CODES = (
+        'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl',
+        'pt', 'tr', 'zh'
+    )
+
+    def _check_wikiwho_supported(self) -> None:
+        """Check if WikiWho API is supported.
+
+        .. versionadded:: 11.0
+
+        :raise NotImplementedError: unsupported site, language, or namespace
+        :raise NoPageError: page does not exist
+        """
+        if self.site.family.name != 'wikipedia':
+            raise NotImplementedError(
+                'WikiWho API is implemented for wikipedia family only')
+
+        if (code := self.site.code) not in self.WIKIWHO_CODES:
+            raise NotImplementedError(
+                f'WikiWho API is not implemented for wikipedia:{code}')
+
+        if (ns := self.namespace()) != 0:
+            raise NotImplementedError(
+                f'WikiWho API is not implemented for {ns} namespace')
+
+        if not self.exists():
+            raise pywikibot.exceptions.NoPageError(self)
+
+    def _build_wikiwho_url(self, endpoint: str) -> str:
+        """Build WikiWho API URL for the given endpoint.
+
+        .. versionadded:: 11.0
+
+        :param endpoint: API endpoint (all_content, rev_content,
+            edit_persistence)
+        :return: Complete API URL
+        """
+        article_title = self.title(with_ns=False, with_section=False)
+        encoded_title = urllib.parse.quote(article_title, safe='')
+        base_url = 'https://wikiwho-api.wmcloud.org'
+        url = (f'{base_url}/{self.site.code}/api/v1.0.0-beta/{endpoint}/'
+               f'{encoded_title}/')
+        return url
+
+    def get_annotations(self, *, use_cache: bool = True) -> dict[str, Any]:
         """Get WikiWho annotations for article revisions.
 
         This method uses the public WikiWho API to get token-level
         provenance annotations showing who added each token in the article.
+        Results are cached locally using pickle files with an optimized
+        subdirectory structure to avoid filesystem performance issues.
 
         Sample:
 
@@ -277,6 +293,8 @@ class WikiBlameMixin:
            - https://wikiwho-api.wmcloud.org
            - https://www.mediawiki.org/wiki/WikiWho
 
+        :param use_cache: Whether to use and save cached data.
+            Set to False to force a fresh API request without caching.
         :return: Dictionary containing article_title, page_id, and revisions
             with token-level annotations
 
@@ -286,6 +304,13 @@ class WikiBlameMixin:
         :raise requests.exceptions.HTTPError: HTTP error from WikiWho API
         """
         self._check_wikiwho_supported()
+
+        # Check cache first
+        cache_path = self._get_wikiwho_pickle_path(
+            self.site.code, self.pageid)
+        if use_cache and cache_path.exists():
+            with open(cache_path, 'rb') as f:
+                return pickle.load(f)
 
         url = self._build_wikiwho_url('all_content')
         url = f'{url}?editor=true&o_rev_id=true'
@@ -306,4 +331,52 @@ class WikiBlameMixin:
             raise pywikibot.exceptions.ServerError(
                 f'WikiWho API error: {error_msg}')
 
+        # Save to cache if caching is enabled
+        if use_cache:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(cache_path, 'wb') as f:
+                pickle.dump(data, f, protocol=pywikibot.config.pickle_protocol)
+
         return data
+
+    @staticmethod
+    def _get_wikiwho_pickle_path(lang: str, page_id: int, cache_dir=None):
+        """Calculate pickle file path with subdirectory structure.
+
+        Uses subdirectories based on floor(page_id/1000) to optimize
+        filesystem performance. This avoids having millions of pickle
+        files in a single directory.
+
+        Directory structure:
+            cache_dir/lang/subdirectory/page_id.p
+
+        Where subdirectory = floor(page_id / 1000) * 1000
+
+        Examples:
+            page_id 100000 → en/100000/100000.p
+            page_id 100002 → en/100000/100002.p
+            page_id 200005 → en/200000/200005.p
+
+        This reduces files per directory from ~7M to ~7K for large wikis.
+
+        .. versionadded:: 11.0
+
+        :param lang: Language code (e.g., 'en', 'de', 'fi')
+        :param page_id: Wikipedia page ID
+        :param cache_dir: Custom cache directory (defaults to apicache/wikiwho)
+        :return: Path object for the pickle file
+        """
+        # Use provided cache_dir or default to apicache/wikiwho
+        if cache_dir is None:
+            cache_dir = (Path(pywikibot.config.base_dir)
+                         / 'apicache' / 'wikiwho')
+        else:
+            cache_dir = Path(cache_dir)
+
+        # Calculate subdirectory as floor(page_id / 1000) * 1000
+        subdirectory = (page_id // 1000) * 1000
+
+        # Construct path: cache_dir/lang/subdirectory/page_id.p
+        pickle_path = cache_dir / lang / str(subdirectory) / f'{page_id}.p'
+
+        return pickle_path

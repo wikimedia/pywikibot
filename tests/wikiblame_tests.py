@@ -99,8 +99,8 @@ class TestWikiBlameMixin(TestCase):
 
     def test_wikiwho_supported_languages(self) -> None:
         """Test that WIKIWHO_CODES contains expected languages."""
-        from pywikibot.page._toolforge import WikiBlameMixin
-        codes = WikiBlameMixin.WIKIWHO_CODES
+        from pywikibot.page._toolforge import WikiWhoMixin
+        codes = WikiWhoMixin.WIKIWHO_CODES
         expected_langs = ['ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id',
                           'it', 'ja', 'nl', 'pl', 'pt', 'tr', 'zh']
         for lang in expected_langs:

@@ -26,7 +26,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.page._basepage import BasePage
-from pywikibot.page._toolforge import WikiBlameMixin
+from pywikibot.page._toolforge import WikiBlameMixin, WikiWhoMixin
 from pywikibot.site import Namespace
 from pywikibot.tools import cached, deprecated_args
 
@@ -34,7 +34,7 @@ from pywikibot.tools import cached, deprecated_args
 __all__ = ['Page']
 
 
-class Page(BasePage, WikiBlameMixin):
+class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
 
     """Page: A MediaWiki page."""
 
