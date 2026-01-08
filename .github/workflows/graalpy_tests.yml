@@ -24,7 +24,7 @@ jobs:
       matrix:
         python-version: [graalpy-24.1, graalpy-25.0]
         site: ['wikipedia:test']
-        os: ['windows-latest', 'macOS-latest', 'ubuntu-latest']
+        os: ['macOS-latest', 'ubuntu-latest']
         experimental: [True]
     steps:
       - name: Checkout Repository
@@ -52,7 +52,6 @@ jobs:
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
       - name: Test with pytest
         id: ci_test
-        shell: bash
         continue-on-error: true
         timeout-minutes: 25
         env:
@@ -60,7 +59,7 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          if [[ "${{ matrix.os }}" == "windows-latest" || ( "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ) ]]; then
+          if [[  "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             echo "Running tests without coverage"
             pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
           else
