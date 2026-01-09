@@ -1,6 +1,6 @@
 """Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import inspect
+import math
 import os
 import pickle
 import pprint
@@ -797,10 +798,10 @@ The text message is:
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
                 if param.endswith('limit'):
-                    # param values are stored a list of str
-                    value = self[param][0]
-                    if value.isdigit():
-                        self[param] = [str(int(value) // 2)]
+                    # param values are stored a list of str or int (T414168)
+                    with suppress(ValueError):
+                        value = int(self[param][0])
+                        self[param] = [str(math.ceil(value / 2))]
                         pywikibot.info(f'Set {param} = {self[param]}')
         else:
             scheme = urlparse(response.url).scheme
