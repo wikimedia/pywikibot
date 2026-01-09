@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,7 @@ import unittest
 import warnings
 from contextlib import suppress
 from http import HTTPStatus
+from platform import python_implementation
 from unittest.mock import patch
 
 import requests
@@ -439,8 +440,7 @@ class CharsetTestCase(TestCase):
         invalid_charsets = ('utf16', 'win-1251')
         for charset in invalid_charsets:
             with self.subTest(charset=charset):
-                resp = CharsetTestCase._create_response(
-                    data=CharsetTestCase.LATIN1_BYTES)
+                resp = self._create_response(data=CharsetTestCase.LATIN1_BYTES)
 
                 with patch('pywikibot.warning'):  # Ignore WARNING:
                     resp.encoding = http._decide_encoding(resp, charset)
@@ -449,9 +449,10 @@ class CharsetTestCase(TestCase):
                 self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
 
                 # test Response.apparent_encoding
-                self.assertEqual(resp.text, str(resp.content,
-                                                resp.apparent_encoding,
-                                                errors='replace'))
+                if python_implementation() != 'GraalVM':  # T414220
+                    self.assertEqual(resp.text, str(resp.content,
+                                                    resp.apparent_encoding,
+                                                    errors='replace'))
 
     def test_get_charset_from_content_type(self) -> None:
         """Test get_charset_from_content_type function."""
