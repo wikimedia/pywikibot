@@ -286,7 +286,9 @@ def request(site: pywikibot.site.BaseSite,
 
     baseuri = site.base_url(uri, protocol=kwargs.pop('protocol', None))
     r = fetch(baseuri, headers=headers, **kwargs)
-    site.throttle.retry_after = int(r.headers.get('retry-after', 0))
+    retry_after = r.headers.get('retry-after', '0')
+    # literal of retry_after may int or float (T414197)
+    site.throttle.retry_after = int(float(retry_after))
     return r
 
 
