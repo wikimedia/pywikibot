@@ -33,7 +33,7 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,7 +43,6 @@ import collections
 import copy
 import os
 import platform
-import re
 import stat
 import sys
 import types
@@ -1028,16 +1027,6 @@ _check_user_config_types(_exec_globals, _public_globals, _imports)
 # Copy the user config settings into globals
 _modified = {_key for _key in _public_globals
              if _exec_globals[_key] != globals()[_key]}
-
-if 'user_agent_format' in _modified:
-    _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
-                                      _exec_globals['user_agent_format'])
-    if _right_user_agent_format != _exec_globals['user_agent_format']:
-        warn('`{httplib2}` in user_agent_format is deprecated, '
-             'will replace `{httplib2}` with `{http_backend}`',
-             _ConfigurationDeprecationWarning, stacklevel=2)
-        _exec_globals['user_agent_format'] = _right_user_agent_format
-    del _right_user_agent_format
 
 for _key in _modified:
     globals()[_key] = _exec_globals[_key]
