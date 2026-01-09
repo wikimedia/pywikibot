@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test pwb.py."""
 #
-# (C) Pywikibot team, 2007-2024
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ from __future__ import annotations
 import io
 import sys
 import unittest
+from platform import python_implementation
 
 from tests import create_path_func, join_tests_path
 from tests.aspects import PwbTestCase
@@ -101,6 +102,7 @@ class TestPwb(PwbTestCase):
         self.assertEqual(stderr.readline().strip(),
                          'ERROR: pywikibot.py not found! Misspelling?')
 
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T413711')
     def test_one_similar_script(self) -> None:
         """Test shell.py script call which gives one similar result."""
         result = [
@@ -120,6 +122,7 @@ class TestPwb(PwbTestCase):
         with self.subTest(line=2):
             self.assertEqual(stderr.readline().strip(), result[2])
 
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T413711')
     def test_similar_scripts_found(self) -> None:
         """Test script call which gives multiple similar results."""
         result = [
