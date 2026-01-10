@@ -551,6 +551,7 @@ class WelcomeBot(SingleSiteBot):
             globalvar.make_welcome_log = False
         if globalvar.random_sign:
             self.define_sign()
+        get_welcome_text(self.site)  # check whether the script is localized
 
     def bad_name_filer(self, name, force: bool = False) -> bool:
         """Check for bad names."""
