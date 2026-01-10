@@ -96,6 +96,7 @@ class TestPwb(PwbTestCase):
         self.assertEqual(stdout.readline().strip(),
                          'Wrapper script to invoke pywikibot-based scripts.')
 
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T413711')
     def test_script_not_found(self) -> None:
         """Test pwbot.py script call which is not found."""
         stderr = io.StringIO(execute_pwb(['pywikibot'])['stderr'])
