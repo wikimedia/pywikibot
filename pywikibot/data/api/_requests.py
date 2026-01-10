@@ -20,7 +20,7 @@ from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import TYPE_CHECKING, Any, NoReturn
 from urllib.parse import unquote, urlencode, urlparse
 from warnings import warn
 
@@ -41,6 +41,9 @@ from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import deprecated
 
+
+if TYPE_CHECKING:
+    import requests
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
@@ -678,9 +681,25 @@ class Request(MutableMapping, WaitingMixin):
                         f'Headers: {headers!r}\nURI: {uri!r}\nBody: {body!r}')
         return use_get, uri, body, headers
 
-    def _http_request(self, use_get: bool, uri: str, data, headers,
-                      paramstring) -> tuple:
-        """Get or post a http request with exception handling.
+    def _http_request(
+        self,
+        use_get: bool,
+        uri: str,
+        data: dict[str, str | int | float | bool] | None,
+        headers: dict[str, str] | None,
+        paramstring: str
+    ) -> tuple[requests.Response | None, bool]:
+        """Send an HTTP GET or POST request with exception handling.
+
+        This method wraps :func:`comms.http.request` to send a request
+        to the site's server, handle common HTTP errors, and optionally
+        retry using an alternative scheme or method.
+
+        .. note::
+           ImportError during request handling will terminate the
+           program; it is not propagated as an exception. Any other
+           unexpected exceptions are logged and trigger a wait  before
+           retrying; they are not propagated to the caller.
 
         .. versionchanged:: 8.2
            change the scheme if the previous request didn't have json
@@ -688,8 +707,21 @@ class Request(MutableMapping, WaitingMixin):
         .. versionchanged:: 9.2
            no wait cycles for :exc:`ImportError` and :exc:`NameError`.
 
+        :param use_get: If True, send a GET request; otherwise send POST.
+        :param uri: The URI path to request on the site.
+        :param data: The data to send in the request body (for POST) or
+            query string (for GET).
+        :param headers: HTTP headers to include in the request.
+        :param paramstring: A string representing the request parameters
+            (used for logging/debug).
         :return: a tuple containing requests.Response object from
             :func:`comms.http.request` and *use_get* value
+
+        :raises Client414Error: If a 414 URI Too Long occurs on a POST
+            request after GET retry failed.
+        :raises ConnectionError: For network connection errors.
+        :raises FatalServerError: For critical server errors.
+        :raises NameError: If a NameError occurs during request handling.
 
         :meta public:
         """
