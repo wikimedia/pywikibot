@@ -1,6 +1,6 @@
 """Structures holding data for Wikibase entities."""
 #
-# (C) Pywikibot team, 2019-2025
+# (C) Pywikibot team, 2019-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,8 +72,8 @@ class BaseDataDict(MutableMapping):
     def normalizeKey(key) -> str:
         """Helper function to return language codes of a site object.
 
-        :param key: input key to be normalized
-        :type key: pywikibot.site.BaseSite or str
+        :param key: Input key to be normalized
+        :type key: Pywikibot.site.BaseSite or str
         """
         if isinstance(key, BaseSite):
             key = key.lang
@@ -154,7 +154,7 @@ class AliasesDict(BaseDataDict):
 
         :param data: Data to normalize
         :return: The dict with normalized data
-        :raises TypeError: data values must be a list
+        :raises TypeError: Data values must be a list
         """
         norm_data = {}
         for key, values in data.items():
@@ -324,8 +324,8 @@ class SiteLinkCollection(MutableMapping):
     def __init__(self, repo, data=None) -> None:
         """Initializer.
 
-        :param repo: the Wikibase site on which badges are defined
-        :type repo: pywikibot.site.DataSite
+        :param repo: The Wikibase site on which badges are defined
+        :type repo: Pywikibot.site.DataSite
         """
         super().__init__()
         self.repo = repo
@@ -348,7 +348,7 @@ class SiteLinkCollection(MutableMapping):
         """Helper function to obtain a dbName for a Site.
 
         :param site: The site to look up.
-        :type site: pywikibot.site.BaseSite or str
+        :type site: Pywikibot.site.BaseSite or str
         """
         if isinstance(site, BaseSite):
             return site.dbName()
@@ -357,8 +357,8 @@ class SiteLinkCollection(MutableMapping):
     def __getitem__(self, key):
         """Get the SiteLink with the given key.
 
-        :param key: site key as Site instance or db key
-        :type key: pywikibot.Site or str
+        :param key: Site key as Site instance or db key
+        :type key: Pywikibot.Site or str
         :rtype: pywikibot.page.SiteLink
         """
         key = self.getdbName(key)
@@ -383,8 +383,8 @@ class SiteLinkCollection(MutableMapping):
         str or dict is given the SiteLink object is created later in
         __getitem__ method.
 
-        :param key: site key as Site instance or db key
-        :param val: page name as a string or JSON containing SiteLink
+        :param key: Site key as Site instance or db key
+        :param val: Page name as a string or JSON containing SiteLink
             data or a SiteLink object
         """
         key = self.getdbName(key)
@@ -423,7 +423,7 @@ class SiteLinkCollection(MutableMapping):
         """Helper function to expand data into the Wikibase API structure.
 
         :param data: Data to normalize
-        :type data: list or dict
+        :type data: List or dict
         :return: The dict with normalized data
         """
         norm_data = {}
@@ -497,9 +497,9 @@ class SubEntityCollection(MutableSequence):
         """Initializer.
 
         :param repo: Wikibase site
-        :type repo: pywikibot.site.DataSite
-        :param data: iterable of LexemeSubEntity
-        :type data: iterable
+        :type repo: Pywikibot.site.DataSite
+        :param data: Iterable of LexemeSubEntity
+        :type data: Iterable
         """
         super().__init__()
         self.repo = repo
@@ -564,8 +564,8 @@ class SubEntityCollection(MutableSequence):
         """Helper function to expand data into the Wikibase API structure.
 
         :param data: Data to normalize
-        :type data: list
-        :return: the altered dict from parameter data.
+        :type data: List
+        :return: The altered dict from parameter data.
         """
         raise NotImplementedError  # TODO
 

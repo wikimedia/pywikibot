@@ -8,7 +8,7 @@
    This module is 'private'.
 """
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -86,7 +86,7 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
            Added *strict* option, backported from Python 3.13
 
         :param n: How many items of the iterable to get in one chunk
-        :param strict: raise a ValueError if the final batch is shorter
+        :param strict: Raise a ValueError if the final batch is shorter
             than *n*.
         :raise ValueError: batched(): incomplete batch
         :raise TypeError: *n* cannot be interpreted as an integer

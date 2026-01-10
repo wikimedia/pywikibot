@@ -318,7 +318,7 @@ def get_base_dir(test_directory: str | None = None,
     :param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
-    :param config_file: filename of the user config file
+    :param config_file: Filename of the user config file
     """
     def exists(directory: str) -> bool:
         directory = os.path.abspath(directory)
@@ -882,8 +882,8 @@ def makepath(path: str, create: bool = True) -> str:
 
     from holger@trillke.net 2002/03/18
 
-    :param path: path in the filesystem
-    :param create: create the directory if it is True. Otherwise do not
+    :param path: Path in the filesystem
+    :param create: Create the directory if it is True. Otherwise do not
         change the filesystem. Default is True.
     """
     dpath = os.path.normpath(os.path.dirname(path))
@@ -900,8 +900,8 @@ def datafilepath(*filename: str, create: bool = True) -> str:
     directories in the path that do not already exist are created if
     create is True, otherwise the filesystem keeps unchanged.
 
-    :param filename: path in the filesystem
-    :param create: create the directory if it is True. Otherwise don't
+    :param filename: Path in the filesystem
+    :param create: Create the directory if it is True. Otherwise don't
         change the filesystem. Default is True.
     """
     return makepath(os.path.join(base_dir, *filename), create=create)

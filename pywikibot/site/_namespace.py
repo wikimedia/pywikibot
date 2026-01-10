@@ -1,6 +1,6 @@
 """Objects representing Namespaces of MediaWiki site."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -172,7 +172,7 @@ class Namespace(Iterable, ComparableMixin, metaclass=MetaNamespace):
         The comparison is case insensitive, and item may have a single
         colon on one or both sides of the name.
 
-        :param item: name to check
+        :param item: Name to check
         """
         if item == '' and self.id == BuiltinNamespace.MAIN:
             return True
@@ -360,7 +360,7 @@ class NamespacesDict(Mapping):
     def __getitem__(self, key: Namespace | int | str) -> Namespace:
         """Get the namespace with the given key.
 
-        :param key: namespace key
+        :param key: Namespace key
         """
         if isinstance(key, (Namespace, int)):
             try:
@@ -378,7 +378,7 @@ class NamespacesDict(Mapping):
     def __getattr__(self, attr: Namespace | int | str) -> Namespace:
         """Get the namespace with the given key.
 
-        :param attr: namespace key
+        :param attr: Namespace key
         """
         # lookup_name access _namespaces
         if attr.isupper():
@@ -422,13 +422,13 @@ class NamespacesDict(Mapping):
         Namespace.lookup_name successfully finds. A numerical string is
         resolved as an integer.
 
-        :param identifiers: namespace identifiers
-        :type identifiers: iterable of str or Namespace key, or a single
+        :param identifiers: Namespace identifiers
+        :type identifiers: Iterable of str or Namespace key, or a single
             instance of those types
-        :return: list of Namespace objects in the same order as the
+        :return: List of Namespace objects in the same order as the
             identifiers
-        :raises KeyError: a namespace identifier was not resolved
-        :raises TypeError: a namespace identifier has an inappropriate
+        :raises KeyError: A namespace identifier was not resolved
+        :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if isinstance(identifiers, (str, Namespace)):

@@ -80,7 +80,7 @@ when :meth:`put_current` is used.
    :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -557,10 +557,10 @@ def input(question: str,
           force: bool = False) -> str:
     """Ask the user a question, return the user's answer.
 
-    :param question: a string that will be shown to the user. Don't add
+    :param question: A string that will be shown to the user. Don't add
         a space after the question mark/colon, this method will do this
         for you.
-    :param password: if True, hides the user's input (for password
+    :param password: If True, hides the user's input (for password
         entry).
     :param default: The default answer if none was entered. None to
         require an answer.
@@ -741,7 +741,7 @@ def handle_args(args: Iterable[str] | None = None,
         :meth:`pywikibot.argvu<userinterfaces._interface_base.ABUIC.argvu>`
         is used which is a copy of ``sys.argv``
     :param do_help: Handle parameter '-help' to show help and invoke sys.exit
-    :return: list of arguments not recognised globally
+    :return: List of arguments not recognised globally
     """
     if pywikibot._sites:
         warnings.warn('Site objects have been created before arguments were '
@@ -1075,7 +1075,7 @@ class OptionHandler:
     def __init__(self, **kwargs: Any) -> None:
         """Only accept options defined in available_options.
 
-        :param kwargs: bot options
+        :param kwargs: Bot options
         """
         self.set_options(**kwargs)
 
@@ -1164,8 +1164,8 @@ class BaseBot(OptionHandler):
     def __init__(self, **kwargs: Any) -> None:
         """Initializer.
 
-        :param kwargs: bot options
-        :keyword generator: a :attr:`generator` processed by :meth:`run`
+        :param kwargs: Bot options
+        :keyword generator: A :attr:`generator` processed by :meth:`run`
             method
         """
         if 'generator' in kwargs:
@@ -1232,7 +1232,7 @@ class BaseBot(OptionHandler):
 
         This also prevents the same title from being printed twice.
 
-        :param page: the working page
+        :param page: The working page
         """
         if page != self._current_page:
             self._current_page = page
@@ -1280,12 +1280,12 @@ class BaseBot(OptionHandler):
 
         * 'always'
 
-        :keyword asynchronous: passed to page.save
-        :keyword summary: passed to page.save
-        :keyword show_diff: show changes between oldtext and newtext (enabled)
-        :keyword ignore_save_related_errors: report and ignore (disabled)
-        :keyword ignore_server_errors: report and ignore (disabled)
-        :return: whether the page was saved successfully
+        :keyword asynchronous: Passed to page.save
+        :keyword summary: Passed to page.save
+        :keyword show_diff: Show changes between oldtext and newtext (enabled)
+        :keyword ignore_save_related_errors: Report and ignore (disabled)
+        :keyword ignore_server_errors: Report and ignore (disabled)
+        :return: Whether the page was saved successfully
         """
         if oldtext.rstrip() == newtext.rstrip():
             pywikibot.info(f'No changes were needed on {page}')
@@ -1310,17 +1310,17 @@ class BaseBot(OptionHandler):
 
         .. note:: Do no use it directly. Use :meth:`userPut` instead.
 
-        :param page: currently edited page
-        :param func: the function to call
-        :param args: passed to the function
-        :param kwargs: passed to the function
-        :keyword ignore_server_errors: if True, server errors will be reported
+        :param page: Currently edited page
+        :param func: The function to call
+        :param args: Passed to the function
+        :param kwargs: Passed to the function
+        :keyword ignore_server_errors: If True, server errors will be reported
             and ignored (default: False)
         :kwtype ignore_server_errors: bool
-        :keyword ignore_save_related_errors: if True, errors related to
+        :keyword ignore_save_related_errors: If True, errors related to
             page save will be reported and ignored (default: False)
         :kwtype ignore_save_related_errors: bool
-        :return: whether the page was saved successfully
+        :return: Whether the page was saved successfully
 
         :meta public:
         """
@@ -1430,8 +1430,8 @@ class BaseBot(OptionHandler):
         Also used to set the arrange the current site. This is called
         before :meth:`skip_page` and :meth:`treat`.
 
-        :param item: any item from :attr:`generator`
-        :return: return the page object to be processed further
+        :param item: Any item from :attr:`generator`
+        :return: Return the page object to be processed further
         """
         return item
 
@@ -1861,7 +1861,7 @@ class CurrentPageBot(BaseBot):
             default.
         :param kwargs: Additional parameters directly given to
             :meth:`BaseBot.userPut`.
-        :return: whether the page was saved successfully
+        :return: Whether the page was saved successfully
         """
         if ignore_save_related_errors is None:
             ignore_save_related_errors = self.ignore_save_related_errors
@@ -1982,15 +1982,15 @@ class WikidataBot(Bot, ExistingPageBot):
         pages are actually already ItemPage (page in treat_page_and_item
         will be None). If None it'll use ItemPage.fromPage when the page
         is not in the site's item namespace.
-    :type use_from_page: bool, None
+    :type use_from_page: Bool, None
     :cvar treat_missing_item: Whether pages without items should be
         treated. Note that this is checked after create_missing_item.
-    :type treat_missing_item: bool
+    :type treat_missing_item: Bool
     :ivar create_missing_item: If True, new items will be created if the
         current page doesn't have one. Subclasses should override this
         in the initializer with a bool value or using self.opt
         attribute.
-    :type create_missing_item: bool
+    :type create_missing_item: Bool
     """
 
     use_from_page = True
@@ -2025,7 +2025,7 @@ class WikidataBot(Bot, ExistingPageBot):
         Method first uses site.search() and if the property isn't found,
         then asks user to provide the property ID.
 
-        :param property_name: property to find
+        :param property_name: Property to find
         """
         ns = self.repo.property_namespace
         for page in self.repo.search(property_name, total=1, namespaces=ns):
@@ -2045,8 +2045,8 @@ class WikidataBot(Bot, ExistingPageBot):
                          **kwargs: Any) -> bool:
         """Edit entity with data provided, with user confirmation as required.
 
-        :param entity: page to be edited
-        :param data: data to be saved, or None if the diff should be
+        :param entity: Page to be edited
+        :param data: Data to be saved, or None if the diff should be
             created automatically
         :param ignore_save_related_errors: Ignore save related errors
             and automatically print a message. If None uses this
@@ -2054,11 +2054,11 @@ class WikidataBot(Bot, ExistingPageBot):
         :param ignore_server_errors: Ignore server errors and
             automatically print a message. If None uses this instances
             default.
-        :keyword summary: revision comment, passed to
+        :keyword summary: Revision comment, passed to
             ItemPage.editEntity
-        :keyword show_diff: show changes between oldtext and newtext
+        :keyword show_diff: Show changes between oldtext and newtext
             (default: True)
-        :return: whether the item was saved successfully
+        :return: Whether the item was saved successfully
         """
         if ignore_save_related_errors is None:
             ignore_save_related_errors = self.ignore_save_related_errors
@@ -2088,15 +2088,15 @@ class WikidataBot(Bot, ExistingPageBot):
                        bot: bool = True, **kwargs: Any) -> bool:
         """Add a claim to an item, with user confirmation as required.
 
-        :param item: page to be edited
-        :param claim: claim to be saved
-        :param source: site where the claim comes from
-        :param bot: whether to flag as bot (if possible)
-        :keyword ignore_server_errors: if True, server errors will be reported
+        :param item: Page to be edited
+        :param claim: Claim to be saved
+        :param source: Site where the claim comes from
+        :param bot: Whether to flag as bot (if possible)
+        :keyword ignore_server_errors: If True, server errors will be reported
           and ignored (default: False)
-        :keyword ignore_save_related_errors: if True, errors related to
+        :keyword ignore_save_related_errors: If True, errors related to
           page save will be reported and ignored (default: False)
-        :return: whether the item was saved successfully
+        :return: Whether the item was saved successfully
 
         .. note:: calling this method sets the current_page property
            to the item which changes the site property
@@ -2117,8 +2117,8 @@ class WikidataBot(Bot, ExistingPageBot):
     def getSource(self, site: BaseSite) -> pywikibot.page.Claim | None:
         """Create a Claim usable as a source for Wikibase statements.
 
-        :param site: site that is the source of assertions.
-        :return: pywikibot.Claim or None
+        :param site: Site that is the source of assertions.
+        :return: Pywikibot.Claim or None
         """
         source = None
         item = i18n.translate(site, self.source_values)
@@ -2141,9 +2141,9 @@ class WikidataBot(Bot, ExistingPageBot):
 
         .. seealso:: documentation of :py:obj:`claimit.py<scripts.claimit>`
 
-        :param exists_arg: pattern for merging existing claims with new ones
-        :param logger_callback: function logging the output of the method
-        :return: whether the claim could be added
+        :param exists_arg: Pattern for merging existing claims with new ones
+        :param logger_callback: Function logging the output of the method
+        :return: Whether the claim could be added
 
         .. note:: calling this method may change the current_page property
            to the item which will also change the site property
@@ -2226,12 +2226,12 @@ class WikidataBot(Bot, ExistingPageBot):
                              ) -> pywikibot.page.ItemPage | None:
         """Create an ItemPage with the provided page as the sitelink.
 
-        :param page: the page for which the item will be created
-        :param data: additional data to be included in the new item
+        :param page: The page for which the item will be created
+        :param data: Additional data to be included in the new item
             (optional). Note that data created from the page have higher
             priority.
-        :param summary: optional edit summary to replace the default one
-        :return: pywikibot.ItemPage or None
+        :param summary: Optional edit summary to replace the default one
+        :return: Pywikibot.ItemPage or None
         """
         if not summary:
             summary = ('Bot: New item with sitelink from '

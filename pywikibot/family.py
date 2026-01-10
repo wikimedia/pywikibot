@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2025
+# (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -336,9 +336,9 @@ class Family:
     def load(fam: str | None = None):
         """Import the named family.
 
-        :param fam: family name (if omitted, uses the configured
+        :param fam: Family name (if omitted, uses the configured
             default)
-        :return: a Family instance configured for the named family.
+        :return: A Family instance configured for the named family.
         :raises pywikibot.exceptions.UnknownFamilyError: family not
             known
         """
@@ -444,7 +444,7 @@ class Family:
     def disambig(self, code, fallback: str | None = '_default') -> list[str]:
         """Return list of disambiguation templates.
 
-        :raises KeyError: unknown title for disambig template
+        :raises KeyError: Unknown title for disambig template
         """
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
@@ -464,8 +464,8 @@ class Family:
         .. versionchanged:: 8.2
            ``https`` is returned instead of ``http``.
 
-        :param code: language code
-        :return: protocol that this family uses
+        :param code: Language code
+        :return: Protocol that this family uses
         """
         return 'https'
 
@@ -475,8 +475,8 @@ class Family:
         .. versionadded:: 5.3
            renamed from ignore_certificate_error
 
-        :param code: language code
-        :return: flag to verify the SSL certificate;
+        :param code: Language code
+        :return: Flag to verify the SSL certificate;
                  set it to False to allow access if certificate has an error.
         """
         return True
@@ -501,7 +501,7 @@ class Family:
         uses a different value.
 
         :param code: Site code
-        :raises KeyError: code is not recognised
+        :raises KeyError: Code is not recognised
         :return: URL path without ending '/'
         """
         return '/w'
@@ -598,7 +598,7 @@ class Family:
         .. versionchanged:: 10.3
            accept a trailing slash in *url* after domain.
 
-        :param url: the URL which may contain a ``$1``. If it's missing
+        :param url: The URL which may contain a ``$1``. If it's missing
             it is assumed to be at the end.
         :return: The language code of the URL. None if that URL is not
             from his family.
@@ -724,7 +724,7 @@ class Family:
 
         Interwiki replacements override removals for the same code.
 
-        :return: mapping of old codes to new codes (or None)
+        :return: Mapping of old codes to new codes (or None)
         """
         data = dict.fromkeys(self.interwiki_removals)
         data.update(self.code_aliases)

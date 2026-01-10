@@ -43,7 +43,7 @@ for tests to set the default site (see :phab:`T216825`)::
    enable external scripts via entry points.
 """
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -121,7 +121,7 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
 
     :param filename: The path to the file to execute, it need not be a
         .py file.
-    :param args: is the argument list to present as sys.argv, as strings.
+    :param args: Is the argument list to present as sys.argv, as strings.
     :param package: The package of the script. Used for checks.
     :type package: Optional[module]
     """
@@ -181,7 +181,7 @@ def handle_args(
     .. versionchanged:: 7.7
        Catch ``PYWIKIBOT_TEST_...`` environment variables.
 
-    :return: filename, script args, local pwb args, environment variables
+    :return: Filename, script args, local pwb args, environment variables
     """
     fname = None
     local = []

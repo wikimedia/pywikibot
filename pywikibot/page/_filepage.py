@@ -6,7 +6,7 @@ This module includes objects:
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,12 +53,12 @@ class FilePage(Page):
            :meth:`Site.file_extensions
            <pywikibot.site._apisite.APISite.file_extensions>`
 
-        :param source: the source of the page
+        :param source: The source of the page
         :type source: pywikibot.page.BaseLink (or subclass),
             pywikibot.page.Page (or subclass), or pywikibot.page.Site
-        :param title: normalized title of the page; required if source is a
+        :param title: Normalized title of the page; required if source is a
             Site, ignored otherwise
-        :param ignore_extension: prevent extension check
+        :param ignore_extension: Prevent extension check
         :raises ValueError: Either the title is not in the file
             namespace or does not have a valid extension and
             *ignore_extension* was not set.
@@ -106,7 +106,7 @@ class FilePage(Page):
         At the same time, the whole history of Image is fetched and
         cached in self._file_revisions
 
-        :return: instance of FileInfo()
+        :return: Instance of FileInfo()
         """
         if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
@@ -120,7 +120,7 @@ class FilePage(Page):
         At the same time, the whole history of Image is fetched and
         cached in self._file_revisions
 
-        :return: instance of FileInfo()
+        :return: Instance of FileInfo()
         """
         if not self._file_revisions:
             self.site.loadimageinfo(self, history=True)
@@ -128,16 +128,16 @@ class FilePage(Page):
         return self._file_revisions[oldest_ts]
 
     def get_file_info(self, ts) -> dict:
-        """Retrieve and store information of a specific Image rev. of FilePage.
+        """Retrieve and store information of a specific Image rev of FilePage.
 
         This function will load also metadata.
         It is also used as a helper in FileInfo to load metadata lazily.
 
         .. versionadded:: 8.6
 
-        :param ts: timestamp of the Image rev. to retrieve
+        :param ts: Timestamp of the Image rev. To retrieve
 
-        :return: instance of FileInfo()
+        :return: Instance of FileInfo()
         """
         self.site.loadimageinfo(self, history=False, timestamp=ts)
         return self._file_revisions[ts]
@@ -145,7 +145,7 @@ class FilePage(Page):
     def get_file_history(self) -> dict:
         """Return the file's version history.
 
-        :return: dictionary with:
+        :return: Dictionary with:
             key: timestamp of the entry
             value: instance of FileInfo()
         """
@@ -195,10 +195,10 @@ class FilePage(Page):
              <pywikibot.site._apisite.APISite.loadimageinfo>`
            * :api:`Imageinfo`
 
-        :param url_width: get info for a thumbnail with given width
-        :param url_height: get info for a thumbnail with given height
-        :param url_param:  get info for a thumbnail with given param
-        :return: latest file url or thumburl
+        :param url_width: Get info for a thumbnail with given width
+        :param url_height: Get info for a thumbnail with given height
+        :param url_param: Get info for a thumbnail with given param
+        :return: Latest file url or thumburl
         """
         # Plain url is requested.
         if url_width is None and url_height is None and url_param is None:
@@ -372,7 +372,7 @@ class FilePage(Page):
            without further notes.
         .. seealso:: :api:`Imageinfo` for new parameters
 
-        :param filename: filename where to save file. If ``None``,
+        :param filename: Filename where to save file. If ``None``,
             ``self.title(as_filename=True, with_ns=False)`` will be used.
             If an Iterable is specified the items will be used as path
             segments. To specify the user directory path you have to use
@@ -382,16 +382,16 @@ class FilePage(Page):
             None. If the suffix is missing or different from url (which
             can happen if a *url_width*, *url_height* or *url_param*
             argument is given), the file suffix is adjusted.
-        :param chunk_size: the size of each chunk to be received and
+        :param chunk_size: The size of each chunk to be received and
             written to file.
-        :param revision: file revision to download. If None
+        :param revision: File revision to download. If None
             :attr:`latest_file_info` will be used; otherwise provided
             revision will be used.
-        :param url_width: download thumbnail with given width
-        :param url_height: download thumbnail with given height
-        :param url_param:  download thumbnail with given param
+        :param url_width: Download thumbnail with given width
+        :param url_height: Download thumbnail with given height
+        :param url_param: Download thumbnail with given param
         :return: True if download is successful, False otherwise.
-        :raise IOError: if filename cannot be written for any reason.
+        :raises IOError: If filename cannot be written for any reason.
         """
         if not filename:
             path = Path()
@@ -431,8 +431,8 @@ class FilePage(Page):
 
         .. seealso:: :meth:`using_pages`
 
-        :param total: iterate no more than this number of pages in total
-        :return: a generator that yields Pages also on sites different from
+        :param total: Iterate no more than this number of pages in total
+        :return: A generator that yields Pages also on sites different from
             self.site.
         :rtype: generator
         """

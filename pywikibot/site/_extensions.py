@@ -1,6 +1,6 @@
 """Objects representing API interface to MediaWiki site extensions."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,9 +64,9 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        :keyword str | None format: If specified, notifications will
-            be returned formatted this way. Its value is either ``model``,
-            ``special`` or ``None``. Default is ``special``.
+        :Keyword str | None format: Notification output format.
+            Possible values are ``model``, ``special``, or ``None``.
+            The default is ``special``.
 
         .. seealso:: :api:`Notifications` for other keywords.
         """
@@ -91,7 +91,7 @@ class EchoMixin:
 
         .. seealso:: :api:`echomarkread`
 
-        :return: whether the action was successful
+        :return: Whether the action was successful
         """
         kwargs = merge_unique_dicts(kwargs, action='echomarkread',
                                     token=self.tokens['csrf'])
@@ -127,8 +127,8 @@ class ProofreadPageMixin:
                {0: 'Without text', 1: 'Not proofread', 2: 'Problematic',
                 3: 'Proofread', 4: 'Validated'}
 
-        :param expiry: either a number of days or a datetime.timedelta object
-        :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)
+        :param expiry: Either a number of days or a datetime.timedelta object
+        :type expiry: Int (days), :py:obj:`datetime.timedelta`, False (config)
         :return: A tuple containing _proofread_index_ns,
             self._proofread_page_ns and self._proofread_levels.
         :rtype: Namespace, Namespace, dict
@@ -226,7 +226,7 @@ class PageImagesMixin:
         """Load [[mw:Extension:PageImages]] info.
 
         :param page: The page for which to obtain the image
-        :type page: pywikibot.Page
+        :type page: Pywikibot.Page
         :raises APIError: PageImages extension is not installed
         """
         title = page.title(with_section=False)
@@ -245,11 +245,11 @@ class GlobalUsageMixin:
     def globalusage(self, page, total=None):
         """Iterate global image usage for a given FilePage.
 
-        :param page: the page to return global image usage for.
-        :type page: pywikibot.FilePage
-        :param total: iterate no more than this number of pages in
+        :param page: The page to return global image usage for.
+        :type page: Pywikibot.FilePage
+        :param total: Iterate no more than this number of pages in
             total.
-        :raises TypeError: input page is not a FilePage.
+        :raises TypeError: Input page is not a FilePage.
         :raises pywikibot.exceptions.SiteDefinitionError: Site could not
             be defined for a returned entry in API response.
         """
@@ -343,21 +343,21 @@ class LinterMixin:
     ) -> Iterable[pywikibot.Page]:
         """Return a generator to pages containing linter errors.
 
-        :param lint_categories: categories of lint errors
-        :type lint_categories: an iterable that returns values (str), or
+        :param lint_categories: Categories of lint errors
+        :type lint_categories: An iterable that returns values (str), or
             a pipe-separated string of values.
-        :param total: if not None, yielding this many items in total
-        :param namespaces: only iterate pages in these namespaces
-        :type namespaces: iterable of str or Namespace key, or a single
+        :param total: If not None, yielding this many items in total
+        :param namespaces: Only iterate pages in these namespaces
+        :type namespaces: Iterable of str or Namespace key, or a single
             instance of those types. May be a '|' separated list of
             namespace identifiers.
-        :param pageids: only include lint errors from the specified
+        :param pageids: Only include lint errors from the specified
             pageids
-        :type pageids: an iterable that returns pageids, or a comma- or
+        :type pageids: An iterable that returns pageids, or a comma- or
              pipe-separated string of pageids (e.g. '945097,1483753,
              956608' or '945097|483753|956608')
         :param lint_from: Lint ID to start querying from
-        :return: pages with Linter errors.
+        :return: Pages with Linter errors.
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',
                                 total=total,  # Will set lntlimit
@@ -395,9 +395,9 @@ class ThanksMixin:
         """Corresponding method to the 'action=thank' API action.
 
         :param revid: Revision ID for the revision to be thanked.
-        :type revid: int
+        :type revid: Int
         :param source: A source for the thanking operation.
-        :type source: str
+        :type source: Str
         :raise APIError: On thanking oneself or other API errors.
         :return: The API response.
         """
@@ -422,7 +422,7 @@ class UrlShortenerMixin:
         and this wiki can process links to all WM domains.
 
         :param url: The link to reduce, with propotol prefix.
-        :type url: str
+        :type url: Str
         :return: The reduced link, without protocol prefix.
         :rtype: str
         """
@@ -447,13 +447,13 @@ class TextExtractsMixin:
                 plaintext: bool = True) -> str:
         """Retrieve an extract of a page.
 
-        :param page: The Page object for which the extract is read
-        :param chars: How many characters to return.  Actual text
-            returned might be slightly longer.
-        :param sentences: How many sentences to return
-        :param intro: Return only content before the first section
-        :param plaintext: if True, return extracts as plain text instead
-            of limited HTML
+        :param page: The Page object for which the extract is read.
+        :param chars: Maximum characters to return.
+        :param sentences: How many sentences to return.
+        :param intro: Return only content before the first section.
+        :param plaintext: Return extracts as plain text instead of limited
+            HTML.
+        :return: The extract of the page.
 
         .. seealso::
 

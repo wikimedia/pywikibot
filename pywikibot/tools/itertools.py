@@ -4,7 +4,7 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,12 +38,12 @@ def islice_with_ellipsis(iterable, *args, marker: str = '…'):
     Function takes the
     and the additional keyword marker.
 
-    :param iterable: the iterable to work on
-    :type iterable: iterable
-    :param args: same args as:
+    :param iterable: The iterable to work on
+    :type iterable: Iterable
+    :param args: Same args as:
         - ``itertools.islice(iterable, stop)``
         - ``itertools.islice(iterable, start, stop[, step])``
-    :param marker: element to yield if iterable still contains elements
+    :param marker: Element to yield if iterable still contains elements
         after showing the required number. Default value: '…'
     """
     s = slice(*args)
@@ -132,8 +132,8 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
        Iterable elements may consist of lists or tuples
        ``allow_duplicates`` is a keyword-only argument
 
-    :param iterables: page generators
-    :param allow_duplicates: optional keyword argument to allow duplicates
+    :param iterables: Page generators
+    :param allow_duplicates: Optional keyword argument to allow duplicates
         if present in all generators
     """
     if not iterables:
@@ -210,9 +210,9 @@ def roundrobin_generators(*iterables) -> Generator[Any]:
        A sentinel variable is used to determine the end of an iterable
        instead of None.
 
-    :param iterables: any iterable to combine in roundrobin way
-    :type iterables: iterable
-    :return: the combined generator of iterables
+    :param iterables: Any iterable to combine in roundrobin way
+    :type iterables: Iterable
+    :return: The combined generator of iterables
     :rtype: generator
     """
     sentinel = object()
@@ -250,14 +250,14 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     .. versionadded:: 3.0
 
-    :param iterable: the source iterable
-    :type iterable: collections.abc.Iterable
-    :param container: storage of seen items
-    :type container: type
-    :param key: function to convert the item to a key
-    :type key: callable
-    :param add: function to add an item to the container
-    :type add: callable
+    :param iterable: The source iterable
+    :type iterable: Collections.abc.Iterable
+    :param container: Storage of seen items
+    :type container: Type
+    :param key: Function to convert the item to a key
+    :type key: Callable
+    :param add: Function to add an item to the container
+    :type add: Callable
     """
     if container is None:
         container = set()

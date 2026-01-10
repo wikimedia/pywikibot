@@ -1,6 +1,6 @@
 """Date data and manipulation module."""
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -270,7 +270,7 @@ def alwaysTrue(x: Any) -> bool:
     Used for multiple value selection function to accept all other
     values.
 
-    :param x: not used
+    :param x: Not used
     :return: True
     """
     return True
@@ -662,8 +662,8 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
     def __init__(self, index: int, format_key: str) -> None:
         """Initializer of MonthFormat mapping.
 
-        :param index: month number
-        :param format_key: formats key like Day_January or Year_December
+        :param index: Month number
+        :param format_key: Formats key like Day_January or Year_December
         """
         self.index = index
         self.variant, _, self.month = format_key.partition('_')
@@ -1680,7 +1680,7 @@ def addFmt1(lang: str, isMnthOfYear: bool,
     patterns parameter is a list of 12 elements to be used for each
     month.
 
-    :param lang: language code
+    :param lang: Language code
     """
     assert len(patterns) == 12, f'pattern {lang} does not have 12 elements'
 
@@ -1954,9 +1954,9 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
                   ) -> tuple[str | None, str | None]:
     """Return first matching formatted date value.
 
-    :param lang: language code
-    :param title: value to format
-    :return: dictName ('YearBC', 'December', ...) and value (a year, date, ...)
+    :param lang: Language code
+    :param title: Value to format
+    :return: DictName ('YearBC', 'December', ...) and value (a year, date, ...)
     """
     for dict_name, dictionary in formats.items():
         with suppress(Exception):
@@ -1980,14 +1980,15 @@ def format_date(month: int, day: int,
                 year: int = 2000) -> str:
     """Format a date localized to given lang.
 
-    :param month: month in range of 1..12
-    :param day: day of month in range of 1..31
-    :param lang: a site object or language key. Defaults to current site.
-    :param year: year for which the date is to be formatted. always 29 will be
-        given For February except the year is given. Default is leap year 2000.
-    :return: localized date like "January 11"
+    :param month: Month in range of 1..12
+    :param day: Day of month in range of 1..31
+    :param lang: A site object or language key. Defaults to current site.
+    :param year: Year for which the date is to be formatted. Always 29 is used
+        for February unless a specific year is given; Default is the leap year
+        2000.
+    :return: Localized date like "January 11"
     :raises ValueError: Wrong day value; must be 1-28/29/30/31
-    :raises IllegalMonthError: bad month number; must be 1-12
+    :raises IllegalMonthError: Bad month number; must be 1-12
     """
     if not lang:
         lang = Site().lang

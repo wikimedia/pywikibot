@@ -4,7 +4,7 @@
    from other partially external modules.
 """
 #
-# (C) Pywikibot team, 2004-2025
+# (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -105,11 +105,11 @@ class TextEditor:
 
         Halts the thread's operation until the editor is closed.
 
-        :param text: the text to be edited
-        :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be
+        :param text: The text to be edited
+        :param jumpIndex: Position at which to put the caret
+        :param highlight: Each occurrence of this substring will be
             highlighted
-        :return: the modified text, or None if the user didn't save the
+        :return: The modified text, or None if the user didn't save the
             text file in his text editor
         """
         if self.editor:

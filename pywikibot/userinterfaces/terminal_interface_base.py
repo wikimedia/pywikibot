@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -344,7 +344,7 @@ class UI(ABUIC):
         recognises a trailing question mark.
 
         :param question: The question, without trailing whitespace.
-        :param password: if True, hides the user's input (for password
+        :param password: If True, hides the user's input (for password
             entry).
         :param default: The default answer if none was entered. None to
             require an answer.
@@ -440,7 +440,7 @@ class UI(ABUIC):
         :return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
-        :raises ValueError: invalid or no *default* value is given with
+        :raises ValueError: Invalid or no *default* value is given with
             *force* or no or an invalid option is given.
         :raises TypeError: *default* value is neither None nor str
         """
@@ -555,11 +555,11 @@ class UI(ABUIC):
 
         Uses a Tkinter edit box because we don't have a console editor
 
-        :param text: the text to be edited
-        :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be
+        :param text: The text to be edited
+        :param jumpIndex: Position at which to put the caret
+        :param highlight: Each occurrence of this substring will be
             highlighted
-        :return: the modified text, or None if the user didn't save the
+        :return: The modified text, or None if the user didn't save the
             text file in his text editor
         """
         try:

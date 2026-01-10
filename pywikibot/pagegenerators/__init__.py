@@ -12,7 +12,7 @@ These parameters are supported to specify which pages titles to be used:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -624,13 +624,13 @@ def RepeatingGenerator(
     will always be discarded to prevent the generator yielding items
     in wrong order.
 
-    :param generator: a function returning a generator that will be queried
-    :param key_func: a function returning key that will be used to detect
+    :param generator: A function returning a generator that will be queried
+    :param key_func: A function returning key that will be used to detect
         duplicate entry
-    :param sleep_duration: duration between each query
-    :param total: if it is a positive number, iterate no more than this
+    :param sleep_duration: Duration between each query
+    :param total: If it is a positive number, iterate no more than this
         number of items in total. Otherwise, iterate forever
-    :return: a generator yielding items in ascending order by time
+    :return: A generator yielding items in ascending order by time
     """
     kwargs.pop('reverse', None)  # always get newest item first
     kwargs.pop('start', None)  # don't set start time
@@ -659,8 +659,8 @@ def PreloadingGenerator(generator: Iterable[pywikibot.page.Page],
                         ) -> Generator[pywikibot.page.Page]:
     """Yield preloaded pages taken from another generator.
 
-    :param generator: pages to iterate over
-    :param groupsize: how many pages to preload at once
+    :param generator: Pages to iterate over
+    :param groupsize: How many pages to preload at once
     :param quiet: If False (default), show the "Retrieving pages"
         message
     """
@@ -691,8 +691,8 @@ def DequePreloadingGenerator(
 ) -> Generator[pywikibot.page.Page]:
     """Preload generator of type DequeGenerator.
 
-    :param generator: pages to iterate over
-    :param groupsize: how many pages to preload at once
+    :param generator: Pages to iterate over
+    :param groupsize: How many pages to preload at once
     :param quiet: If False (default), show the "Retrieving pages"
         message
     """
@@ -715,8 +715,8 @@ def PreloadingEntityGenerator(
 
     Function basically is copied from above, but for Wikibase entities.
 
-    :param generator: pages to iterate over
-    :param groupsize: how many pages to preload at once
+    :param generator: Pages to iterate over
+    :param groupsize: How many pages to preload at once
     """
     sites: dict[pywikibot.site.BaseSite,
                 list[pywikibot.page.WikibaseEntity]] = {}

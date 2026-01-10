@@ -50,7 +50,7 @@ or by adding a list to the given one::
                                      'your_script_name_2']
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -247,9 +247,9 @@ class CosmeticChangesToolkit:
         .. versionchanged:: 7.0
            `namespace` and `pageTitle` parameters were removed
 
-        :param page: the Page object containing the text to be modified
-        :param show_diff: show difference after replacements
-        :param ignore: ignores if an error occurred and either skips the page
+        :param page: The Page object containing the text to be modified
+        :param show_diff: Show difference after replacements
+        :param ignore: Ignores if an error occurred and either skips the page
             or only that method. It can be set one of the CANCEL constants
         """
         self.site = page.site
@@ -354,9 +354,9 @@ class CosmeticChangesToolkit:
            main article within a category. If the main article has a
            sort key already, it will not be changed any longer.
 
-        :param text: text to be modified
-        :return: the modified *text*
-        :raises ValueError: wrong value of sortkey in
+        :param text: Text to be modified
+        :return: The modified *text*
+        :raises ValueError: Wrong value of sortkey in
             :attr:`main_sortkey` for the given site
         """
         categories = []
@@ -550,8 +550,8 @@ class CosmeticChangesToolkit:
            Convert URL-encoded characters if a link is an interwiki link
            or different from main namespace.
 
-        :param text: string to perform the clean-up on
-        :return: text with tidied wikilinks
+        :param text: String to perform the clean-up on
+        :return: Text with tidied wikilinks
         """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.

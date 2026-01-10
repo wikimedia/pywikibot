@@ -38,12 +38,12 @@ class BaseSite(ComparableMixin):
     def __init__(self, code: str, fam=None, user=None) -> None:
         """Initializer.
 
-        :param code: the site's language code
-        :type code: str
-        :param fam: wiki family name (optional)
-        :type fam: str or pywikibot.family.Family
-        :param user: bot user name (optional)
-        :type user: str
+        :param code: The site's language code
+        :type code: Str
+        :param fam: Wiki family name (optional)
+        :type fam: Str or pywikibot.family.Family
+        :param user: Bot user name (optional)
+        :type user: Str
         """
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
@@ -319,9 +319,9 @@ class BaseSite(ComparableMixin):
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
 
-        :param page: the page to be locked
-        :type page: pywikibot.Page
-        :param block: if true, wait until the page is available to be
+        :param page: The page to be locked
+        :type page: Pywikibot.Page
+        :param block: If true, wait until the page is available to be
             locked; otherwise, raise an exception if page can't be
             locked
         """
@@ -336,8 +336,8 @@ class BaseSite(ComparableMixin):
     def unlock_page(self, page) -> None:
         """Unlock page. Call as soon as a write operation has completed.
 
-        :param page: the page to be locked
-        :type page: pywikibot.Page
+        :param page: The page to be locked
+        :type page: Pywikibot.Page
         """
         with self._pagemutex:
             self._locked_pages.discard(page.title(with_section=False))

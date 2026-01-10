@@ -11,7 +11,7 @@ This module requires requests-sse to be installed::
    ``requests-sse`` package is required instead of ``sseclient``.
 """
 #
-# (C) Pywikibot team, 2017-2025
+# (C) Pywikibot team, 2017-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -120,9 +120,9 @@ class EventStreams(GeneratorWrapper):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
-        :keyword bool canary: if True, include canary events, see
+        :keyword bool canary: If True, include canary events, see
             https://w.wiki/7$2z for more info.
-        :keyword APISite site: a project site object. Used if no *url*
+        :keyword APISite site: A project site object. Used if no *url*
             is given.
         :keyword int retry: Number of milliseconds to wait after disconnects
             before attempting to reconnect. The server may change this
@@ -137,14 +137,14 @@ class EventStreams(GeneratorWrapper):
             history available but is not guaranteed. It may be given as
             a pywikibot.Timestamp, an ISO 8601 string or a mediawiki
             timestamp string.
-        :keyword Iterable[str] | str streams: event stream types.
+        :keyword Iterable[str] | str streams: Event stream types.
             Mandatory when no url is given. Multiple streams may be
             given as a string with comma separated stream types or an
             iterable of strings
         :keyword int | float | tuple[int | float, int | float] timeout:
             a timeout value indication how long to wait to send data
             before giving up
-        :keyword str url: an url retrieving events from. Will be set up
+        :keyword str url: An url retrieving events from. Will be set up
             to a default url using _site.family settings, stream types
             and timestamp
 
@@ -167,8 +167,8 @@ class EventStreams(GeneratorWrapper):
 
         :param kwargs: Other keyword arguments passed to `requests_sse`
             and `requests` library
-        :raises ModuleNotFoundError: requests-sse is not installed
-        :raises NotImplementedError: no stream types specified
+        :raises ModuleNotFoundError: Requests-sse is not installed
+        :raises NotImplementedError: No stream types specified
 
         .. seealso:: https://stream.wikimedia.org/?doc#streams for
            available Wikimedia stream types to be passed with `streams`
@@ -234,7 +234,7 @@ class EventStreams(GeneratorWrapper):
     def url(self) -> str:
         """Get the EventStream's url.
 
-        :raises NotImplementedError: no stream types specified
+        :raises NotImplementedError: No stream types specified
         """
         if self._streams is None:
             raise NotImplementedError(
@@ -309,13 +309,13 @@ class EventStreams(GeneratorWrapper):
 
         :keyword ftype: The filter type, one of 'all', 'any', 'none'.
             Default value is 'all'
-        :type ftype: str
+        :type ftype: Str
         :param args: You may pass your own filter functions here.
             Every function should be able to handle the data dict from events.
-        :type args: callable
+        :type args: Callable
         :param kwargs: Any key returned by event data with an event data value
             for this given key.
-        :type kwargs: str, list, tuple or other sequence
+        :type kwargs: Str, list, tuple or other sequence
         :raise TypeError: A given args parameter is not a callable.
         """
         def _is(data, key=None, value=None):
@@ -353,7 +353,7 @@ class EventStreams(GeneratorWrapper):
 
         See the description of register_filter() how it works.
 
-        :param data: event data dict used by filter functions
+        :param data: Event data dict used by filter functions
         """
         if not self._canary and data.get('meta', {}).get('domain') == 'canary':
             return False  # T266798
@@ -420,13 +420,13 @@ class EventStreams(GeneratorWrapper):
 def site_rc_listener(site, total: int | None = None):
     """Yield changes received from EventStream.
 
-    :param site: the Pywikibot.Site object to yield live recent changes
+    :param site: The Pywikibot.Site object to yield live recent changes
         for
     :type site: Pywikibot.BaseSite
-    :param total: the maximum number of changes to return
-    :return: pywikibot.comms.eventstream.rc_listener configured for
+    :param total: The maximum number of changes to return
+    :return: Pywikibot.comms.eventstream.rc_listener configured for
         given site
-    :raises ModuleNotFoundError: requests-sse installation is required
+    :raises ModuleNotFoundError: Requests-sse installation is required
     """
     if isinstance(EventSource, ModuleNotFoundError):
         raise ModuleNotFoundError(INSTALL_MSG) from EventSource

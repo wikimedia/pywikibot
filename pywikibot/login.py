@@ -92,9 +92,9 @@ class LoginManager:
         All parameters default to defaults in user-config.
 
         :param site: Site object to log into
-        :param user: username to use. If user is None, the username is
+        :param user: Username to use. If user is None, the username is
             loaded from config.usernames.
-        :param password: password to use
+        :param password: Password to use
         :raises pywikibot.exceptions.NoUsernameError: No username is
             configured for the requested site.
         """
@@ -228,7 +228,7 @@ class LoginManager:
 
         :raises ValueError: `password_file` is not set in the
             ``user-config.py`` or entries are critical malformed
-        :raises FileNotFoundError: password file does not exist
+        :raises FileNotFoundError: Password file does not exist
         """
         if config.password_file is None:
             raise ValueError('password_file is not set in the user-config.py')
@@ -311,8 +311,8 @@ class LoginManager:
 
         .. seealso:: :api:`Login`
 
-        :param retry: infinitely retry if the API returns an unknown error
-        :param autocreate: if true, allow auto-creation of the account
+        :param retry: Infinitely retry if the API returns an unknown error
+        :param autocreate: If true, allow auto-creation of the account
                            using unified login
 
         :raises pywikibot.exceptions.NoUsernameError: Username is not
@@ -549,8 +549,8 @@ class BotPassword:
         suffixed username of the form <username>@<suffix>.
 
         :param suffix: Suffix of the login name
-        :param password: bot password
-        :raises _PasswordFileWarning: suffix improperly specified
+        :param password: Bot password
+        :raises _PasswordFileWarning: Suffix improperly specified
         """
         if '@' in suffix:
             warn('The BotPassword entry should only include the suffix',
@@ -561,7 +561,7 @@ class BotPassword:
     def login_name(self, username: str) -> str:
         """Construct the login name from the username and suffix.
 
-        :param username: username (without suffix)
+        :param username: Username (without suffix)
         """
         return f'{username}@{self.suffix}'
 
@@ -581,11 +581,11 @@ class OauthLoginManager(LoginManager):
         All parameters default to defaults in user-config.
 
         :param site: Site object to log into
-        :param user: consumer key
-        :param password: consumer secret
+        :param user: Consumer key
+        :param password: Consumer secret
         :raises pywikibot.exceptions.NoUsernameError: No username is
             configured for the requested site.
-        :raises ImportError: mwoauth isn't installed
+        :raises ImportError: Mwoauth isn't installed
         """
         if isinstance(mwoauth, ImportError):
             raise ImportError(f'mwoauth is not installed: {mwoauth}.')
@@ -606,9 +606,9 @@ class OauthLoginManager(LoginManager):
 
         .. seealso:: :api:`Login`
 
-        :param retry: infinitely retry if exception occurs during
+        :param retry: Infinitely retry if exception occurs during
             authentication.
-        :param force: force to re-authenticate
+        :param force: Force to re-authenticate
         """
         if self.access_token is None or force:
             pywikibot.info(f'Logging in to {self.site} via OAuth consumer '

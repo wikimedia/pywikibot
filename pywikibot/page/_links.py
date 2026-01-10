@@ -6,7 +6,7 @@
    its contents.
 """
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,16 +50,16 @@ class BaseLink(ComparableMixin):
     def __init__(self, title: str, namespace=None, site=None) -> None:
         """Initializer.
 
-        :param title: the title of the page linked to (str); does not
+        :param title: The title of the page linked to (str); does not
             include namespace or section
-        :param namespace: the namespace of the page linked to. Can be
+        :param namespace: The namespace of the page linked to. Can be
             provided as either an int, a Namespace instance or a str,
             defaults to the MAIN namespace.
-        :type namespace: int, pywikibot.Namespace or str
-        :param site: the Site object for the wiki linked to. Can be
+        :type namespace: Int, pywikibot.Namespace or str
+        :param site: The Site object for the wiki linked to. Can be
             provided as either a Site instance or a db key, defaults to
             pywikibot.Site().
-        :type site: pywikibot.Site or str
+        :type site: Pywikibot.Site or str
         """
         self.title = title
 
@@ -138,7 +138,7 @@ class BaseLink(ComparableMixin):
     def ns_title(self, onsite=None):
         """Return full page title, including namespace.
 
-        :param onsite: site object if specified, present title using
+        :param onsite: Site object if specified, present title using
             onsite local namespace, otherwise use self canonical
             namespace.
         :raise pywikibot.exceptions.InvalidTitleError: no corresponding
@@ -166,7 +166,7 @@ class BaseLink(ComparableMixin):
     def astext(self, onsite=None) -> str:
         """Return a text representation of the link.
 
-        :param onsite: if specified, present as a (possibly interwiki)
+        :param onsite: If specified, present as a (possibly interwiki)
             link from the given site; otherwise, present as an internal
             link on the site.
         """
@@ -208,8 +208,8 @@ class BaseLink(ComparableMixin):
     def fromPage(cls, page):  # noqa: N802
         """Create a BaseLink to a Page.
 
-        :param page: target pywikibot.page.Page
-        :type page: pywikibot.page.Page
+        :param page: Target pywikibot.page.Page
+        :type page: Pywikibot.page.Page
         :rtype: pywikibot.page.BaseLink
         """
         title = page.title(with_ns=False,
@@ -251,16 +251,16 @@ class Link(BaseLink):
     def __init__(self, text, source=None, default_namespace=0) -> None:
         """Initializer.
 
-        :param text: the link text (everything appearing between [[ and
+        :param text: The link text (everything appearing between [[ and
             ]] on a wiki page)
-        :type text: str
-        :param source: the Site on which the link was found (not
+        :type text: Str
+        :param source: The Site on which the link was found (not
             necessarily the site to which the link refers)
         :type source: Site or BasePage
-        :param default_namespace: a namespace to use if the link does
+        :param default_namespace: A namespace to use if the link does
             not contain one (defaults to 0)
-        :type default_namespace: int
-        :raises UnicodeError: text could not be converted to unicode.
+        :type default_namespace: Int
+        :raises UnicodeError: Text could not be converted to unicode.
         """
         source_is_page = isinstance(source, pywikibot.page.BasePage)
 
@@ -527,7 +527,7 @@ class Link(BaseLink):
     def astext(self, onsite=None):
         """Return a text representation of the link.
 
-        :param onsite: if specified, present as a (possibly interwiki)
+        :param onsite: If specified, present as a (possibly interwiki)
             link from the given site; otherwise, present as an internal
             link on the source site.
         """
@@ -554,8 +554,8 @@ class Link(BaseLink):
     def fromPage(cls, page, source=None):  # noqa: N802
         """Create a Link to a Page.
 
-        :param page: target Page
-        :type page: pywikibot.page.Page
+        :param page: Target Page
+        :type page: Pywikibot.page.Page
         :param source: Link from site source
         :param source: Site
         :rtype: pywikibot.page.Link
@@ -578,8 +578,8 @@ class Link(BaseLink):
 
         Assumes that the lang & title come clean, no checks are made.
 
-        :param lang: target site code (language)
-        :param title: target Page
+        :param lang: Target site code (language)
+        :param title: Target Page
         :param source: Link from site source
         :type source: Site
         :rtype: pywikibot.page.Link
@@ -616,12 +616,12 @@ class Link(BaseLink):
         The returned Link instance is already parsed.
 
         :param link: The original link text.
-        :type link: str
+        :type link: Str
         :param source: The source of the link.
         :type source: Site
         :param default_namespace: The namespace this link uses when no
             namespace is defined in the link text.
-        :type default_namespace: int
+        :type default_namespace: Int
         :param section: The new section replacing the one in link. If
             None (default) it doesn't replace it.
         :type section: None or str
@@ -658,13 +658,13 @@ class SiteLink(BaseLink):
     def __init__(self, title, site=None, badges=None) -> None:
         """Initializer.
 
-        :param title: the title of the linked page including namespace
-        :type title: str
-        :param site: the Site object for the wiki linked to. Can be
+        :param title: The title of the linked page including namespace
+        :type title: Str
+        :param site: The Site object for the wiki linked to. Can be
             provided as either a Site instance or a db key, defaults to
             pywikibot.Site().
-        :type site: pywikibot.Site or str
-        :param badges: list of badges
+        :type site: Pywikibot.Site or str
+        :param badges: List of badges
         :type badges: [pywikibot.ItemPage]
         """
         # split of namespace from title
@@ -682,13 +682,13 @@ class SiteLink(BaseLink):
     def _parse_namespace(title, site=None):
         """Parse enough of a title with a ':' to determine the namespace.
 
-        :param site: the Site object for the wiki linked to. Can be
+        :param site: The Site object for the wiki linked to. Can be
             provided as either a Site instance or a db key, defaults to
             pywikibot.Site().
-        :type site: pywikibot.Site or str
-        :param title: the title of the linked page including namespace
-        :type title: str
-        :return: a (site, namespace, title) tuple
+        :type site: Pywikibot.Site or str
+        :param title: The title of the linked page including namespace
+        :type title: Str
+        :return: A (site, namespace, title) tuple
         :rtype: (pywikibot.Site, pywikibot.Namespace or None, str)
         """
         # need a Site instance to evaluate local namespaces
@@ -723,7 +723,7 @@ class SiteLink(BaseLink):
 
         :param data: JSON containing SiteLink data
         :param site: The Wikibase site
-        :type site: pywikibot.site.DataSite
+        :type site: Pywikibot.site.DataSite
         """
         sl = cls(data['title'], data['site'])
         repo = site or sl.site.data_repository()

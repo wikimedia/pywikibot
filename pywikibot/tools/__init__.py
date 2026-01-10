@@ -104,7 +104,7 @@ def is_ip_address(value: str) -> bool:
        Was renamed from ``is_IP()``.
     .. seealso:: :func:`is_ip_network`
 
-    :param value: value to check
+    :param value: Value to check
     """
     with suppress(ValueError):
         ipaddress.ip_address(value)
@@ -119,7 +119,7 @@ def is_ip_network(value: str) -> bool:
     .. versionadded:: 9.0
     .. seealso:: :func:`is_ip_address`
 
-    :param value: value to check
+    :param value: Value to check
     """
     with suppress(ValueError):
         ipaddress.ip_network(value)
@@ -225,7 +225,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
             (case-insensitive)
         :param category: A class (a subclass of Warning) of which the
             warning category must be a subclass in order to match.
-        :type category: type
+        :type category: Type
         :param filename: A string containing a regular expression that
             the start of the path to the warning module must match.
             (case-sensitive)
@@ -374,8 +374,8 @@ def as_filename(string: str, repl: str = '_') -> str:
 
     .. versionadded:: 8.0
 
-    :param string: the string to be modified
-    :param repl: the replacement character
+    :param string: The string to be modified
+    :param repl: The replacement character
     :raises ValueError: Invalid repl parameter
     """
     pattern = r':*?/\\" '
@@ -460,7 +460,7 @@ class MediaWikiVersion:
     def __init__(self, version_str: str) -> None:
         """Initializer.
 
-        :param version_str: version to parse
+        :param version_str: Version to parse
         """
         self._parse(version_str)
 
@@ -677,10 +677,10 @@ def file_mode_checker(
 
     .. versionadded:: 3.0
 
-    :param filename: filename path
-    :param mode: requested file mode
-    :param quiet: warn about file mode change if False.
-    :param create: create the file if it does not exist already
+    :param filename: Filename path
+    :param mode: Requested file mode
+    :param quiet: Warn about file mode change if False.
+    :param create: Create the file if it does not exist already
     :raise IOError: The file does not exist and `create` is False.
     """
     try:
@@ -708,22 +708,22 @@ def compute_file_hash(filename: str | os.PathLike,
     Result is expressed as hexdigest().
 
     .. versionadded:: 3.0
-    .. versionchanged:: 8.2
-       *sha* may be  also a hash constructor, or a callable that returns
-       a hash object.
+     .. versionchanged:: 8.2
+         The *sha* parameter may also be a hash constructor, or a callable
+         that returns a hash object.
 
 
-    :param filename: filename path
-    :param sha: hash algorithm available with hashlib: ``sha1()``,
+    :param filename: Filename path
+    :param sha: Hash algorithm available with hashlib: ``sha1()``,
         ``sha224()``, ``sha256()``, ``sha384()``, ``sha512()``,
         ``blake2b()``, and ``blake2s()``. Additional algorithms like
         ``md5()``, ``sha3_224()``, ``sha3_256()``, ``sha3_384()``,
         ``sha3_512()``, ``shake_128()`` and ``shake_256()`` may also be
-        available. *sha* must either be a hash algorithm name as a str
-        like ``'sha1'`` (default), a hash constructor like
+        available. The *sha* parameter must either be a hash algorithm
+        name as a str like ``'sha1'`` (default), a hash constructor like
         ``hashlib.sha1``, or a callable that returns a hash object like
         ``lambda: hashlib.sha1()``.
-    :param bytes_to_read: only the first bytes_to_read will be
+    :param bytes_to_read: Only the first bytes_to_read will be
         considered; if file size is smaller, the whole file will be
         considered.
     """
@@ -768,7 +768,7 @@ def cached(*arg: Callable) -> Any:
        functions.
     .. versionadded:: 7.3
 
-    :raises TypeError: decorator must be used without arguments
+    :raises TypeError: Decorator must be used without arguments
     """
     fn = arg and arg[0]
     if not callable(fn):

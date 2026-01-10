@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,11 +61,11 @@ def NamespaceFilterPageGenerator(
     .. note:: API-based generators that have a "namespaces" parameter
        perform namespace filtering more efficiently than this generator.
 
-    :param namespaces: list of namespace identifiers to limit results
+    :param namespaces: List of namespace identifiers to limit results
     :param site: Site for generator results; mandatory if
         namespaces contains namespace names. Defaults to the default site.
-    :raises KeyError: a namespace identifier was not resolved
-    :raises TypeError: a namespace identifier has an inappropriate
+    :raises KeyError: A namespace identifier was not resolved
+    :raises TypeError: A namespace identifier has an inappropriate
         type such as NoneType or bool, or more than one namespace
         if the API module does not support multiple namespaces
     """
@@ -90,7 +90,7 @@ def PageTitleFilterPageGenerator(
 ) -> Generator[pywikibot.page.BasePage]:
     """Yield only those pages are not listed in the ignore list.
 
-    :param ignore_list: family names are mapped to dictionaries in which
+    :param ignore_list: Family names are mapped to dictionaries in which
         language codes are mapped to lists of page titles. Each title must
         be a valid regex as they are compared using :py:obj:`re.search`.
     """
@@ -151,8 +151,8 @@ class ItemClaimFilter:
                        qualifiers: dict[str, str]) -> bool:
         """Return true if the page contains the claim given.
 
-        :param page: the page to check
-        :return: true if page contains the claim, false otherwise
+        :param page: The page to check
+        :return: True if page contains the claim, false otherwise
         """
         if not isinstance(page, pywikibot.page.WikibasePage):  # T175151
             try:
@@ -188,14 +188,13 @@ class ItemClaimFilter:
     ) -> Generator[pywikibot.page.WikibasePage]:
         """Yield all ItemPages which contain certain claim in a property.
 
-        :param prop: property id to check
-        :param claim: value of the property to check. Can be exact value
-            (for instance, ItemPage instance) or a string (e.g.
-            'Q37470').
-        :param qualifiers: dict of qualifiers that must be present, or
+        :param prop: Property id to check
+        :param claim: Value of the property to check. For instance, an
+            ItemPage instance or a string, e.g. 'Q37470'.
+        :param qualifiers: Dict of qualifiers that must be present, or
             None if qualifiers are irrelevant
-        :param negate: true if pages that do *not* contain specified
-            claim should be yielded, false otherwise
+        :param negate: True if pages that do *not* contain the specified
+            claim should be yielded; Otherwise False
         """
         qualifiers = qualifiers or {}
         for page in generator:
@@ -240,7 +239,7 @@ class RegexFilter:
                        string: str, quantifier: str) -> bool:
         """Return True if string matches precompiled regex list.
 
-        :param quantifier: a qualifier
+        :param quantifier: A qualifier
         """
         if quantifier == 'all':
             match = all(r.search(string) for r in regex)
@@ -281,14 +280,14 @@ class RegexFilter:
         .. note:: if you want to check for a match at the beginning of
            the title, you have to start the regex with "^"
 
-        :param generator: another generator
-        :param regex: a regex which should match the page title
-        :param quantifier: must be one of the following values:
+        :param generator: Another generator
+        :param regex: A regex which should match the page title
+        :param quantifier: Must be one of the following values:
             'all' - yields page if title is matched by all regexes
             'any' - yields page if title is matched by any regexes
             'none' - yields page if title is NOT matched by any regexes
-        :param ignore_namespace: ignore the namespace when matching the title
-        :return: return a page depending on the matching parameters
+        :param ignore_namespace: Ignore the namespace when matching the title
+        :return: Return a page depending on the matching parameters
         """
         # for backwards compatibility with compat for inverse parameter
         if quantifier is False:
@@ -329,7 +328,7 @@ def QualityFilterPageGenerator(
     In all the other cases, no filter is applied.
 
     :param generator: A generator object
-    :param quality: proofread-page quality levels (valid range 0-4)
+    :param quality: Proofread-page quality levels (valid range 0-4)
     """
     for page in generator:
         if page.namespace() == page.site.proofread_page_ns:
@@ -347,7 +346,7 @@ def CategoryFilterPageGenerator(
     """Wrap a generator to filter pages by categories specified.
 
     :param generator: A generator object
-    :param category_list: categories used to filter generated pages
+    :param category_list: Categories used to filter generated pages
     """
     for page in generator:
         if all(x in page.categories() for x in category_list):
@@ -440,8 +439,8 @@ def UserEditFilterGenerator(
     otherwise only pages edited by this user are given back.
 
     :param generator: A generator object
-    :param username: user name which edited the page
-    :param timestamp: ignore edits which are older than this timestamp
+    :param username: User name which edited the page
+    :param timestamp: Ignore edits which are older than this timestamp
     :param skip: Ignore pages edited by the given user
     :param max_revision_depth: It only looks at the last editors given
         by max_revision_depth

@@ -3,7 +3,7 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -243,7 +243,7 @@ class UploadRobot(BaseBot):
            no longer shows the description if UploadRobot's parameter
            *verify_description* is set to False.
 
-        :param file_url: either a URL or a local file path
+        :param file_url: Either a URL or a local file path
         """
         # Isolate the pure name
         filename = file_url
@@ -398,7 +398,7 @@ class UploadRobot(BaseBot):
            If 'copyuploadbaddomain' API error occurred in first step,
            download the file and upload it afterwards
 
-        :param file_url: either a URL or a local file path
+        :param file_url: Either a URL or a local file path
         """
         filename = self.process_filename(file_url)
         if not filename:

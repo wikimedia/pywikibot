@@ -3,7 +3,7 @@
 .. versionadded:: 7.5
 """
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -94,7 +94,7 @@ class Timestamp(datetime.datetime):
 
         :param ts: Timestamp, datetime.datetime or str
         :return: Timestamp object
-        :raises TypeError: conversion failed
+        :raises TypeError: Conversion failed
         """
         if isinstance(ts, cls):
             return ts
@@ -225,7 +225,7 @@ class Timestamp(datetime.datetime):
     def _ISO8601Format(cls, sep: str = 'T') -> str:  # noqa: N802
         """ISO8601 format string.
 
-        :param sep: one-character separator, placed between the date and
+        :param sep: One-character separator, placed between the date and
             time
         :return: ISO8601 format string
         """
@@ -239,7 +239,7 @@ class Timestamp(datetime.datetime):
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
         :param ts: ISO 8601 timestamp or a Timestamp object already
-        :param sep: one-character separator, placed between the date and
+        :param sep: One-character separator, placed between the date and
             time
         :return: Timestamp object
         """
@@ -279,10 +279,10 @@ class Timestamp(datetime.datetime):
         ...
         ValueError: time data '20221109' does not match MW format.
 
-        :param ts: the timestamp to be converted
+        :param ts: The timestamp to be converted
         :param strict: If true, do not ignore missing timestamp elements
             for hours, minutes or seconds
-        :return: return the *Timestamp* object from given *ts*.
+        :return: Return the *Timestamp* object from given *ts*.
         :raises ValueError: The timestamp is invalid, e.g. missing or
             invalid timestamp component.
         """
@@ -425,9 +425,9 @@ class TZoneFixedOffset(datetime.tzinfo):
 
     """Class building tzinfo objects for fixed-offset time zones.
 
-    :param offset: a number indicating fixed offset in minutes east from
+    :param offset: A number indicating fixed offset in minutes east from
         UTC
-    :param name: a string with name of the timezone
+    :param name: A string with name of the timezone
     """
 
     def __init__(self, offset: int, name: str) -> None:
@@ -460,7 +460,7 @@ def str2timedelta(
 ) -> datetime.timedelta:
     """Return a timedelta for a shorthand duration.
 
-    :param string: a string defining a time period:
+    :param string: A string defining a time period:
 
     Examples::
 
@@ -470,10 +470,10 @@ def str2timedelta(
         2w - 2 weeks (14 days)
         1y - 1 year
 
-    :param timestamp: a timestamp to calculate a more accurate duration offset
+    :param timestamp: A timestamp to calculate a more accurate duration offset
         used by years
-    :type timestamp: datetime.datetime
-    :return: the corresponding timedelta object
+    :type timestamp: Datetime.datetime
+    :return: The corresponding timedelta object
     """
     key, duration = parse_duration(string)
 
@@ -493,7 +493,7 @@ def str2timedelta(
 def parse_duration(string: str) -> tuple[str, int]:
     """Return the key and duration extracted from the string.
 
-    :param string: a string defining a time period
+    :param string: A string defining a time period
 
     Examples::
 
@@ -503,7 +503,7 @@ def parse_duration(string: str) -> tuple[str, int]:
         2w - 2 weeks (14 days)
         1y - 1 year
 
-    :return: key and duration extracted form the string
+    :return: Key and duration extracted form the string
     """
     if len(string) < 2:
         raise ValueError('Time period should be a numeric value followed by '

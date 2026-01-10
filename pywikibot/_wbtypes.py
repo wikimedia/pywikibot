@@ -1,6 +1,6 @@
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2025
+# (C) Pywikibot team, 2013-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -164,7 +164,7 @@ class Coordinate(WbRepresentation):
     def entity(self) -> str:
         """Return the entity URI of the globe.
 
-        :raises CoordinateGlobeUnknownError: the globe is not supported
+        :raises CoordinateGlobeUnknownError: The globe is not supported
             by Wikibase
         """
         if not self._entity:
@@ -249,7 +249,7 @@ class Coordinate(WbRepresentation):
            precision = math.degrees(
                self._dim / (radius * math.cos(math.radians(self.lat))))
 
-        :return: precision in degrees or None
+        :return: Precision in degrees or None
         """
         if self._precision is not None:
             return self._precision
@@ -268,7 +268,7 @@ class Coordinate(WbRepresentation):
     def precision(self, value: float) -> None:
         """Set the precision value.
 
-        :param value: precision in degrees
+        :param value: Precision in degrees
         """
         self._precision = value
 
@@ -303,8 +303,8 @@ class Coordinate(WbRepresentation):
            dim = int(round(math.radians(
                precision)*radius*math.cos(math.radians(self.lat))))
 
-        :return: dimension in meters
-        :raises ValueError: if neither dim nor precision is set
+        :return: Dimension in meters
+        :raises ValueError: If neither dim nor precision is set
         """
         if self._dim is not None:
             return self._dim
@@ -335,11 +335,11 @@ class Coordinate(WbRepresentation):
         .. versionchanged:: 10.4
            The *lazy_load* parameter is now keyword-only.
 
-        :param repo: the Wikibase site for the globe, if different from
+        :param repo: The Wikibase site for the globe, if different from
             that provided with the Coordinate
         :param lazy_load: Do not raise :exc:`exceptions.NoPageError` if
             ItemPage does not exist
-        :return: pywikibot.ItemPage of the globe
+        :return: Pywikibot.ItemPage of the globe
         """
         if isinstance(self._entity, pywikibot.ItemPage):
             return self._entity
@@ -885,7 +885,7 @@ class WbTime(WbRepresentation):
            *normalize* parameter was removed due to :phab:`T340495` and
            :phab:`T57755`
 
-        :param force_iso: whether the output should be forced to ISO 8601
+        :param force_iso: Whether the output should be forced to ISO 8601
         :return: Timestamp in a format resembling ISO 8601
         """
         if force_iso:
@@ -903,7 +903,7 @@ class WbTime(WbRepresentation):
 
         :param timezone_aware: Whether the timezone should be passed to
             the Timestamp object.
-        :raises ValueError: instance value cannot be represented using
+        :raises ValueError: Instance value cannot be represented using
             Timestamp
         """
         if self.year <= 0:
@@ -967,7 +967,7 @@ class WbQuantity(WbRepresentation):
 
         None value is returned as is.
 
-        :param value: decimal number to convert
+        :param value: Decimal number to convert
         """
         if isinstance(value, Decimal):
             return value
@@ -981,7 +981,7 @@ class WbQuantity(WbRepresentation):
 
         None value is returned as is.
 
-        :param value: decimal number to convert
+        :param value: Decimal number to convert
         """
         return format(value, '+g') if value is not None else None
 
@@ -993,10 +993,10 @@ class WbQuantity(WbRepresentation):
     ) -> None:
         """Create a new WbQuantity object.
 
-        :param amount: number representing this quantity
-        :param unit: the Wikibase item for the unit or the entity URI of
+        :param amount: Number representing this quantity
+        :param unit: The Wikibase item for the unit or the entity URI of
             this Wikibase item.
-        :param error: the uncertainty of the amount (e.g. ±1)
+        :param error: The uncertainty of the amount (e.g. ±1)
         :param site: The Wikibase site
         """
         if amount is None:
@@ -1043,11 +1043,11 @@ class WbQuantity(WbRepresentation):
         A successful lookup is stored as an internal value to avoid the
         need for repeated lookups.
 
-        :param repo: the Wikibase site for the unit, if different from
+        :param repo: The Wikibase site for the unit, if different from
             that provided with the WbQuantity.
         :param lazy_load: Do not raise NoPage if ItemPage does not
             exist.
-        :return: pywikibot.ItemPage
+        :return: Pywikibot.ItemPage
         """
         if not isinstance(self._unit, str):
             return self._unit
@@ -1097,8 +1097,8 @@ class WbMonolingualText(WbRepresentation):
     def __init__(self, text: str, language: str) -> None:
         """Create a new WbMonolingualText object.
 
-        :param text: text string
-        :param language: language code of the string
+        :param text: Text string
+        :param language: Language code of the string
         """
         if not text or not language:
             raise ValueError('text and language cannot be empty')
@@ -1209,7 +1209,7 @@ class WbDataPage(WbRepresentation):
                  site: DataSite | None = None) -> None:
         """Create a new WbDataPage object.
 
-        :param page: page containing the data
+        :param page: Page containing the data
         :param site: The Wikibase site
         """
         site = site or page.site.data_repository()
@@ -1225,7 +1225,7 @@ class WbDataPage(WbRepresentation):
     def toWikibase(self) -> str:
         """Convert the data to the value required by the Wikibase API.
 
-        :return: title of the data page incl. namespace
+        :return: Title of the data page incl. namespace
         """
         return self.page.title()
 
@@ -1233,7 +1233,7 @@ class WbDataPage(WbRepresentation):
     def fromWikibase(cls, page_name: str, site: DataSite | None) -> WbDataPage:
         """Create a WbDataPage from the JSON data given by the Wikibase API.
 
-        :param page_name: page name from Wikibase value
+        :param page_name: Page name from Wikibase value
         :param site: The Wikibase site
         """
         # TODO: This method signature does not match our parent class (which
@@ -1315,7 +1315,7 @@ class WbUnknown(WbRepresentation):
         """Create a new WbUnknown object.
 
         :param json: Wikibase JSON
-        :param warning: a warning message which is shown once if
+        :param warning: A warning message which is shown once if
             :meth:`toWikibase` is called
         """
         self.json = json

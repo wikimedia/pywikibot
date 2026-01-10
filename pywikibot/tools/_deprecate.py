@@ -64,7 +64,7 @@ def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
     otherwise the second decorator will have the wrong full name.
 
     :param obj: An object being decorated
-    :type obj: object
+    :type obj: Object
     :param stacklevel: Stack level to use
     """
     if hasattr(obj, '__full_name__'):
@@ -127,8 +127,8 @@ def add_full_name(obj):
     <xyz>.foo = add_full_name(<xyz>.foo)
 
     :param obj: The function to decorate
-    :type obj: callable
-    :return: decorating function
+    :type obj: Callable
+    :return: Decorating function
     :rtype: function
     """
     def outer_wrapper(*outer_args, **outer_kwargs):
@@ -139,8 +139,8 @@ def add_full_name(obj):
         replacement decorator if the decorated decorator was called
         without arguments.
 
-        :param outer_args: args
-        :param outer_kwargs: kwargs
+        :param outer_args: Args
+        :param outer_kwargs: Kwargs
         """
         def inner_wrapper(*args, **kwargs):
             """Replacement function.
@@ -150,8 +150,8 @@ def add_full_name(obj):
             which belong to the function that the decorated decorator
             was decorating.
 
-            :param args: args passed to the decorated function.
-            :param kwargs: kwargs passed to the decorated function.
+            :param args: Args passed to the decorated function.
+            :param kwargs: Kwargs passed to the decorated function.
             """
             add_decorated_full_name(args[0])
             return obj(*outer_args, **outer_kwargs)(*args, **kwargs)
@@ -183,8 +183,8 @@ def _build_msg_string(instead: str | None, since: str | None) -> str:
     .. versionchanged:: 7.0
        `since`parameter must be a release number, not a timestamp.
 
-    :param instead: suggested replacement for the deprecated object
-    :param since: a version string when the method or function was deprecated
+    :param instead: Suggested replacement for the deprecated object
+    :param since: A version string when the method or function was deprecated
     """
     if since and '.' not in since:
         raise ValueError(f'{since} is not a valid release number')
@@ -208,15 +208,14 @@ def issue_deprecation_warning(name: str,
 
     .. versionchanged:: 8.2
        *warning_class* and *since* are keyword-only parameters.
-
-    :param name: The name of the deprecated object
-    :param instead: Suggested replacement for the deprecated object
-    :param depth: *depth* + 1 will be used as stacklevel for the
-        warnings
-    :param warning_class: A warning class (category) to be used,
-        defaults to FutureWarning
-    :param since: A version string when the method or function was
-        deprecated
+        :param name: The name of the deprecated object
+        :param instead: Suggested replacement for the deprecated object
+        :param depth: *depth* + 1 will be used as stacklevel for the
+        Warnings
+        :param warning_class: A warning class (category) to be used,
+        Defaults to FutureWarning
+        :param since: A version string when the method or function was
+        Deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -231,11 +230,11 @@ def deprecated(*args, **kwargs):
     .. versionchanged:: 7.0
        `since` keyword must be a release number, not a timestamp.
 
-    :keyword str instead: if provided, will be used to specify the
+    :keyword str instead: If provided, will be used to specify the
         replacement
-    :keyword str since: a version string when the method or function was
+    :keyword str since: A version string when the method or function was
         deprecated
-    :keyword bool future_warning: if True a FutureWarning will be thrown,
+    :keyword bool future_warning: If True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
     """
     def decorator(obj):
@@ -243,15 +242,15 @@ def deprecated(*args, **kwargs):
 
         The outer wrapper is used to create the decorating wrapper.
 
-        :param obj: function being wrapped
-        :type obj: object
+        :param obj: Function being wrapped
+        :type obj: Object
         """
         def wrapper(*args, **kwargs):
             """Replacement function.
 
-            :param args: args passed to the decorated function.
-            :param kwargs: kwargs passed to the decorated function.
-            :return: the value returned by the decorated function
+            :param args: Args passed to the decorated function.
+            :param kwargs: Kwargs passed to the decorated function.
+            :return: The value returned by the decorated function
             :rtype: any
             """
             name = obj.__full_name__
@@ -344,8 +343,8 @@ def deprecate_arg(old_arg: str, new_arg: str | None = None):
     .. versionchanged:: 9.2
        bool type of *new_arg* is no longer supported.
 
-    :param old_arg: old keyword
-    :param new_arg: new keyword
+    :param old_arg: Old keyword
+    :param new_arg: New keyword
     """
     return deprecated_args(**{old_arg: new_arg})
 
@@ -379,15 +378,15 @@ def deprecated_args(**arg_pairs: str | None):
 
         The outer wrapper is used to create the decorating wrapper.
 
-        :param obj: function being wrapped
-        :type obj: object
+        :param obj: Function being wrapped
+        :type obj: Object
         """
         def wrapper(*__args, **__kw):
             """Replacement function.
 
-            :param __args: args passed to the decorated function
-            :param __kw: kwargs passed to the decorated function
-            :return: the value returned by the decorated function
+            :param __args: Args passed to the decorated function
+            :param __kw: Kwargs passed to the decorated function
+            :return: The value returned by the decorated function
             :rtype: any
             """
             name = obj.__full_name__
@@ -515,17 +514,17 @@ def deprecated_signature(since: str = ''):
     def decorator(func):
         """Outer wrapper. Inspect the parameters of *func*.
 
-        :param func: function or method being wrapped.
+        :param func: Function or method being wrapped.
         """
 
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             """Throws the warning and makes the argument fixing.
 
-            :param args: args passed to the decorated function or method
-            :param kwargs: kwargs passed to the decorated function or
+            :param args: Args passed to the decorated function or method
+            :param kwargs: Kwargs passed to the decorated function or
                   method
-            :return: the value returned by the decorated function or
+            :return: The value returned by the decorated function or
                   method
             """
             # 1. fix deprecated positional-only usage
@@ -638,7 +637,7 @@ def remove_last_args(arg_names):
     The decorated function may not use ``*args`` or ``**kwargs``.
 
     :param arg_names: The names of all arguments.
-    :type arg_names: iterable; for the most explanatory message it should
+    :type arg_names: Iterable; for the most explanatory message it should
         retain the given order (so not a set for example).
     """
     def decorator(obj):
@@ -646,15 +645,15 @@ def remove_last_args(arg_names):
 
         The outer wrapper is used to create the decorating wrapper.
 
-        :param obj: function being wrapped
-        :type obj: object
+        :param obj: Function being wrapped
+        :type obj: Object
         """
         def wrapper(*__args, **__kw):
             """Replacement function.
 
-            :param __args: args passed to the decorated function
-            :param __kw: kwargs passed to the decorated function
-            :return: the value returned by the decorated function
+            :param __args: Args passed to the decorated function
+            :param __kw: Kwargs passed to the decorated function
+            :return: The value returned by the decorated function
             :rtype: any
             """
             name = obj.__full_name__
@@ -706,7 +705,7 @@ def redirect_func(target, *,
        All parameters except *target* are keyword-only parameters.
 
     :param target: The targeted function which is to be executed.
-    :type target: callable
+    :type target: Callable
     :param source_module: The module of the old function. If '.' defaults
         to target_module. If 'None' (default) it tries to guess it from the
         executing function.
@@ -717,8 +716,8 @@ def redirect_func(target, *,
         new function.
     :param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
-    :param since: a version string when the method or function was deprecated
-    :param future_warning: if True a FutureWarning will be thrown,
+    :param since: A version string when the method or function was deprecated
+    :param future_warning: If True a FutureWarning will be thrown,
         otherwise it provides a DeprecationWarning
     :return: A new function which adds a warning prior to each execution.
     :rtype: callable
@@ -793,9 +792,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
             object name, and evaluated when the deprecated object is needed.
         :param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
-        :param since: a version string when the method or function was
+        :param since: A version string when the method or function was
             deprecated
-        :param future_warning: if True a FutureWarning will be thrown,
+        :param future_warning: If True a FutureWarning will be thrown,
             otherwise it provides a DeprecationWarning
         """
         if '.' in name:

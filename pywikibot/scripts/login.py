@@ -52,7 +52,7 @@ subdirectory.
    the -cookies option
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -135,7 +135,7 @@ def main(*args: str) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    :param args: command line arguments
+    :param args: Command line arguments
     """
     logall = False
     logout = False
