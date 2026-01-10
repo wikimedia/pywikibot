@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,6 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
-    UnknownExtensionError,
     WikiBaseError,
 )
 from pywikibot.page import ItemPage, PropertyPage, WikibasePage
@@ -1425,18 +1424,12 @@ class TestUnconnectedClient(TestCase):
         with self.assertRaisesRegex(WikiBaseError, regex):
             self.wdp.data_item()
 
-    def test_has_data_repository(self, key) -> None:
-        """Test that site has no data repository."""
-        site = self.get_site(key)
-        self.assertFalse(site.has_data_repository)
-
-    def test_page_from_repository_fails(self, key) -> None:
-        """Test that page_from_repository method fails."""
+    def test_missing_data_repository(self, key) -> None:
+        """Test page_from_repository with no data repository."""
         site = self.get_site(key)
         dummy_item = 'Q1'
-        regex = r'^Wikibase is not implemented for .+\.$'
-        with self.assertRaisesRegex(UnknownExtensionError, regex):
-            site.page_from_repository(dummy_item)
+        self.assertFalse(site.has_data_repository)
+        self.assertIsNone(site.page_from_repository(dummy_item))
 
 
 class TestJSON(WikidataTestCase):

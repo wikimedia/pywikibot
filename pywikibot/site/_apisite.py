@@ -46,7 +46,6 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
-    UnknownExtensionError,
 )
 from pywikibot.site._basesite import BaseSite
 from pywikibot.site._decorators import need_right
@@ -1384,17 +1383,16 @@ class APISite(
         .. versionchanged:: 7.7
            No longer raise NotimplementedError if used with a Wikibase
            site.
+        .. versionchanged:: 11.0
+           No longer raise UnknownExtensionError if site is not
+           connected to a wikibase but retern None instead.
 
         :param item: Id number of item, "Q###",
         :return: Page, or Category object given by Wikibase item number
             for this site object.
-
-        :raises pywikibot.exceptions.UnknownExtensionError: site has no
-            Wikibase extension
         """
         if not self.has_data_repository:
-            raise UnknownExtensionError(
-                f'Wikibase is not implemented for {self}.')
+            return None
 
         repo = self.data_repository()
         dp = pywikibot.ItemPage(repo, item)

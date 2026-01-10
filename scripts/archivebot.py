@@ -188,7 +188,7 @@ Version historty:
    The ``-namespace`` option is now respected by ``-page`` option.
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -469,6 +469,10 @@ class DiscussionPage(pywikibot.Page):
            the current timestamp to the previous if the current is lower.
         .. versionchanged:: 7.7
            Load unsigned threads using timestamp of the next thread.
+        .. versionchanged:: 11.0
+           Use explicit check for 'archiveheader' to avoid eager
+           evaluation of :meth:`get_header_template` when an
+           archiveheader exists within archive template.
         """
         self.header = ''
         self.threads = []
@@ -476,8 +480,16 @@ class DiscussionPage(pywikibot.Page):
         try:
             text = self.get()
         except NoPageError:
-            self.header = self.archiver.get_attr('archiveheader',
-                                                 self.get_header_template())
+            # Use explicit check for 'archiveheader' instead of passing it as
+            # a default to get_attr(), because get_attr evaluates the default
+            # eagerly. Without this, get_header_template() would always be
+            # called, even when an archiveheader exists within archive
+            # template, defeating lazy fallback.
+            if 'archiveheader' in self.archiver.attributes:
+                self.header = self.archiver.get_attr('archiveheader')
+            else:
+                self.header = self.get_header_template()
+
             if self.params:
                 self.header = self.header % self.params
             return
