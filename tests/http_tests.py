@@ -435,6 +435,7 @@ class CharsetTestCase(TestCase):
         self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T414220')
     def test_invalid_charset(self) -> None:
         """Test decoding with different and invalid charsets."""
         invalid_charsets = ('utf16', 'win-1251')
@@ -449,10 +450,9 @@ class CharsetTestCase(TestCase):
                 self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
 
                 # test Response.apparent_encoding
-                if python_implementation() != 'GraalVM':  # T414220
-                    self.assertEqual(resp.text, str(resp.content,
-                                                    resp.apparent_encoding,
-                                                    errors='replace'))
+                self.assertEqual(resp.text, str(resp.content,
+                                                resp.apparent_encoding,
+                                                errors='replace'))
 
     def test_get_charset_from_content_type(self) -> None:
         """Test get_charset_from_content_type function."""
