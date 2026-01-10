@@ -799,11 +799,13 @@ class Request(MutableMapping, WaitingMixin):
             text = removeDisabledParts(response.text, ['script'])
             text = re.sub('\n{2,}', '\n',
                           '\n'.join(removeHTMLParts(text).splitlines()[:20]))
+            ua = response.request.headers.get('User-Agent')
             msg = f"""\
 Non-JSON response received from server {self.site} for url
 {response.url}
 The server may be down.
 Status code: {response.status_code}
+User agent: {ua}
 
 The text message is:
 {text}
