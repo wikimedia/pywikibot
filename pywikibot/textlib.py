@@ -22,6 +22,7 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
 from pywikibot.tools import ModuleDeprecationWrapper, first_lower, first_upper
+from pywikibot.tools.chars import INVISIBLE_REGEX
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
@@ -1112,9 +1113,12 @@ class Section(NamedTuple):
         """Return the section title without equal signs.
 
         .. versionadded:: 8.2
+        .. versionchanged:: 11.0
+           Invisible chars like LTR or RTO are removed.
         """
         level = self.level
-        return self.title[level:-level].strip()
+        title = self.title[level:-level].strip()
+        return INVISIBLE_REGEX.sub('', title)
 
 
 class SectionList(list):
