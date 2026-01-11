@@ -63,6 +63,49 @@ class TestWikiBlameMixin(TestCase):
                 self.assertGreaterEqual(chars, 100)
                 self.assertGreaterEqual(pct, 5.0)
 
+    def test_wikiwho_exceptions(self) -> None:
+        """Test that get_annotations fails for unsupported configurations."""
+        en_site = pywikibot.Site('wikipedia:en')
+        page = pywikibot.Page(en_site, 'NonExistentPageXYZ123')
+        with self.assertRaisesRegex(pywikibot.exceptions.NoPageError,
+                                    "doesn't exist"):
+            page.get_annotations()
+
+        page = pywikibot.Page(en_site, 'Talk:Wikipedia')
+        with self.assertRaisesRegex(
+            NotImplementedError,
+                'WikiWho API is not implemented for Talk: namespace'):
+            page.get_annotations()
+
+        page = pywikibot.Page(pywikibot.Site('wikipedia:ru'),
+                              'Python')
+        with self.assertRaisesRegex(
+            NotImplementedError,
+                'WikiWho API is not implemented for wikipedia:ru'):
+            page.get_annotations()
+
+    def test_wikiwho_url_construction(self) -> None:
+        """Test WikiWho URL construction."""
+        page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Test')
+        url = page._build_wikiwho_url('all_content')
+        expected = ('https://wikiwho-api.wmcloud.org/en/api/v1.0.0-beta/'
+                    'all_content/Test/')
+        self.assertEqual(url, expected)
+
+        page = pywikibot.Page(pywikibot.Site('wikipedia:en'),
+                              'Python (programming language)')
+        url = page._build_wikiwho_url('all_content')
+        self.assertIn('Python%20%28programming%20language%29', url)
+
+    def test_wikiwho_supported_languages(self) -> None:
+        """Test that WIKIWHO_CODES contains expected languages."""
+        from pywikibot.page._toolforge import WikiBlameMixin
+        codes = WikiBlameMixin.WIKIWHO_CODES
+        expected_langs = ['ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id',
+                          'it', 'ja', 'nl', 'pl', 'pt', 'tr', 'zh']
+        for lang in expected_langs:
+            self.assertIn(lang, codes)
+
 
 if __name__ == '__main__':
     with suppress(SystemExit):

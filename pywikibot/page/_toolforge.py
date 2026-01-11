@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import collections
 import re
+import urllib.parse
 from http import HTTPStatus
+from typing import Any
 from warnings import warn
 
 import pywikibot
@@ -27,6 +29,12 @@ class WikiBlameMixin:
 
     #: Supported wikipedia site codes
     WIKIBLAME_CODES = 'als', 'bar', 'de', 'en', 'it', 'nds', 'sco'
+
+    #: Supported WikiWho API language codes
+    WIKIWHO_CODES = (
+        'ar', 'de', 'en', 'es', 'eu', 'fr', 'hu', 'id', 'it', 'ja', 'nl', 'pl',
+        'pt', 'tr', 'zh'
+    )
 
     def _check_wh_supported(self) -> None:
         """Check if WikiHistory is supported."""
@@ -44,6 +52,45 @@ class WikiBlameMixin:
 
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
+
+    def _check_wikiwho_supported(self) -> None:
+        """Check if WikiWho API is supported.
+
+        .. versionadded:: 11.0
+
+        :raise NotImplementedError: unsupported site, language, or namespace
+        :raise NoPageError: page does not exist
+        """
+        if self.site.family.name != 'wikipedia':
+            raise NotImplementedError(
+                'WikiWho API is implemented for wikipedia family only')
+
+        if (code := self.site.code) not in self.WIKIWHO_CODES:
+            raise NotImplementedError(
+                f'WikiWho API is not implemented for wikipedia:{code}')
+
+        if (ns := self.namespace()) != 0:
+            raise NotImplementedError(
+                f'WikiWho API is not implemented for {ns} namespace')
+
+        if not self.exists():
+            raise pywikibot.exceptions.NoPageError(self)
+
+    def _build_wikiwho_url(self, endpoint: str) -> str:
+        """Build WikiWho API URL for the given endpoint.
+
+        .. versionadded:: 11.0
+
+        :param endpoint: API endpoint (all_content, rev_content,
+            edit_persistence)
+        :return: Complete API URL
+        """
+        article_title = self.title(with_ns=False, with_section=False)
+        encoded_title = urllib.parse.quote(article_title, safe='')
+        base_url = 'https://wikiwho-api.wmcloud.org'
+        url = (f'{base_url}/{self.site.code}/api/v1.0.0-beta/{endpoint}/'
+               f'{encoded_title}/')
+        return url
 
     @deprecated('authorsship', since='9.3.0')
     @deprecated_args(onlynew=None)  # since 9.2.0
@@ -207,3 +254,56 @@ class WikiBlameMixin:
                 break
 
         return {user: (chars, percent) for user, chars, percent in result}
+
+    def get_annotations(self) -> dict[str, Any]:
+        """Get WikiWho annotations for article revisions.
+
+        This method uses the public WikiWho API to get token-level
+        provenance annotations showing who added each token in the article.
+
+        Sample:
+
+        >>> import pywikibot
+        >>> site = pywikibot.Site('wikipedia:en')
+        >>> page = pywikibot.Page(site, 'Python (programming language)')
+        >>> data = page.get_annotations()  # doctest: +SKIP
+        >>> data['article_title']  # doctest: +SKIP
+        'Python (programming language)'
+
+        .. important:: Only implemented for main namespace pages and only
+           Wikipedias of :attr:`WIKIWHO_CODES` are supported.
+        .. versionadded:: 11.0
+        .. seealso::
+           - https://wikiwho-api.wmcloud.org
+           - https://www.mediawiki.org/wiki/WikiWho
+
+        :return: Dictionary containing article_title, page_id, and revisions
+            with token-level annotations
+
+        :raise NotImplementedError: unsupported site, language, or namespace
+        :raise NoPageError: page does not exist
+        :raise pywikibot.exceptions.ServerError: WikiWho API error
+        :raise requests.exceptions.HTTPError: HTTP error from WikiWho API
+        """
+        self._check_wikiwho_supported()
+
+        url = self._build_wikiwho_url('all_content')
+        url = f'{url}?editor=true&o_rev_id=true'
+
+        r = pywikibot.comms.http.fetch(url)
+
+        if r.status_code != HTTPStatus.OK:
+            r.raise_for_status()
+
+        try:
+            data = r.json()
+        except Exception as e:
+            raise pywikibot.exceptions.ServerError(
+                f'Failed to parse WikiWho API response: {e}')
+
+        if 'Error' in data or 'error' in data:
+            error_msg = data.get('Error') or data.get('error', 'Unknown error')
+            raise pywikibot.exceptions.ServerError(
+                f'WikiWho API error: {error_msg}')
+
+        return data
