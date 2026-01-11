@@ -3,6 +3,11 @@ Release 11 (in development)
 
 **Improvements**
 
+* Add support for beta site in :class:`families.meta_family.Family` (:phab:`T413060`)
+* Add user agent to :class:`data.api.Request` error log (:phab:`T414170`)
+* Increase performance of delegation for :class:`BaseSite<pywikibot.site._basesite.BaseSite>`
+  methods to :class:`family.Family` methods (:phab:`T413398`)
+* Use ``queue.shutdown()``  for the async_manager queue
 * Use :class:`backports.RLock` instead of Queue to signal async_manager activity (:phab:`T147178`)
 * Add :meth:`User.is_partial_blocked()<pywikibot.User.is_partial_blocked>` and methods
   :meth:`APISite.is_partial_blocked()<pywikibot.site._apisite.APISite.is_partial_blocked>` to detect
@@ -23,12 +28,15 @@ Release 11 (in development)
 
 **Bugfixes**
 
+* Handle retry-after value gracefully if it is a float instead an int (:phab:`T414197`)
+* Handle limit value gracefully if it is an int instead a str (:phab:`T414168`)
 * Handle `lockmanager-fail-conflict` API error in :meth:`data.api.Request.submit` as retryable
   (:phab:`T396984`)
 * Prevent login loop in :mod:`data.superset` with unsupported auth methods (:phab:`T408287`)
 
 **Code cleanups**
 
+* ``{httplib2}`` user_agent_format variable is no longer supported (:phab:`T98439`)
 * The undocumented ``page_put_queue_busy`` was removed without deprecation period.
 * Dysfunctional :meth:`APISite.alllinks()
   <pywikibot.site._generators.GeneratorsMixin.alllinks>` was removed.

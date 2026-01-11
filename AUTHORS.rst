@@ -16,7 +16,7 @@ A
     Alex Shih-Han Lin
     Alexander Jones
     Alexander Shtyrov
-    Alexander Vorwerk
+    Alexander Vorwerk (Zabe)
     Alfio
     Allen Guo
     Amir Sarabadani
@@ -108,7 +108,6 @@ F
 
 ::
 
-
     Fabian Neundorf
     Federico Leva
     Felix Reimann
@@ -121,7 +120,6 @@ G
 -
 
 ::
-
 
     Gallaecio
     Geoffrey Mon
@@ -136,7 +134,6 @@ H
 
 ::
 
-
     Hazard-SJ
     Huji
     Homeboy445
@@ -146,7 +143,6 @@ I
 
 ::
 
-
     Ignacio Rodríguez
     Inductiveload
 
@@ -154,7 +150,6 @@ J
 -
 
 ::
-
 
     James Michael DuPont
     Jamison Lofthouse
@@ -179,7 +174,6 @@ K
 
 ::
 
-
     Kaleem Bhatti
     Karl Eichwalder
     Kasper Souren
@@ -195,7 +189,6 @@ L
 
 ::
 
-
     Lars G
     Legoktm
     Leonardo Gregianin
@@ -208,7 +201,6 @@ M
 -
 
 ::
-
 
     m4tx
     Maarten Dammers
@@ -240,7 +232,6 @@ N
 
 ::
 
-
     Nicolas Dumazet
     Nikhil Prakash
     Nikitrain
@@ -253,14 +244,12 @@ O
 
 ::
 
-
     opensourceware
 
 P
 -
 
 ::
-
 
     Pamputt
     pere prlpz
@@ -284,7 +273,6 @@ R
 
 ::
 
-
     Reza
     RichardL
     ricordisamoa
@@ -299,7 +287,6 @@ S
 -
 
 ::
-
 
     Sanjai Siddharthan
     Sarthak Singh
@@ -324,7 +311,6 @@ T
 
 ::
 
-
     Tacsipacsi
     Tbodt
     Tejashxv
@@ -343,14 +329,12 @@ U
 
 ::
 
-
     Udoka
 
 V
 -
 
 ::
-
 
     Vadiraja K
     Vadivelu Murali Pranavan
@@ -363,7 +347,6 @@ W
 -
 
 ::
-
 
     Warddr
     WASP-Outis
@@ -380,14 +363,12 @@ X
 
 ::
 
-
     xqt
 
 Y
 -
 
 ::
-
 
     Yifei He
     Yongmin Hong
@@ -400,8 +381,6 @@ Z
 
 ::
 
-
-    Zabe
     Zaher Kadour
     zhuyifei1999
     Zoran Dori
