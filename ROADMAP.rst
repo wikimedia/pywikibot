@@ -90,6 +90,8 @@ Release 11 (in development)
 
 **Other breaking changes**
 
+* Protocol swapping in :class:`data.api.Request` was removed. Family files should provide
+  the correct protocol. (:phab:`T414369`)
 * Package requirements were updated (``beautifulsoup4``, ``fake-useragent``, ``mwoauth``,
   ``mwparserfromhell``, ``packaging``, ``Pillow``, ``pydot``, ``PyMySQL``, ``python-stdnum``,
   ``requests``, ``requests-sse``, ``wikitextparser``)

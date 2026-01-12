@@ -21,7 +21,7 @@ from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NoReturn
-from urllib.parse import unquote, urlencode, urlparse
+from urllib.parse import unquote, urlencode
 from warnings import warn
 
 import pywikibot
@@ -725,16 +725,10 @@ class Request(MutableMapping, WaitingMixin):
 
         :meta public:
         """
-        kwargs = {}
-        schemes = ('http', 'https')
-        if self.json_warning and self.site.protocol() in schemes:
-            # retry with other scheme
-            kwargs['protocol'] = schemes[self.site.protocol() == 'http']
-
         try:
             response = http.request(self.site, uri=uri,
                                     method='GET' if use_get else 'POST',
-                                    data=data, headers=headers, **kwargs)
+                                    data=data, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
 
@@ -838,16 +832,6 @@ The text message is:
                         self[param] = [str(math.ceil(value / 2))]
                         pywikibot.info(f'Set {param} = {self[param]}')
         else:
-            scheme = urlparse(response.url).scheme
-            if self.json_warning and scheme != self.site.protocol():
-                warn(f"""
-Your {self.site.family} family uses a wrong scheme {self.site.protocol()!r}
-but {scheme!r} is required. Please add the following code to your family file:
-
-    def protocol(self, code: str) -> str:
-        return '{scheme}'
-
-""", stacklevel=2)
             return result or {}
 
         self.wait()
