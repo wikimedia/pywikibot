@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import atexit
 import codecs
+import os
 import re
 import sys
 import threading
@@ -176,7 +177,14 @@ def user_agent_username(username=None) -> str:
     - replaces spaces (' ') with '_'
     - encodes the username as 'utf-8' and if the username is not ASCII
     - URL encodes the username if it is not ASCII, or contains '%'
+
+    .. versionchanged:: 11.0
+       If *username* is not given, get it from environment variables
+       'PYWIKIBOT_USERNAME' usually used by tests or 'PWB_USERNAME' used
+       on toolforge.
     """
+    if not username:
+        username = os.getenv('PYWIKIBOT_USERNAME') or os.getenv('PWB_USERNAME')
     if not username:
         return ''
 
@@ -215,13 +223,11 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
-    username = ''
+    username = user_agent_username(site.username() if site else None)
     if site:
         script_comments.append(str(site))
 
-        # TODO: there are several ways of identifying a user, and username
-        # is not the best for a HTTP header if the username isn't ASCII.
-        if site.username():
+        if username:
             username = user_agent_username(site.username())
             script_comments.append('User:' + username)
 
