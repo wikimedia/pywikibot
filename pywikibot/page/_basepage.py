@@ -77,7 +77,7 @@ class BasePage(ComparableMixin):
         '_timestamp',
     )
 
-    def __init__(self, source, title: str = '', ns=0) -> None:
+    def __init__(self, source, title: str = '', ns: int = 0) -> None:
         """Instantiate a Page object.
 
         Three calling formats are supported:
@@ -99,14 +99,12 @@ class BasePage(ComparableMixin):
             wikitext, URLs, or another non-normalized source.
 
         :param source: The source of the page
-        :type source: Pywikibot.page.BaseLink (or subclass),
+        :type source: pywikibot.page.BaseLink (or subclass),
             pywikibot.page.Page (or subclass), or pywikibot.page.Site
         :param title: Normalized title of the page; required if source is a
             Site, ignored otherwise
-        :type title: Str
         :param ns: Namespace number; required if source is a Site, ignored
             otherwise
-        :type ns: Int
         """
         if title is None:
             raise ValueError('Title cannot be None.')
@@ -190,7 +188,7 @@ class BasePage(ComparableMixin):
     def pageid(self) -> int:
         """Return pageid of the page.
 
-        :return: Pageid or 0 if page does not exist
+        :return: Page id or 0 if page does not exist
         """
         if not hasattr(self, '_pageid'):
             self.site.loadpageinfo(self)
@@ -213,29 +211,31 @@ class BasePage(ComparableMixin):
     ) -> str:
         """Return the title of this Page, as a string.
 
-        :param underscore: Not used with as_link, If true, replace all ' '
-        characters with '_'.
+        :param underscore: Not used with as_link, If true, replace all
+            spaces with underscores.
         :param with_ns: If false, omit the namespace prefix. If this
-        option is False and used together with as_link return a labeled
-        link like [[link|label]].
+            option is False and used together with *as_link* return a
+            labeled link like ``[[link|label]]``.
         :param with_section: If false, omit the section.
-        :param as_url: Not used with as_link, If true, quote title as if in an
-        URL.
-        :param as_link: If true, return the title in the form of a wikilink.
-        :param allow_interwiki: Only used if as_link is true, If true, format
-        the link as an interwiki link if necessary.
-        :param force_interwiki: Only used if as_link is true, If true, always
-        format the link as an interwiki link.
-        :param textlink: Only used if as_link is true, If true, place a ':'
-        before Category: and Image: links.
-        :param as_filename: Not used with as_link, If true, replace any
-        characters that are unsafe in filenames.
-        :param insite: Only used if as_link is true, A site object where the
-        title is to be shown. Default is the current family/lang given by
-        -family and -lang or -site option i.e. config.family and
-        config.mylang.
-        :param without_brackets: Cannot be used with as_link, If true, remove
-        the last pair of brackets (usually removes disambiguation brackets)
+        :param as_url: Not used with *as_link*, If true, quote title as
+            if in an URL.
+        :param as_link: If true, return the title in the form of a
+            wikilink.
+        :param allow_interwiki: Only used if *as_link* is true, If true,
+            format the link as an interwiki link if necessary.
+        :param force_interwiki: Only used if *as_link* is true, If true,
+            always format the link as an interwiki link.
+        :param textlink: Only used if *as_link* is true, If true, place
+            a ':' before ``Category:`` and ``Image:`` links.
+        :param as_filename: Not used with *as_link*, If true, replace
+            any characters that are unsafe in filenames.
+        :param insite: Only used if *as_link* is true, A site object
+            where the title is to be shown. Default is the current
+            family/lang given by ``-family`` and ``-lang`` or ``-site``
+            option i.e. config.family and config.mylang.
+        :param without_brackets: Cannot be used with *as_link*, If true,
+            remove the last pair of brackets (usually removes
+            disambiguation brackets)
         """
         title = self._link.canonical_title()
         label = self._link.title
@@ -626,9 +626,13 @@ class BasePage(ComparableMixin):
 
         .. versionchanged:: 7.1
            `force` parameter was added;
-           `_get_parsed_page` becomes a Public method
+           `_get_parsed_page` becomes a public method
 
+        .. seealso::
+           :meth:`APISite.get_parsed_page()
+           <pywikibot.site._apisite.APISite.get_parsed_page>`
 
+        :param force: Force updating from the live site
         """
         if not hasattr(self, '_parsed_text') or force:
             self._parsed_text = self.site.get_parsed_page(self)
@@ -641,11 +645,10 @@ class BasePage(ComparableMixin):
                 intro: bool = True) -> str:
         """Retrieve an extract of this page.
 
-        .. seealso::
-            :meth:`APISite.get_parsed_page
-            <pywikibot.site._apisite.APISite.get_parsed_page>`
-
         .. versionadded:: 7.1
+
+        .. seealso:: :meth:`APISite.extract()
+           <pywikibot.site._extensions.TextExtractsMixin.extract>`.
 
         :param variant: The variant of extract, either 'plain' for plain
             text, 'html' for limited HTML (both excludes templates and
@@ -663,9 +666,6 @@ class BasePage(ComparableMixin):
             `sentences` parameter.
         :raises ValueError: `variant` parameter must be "plain", "html" or
             "wiki".
-
-        .. seealso:: :meth:`APISite.extract()
-           <pywikibot.site._extensions.TextExtractsMixin.extract>`.
         """
         if variant in ('plain', 'html'):
             extract = self.site.extract(self, chars=chars, sentences=sentences,
@@ -1066,9 +1066,10 @@ class BasePage(ComparableMixin):
         """Return an iterable of redirects to this page.
 
         .. versionadded:: 7.0
-        :param filter_fragments: If True, only return redirects with fragments.
-            If False, only return redirects without fragments. If None, return
-            Both (no filtering).
+
+        :param filter_fragments: If True, only return redirects with
+            fragments. If False, only return redirects without fragments.
+            If None, return both (no filtering).
         :param namespaces: Only return redirects from these namespaces
         :param total: Maximum number of redirects to retrieve in total
         :param content: Load the current content of each redirect
@@ -1476,7 +1477,7 @@ class BasePage(ComparableMixin):
             or `never`. For absolute timestamps the :class:`Timestamp`
             class can be used.
         :return: True if successful, False otherwise.
-        :raises APIError: Badexpiry: Invalid value for expiry parameter
+        :raises APIError: badexpiry: Invalid value for expiry parameter
         :raises KeyError: 'watch' isn't in API response
         :raises TypeError: Unexpected keyword argument
         """
@@ -1492,18 +1493,14 @@ class BasePage(ComparableMixin):
     def purge(self, **kwargs) -> bool:
         """Purge the server's cache for this page.
 
-        :keyword redirects: Automatically resolve redirects.
-        :type redirects: Bool
-        :keyword converttitles: Convert titles to other variants if
+        :keyword bool redirects: Automatically resolve redirects.
+        :keyword bool converttitles: Convert titles to other variants if
             necessary. Only works if the wiki's content language
             supports variant conversion.
-        :type converttitles: Bool
-        :keyword forcelinkupdate: Update the links tables.
-        :type forcelinkupdate: Bool
-        :keyword forcerecursivelinkupdate: Update the links table, and
-            update the links tables for any page that uses this page as
-            a template.
-        :type forcerecursivelinkupdate: Bool
+        :keyword bool forcelinkupdate: Update the links tables.
+        :keyword bool forcerecursivelinkupdate: Update the links table,
+            and update the links tables for any page that uses this page
+            as a template.
         """
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
@@ -2300,7 +2297,7 @@ class BasePage(ComparableMixin):
 
     def change_category(self, old_cat, new_cat,
                         summary: str | None = None,
-                        sort_key=None,
+                        sort_key: str | bool | None = None,
                         in_place: bool = True,
                         include: list[str] | None = None,
                         show_diff: bool = False) -> bool:
@@ -2310,21 +2307,18 @@ class BasePage(ComparableMixin):
            The `show_diff` parameter
 
         :param old_cat: Category to be removed
-        :type old_cat: Pywikibot.page.Category
+        :type old_cat: pywikibot.page.Category
         :param new_cat: Category to be added, if any
-        :type new_cat: Pywikibot.page.Category or None
-
+        :type new_cat: pywikibot.page.Category or None
         :param summary: String to use as an edit summary
-
-        :param sort_key: SortKey to use for the added category.
-            Unused if newCat is None, or if inPlace=True
-            If sortKey=True, the sortKey used for oldCat will be used.
-
+        :param sort_key: Sort key to use for the added category. Unused
+            if *new_cat* is None, or if *in_place* is True. If *sort_key*
+            is True, the sort Key used for *old_cat* will be used.
         :param in_place: If True, change categories in place rather than
             rearranging them.
-
-        :param include: List of tags not to be disabled by default in relevant
-            textlib functions, where CategoryLinks can be searched.
+        :param include: List of tags not to be disabled by default in
+            relevant :mod:`textlib` functions, where category links can
+            be searched.
         :param show_diff: Show changes between oldtext and newtext
             (default: False)
 
@@ -2414,7 +2408,7 @@ class BasePage(ComparableMixin):
             the link will have http(s) protocol prepended. On Wikimedia
             wikis the protocol is already present.
         :return: The reduced link.
-        :raises APIError: Urlshortener-ratelimit exceeded
+        :raises APIError: urlshortener-ratelimit exceeded
         """
         wiki = self.site
         if self.site.family.shared_urlshortner_wiki:

@@ -304,7 +304,7 @@ class Coordinate(WbRepresentation):
                precision)*radius*math.cos(math.radians(self.lat))))
 
         :return: Dimension in meters
-        :raises ValueError: If neither dim nor precision is set
+        :raises ValueError: If neither *dim* nor *precision* is set
         """
         if self._dim is not None:
             return self._dim
@@ -339,7 +339,7 @@ class Coordinate(WbRepresentation):
             that provided with the Coordinate
         :param lazy_load: Do not raise :exc:`exceptions.NoPageError` if
             ItemPage does not exist
-        :return: Pywikibot.ItemPage of the globe
+        :return: :class:`pywikibot.ItemPage` of the globe
         """
         if isinstance(self._entity, pywikibot.ItemPage):
             return self._entity
@@ -1047,7 +1047,7 @@ class WbQuantity(WbRepresentation):
             that provided with the WbQuantity.
         :param lazy_load: Do not raise NoPage if ItemPage does not
             exist.
-        :return: Pywikibot.ItemPage
+        :return: :class:`pywikibot.ItemPage`
         """
         if not isinstance(self._unit, str):
             return self._unit

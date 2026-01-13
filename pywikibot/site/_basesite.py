@@ -35,15 +35,13 @@ class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
 
-    def __init__(self, code: str, fam=None, user=None) -> None:
+    def __init__(self, code: str, fam=None, user: str | None = None) -> None:
         """Initializer.
 
         :param code: The site's language code
-        :type code: Str
         :param fam: Wiki family name (optional)
-        :type fam: Str or pywikibot.family.Family
+        :type fam: str or pywikibot.family.Family or None
         :param user: Bot user name (optional)
-        :type user: Str
         """
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
@@ -320,7 +318,7 @@ class BaseSite(ComparableMixin):
         at the same time, even to different sections.
 
         :param page: The page to be locked
-        :type page: Pywikibot.Page
+        :type page: pywikibot.Page
         :param block: If true, wait until the page is available to be
             locked; otherwise, raise an exception if page can't be
             locked
@@ -337,7 +335,7 @@ class BaseSite(ComparableMixin):
         """Unlock page. Call as soon as a write operation has completed.
 
         :param page: The page to be locked
-        :type page: Pywikibot.Page
+        :type page: pywikibot.Page
         """
         with self._pagemutex:
             self._locked_pages.discard(page.title(with_section=False))

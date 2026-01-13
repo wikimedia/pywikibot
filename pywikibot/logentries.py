@@ -188,7 +188,7 @@ class BlockEntry(LogEntry):
     def duration(self) -> datetime.timedelta | None:
         """Return a datetime.timedelta representing the block duration.
 
-        :return: Datetime.timedelta, or None if block is indefinite.
+        :return: datetime.timedelta, or None if block is indefinite.
         """
         # Doing the difference is easier than parsing the string
         return (self.expiry() - self.timestamp()

@@ -64,11 +64,11 @@ class EchoMixin:
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        :Keyword str | None format: Notification output format.
+        .. seealso:: :api:`Notifications` for other keywords.
+
+        :keyword str | None format: Notification output format.
             Possible values are ``model``, ``special``, or ``None``.
             The default is ``special``.
-
-        .. seealso:: :api:`Notifications` for other keywords.
         """
         params = {
             'action': 'query',
@@ -128,7 +128,7 @@ class ProofreadPageMixin:
                 3: 'Proofread', 4: 'Validated'}
 
         :param expiry: Either a number of days or a datetime.timedelta object
-        :type expiry: Int (days), :py:obj:`datetime.timedelta`, False (config)
+        :type expiry: int (days), :py:obj:`datetime.timedelta`, False (config)
         :return: A tuple containing _proofread_index_ns,
             self._proofread_page_ns and self._proofread_levels.
         :rtype: Namespace, Namespace, dict
@@ -226,7 +226,7 @@ class PageImagesMixin:
         """Load [[mw:Extension:PageImages]] info.
 
         :param page: The page for which to obtain the image
-        :type page: Pywikibot.Page
+        :type page: pywikibot.Page
         :raises APIError: PageImages extension is not installed
         """
         title = page.title(with_section=False)
@@ -246,7 +246,7 @@ class GlobalUsageMixin:
         """Iterate global image usage for a given FilePage.
 
         :param page: The page to return global image usage for.
-        :type page: Pywikibot.FilePage
+        :type page: pywikibot.FilePage
         :param total: Iterate no more than this number of pages in
             total.
         :raises TypeError: Input page is not a FilePage.
@@ -391,13 +391,11 @@ class ThanksMixin:
     """APISite mixin for Thanks extension."""
 
     @need_extension('Thanks')
-    def thank_revision(self, revid, source=None):
+    def thank_revision(self, revid: int, source: str | None = None):
         """Corresponding method to the 'action=thank' API action.
 
         :param revid: Revision ID for the revision to be thanked.
-        :type revid: Int
         :param source: A source for the thanking operation.
-        :type source: Str
         :raise APIError: On thanking oneself or other API errors.
         :return: The API response.
         """
@@ -415,16 +413,14 @@ class UrlShortenerMixin:
     """APISite mixin for UrlShortener extension."""
 
     @need_extension('UrlShortener')
-    def create_short_link(self, url):
+    def create_short_link(self, url: str) -> str:
         """Return a shortened link.
 
         Note that on Wikimedia wikis only metawiki supports this action,
         and this wiki can process links to all WM domains.
 
         :param url: The link to reduce, with propotol prefix.
-        :type url: Str
         :return: The reduced link, without protocol prefix.
-        :rtype: str
         """
         req = self.simple_request(action='shortenurl', url=url)
         data = req.submit()
@@ -451,8 +447,8 @@ class TextExtractsMixin:
         :param chars: Maximum characters to return.
         :param sentences: How many sentences to return.
         :param intro: Return only content before the first section.
-        :param plaintext: Return extracts as plain text instead of limited
-            HTML.
+        :param plaintext: Return extracts as plain text instead of
+            limited HTML.
         :return: The extract of the page.
 
         .. seealso::

@@ -336,26 +336,22 @@ class User(Page):
     def logevents(self, **kwargs):
         """Yield user activities.
 
-        :keyword logtype: Only iterate entries of this type (see
+        :keyword str logtype: Only iterate entries of this type (see
             mediawiki api documentation for available types)
-        :type logtype: Str
         :keyword page: Only iterate entries affecting this page
         :type page: Page or str
         :keyword namespace: Namespace to retrieve logevents from
-        :type namespace: Int or Namespace
+        :type namespace: int or Namespace
         :keyword start: Only iterate entries from and after this
             Timestamp
         :type start: Timestamp or ISO date string
         :keyword end: Only iterate entries up to and through this
             Timestamp
         :type end: Timestamp or ISO date string
-        :keyword reverse: If True, iterate oldest entries first
+        :keyword bool reverse: If True, iterate oldest entries first
             (default: newest)
-        :type reverse: Bool
-        :keyword tag: Only iterate entries tagged with this tag
-        :type tag: Str
-        :keyword total: Maximum number of events to iterate
-        :type total: Int
+        :keyword str tag: Only iterate entries tagged with this tag
+        :keyword int total: Maximum number of events to iterate
         :rtype: iterable
         """
         return self.site.logevents(user=self.username, **kwargs)

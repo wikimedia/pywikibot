@@ -182,19 +182,20 @@ class ItemClaimFilter:
         cls,
         generator: Iterable[pywikibot.page.WikibasePage],
         prop: str,
-        claim: str,
+        claim,
         qualifiers: dict[str, str] | None = None,
         negate: bool = False,
     ) -> Generator[pywikibot.page.WikibasePage]:
         """Yield all ItemPages which contain certain claim in a property.
 
         :param prop: Property id to check
-        :param claim: Value of the property to check. For instance, an
-            ItemPage instance or a string, e.g. 'Q37470'.
+        :param claim: Value of the property to check. An ItemPage
+            instance or a string, e.g. 'Q37470'.
+        :type claim: Itempage | str
         :param qualifiers: Dict of qualifiers that must be present, or
             None if qualifiers are irrelevant
         :param negate: True if pages that do *not* contain the specified
-            claim should be yielded; Otherwise False
+            claim should be yielded; otherwise False
         """
         qualifiers = qualifiers or {}
         for page in generator:
@@ -328,7 +329,7 @@ def QualityFilterPageGenerator(
     In all the other cases, no filter is applied.
 
     :param generator: A generator object
-    :param quality: Proofread-page quality levels (valid range 0-4)
+    :param quality: Any proofread-page quality levels (valid range 0-4)
     """
     for page in generator:
         if page.namespace() == page.site.proofread_page_ns:

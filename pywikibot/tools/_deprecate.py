@@ -57,14 +57,13 @@ class _NotImplementedWarning(RuntimeWarning):
     """
 
 
-def add_decorated_full_name(obj, stacklevel: int = 1) -> None:
+def add_decorated_full_name(obj: Any, stacklevel: int = 1) -> None:
     """Extract full object name, including class, and store in __full_name__.
 
     This must be done on all decorators that are chained together,
     otherwise the second decorator will have the wrong full name.
 
     :param obj: An object being decorated
-    :type obj: Object
     :param stacklevel: Stack level to use
     """
     if hasattr(obj, '__full_name__'):
@@ -208,14 +207,15 @@ def issue_deprecation_warning(name: str,
 
     .. versionchanged:: 8.2
        *warning_class* and *since* are keyword-only parameters.
-        :param name: The name of the deprecated object
-        :param instead: Suggested replacement for the deprecated object
-        :param depth: *depth* + 1 will be used as stacklevel for the
-        Warnings
-        :param warning_class: A warning class (category) to be used,
-        Defaults to FutureWarning
-        :param since: A version string when the method or function was
-        Deprecated
+
+    :param name: The name of the deprecated object
+    :param instead: Suggested replacement for the deprecated object
+    :param depth: Stacklevel depth; *depth* + 1 will be used as
+        stacklevel for the warnings
+    :param warning_class: A warning class (category) to be used,
+        defaults to FutureWarning
+    :param since: A version string when the method or function was
+        deprecated
     """
     msg = _build_msg_string(instead, since)
     if warning_class is None:
@@ -245,13 +245,12 @@ def deprecated(*args, **kwargs):
         :param obj: Function being wrapped
         :type obj: Object
         """
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             """Replacement function.
 
             :param args: Args passed to the decorated function.
             :param kwargs: Kwargs passed to the decorated function.
             :return: The value returned by the decorated function
-            :rtype: any
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1

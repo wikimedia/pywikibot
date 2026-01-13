@@ -625,7 +625,7 @@ def get_close_matches_ratio(
 
     This method is similar to Python's :pylib:`difflib.get_close_matches()
     <difflib#difflib.get_close_matches>` but also gives ratio back and
-    Has an *ignorecase* parameter to compare case-insensitive.
+    has an *ignorecase* parameter to compare case-insensitive.
 
     SequenceMatcher is used to return a list of the best "good enough"
     matches together with their ratio. The ratio is computed by the

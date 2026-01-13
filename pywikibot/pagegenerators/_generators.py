@@ -1478,7 +1478,6 @@ class PagePilePageGenerator(GeneratorWrapper):
     def buildQuery(self, id: int):
         """Get the querystring options to query PagePile.
 
-        :param id: Int
         :return: Dictionary of querystring parameters to use in the
             query
         """

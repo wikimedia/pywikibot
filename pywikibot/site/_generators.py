@@ -721,7 +721,7 @@ class GeneratorsMixin:
     def _rvprops(self, content: bool = False) -> list[str]:
         """Setup rvprop items for loadrevisions and preloadpages.
 
-        :return: Rvprop items
+        :return: rvprop items
         """
         props = ['comment', 'contentmodel', 'flags', 'ids', 'parsedcomment',
                  'sha1', 'size', 'tags', 'timestamp', 'user', 'userid']
@@ -1296,12 +1296,13 @@ class GeneratorsMixin:
 
         :param image: The image to search for (FilePage need not exist on
             the wiki)
-        :param namespaces: If present, only iterate pages in these namespaces
-        :param filterredir: If True, only yield redirects; if False (and not
-            None), only yield non-redirects (default: yield both)
+        :param namespaces: If present, only iterate pages in these
+            namespaces.
+        :param filterredir: If True, only yield redirects; if False (and
+            not None), only yield non-redirects (default: yield both).
         :param total: Iterate no more than this number of pages in total
-        :param content: If True, load the current content of each iterated page
-            (default False)
+        :param content: If True, load the current content of each
+            iterated page (default False)
         :raises KeyError: A namespace identifier was not resolved
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -1314,7 +1315,7 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content, **iuargs)
 
-    def logevents(
+    def logevents(  # docsig: disable=SIG305
         self,
         logtype: str | None = None,
         user: str | None = None,
@@ -1333,25 +1334,29 @@ class GeneratorsMixin:
         .. note:: logevents with `logtype='block'` only logs user blocks
            whereas `site.blocks` iterates all blocks including IP ranges.
 
-        .. note:: Due to an API limitation, if namespace param contains
-           multiple namespaces, log entries from all namespaces will be
-           fetched from the API and will be filtered later during
-           iteration.
-
         :param logtype: Only iterate entries of this type (see mediawiki
             api documentation for available types)
         :param user: Only iterate entries that match this user name
         :param page: Only iterate entries affecting this page
-        :param namespace: Namespace(s) to retrieve logevents from
+        :param namespace: Namespace(s) to retrieve logevents from.
+
+            .. note:: Due to an API limitation, if namespace param
+               contains multiple namespaces, log entries from all
+               namespaces will be fetched from the API and will be
+               filtered later during iteration.
+
         :param start: Only iterate entries from and after this Timestamp
-        :param end: Only iterate entries up to and through this Timestamp
-        :param reverse: If True, iterate oldest entries first (default: newest)
+        :param end: Only iterate entries up to and through this
+            Timestamp
+        :param reverse: If True, iterate oldest entries first (default:
+            newest)
         :param tag: Only iterate entries tagged with this tag
         :param total: Maximum number of events to iterate
 
         :raises KeyError: The namespace identifier was not resolved
         :raises TypeError: The namespace identifier has an inappropriate
-            type such as bool, or an iterable with more than one namespace
+            type such as bool, or an iterable with more than one
+            namespace.
         """
         if start and end:
             self.assert_valid_iter_params('logevents', start, end, reverse)
@@ -1405,9 +1410,9 @@ class GeneratorsMixin:
         .. seealso:: :api:`RecentChanges`
 
         :param start: Timestamp to start listing from
-        :type start: Pywikibot.Timestamp
+        :type start: pywikibot.Timestamp
         :param end: Timestamp to end listing at
-        :type end: Pywikibot.Timestamp
+        :type end: pywikibot.Timestamp
         :param reverse: If True, start with oldest changes (default: newest)
         :param namespaces: Only iterate pages in these namespaces
         :param changetype: Only iterate changes of this type ("edit" for
@@ -1668,7 +1673,7 @@ class GeneratorsMixin:
                                        or self.has_right('undelete'))):
             raise UserRightsError(err + 'deleted content.')
 
-    def deletedrevs(
+    def deletedrevs(  # docsig: disable=SIG305
         self,
         titles: str
         | pywikibot.Page
@@ -1692,7 +1697,6 @@ class GeneratorsMixin:
         also given with the content request.
 
         .. seealso:: :api:`Deletedrevisions`
-        .. note:: either titles or revids must be set but not both
 
         :param titles: The page titles to check for deleted revisions
         :param start: Iterate revisions starting at this Timestamp
@@ -1700,7 +1704,10 @@ class GeneratorsMixin:
         :param reverse: Iterate oldest revisions first (default: newest)
         :param content: If True, retrieve the content of each revision
         :param total: Number of revisions to retrieve
-        :keyword revids: Get revisions by their ID
+        :keyword revids: Get revisions by their ID.
+
+            .. note:: Either titles or revids must be set but not both
+
         :keyword user: List revisions by this user
         :keyword excludeuser: Exclude revisions by this user
         :keyword tag: Only list revision tagged with this tag

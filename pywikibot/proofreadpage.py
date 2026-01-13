@@ -432,8 +432,8 @@ class ProofreadPage(pywikibot.Page):
     def __init__(self, source: PageSourceType, title: str = '') -> None:
         """Instantiate a ProofreadPage object.
 
-        :raises UnknownExtensionError: Source Site has no ProofreadPage
-            Extension.
+        :raises UnknownExtensionError: *source* Site has no
+            ProofreadPage Extension.
         """
         if not isinstance(source, pywikibot.site.BaseSite):
             site = source.site

@@ -470,7 +470,7 @@ def save_botpasswords(botpasswords: str,
             raise
 
 
-def ask_for_dir_change(force) -> tuple[bool, bool]:
+def ask_for_dir_change(force: bool) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
     Only give option for directory change if user-config.py or user-
@@ -478,7 +478,6 @@ def ask_for_dir_change(force) -> tuple[bool, bool]:
     config.py also exists in the requested directory.
 
     :param force: Skip asking for directory change
-    :type force: Bool
     :return: Whether user file or password file exists already
     """
     global base_dir

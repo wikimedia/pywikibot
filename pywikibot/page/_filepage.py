@@ -130,13 +130,12 @@ class FilePage(Page):
     def get_file_info(self, ts) -> dict:
         """Retrieve and store information of a specific Image rev of FilePage.
 
-        This function will load also metadata.
-        It is also used as a helper in FileInfo to load metadata lazily.
+        This function will load also metadata. It is also used as a
+        helper in FileInfo to load metadata lazily.
 
         .. versionadded:: 8.6
 
-        :param ts: Timestamp of the Image rev. To retrieve
-
+        :param ts: Timestamp of the Image revision to retrieve
         :return: Instance of FileInfo()
         """
         self.site.loadimageinfo(self, history=False, timestamp=ts)

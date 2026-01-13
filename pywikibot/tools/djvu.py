@@ -223,11 +223,10 @@ class DjVuFile:
         return self._remove_control_chars(stdoutdata)
 
     @check_page_number
-    def whiten_page(self, n) -> bool:
+    def whiten_page(self, n: int) -> bool:
         """Replace page 'n' of djvu file with a blank page.
 
         :param n: Page n of djvu file
-        :type n: Int
         """
         # tmp files for creation/insertion of a white page.
         white_ppm = os.path.join(self.dirname, 'white_page.ppm')
@@ -274,11 +273,10 @@ class DjVuFile:
         return True
 
     @check_page_number
-    def delete_page(self, n) -> bool:
+    def delete_page(self, n: int) -> bool:
         """Delete page 'n' of djvu file.
 
         :param n: Page n of djvu file
-        :type n: Int
         """
         n_tot = self.number_of_images()
 

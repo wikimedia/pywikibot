@@ -585,7 +585,7 @@ class OauthLoginManager(LoginManager):
         :param password: Consumer secret
         :raises pywikibot.exceptions.NoUsernameError: No username is
             configured for the requested site.
-        :raises ImportError: Mwoauth isn't installed
+        :raises ImportError: mwoauth package isn't installed
         """
         if isinstance(mwoauth, ImportError):
             raise ImportError(f'mwoauth is not installed: {mwoauth}.')

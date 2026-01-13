@@ -194,19 +194,19 @@ def Site(code: str | None = None,  # noqa: N802
     .. versionchanged:: 10.3
        accept a trailing slash in *url* after domain.
 
-    :param code: Language code (override config.mylang)
-        code may also be a sitename like 'wikipedia:test'
+    :param code: Site code (override config.mylang); *code* may also be
+        a sitename like 'wikipedia:test'
     :param fam: Family name or object (override config.family)
     :param user: Bot user name to use on this site (override
         config.usernames)
-    :param interface: Site class or name of class in :py:obj:`pywikibot.site`
-        (override config.site_interface)
-    :param url: Instead of code and fam, does try to get a Site based on
-        the URL.
-    :raises ValueError: URL and pair of code and family given
-    :raises ValueError: Invalid interface name
-    :raises ValueError: Missing Site code
-    :raises ValueError: Missing Site family
+    :param interface: Site class or name of class in
+        :py:obj:`pywikibot.site` (override config.site_interface)
+    :param url: Instead of *code* and *fam*, does try to get a Site
+        based on the URL.
+    :raises ValueError: *url* and pair of *code* and *fam* given
+    :raises ValueError: Invalid *interface* name
+    :raises ValueError: Missing Site *code*
+    :raises ValueError: Missing Site *fam*
     """
     if url:
         # Either code and fam or url with optional fam for AutoFamily name

@@ -472,7 +472,7 @@ def str2timedelta(
 
     :param timestamp: A timestamp to calculate a more accurate duration offset
         used by years
-    :type timestamp: Datetime.datetime
+    :type timestamp: datetime.datetime
     :return: The corresponding timedelta object
     """
     key, duration = parse_duration(string)

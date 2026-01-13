@@ -1050,7 +1050,7 @@ def add_text(text: str, add: str, *, site=None) -> str:
     :param site: The site that the text is coming from. Required for
         reorder of categories and interlanguage links. Te default site
         is used otherwise.
-    :type site: Pywikibot.Site
+    :type site: pywikibot.Site
     """
     # Translating the \\n (e.g. from command line) into binary \n
     add = add.replace('\\n', '\n')
@@ -1456,7 +1456,7 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
-    :type site: Pywikibot.Site
+    :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last language
         link, or at the end of text if there are no language links.
     :return: The modified text.
@@ -1488,7 +1488,7 @@ def removeLanguageLinksAndSeparator(text: str, site=None, marker: str = '',
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
-    :type site: Pywikibot.Site
+    :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last language
         link, or at the end of text if there are no language links.
     :param separator: The separator string that will be removed if
@@ -1737,7 +1737,7 @@ def removeCategoryLinks(text: str, site=None, marker: str = '') -> str:
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
-    :type site: Pywikibot.Site
+    :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last category
         link, or at the end of text if there are no category links.
     :return: The modified text.
@@ -1768,7 +1768,7 @@ def removeCategoryLinksAndSeparator(text: str, site=None, marker: str = '',
 
     :param text: The text that needs to be modified.
     :param site: The site that the text is coming from.
-    :type site: Pywikibot.Site
+    :type site: pywikibot.Site
     :param marker: If defined, marker is placed after the last category
         link, or at the end of text if there are no category links.
     :param separator: The separator string that will be removed if
@@ -1790,8 +1790,10 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     """Replace old category with new one and return the modified text.
 
     :param oldtext: Content of the old category
-    :param oldcat: Pywikibot.Category object of the old category
-    :param newcat: Pywikibot.Category object of the new category
+    :param oldcat: :class:`pywikibot.Category` object of the old
+        category
+    :param newcat: :class:`Pywikibot.Category` object of the new
+        category
     :param add_only: If add_only is True, the old category won't be
         replaced and the category given will be added after it.
     :return: The modified text
@@ -1939,7 +1941,7 @@ def categoryFormat(categories, insite=None) -> str:
         be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
     :type categories: Iterable
     :param insite: Used to to localise the category namespace.
-    :type insite: Pywikibot.Site
+    :type insite: pywikibot.Site
     :return: String of categories
     """
     if not categories:

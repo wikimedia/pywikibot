@@ -3028,7 +3028,7 @@ class APISite(
         :return: True if API returns expected response; False otherwise.
             If *unwatch* is False, *expiry* is None or specifies no
             defined end date, return False if the page does not exist.
-        :raises APIError: Badexpiry: Invalid value for expiry parameter
+        :raises APIError: badexpiry: Invalid value for expiry parameter
         :raises KeyError: 'watch' isn't in API response
         :raises TypeError: Unexpected keyword argument
         """

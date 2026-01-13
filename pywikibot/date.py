@@ -1956,7 +1956,8 @@ def getAutoFormat(lang: str, title: str, ignoreFirstLetterCase: bool = True
 
     :param lang: Language code
     :param title: Value to format
-    :return: DictName ('YearBC', 'December', ...) and value (a year, date, ...)
+    :return: dict name ('YearBC', 'December', ...) and value
+        (a year, date, ...)
     """
     for dict_name, dictionary in formats.items():
         with suppress(Exception):

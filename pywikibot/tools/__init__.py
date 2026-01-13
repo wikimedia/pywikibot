@@ -212,7 +212,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     def __init__(
         self,
         message: str = '',
-        category=Warning,
+        category: type[Warning] = Warning,
         filename: str = ''
     ) -> None:
         """Initialize the object.
@@ -225,7 +225,6 @@ class suppress_warnings(catch_warnings):  # noqa: N801
             (case-insensitive)
         :param category: A class (a subclass of Warning) of which the
             warning category must be a subclass in order to match.
-        :type category: Type
         :param filename: A string containing a regular expression that
             the start of the path to the warning module must match.
             (case-sensitive)

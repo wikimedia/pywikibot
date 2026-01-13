@@ -28,6 +28,7 @@ from requests.packages.urllib3.util.response import httplib
 from pywikibot import Site, Timestamp, config, debug, warning
 from pywikibot.backports import NoneType
 from pywikibot.comms.http import user_agent
+from pywikibot.site import BaseSite
 from pywikibot.tools import cached, deprecated_args
 from pywikibot.tools.collections import GeneratorWrapper
 
@@ -120,6 +121,12 @@ class EventStreams(GeneratorWrapper):
     def __init__(self, **kwargs) -> None:
         """Initializer.
 
+        .. seealso:: https://stream.wikimedia.org/?doc#streams for
+           available Wikimedia stream types to be passed with `streams`
+           parameter.
+        .. note:: *retry* keyword argument is used instead of the
+           underlying *reconnection_time* argument which is ignored.
+
         :keyword bool canary: If True, include canary events, see
             https://w.wiki/7$2z for more info.
         :keyword APISite site: A project site object. Used if no *url*
@@ -167,14 +174,9 @@ class EventStreams(GeneratorWrapper):
 
         :param kwargs: Other keyword arguments passed to `requests_sse`
             and `requests` library
-        :raises ModuleNotFoundError: Requests-sse is not installed
+        :raises ModuleNotFoundError: requests-sse package is not
+            installed
         :raises NotImplementedError: No stream types specified
-
-        .. seealso:: https://stream.wikimedia.org/?doc#streams for
-           available Wikimedia stream types to be passed with `streams`
-           parameter.
-        .. note:: *retry* keyword argument is used instead of the
-           underlying *reconnection_time* argument which is ignored.
         """
         if isinstance(EventSource, ModuleNotFoundError):
             raise ImportError(INSTALL_MSG) from EventSource
@@ -307,15 +309,14 @@ class EventStreams(GeneratorWrapper):
         2. ``return data['type'] in ('edit', 'log')``
         3. ``return data['bot'] is True``
 
-        :keyword ftype: The filter type, one of 'all', 'any', 'none'.
+        :keyword str ftype: The filter type, one of 'all', 'any', 'none'.
             Default value is 'all'
-        :type ftype: Str
-        :param args: You may pass your own filter functions here.
-            Every function should be able to handle the data dict from events.
-        :type args: Callable
+        :param Callable args: You may pass your own filter functions
+            here. Every function should be able to handle the data dict
+            from events.
         :param kwargs: Any key returned by event data with an event data value
             for this given key.
-        :type kwargs: Str, list, tuple or other sequence
+        :type kwargs: str, list, tuple or other sequence
         :raise TypeError: A given args parameter is not a callable.
         """
         def _is(data, key=None, value=None):
@@ -417,16 +418,15 @@ class EventStreams(GeneratorWrapper):
         del self.source
 
 
-def site_rc_listener(site, total: int | None = None):
+def site_rc_listener(site: BaseSite, total: int | None = None):
     """Yield changes received from EventStream.
 
-    :param site: The Pywikibot.Site object to yield live recent changes
+    :param site: The pywikibot.Site object to yield live recent changes
         for
-    :type site: Pywikibot.BaseSite
     :param total: The maximum number of changes to return
-    :return: Pywikibot.comms.eventstream.rc_listener configured for
-        given site
-    :raises ModuleNotFoundError: Requests-sse installation is required
+    :return: A recent changes listener configured for given site
+    :raises ModuleNotFoundError: rRequests-sse package installation is
+        required
     """
     if isinstance(EventSource, ModuleNotFoundError):
         raise ModuleNotFoundError(INSTALL_MSG) from EventSource

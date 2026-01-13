@@ -19,7 +19,7 @@ import re
 from collections import OrderedDict, defaultdict
 from contextlib import suppress
 from itertools import chain
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import TYPE_CHECKING, Any, Literal, NoReturn
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -88,13 +88,9 @@ class WikibaseEntity:
         (e.g., 'labels', 'claims') to appropriate collection classes
         (e.g., :class:`LanguageDict<pywikibot.page._collections.LanguageDict>`,
         :class:`ClaimCollection<pywikibot.page._collections.ClaimCollection>`)
-
-    :cvar entity_type: entity type identifier
-    :type entity_type: Str
-
-    :cvar title_pattern: regular expression which matches all possible
+    :cvar str entity_type: entity type identifier
+    :cvar str title_pattern: regular expression which matches all possible
         entity ids for this entity type
-    :type title_pattern: Str
     """
 
     DATA_ATTRIBUTES: dict[str, Any] = {}
@@ -104,8 +100,7 @@ class WikibaseEntity:
 
         :param repo: Entity repository.
         :type repo: DataSite
-        :param id_: Entity identifier.
-        :type id_: Str or None, -1 and None mean non-existing
+        :param id_: Entity identifier; -1 and None mean non-existing
         """
         self.repo = repo
         self.id = id_ if id_ is not None else '-1'
@@ -555,7 +550,7 @@ class MediaInfo(WikibaseEntity):
         .. versionadded:: 8.5
 
         :param claim: The claim to add
-        :type claim: Pywikibot.page.Claim
+        :type claim: pywikibot.page.Claim
         :param bot: Whether to flag as bot (if possible)
         """
         if claim.on_item is not None:
@@ -604,11 +599,10 @@ class WikibasePage(BasePage, WikibaseEntity):
         :param site: Wikibase data site
         :type site: Pywikibot.site.DataSite
         :param title: Normalized title of the page
-        :type title: Str
         :keyword ns: Namespace
         :type ns: Namespace instance, or int
         :keyword entity_type: Wikibase entity type
-        :type entity_type: Str ('item' or 'property')
+        :type entity_type: Literal['item' | 'property']
         :raises TypeError: Incorrect use of parameters
         :raises ValueError: Incorrect namespace
         :raises pywikibot.exceptions.Error: title parsing problems
@@ -948,17 +942,15 @@ class ItemPage(WikibasePage):
         'sitelinks': SiteLinkCollection,
     }
 
-    def __init__(self, site, title=None, ns=None) -> None:
+    def __init__(self, site, title=None, ns: str | None = None) -> None:
         """Initializer.
 
         :param site: Data repository
-        :type site: Pywikibot.site.DataSite
-        :param title: Identifier of item, "Q###",
-                      -1 or None for an empty item.
-        :type title: Str
-        :type ns: Namespace
+        :type site: pywikibot.site.DataSite
+        :param title: Identifier of item, "Q###"; '-1' or None for an
+            empty item.
+        :param ns: Namespace, None for default site.item_namespace
         :type ns: Namespace instance, or int, or None
-            for default item_namespace
         """
         if ns is None:
             ns = site.item_namespace
@@ -1070,7 +1062,7 @@ class ItemPage(WikibasePage):
         """Get the ItemPage for a Page that links to it.
 
         :param page: Page to look for corresponding data item
-        :type page: Pywikibot.page.Page
+        :type page: pywikibot.page.Page
         :param lazy_load: Do not raise NoPageError if either page or
             corresponding ItemPage does not exist.
         :rtype: pywikibot.page.ItemPage
@@ -1108,7 +1100,7 @@ class ItemPage(WikibasePage):
         """Get the ItemPage from its entity uri.
 
         :param site: The Wikibase site for the item.
-        :type site: Pywikibot.site.DataSite
+        :type site: pywikibot.site.DataSite
         :param uri: Entity uri for the Wikibase item.
         :param lazy_load: Do not raise NoPageError if ItemPage does not
             exist.
@@ -1197,7 +1189,7 @@ class ItemPage(WikibasePage):
 
         :param family: String/Family object which represents what family
             of links to iterate
-        :type family: Str|pywikibot.family.Family
+        :type family: str | pywikibot.family.Family | None
         :return: Iterator of pywikibot.Page objects
         :rtype: iterator
         """
@@ -1221,7 +1213,7 @@ class ItemPage(WikibasePage):
            raises NoSiteLinkError instead of NoPageError.
 
         :param site: Site to find the linked page of.
-        :type site: Pywikibot.Site or database name
+        :type site: pywikibot.Site or database name
         :param force: Override caching
         :raise IsRedirectPageError: instance is a redirect page
         :raise NoSiteLinkError: site is not in :attr:`sitelinks`
@@ -1283,7 +1275,7 @@ class ItemPage(WikibasePage):
         """Merge the item into another item.
 
         :param item: The item to merge into
-        :type item: Pywikibot.page.ItemPage
+        :type item: pywikibot.page.ItemPage
         """
         data = self.repo.mergeItems(from_item=self, to_item=item, **kwargs)
         if not data.get('success', 0):
@@ -1501,7 +1493,7 @@ class Property:
         """Initializer.
 
         :param site: Data repository
-        :type site: Pywikibot.site.DataSite
+        :type site: pywikibot.site.DataSite
         :param id: Id of the property
         :param datatype: Datatype of the property; if not given, it will
             be queried via the API
@@ -1569,14 +1561,16 @@ class PropertyPage(WikibasePage, Property):
         'claims': ClaimCollection,
     }
 
-    def __init__(self, source, title=None, datatype=None) -> None:
+    def __init__(self,
+                 source,
+                 title: str | None = None,
+                 datatype: str | None = None) -> None:
         """Initializer.
 
         :param source: Data repository property is on
-        :type source: Pywikibot.site.DataSite
+        :type source: pywikibot.site.DataSite
         :param title: Identifier of property, like "P##", "-1" or None
             for an empty property.
-        :type title: Str
         :param datatype: Datatype for a new property.
         :type datatype: Str
         """
@@ -1974,14 +1968,13 @@ class Claim(Property):
 
     def changeTarget(
         self,
-        value=None,
-        snaktype: str = 'value',
+        value: Any = None,
+        snaktype: Literal['value' | 'somevalue' | 'novalue'] = 'value',
         **kwargs
     ) -> None:
         """Set the target value in the data repository.
 
         :param value: The new target value.
-        :type value: Object
         :param snaktype: The new snak type ('value', 'somevalue', or
             'novalue').
         """
@@ -2004,18 +1997,15 @@ class Claim(Property):
         """
         return self.target
 
-    def getSnakType(self) -> str:
-        """Return the type of snak.
-
-        :return: Str ('value', 'somevalue' or 'novalue')
-        """
+    def getSnakType(self) -> Literal['value' | 'somevalue' | 'novalue']:
+        """Return the type of snak."""
         return self.snaktype
 
-    def setSnakType(self, value) -> None:
+    def setSnakType(self,
+                    value: Literal['value' | 'somevalue' | 'novalue']) -> None:
         """Set the type of snak.
 
         :param value: Type of snak
-        :type value: Str ('value', 'somevalue', or 'novalue')
         """
         if value in self.SNAK_TYPES:
             self.snaktype = value
@@ -2111,7 +2101,7 @@ class Claim(Property):
         """Add the given qualifier.
 
         :param qualifier: The qualifier to add
-        :type qualifier: Pywikibot.page.Claim
+        :type qualifier: pywikibot.page.Claim
         """
         self._assert_mainsnak('Cannot add qualifiers to a {}')
         if qualifier.on_item is not None:
@@ -2131,7 +2121,7 @@ class Claim(Property):
         """Remove the qualifier. Call removeQualifiers().
 
         :param qualifier: The qualifier to remove
-        :type qualifier: Pywikibot.page.Claim
+        :type qualifier: pywikibot.page.Claim
         """
         self.removeQualifiers([qualifier], **kwargs)
 
@@ -2288,14 +2278,13 @@ class LexemePage(WikibasePage):
         # 'senses': LexemeSenseCollection,
     }
 
-    def __init__(self, site, title=None) -> None:
+    def __init__(self, site, title: str | None = None) -> None:
         """Initializer.
 
         :param site: Data repository
         :type site: Pywikibot.site.DataSite
-        :param title: Identifier of lexeme, "L###",
-            -1 or None for an empty lexeme.
-        :type title: Str or None
+        :param title: Identifier of lexeme, "L###"; '-1' or None for an
+            empty lexeme.
         """
         # Special case for empty lexeme.
         if title is None or title == '-1':
@@ -2333,19 +2322,21 @@ class LexemePage(WikibasePage):
 
         return data
 
-    def get(self, force=False, get_redirect=False, *args, **kwargs):
+    def get(self,
+            force: bool = False,
+            get_redirect: bool = False,
+            *args,
+            **kwargs):
         """Fetch all lexeme data, and cache it.
-
-        :param force: Override caching
-        :type force: Bool
-        :param get_redirect: Return the lexeme content, do not follow the
-            redirect, do not raise an exception.
-        :type get_redirect: Bool
-        :raise NotImplementedError: a value in args or kwargs
 
         .. note:: dicts returned by this method are references to content
            of this entity and their modifying may indirectly cause
            unwanted change to the live content
+
+        :param force: Override caching
+        :param get_redirect: Return the lexeme content, do not follow the
+            redirect, do not raise an exception.
+        :raise NotImplementedError: a value in args or kwargs
         """
         data = super().get(force, *args, **kwargs)
 
@@ -2391,18 +2382,15 @@ class LexemePage(WikibasePage):
 
         :param form: The form to add
         :type form: Form
-        :keyword bot: Whether to flag as bot (if possible)
-        :type bot: Bool
-        :keyword asynchronous: If True, launch a separate thread to add
-            form asynchronously
-        :type asynchronous: Bool
-        :keyword callback: A callable object that will be called after
-            the claim has been added. It must take two arguments: (1) a
-            LexemePage object, and (2) an exception instance, which will
-            be None if the entity was saved successfully. This is
-            intended for use by bots that need to keep track of which
-            saves were successful.
-        :type callback: Callable
+        :keyword bool bot: Whether to flag as bot (if possible)
+        :keyword bool asynchronous: If True, launch a separate thread to
+            add form asynchronously
+        :keyword Callable callback: A callable object that will be
+            called after the claim has been added. It must take two
+            arguments: (1) a LexemePage object, and (2) an exception
+            instance, which will be None if the entity was saved
+            successfully. This is intended for use by bots that need to
+            keep track of which saves were successful.
         """
         if form.on_lexeme is not None:
             raise ValueError('The provided LexemeForm instance is already '
@@ -2419,7 +2407,7 @@ class LexemePage(WikibasePage):
         """Remove a form from the lexeme.
 
         :param form: The form to remove
-        :type form: Pywikibot.LexemeForm
+        :type form: pywikibot.LexemeForm
         """
         data = self.repo.remove_form(form, **kwargs)
         form.on_lexeme.latest_revision_id = data['lastrevid']
@@ -2499,18 +2487,15 @@ class LexemeSubEntity(WikibaseEntity):
 
         :param claim: The claim to add
         :type claim: Claim
-        :keyword bot: Whether to flag as bot (if possible)
-        :type bot: Bool
-        :keyword asynchronous: If True, launch a separate thread to add
-            claim asynchronously
-        :type asynchronous: Bool
-        :keyword callback: A callable object that will be called after
-            the claim has been added. It must take two arguments: (1) a
-            Form object, and (2) an exception instance, which will be
-            None if the form was saved successfully. This is intended
-            for use by bots that need to keep track of which saves were
-            successful.
-        :type callback: Callable
+        :keyword bool bot: Whether to flag as bot (if possible)
+        :keyword bool asynchronous: If True, launch a separate thread to
+            add claim asynchronously
+        :keyword Callable callback: A callable object that will be
+            called after the claim has been added. It must take two
+            arguments: (1) a Form object, and (2) an exception instance,
+            which will be None if the form was saved successfully. This
+            is intended for use by bots that need to keep track of which
+            saves were successful.
         """
         self.repo.addClaim(self, claim, **kwargs)
         claim.on_item = self

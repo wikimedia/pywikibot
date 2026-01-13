@@ -1977,20 +1977,17 @@ class WikidataBot(Bot, ExistingPageBot):
 
     Source claims (P143) can be created for specific sites
 
-    :cvar use_from_page: If True (default) it will apply
+    :cvar bool | None use_from_page: If True (default) it will apply
         ItemPage.fromPage for every item. If False it assumes that the
         pages are actually already ItemPage (page in treat_page_and_item
         will be None). If None it'll use ItemPage.fromPage when the page
         is not in the site's item namespace.
-    :type use_from_page: Bool, None
-    :cvar treat_missing_item: Whether pages without items should be
+    :cvar bool treat_missing_item: Whether pages without items should be
         treated. Note that this is checked after create_missing_item.
-    :type treat_missing_item: Bool
-    :ivar create_missing_item: If True, new items will be created if the
+    :ivar bool create_missing_item: If True, new items will be created if the
         current page doesn't have one. Subclasses should override this
         in the initializer with a bool value or using self.opt
         attribute.
-    :type create_missing_item: Bool
     """
 
     use_from_page = True
@@ -2118,7 +2115,7 @@ class WikidataBot(Bot, ExistingPageBot):
         """Create a Claim usable as a source for Wikibase statements.
 
         :param site: Site that is the source of assertions.
-        :return: Pywikibot.Claim or None
+        :return: :class:`pywikibot.Claim` or None
         """
         source = None
         item = i18n.translate(site, self.source_values)
@@ -2231,7 +2228,7 @@ class WikidataBot(Bot, ExistingPageBot):
             (optional). Note that data created from the page have higher
             priority.
         :param summary: Optional edit summary to replace the default one
-        :return: Pywikibot.ItemPage or None
+        :return: :class:`pywikibot.ItemPage` or None
         """
         if not summary:
             summary = ('Bot: New item with sitelink from '
