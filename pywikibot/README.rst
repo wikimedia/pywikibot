@@ -28,7 +28,7 @@ restrictions.
 
 You do not need to "install" this package to be able to make use of
 it. You can actually just run it from the directory where you unpacked
-it or where you have your copy of the SVN or git sources.
+it or where you have your copy of the git sources.
 
 
 The first time you run a script, the package creates a file named user-config.py

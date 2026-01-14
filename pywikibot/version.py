@@ -108,7 +108,7 @@ def getversiondict() -> dict[str, str]:
              UserWarning, stacklevel=2)
         exceptions = None
 
-    # Git and SVN can silently fail, as it may be a nightly.
+    # Git can silently fail, as it may be a nightly.
     if exceptions:  # pragma: no cover
         pywikibot.debug(f'version algorithm exceptions:\n{exceptions!r}')
 

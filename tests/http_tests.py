@@ -198,7 +198,7 @@ class UserAgentTestCase(TestCase):
         self.assertNotIn(' ', http.user_agent(format_string=' {pwb} '))
 
         self.assertIn('Pywikibot/' + pywikibot.__version__,
-                      http.user_agent(format_string='SVN/1.7.5 {pwb}'))
+                      http.user_agent(format_string='Git/2.52.0 {pwb}'))
 
     def test_user_agent_username(self) -> None:
         """Test http.user_agent_username function."""
