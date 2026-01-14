@@ -1105,11 +1105,9 @@ class TestPageUserAction(DefaultSiteTestCase):
         rv = userpage.watch(expiry='5 seconds')
         self.assertTrue(rv)
         self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
-        # Wait for the expiry to pass
-        time.sleep(5)
         # Retry check for unwatch to propagate for up to 30 seconds
-        for _ in range(30):
-            time.sleep(1)
+        for _ in range(6):
+            time.sleep(5)  # Wait for the expiry to pass
             if userpage not in userpage.site.watched_pages(**wp_params):
                 break
         else:
