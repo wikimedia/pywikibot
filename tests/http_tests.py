@@ -188,8 +188,9 @@ class UserAgentTestCase(TestCase):
         self.assertEqual('', http.user_agent(format_string=' '))
         self.assertEqual('a', http.user_agent(format_string=' a '))
 
-        # if there is no site, these can't have a value
-        self.assertEqual('', http.user_agent(format_string='{username}'))
+        # if there is no site, these can't have a value except for username
+        self.assertEqual(http.user_agent_username(),
+                         http.user_agent(format_string='{username}'))
         self.assertEqual('', http.user_agent(format_string='{family}'))
         self.assertEqual('', http.user_agent(format_string='{lang}'))
 

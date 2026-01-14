@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2022
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,7 +10,7 @@ from __future__ import annotations
 import unittest
 
 import pywikibot
-from pywikibot.comms.http import user_agent
+from pywikibot.comms.http import user_agent, user_agent_username
 from tests.aspects import DefaultDrySiteTestCase
 
 
@@ -68,9 +68,9 @@ class TestDrySite(DefaultDrySiteTestCase):
         self.assertEqual(x.family.name,
                          user_agent(x, format_string='{family}'))
         self.assertEqual(x.code,
-                         user_agent(x, format_string='{lang}'))
+                         user_agent(x, format_string='{code}'))
         self.assertEqual(x.family.name + ' ' + x.code,
-                         user_agent(x, format_string='{family} {lang}'))
+                         user_agent(x, format_string='{family} {code}'))
 
         self.assertEqual(x.username(),
                          user_agent(x, format_string='{username}'))
@@ -102,10 +102,13 @@ class TestDrySite(DefaultDrySiteTestCase):
         x._userinfo = {'name': '127.0.0.1'}
         x._username = None
 
-        self.assertEqual('Foo', user_agent(x, format_string='Foo {username}'))
-        self.assertEqual('Foo (' + x.family.name + ':' + x.code + ')',
-                         user_agent(x,
-                                    format_string='Foo ({script_comments})'))
+        # user_agent_username() may set ua_username from environment variable
+        ua_username = user_agent_username()
+        self.assertEqual(f'Foo {ua_username}'.strip(),
+                         user_agent(x, format_string='Foo {username}'))
+        self.assertEqual(f'Foo ({x})',
+                         user_agent(
+                             x, format_string='Foo ({script_comments})'))
 
 
 if __name__ == '__main__':
