@@ -106,9 +106,9 @@ class TestDrySite(DefaultDrySiteTestCase):
         ua_username = user_agent_username()
         self.assertEqual(f'Foo {ua_username}'.strip(),
                          user_agent(x, format_string='Foo {username}'))
-        self.assertEqual(f'Foo ({x})',
-                         user_agent(
-                             x, format_string='Foo ({script_comments})'))
+        res = f'Foo ({x}; User:{ua_username})' if ua_username else f'Foo ({x})'
+        self.assertEqual(
+            res, user_agent(x, format_string='Foo ({script_comments})'))
 
 
 if __name__ == '__main__':
