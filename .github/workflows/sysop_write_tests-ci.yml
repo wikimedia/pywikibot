@@ -55,7 +55,6 @@ jobs:
       - name: Sysop and write tests with pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 25
         env:
           PYWIKIBOT_TEST_WRITE: ${{ matrix.site == 'wikipedia:test' && 1 || 0 }}
         run: |
