@@ -10,7 +10,7 @@ It supports both read and write throttling, automatic adjustment based
 on the number of concurrent bot instances, and optional lag-aware delays.
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -269,25 +269,33 @@ class Throttle:
     def get_delay(self, *, write: bool = False) -> float:
         """Return the current delay, adjusted for active processes.
 
-        Compute the delay for a read or write operation, factoring in
-        process concurrency. This method does not account for how much
-        time has already passed since the last access — use
+        Computes the delay for a read or write operation, taking into
+        account process concurrency and any pending retry-after value.
+        The returned value already includes the
+        :attr:`process_multiplicity` factor. This method does not
+        consider how much time has passed since the last access — use
         :meth:`waittime` for that.
 
         .. versionadded:: 10.3.0
            Renamed from :meth:`getDelay`.
+        .. versionchanged:: 11.0
+           The delay now takes any pending :attr:`retry_after` into
+           account.
 
         :param write: Whether the operation is a write (uses writedelay).
         :return: The delay in seconds before the next operation should
             occur.
         """
-        current_delay = self.writedelay if write else self.delay
-
         # Refresh process count if the check interval has elapsed
         if time.time() > self.checktime + self.checkdelay:
             self.checkMultiplicity()
 
-        current_delay = max(self.mindelay, min(current_delay, self.maxdelay))
+        current_delay = max(
+            self.mindelay,
+            self.retry_after,
+            min(self.writedelay if write else self.delay, self.maxdelay)
+        )
+
         return current_delay * self.process_multiplicity
 
     def waittime(self, write: bool = False):
