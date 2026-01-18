@@ -706,6 +706,10 @@ class Request(MutableMapping, WaitingMixin):
            content.
         .. versionchanged:: 9.2
            no wait cycles for :exc:`ImportError` and :exc:`NameError`.
+        .. versionchanged:: 11.0
+           The scheme swapping introduced in version 8.2 was removed.
+           Any :class:`Family<family.Family>` file must provide a
+           correct :meth:`protocol()<family.Family.protocol>` method.
 
         :param use_get: If True, send a GET request; otherwise send POST.
         :param uri: The URI path to request on the site.
@@ -773,8 +777,11 @@ class Request(MutableMapping, WaitingMixin):
         """Return a dict from requests.Response.
 
         .. versionchanged:: 8.2
-           show a warning to add a ``protocol()`` method to the family
-           file if suitable.
+           show a warning to add a :meth:`protocol()
+           <family.Family.protocol>` method to the family file if suitable.
+        .. versionchanged:: 11.0
+           The warning about missing or wrong ``protocol()`` method
+           introduced in version 8.2 was removed.
 
         :param response: a requests.Response object
         :type response: requests.Response
