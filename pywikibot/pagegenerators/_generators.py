@@ -378,11 +378,9 @@ def SubCategoriesPageGenerator(category: pywikibot.page.Category,
     :param content: If True, retrieve the content of the current version
         of each page (default False)
     """
-    # TODO: page generator could be modified to use cmstartsortkey ...
-    for s in category.subcategories(recurse=recurse,
-                                    total=total, content=content):
-        if start is None or s.title(with_ns=False) >= start:
-            yield s
+    return category.subcategories(recurse=recurse,
+                                  total=total, content=content,
+                                  startprefix=start)
 
 
 def LinkedPageGenerator(
