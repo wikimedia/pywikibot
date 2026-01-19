@@ -333,7 +333,7 @@ class User(Page):
         """
         self.site.unblockuser(self, reason)
 
-    def logevents(self, **kwargs):
+    def logevents(self, **kwargs) -> Generator[pywikibot.logentries.LogEntry]:
         """Yield user activities.
 
         :keyword str logtype: Only iterate entries of this type (see
@@ -357,13 +357,45 @@ class User(Page):
         return self.site.logevents(user=self.username, **kwargs)
 
     @property
-    def last_event(self):
-        """Return last user activity.
+    def last_event(self) -> pywikibot.logentries.LogEntry | None:
+        """Return last user log event.
 
         :return: Last user log entry
-        :rtype: LogEntry or None
         """
         return next(self.logevents(total=1), None)
+
+    @property
+    def last_activity(self) -> pywikibot.Timestamp | None:
+        """Return timestamp of last user activity.
+
+        This includes the last log event, last edit, last deleted
+        contribution, and last abuse log entry.
+
+        .. versionadded:: 11.0
+
+        :return: Timestamp of last user activity
+        """
+        last = set()
+
+        if last_event := self.last_event:
+            last.add(last_event.timestamp())
+
+        if last_edit := self.last_edit:
+            last.add(last_edit[2])
+
+        if last_deleted_contrib := self.deleted_contributions(total=1):
+            last.add(next(last_deleted_contrib)[1]['timestamp'])
+
+        if last_abuse_log := self.site.abuselog(
+            user=self.username, total=1, aflprop='timestamp'
+        ):
+            last.add(
+                pywikibot.Timestamp.fromISOformat(
+                    next(last_abuse_log)['timestamp']
+                )
+            )
+
+        return max(last) if last else None
 
     def contributions(
         self,

@@ -1382,6 +1382,38 @@ class GeneratorsMixin:
 
         return legen
 
+    def abuselog(self,
+                 user: str | None = None,
+                 *,
+                 start: str | pywikibot.Timestamp | None = None,
+                 end: str | pywikibot.Timestamp | None = None,
+                 reverse: bool = False,
+                 total: int | None = None,
+                 **kwargs) -> Generator[dict[str, Any]]:
+        """Yield entries from Special:AbuseLog.
+
+        .. versionadded:: 11.0
+
+        .. seealso::
+           :api:`Abuselog`
+
+        :param user: Only iterate entries that match this user name
+        :param start: Only iterate entries from and after this Timestamp
+        :param end: Only iterate entries up to and through this Timestamp
+        :param reverse: If True, iterate oldest entries first (default:
+            newest)
+        :param total: Maximum number of events to iterate
+        """
+        if start and end:
+            self.assert_valid_iter_params('abuselog', start, end, reverse)
+
+        gen = self._generator(api.ListGenerator, type_arg='abuselog',
+                              afluser=user, total=total,
+                              aflstart=start, aflend=end,
+                              afldir=('newer' if reverse else 'older'),
+                              **kwargs)
+        return gen
+
     def recentchanges(
         self,
         *,
