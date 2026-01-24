@@ -16,7 +16,7 @@ from heapq import nlargest
 from itertools import zip_longest
 
 import pywikibot
-from pywikibot.tools import chars
+from pywikibot.tools import chars, deprecated_signature
 
 
 __all__ = [
@@ -242,11 +242,23 @@ class PatchManager:
     """Apply patches to text_a to obtain a new text.
 
     If all hunks are approved, text_b will be obtained.
+
+    .. versionchanged:: 11.0
+       *text_a* and *text_b* are positional-only parameters.
+       *by_letter* and *replace_invisible* are keyword-only parameters.
     """
 
-    def __init__(self, text_a: str, text_b: str, context: int = 0,
-                 by_letter: bool = False,
-                 replace_invisible: bool = False) -> None:
+    @deprecated_signature(since='11.0.0')
+    def __init__(
+        self,
+        text_a: str,
+        text_b: str,
+        /,
+        context: int = 0,
+        *,
+        by_letter: bool | None = None,
+        replace_invisible: bool = False,
+    ) -> None:
         """Initializer.
 
         :param text_a: Base text
@@ -257,6 +269,9 @@ class PatchManager:
         :param replace_invisible: Replace invisible characters like
             U+200e with the charnumber in brackets (e.g. <200e>).
         """
+        self.context = context
+        self._replace_invisible = replace_invisible
+
         self.a: str | list[str] = text_a.splitlines(True)
         self.b: str | list[str] = text_b.splitlines(True)
         if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
@@ -281,9 +296,7 @@ class PatchManager:
         # blocks are a superset of hunk, as include also parts not
         # included in any hunk.
         self.blocks = self.get_blocks()
-        self.context = context
         self._super_hunks = self._generate_super_hunks()
-        self._replace_invisible = replace_invisible
 
     def get_blocks(self) -> list[tuple[int, tuple[int, int], tuple[int, int]]]:
         """Return list with blocks of indexes.
@@ -382,6 +395,7 @@ class PatchManager:
         output += extend_context(hunks[-1].a_rng[1], context_range[0][1])
         if self._replace_invisible:
             output = chars.replace_invisible(output)
+
         return output
 
     def review_hunks(self) -> None:
