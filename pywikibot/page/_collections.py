@@ -9,7 +9,6 @@ from __future__ import annotations
 import reprlib
 from collections import defaultdict
 from collections.abc import MutableMapping, MutableSequence
-from functools import singledispatchmethod
 from typing import Any
 
 import pywikibot
@@ -417,48 +416,34 @@ class SiteLinkCollection(MutableMapping):
             return {'site': db_name, 'title': obj.title()}
         return obj
 
-    @singledispatchmethod
     @classmethod
-    def normalizeData(cls, data) -> dict:
+    def normalizeData(cls, data: list | dict[str, Any]) -> dict:
         """Helper function to expand data into the Wikibase API structure.
 
         :param data: Data to normalize
-        :type data: dict | list
         :return: The dict with normalized data
-        :raises ValueError: Couldn't determine the site and title or the
-            key doesn't match the site within *data* collection.
-        :raises TypeError: Unsupported type for *data*
         """
-        raise TypeError(f'Unsupported type: {type(data)}')
-
-    @normalizeData.register
-    @classmethod
-    def _(cls, data: dict) -> dict:
         norm_data = {}
-        for key, obj in data.items():
-            key = cls.getdbName(key)
-            json = cls._extract_json(obj)
-            if isinstance(json, str):
-                json = {'site': key, 'title': json}
-            elif key != json['site']:
-                raise ValueError(
-                    "Key '{}' doesn't match the site of the value: '{}'"
-                    .format(key, json['site']))
-            norm_data[key] = json
-        return norm_data
-
-    @normalizeData.register
-    @classmethod
-    def _(cls, data: list) -> dict:
-        norm_data = {}
-        for obj in data:
-            json = cls._extract_json(obj)
-            if not isinstance(json, dict):
-                raise ValueError(
-                    "Couldn't determine the site and title of the value: "
-                    f'{json!r}')
-            db_name = json['site']
-            norm_data[db_name] = json
+        if isinstance(data, dict):
+            for key, obj in data.items():
+                key = cls.getdbName(key)
+                json = cls._extract_json(obj)
+                if isinstance(json, str):
+                    json = {'site': key, 'title': json}
+                elif key != json['site']:
+                    raise ValueError(
+                        "Key '{}' doesn't match the site of the value: '{}'"
+                        .format(key, json['site']))
+                norm_data[key] = json
+        else:
+            for obj in data:
+                json = cls._extract_json(obj)
+                if not isinstance(json, dict):
+                    raise ValueError(
+                        "Couldn't determine the site and title of the value: "
+                        f'{json!r}')
+                db_name = json['site']
+                norm_data[db_name] = json
         return norm_data
 
     def toJSON(self, diffto: dict | None = None) -> dict:
