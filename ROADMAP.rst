@@ -3,6 +3,17 @@ Release 11 (in development)
 
 **Improvements**
 
+* Add WikiWho API support. (:phab:`T414071`)
+* Never use None as key in WeakKeyDictionary within :class:`proofreadpage.TagAttrDesc`.
+  Class-level access returns the descriptor itself. (:phab:`T413563`)
+* *text_a* and *text_b* of :class:`diff.PatchManager` are positional-only parameters.
+  *by_letter* and *replace_invisible* are keyword-only parameters.
+* Optimize :func:`pagegenerators.SubCategoriesPageGenerator`
+* Consider ``retry_after`` in delay calculation of :meth:`throttle.Throttle.get_delay`.
+  (:phab:`T414354`)
+* Remove protocol swapping in :class:`data.api.Request`. (:phab:`T414369`)
+* Use environment variables ``PYWIKIBOT_USERNAME`` or ``PWB_USERNAME`` for ``User-Agent`` username
+  if username isn't set in :mod:`user-config.py<config>` for a given site. (:phab:`T414201`)
 * Add support for beta site in :class:`families.meta_family.Family` (:phab:`T413060`)
 * Add user agent to :class:`data.api.Request` error log (:phab:`T414170`)
 * Increase performance of delegation for :class:`BaseSite<pywikibot.site._basesite.BaseSite>`
@@ -11,23 +22,27 @@ Release 11 (in development)
 * Use :class:`backports.RLock` instead of Queue to signal async_manager activity (:phab:`T147178`)
 * Add :meth:`User.is_partial_blocked()<pywikibot.User.is_partial_blocked>` and methods
   :meth:`APISite.is_partial_blocked()<pywikibot.site._apisite.APISite.is_partial_blocked>` to detect
-  partial blocks (:phab:`T412613`)
+  partial blocks. (:phab:`T412613`)
 * Add :meth:`get_block_info()<pywikibot.User.get_block_info>` method to :class:`pywikibot.User`
   class to retrieve detailed block information including block ID, reason, expiry, and restrictions
   (:phab:`T412613`)
 * Java based GraalPy is supported but Pillow cannot be used (:phab:`T412739`)
-* Free threading Python is supported with some restrictions
+* Free threading Python is supported with some restrictions.
   (:phab:`T408131`, :phab:`T412605`, :phab:`T412624`)
-* i18n updates
-* Provide a security policy with Pywikibot (:phab:`T410753`)
+* i18n updates.
+* Provide a security policy with Pywikibot. (:phab:`T410753`)
 * Show a friendly install message with :mod:`pwb<pywikibot.scripts.wrapper>` wrapper
-  when mandatory packages are missing (:phab:`T409662`)
+  when mandatory packages are missing (:phab:`T409662`).
 * Update `tools._unidata.__category_cf` dict for :func:`tools.chars.contains_invisible` and
-  :func:`tools.chars.replace_invisible` to unicode version 17.0.0
-* Update Docker files to Python 3.12 (:phab:`T408997`)
+  :func:`tools.chars.replace_invisible` to unicode version 17.0.0.
+* Update Docker files to Python 3.12. (:phab:`T408997`)
 
 **Bugfixes**
 
+* Remove invisible chars from :attr:`textlib.Section.heading`. (:phab:`T411307`)
+* Do not raise :exc:`exceptions.UnknownExtensionError` within
+  :meth:`APISite.page_from_repository()<pywikibot.site._apisite.APISite.page_from_repository>`
+  on non-Wikibase sites (:phab:`T414068`)
 * Handle retry-after value gracefully if it is a float instead an int (:phab:`T414197`)
 * Handle limit value gracefully if it is an int instead a str (:phab:`T414168`)
 * Handle `lockmanager-fail-conflict` API error in :meth:`data.api.Request.submit` as retryable
@@ -90,6 +105,8 @@ Release 11 (in development)
 
 **Other breaking changes**
 
+* Use global ``-code`` instead of ``-lang`` to determine a site.
+  The old ``-lang`` option is kept for backward compatibility.
 * Protocol swapping in :class:`data.api.Request` was removed. Family files should provide
   the correct protocol. (:phab:`T414369`)
 * Package requirements were updated (``beautifulsoup4``, ``fake-useragent``, ``mwoauth``,
@@ -194,3 +211,9 @@ Pending removal in Pywikibot 13
   'millennium' must be used instead
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
   :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
+
+Pending removal in Pywikibot 14
+-------------------------------
+
+* Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
+  Positional parameters for *by_letter* and *replace_invisible* are deprecated.

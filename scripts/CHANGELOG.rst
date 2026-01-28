@@ -10,7 +10,14 @@ Scripts Changelog
 archivebot
 ^^^^^^^^^^
 
+* Also no longer search for an archiveheader template if it is already
+  given with the archive template. (:phab:`T414068`)
 * respect the ``-namespace`` option with ``-page`` option (:phab:`T409016`)
+
+welcome
+^^^^^^^
+
+* Check whether the script is localized within WelcomeBot initializer.  (:phab:`T414007`)
 
 10.7.0
 ------

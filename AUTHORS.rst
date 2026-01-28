@@ -11,6 +11,7 @@ A
     adiyetichaves
     Ævar Arnfjörð Bjarmason
     akashagarwal
+    Akaza24
     AkshitKumar
     Alangi Derick
     Alex Shih-Han Lin
@@ -134,6 +135,7 @@ H
 
 ::
 
+    Harshita
     Hazard-SJ
     Huji
     Homeboy445
