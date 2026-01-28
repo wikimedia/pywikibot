@@ -1,7 +1,7 @@
 Current Release Changes
 =======================
 
-* Fix extracting password line (:phab:`T412191`)
+* Add support for kajwiki. (:phab:`T415040`)
 
 
 Deprecations
