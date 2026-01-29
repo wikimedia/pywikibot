@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 65
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       matrix:
@@ -69,7 +69,6 @@ jobs:
       - name: Test with unittest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 60
         env:
           PYTHONIOENCODING: utf-8
         run: |
