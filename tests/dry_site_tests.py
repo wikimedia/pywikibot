@@ -11,6 +11,7 @@ import unittest
 
 import pywikibot
 from pywikibot.comms.http import user_agent, user_agent_username
+from pywikibot.tools import suppress_warnings
 from tests.aspects import DefaultDrySiteTestCase
 
 
@@ -65,12 +66,13 @@ class TestDrySite(DefaultDrySiteTestCase):
         self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          user_agent(x, format_string='{pwb}'))
 
-        self.assertEqual(x.family.name,
-                         user_agent(x, format_string='{family}'))
-        self.assertEqual(x.code,
-                         user_agent(x, format_string='{code}'))
-        self.assertEqual(x.family.name + ' ' + x.code,
-                         user_agent(x, format_string='{family} {code}'))
+        # {family} {lang} and {code} are replaced with {site}
+        # since Pywikibot 11.0
+        for format_string in ('{family}', '{code}', '{lang}'):
+            with suppress_warnings(f'{format_string} value for user_agent',
+                                   category=FutureWarning):
+                self.assertEqual(x.sitename,
+                                 user_agent(x, format_string=format_string))
 
         self.assertEqual(x.username(),
                          user_agent(x, format_string='{username}'))
@@ -90,8 +92,11 @@ class TestDrySite(DefaultDrySiteTestCase):
         script_value = (pywikibot.calledModuleName() + '/'
                         + pywikibot.version.getversiondict()['rev'])
 
-        self.assertEqual(script_value + ' Pywikibot/6.0 (User:foo_bar)',
-                         user_agent(x, format_string=old_config))
+        # {version} is replaced with {revision} since Pywikibot 11.0
+        with suppress_warnings('{version} value for user_agent',
+                               category=FutureWarning):
+            self.assertEqual(script_value + ' Pywikibot/6.0 (User:foo_bar)',
+                             user_agent(x, format_string=old_config))
 
         x._userinfo = {'name': '⁂'}
         x._username = '⁂'

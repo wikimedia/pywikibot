@@ -56,7 +56,7 @@ from pywikibot.exceptions import (
     ServerError,
 )
 from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import file_mode_checker
+from pywikibot.tools import file_mode_checker, issue_deprecation_warning
 
 
 try:
@@ -160,10 +160,31 @@ class _UserAgentFormatter(Formatter):
     """User-agent formatter to load version/revision only if necessary."""
 
     def get_value(self, key, args, kwargs):
-        """Get field as usual except for version and revision."""
-        # This is the Pywikibot version; also map it to {revision} at present.
+        """Lazy load revision key. Also replace deprecated variables."""
+        replacements = {
+            'script_product': 'script',
+            'version': 'revision',
+        }
+        replacements.update(dict.fromkeys(['code', 'lang', 'family'], 'site'))
+
+        revision: str = ''
         if key in ('version', 'revision'):
-            return pywikibot.version.getversiondict()['rev']
+            # lazy load the revision
+            revision = pywikibot.version.getversiondict()['rev']
+            if key == 'revision':
+                return revision
+
+        if key in ('code', 'lang', 'family', 'script_product', 'version'):
+            repl = replacements[key]
+            issue_deprecation_warning(
+                f'{{{key}}} value for user_agent',
+                f'{{{repl}}}',
+                depth=7,
+                since='11.0.0'
+            )
+            if key == 'version':
+                return revision
+            return super().get_value(repl, args, kwargs)
         return super().get_value(key, args, kwargs)
 
 
@@ -208,6 +229,11 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
                format_string: str | None = '') -> str:
     """Generate the user agent string for a given site and format.
 
+    .. versionchanged:: 11.0
+       ``code``, ``lang`` and ``family`` variables within format string
+       are no longer supported. They will be replaced  by ``site``
+       during deprecation period.
+
     :param site: The site for which this user agent is intended. May be
         None.
     :param format_string: The string to which the values will be added
@@ -216,29 +242,21 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     :return: The formatted user agent
     """
     values = USER_AGENT_PRODUCTS.copy()
-    values.update(dict.fromkeys(['script', 'script_product'],
-                                pywikibot.bot.calledModuleName()))
-    values.update(dict.fromkeys(['family', 'code', 'lang', 'site'], ''))
+    values['script'] = pywikibot.bot.calledModuleName()
+    values['site'] = ''
 
     script_comments: list[str] = []
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
     username = user_agent_username(site.username() if site else None)
+
     if site:
-        script_comments.append(str(site))
+        values['site'] = site.sitename
+        script_comments.append(site.sitename)
 
         if username:
-            username = user_agent_username(site.username())
             script_comments.append('User:' + username)
-
-        values.update({
-            'family': site.family.name,
-            'code': site.code,
-            'lang': (site.lang if site.siteinfo.is_cached('lang')
-                     else f'({site.code})'),
-            'site': str(site),
-        })
 
     values['username'] = username
     values['script_comments'] = '; '.join(script_comments)

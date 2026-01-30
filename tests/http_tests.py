@@ -23,7 +23,12 @@ from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
 from pywikibot.tools import PYTHON_VERSION, THREADING_FREE, suppress_warnings
 from tests import join_images_path, utils
-from tests.aspects import HttpbinTestCase, TestCase, require_modules
+from tests.aspects import (
+    DeprecationTestCase,
+    HttpbinTestCase,
+    TestCase,
+    require_modules,
+)
 
 
 class HttpTestCase(TestCase):
@@ -176,7 +181,7 @@ class TestHttpStatus(HttpbinTestCase):
                          'https://community.fandom.com/wiki/Community_Central')
 
 
-class UserAgentTestCase(TestCase):
+class UserAgentTestCase(DeprecationTestCase):
 
     """User agent formatting tests using a format string."""
 
@@ -192,7 +197,11 @@ class UserAgentTestCase(TestCase):
         self.assertEqual(http.user_agent_username(),
                          http.user_agent(format_string='{username}'))
         self.assertEqual('', http.user_agent(format_string='{family}'))
+        self.assertOneDeprecationParts(
+            '{family} value for user_agent', '{site}')
         self.assertEqual('', http.user_agent(format_string='{lang}'))
+        self.assertOneDeprecationParts('{lang} value for user_agent', '{site}')
+        self.assertEqual('', http.user_agent(format_string='{site}'))
 
         self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          http.user_agent(format_string='{pwb}'))
