@@ -1,6 +1,6 @@
 """Functions for manipulating wiki-text."""
 #
-# (C) Pywikibot team, 2008-2026
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2234,8 +2234,8 @@ class TimeStripper:
 
         self.origNames2monthNum = {}
         # use first_lower/first_upper for those language where month names
-        # were changed: T324310, T356175, T415880
-        if self.site.lang in ('hy', 'it', 'vi'):
+        # were changed: T324310, T356175
+        if self.site.lang in ('hy', 'vi'):
             functions = [first_upper, first_lower]
         else:
             functions = [str]
