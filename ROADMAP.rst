@@ -1,7 +1,7 @@
 Current Release Changes
 =======================
 
-* Add support for kajwiki. (:phab:`T415040`)
+* Add support for pplwiki. (:phab:`T415048`)
 
 
 Deprecations

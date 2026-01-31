@@ -1,6 +1,13 @@
 Release History
 ===============
 
+10.7.5
+------
+*28 January 2026*
+
+* Add support for kajwiki. (:phab:`T415040`)
+
+
 10.7.4
 ------
 *13 December 2025*
