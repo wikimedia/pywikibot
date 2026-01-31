@@ -20,7 +20,8 @@ Example:
 .. deprecated:: 10.4
    The ``help`` option
 .. versionchanged:: 11.0
-   Multiple families can be given with one run.
+   Multiple families can be given with one run. The difference is shown
+   instead of the new list.
 """
 #
 # (C) Pywikibot team, 2024-2025
@@ -73,7 +74,7 @@ def update_family(family: str, wikis: set) -> None:
 
     # combine new codes set
     new = sorted(original | new_codes)
-    pywikibot.info("The lists don't match, the new list is:\n")
+    pywikibot.info("The lists don't match, the updated list is:\n")
     text = '    codes = {\n'
     line = ' ' * 7
     for code in new:
@@ -83,14 +84,14 @@ def update_family(family: str, wikis: set) -> None:
         line += f" '{code}',"
     text += line + '\n'
     text += '    }'
-    pywikibot.info(text)
 
     # update codes
     filepath = Path(f'pywikibot/families/{family}_family.py')
-    family_text = filepath.read_text(encoding='utf8')
-    family_text = re.sub(r'(?ms)^ {4}codes = \{.+?\}',
-                         text, family_text, count=1)
-    filepath.write_text(family_text, encoding='utf8')
+    old_family_text = filepath.read_text(encoding='utf8')
+    new_family_text = re.sub(r'(?ms)^ {4}codes = \{.+?\}',
+                             text, old_family_text, count=1)
+    pywikibot.showDiff(old_family_text, new_family_text)
+    filepath.write_text(new_family_text, encoding='utf8')
 
 
 def main(*args: str) -> None:
