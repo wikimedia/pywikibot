@@ -41,14 +41,19 @@ class GraphSavingThread(threading.Thread):
         self.origin = origin
 
     def run(self) -> None:
-        """Write graphs to the data directory."""
+        """Write graphs to the data directory.
+
+        .. versionchanged:: 11.0
+           use explicit ``utf-8`` encoding.
+        """
         for fmt in config.interwiki_graph_formats:
             filename = config.datafilepath(
                 'interwiki-graphs/' + getFilename(self.origin, fmt))
-            if self.graph.write(filename, prog='dot', format=fmt):
-                pywikibot.info('Graph saved as ' + filename)
+            if self.graph.write(filename, prog='dot', format=fmt,
+                                encoding='utf-8'):
+                pywikibot.info(f'Graph saved as {filename}')
             else:
-                pywikibot.info('Graph could not be saved as ' + filename)
+                pywikibot.info(f'Graph could not be saved as {filename}')
 
 
 class Subject:
