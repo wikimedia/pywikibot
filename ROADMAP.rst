@@ -3,6 +3,8 @@ Release 11 (in development)
 
 **Improvements**
 
+* :ref:`config.pickle_protocol<Further Settings>` was updated from version `2` to `5`. Older pickle
+  files are still readable.
 * Make :class:`textlib.TimeStripper` more resilient for itwiki. (:phab:`T415880`)
 * Add WikiWho API support. (:phab:`T414071`)
 * Never use None as key in WeakKeyDictionary within :class:`proofreadpage.TagAttrDesc`.

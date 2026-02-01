@@ -857,13 +857,13 @@ max_queue_size = 64
 
 # Pickle protocol version to use for storing dumps.
 # This config variable is not used for loading dumps.
-# Version 0 is a more or less human-readable protocol
-# Version 2 is common to both Python 2 and 3, and should
-# be used when dumps are accessed by both versions.
+# Version 0 is a more or less human-readable protocol.
+# Version 1 is an old binary format.
+# Version 2 is common to both Python 2 and 3. Default for Pywikibot 1–10.
 # Version 3 is only available for Python 3
 # Version 4 is only available for Python 3.4+
-# Version 5 was added with Python 3.8
-pickle_protocol = 2
+# Version 5 was added with Python 3.8. It is the default since Pywikibot 11.
+pickle_protocol = 5
 
 # ============================
 # End of configuration section
