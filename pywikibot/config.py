@@ -987,9 +987,10 @@ def _assert_types(
 
 
 DEPRECATED_VARIABLE = (
-    f'"{{}}" present in your {user_config_file} is no longer a supported'
-    ' configuration variable and should be removed. Please inform the'
-    ' maintainers if you depend on it.'
+    '"{name}" present in your '
+    f'{user_config_file} is deprecated since'
+    ' {since} and no longer a supported configuration variable and should be'
+    ' removed. Please inform the maintainers if you depend on it.'
 )
 
 
@@ -1013,7 +1014,11 @@ def _check_user_config_types(
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
             if name in _deprecated_variables:
-                warn('\n' + fill(DEPRECATED_VARIABLE.format(name)),
+                msg = DEPRECATED_VARIABLE.format(
+                    name=name,
+                    since=_deprecated_variables[name]
+                )
+                warn('\n' + fill(msg),
                      _ConfigurationDeprecationWarning, stacklevel=2)
             else:
                 warn('\n' + fill(f'Configuration variable "{name}" is defined '
