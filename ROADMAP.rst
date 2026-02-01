@@ -3,6 +3,7 @@ Release 11 (in development)
 
 **Improvements**
 
+* Make :class:`textlib.TimeStripper` more resilient for itwiki. (:phab:`T415880`)
 * Add WikiWho API support. (:phab:`T414071`)
 * Never use None as key in WeakKeyDictionary within :class:`proofreadpage.TagAttrDesc`.
   Class-level access returns the descriptor itself. (:phab:`T413563`)

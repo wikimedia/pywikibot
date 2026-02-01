@@ -1,6 +1,13 @@
 Release History
 ===============
 
+10.7.6
+------
+*31 January 2026*
+
+* Add support for pplwiki. (:phab:`T415048`)
+
+
 10.7.5
 ------
 *28 January 2026*
