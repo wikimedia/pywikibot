@@ -702,10 +702,11 @@ upload_to_commons = False
 
 # ############# SETTINGS TO AVOID SERVER OVERLOAD ##############
 
-# Slow down the robot such that it never requests a second page within
-# 'minthrottle' seconds. This can be lengthened if the server is slow,
-# but never more than 'maxthrottle' seconds. However - if you are running
-# more than one bot in parallel the times are lengthened.
+# Slow down the bot so that it never issues two API requests within
+# 'minthrottle' seconds. This delay may be increased if the server is slow
+# or requests are limited by bot policy, but never beyond 'maxthrottle'
+# seconds. When running multiple bots in parallel, the effective waiting
+# time is increased accordingly.
 #
 # 'maxlag' is used to control the rate of server access (see below).
 # Set minthrottle to non-zero to use a throttle on read access.

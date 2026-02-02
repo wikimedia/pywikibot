@@ -301,13 +301,22 @@ class Throttle:
     def waittime(self, write: bool = False):
         """Return waiting time in seconds.
 
+        .. versionchanged:: 11.0
+           Use the latest request timestamp for read operation.
+
         The result is for a query that would be made right now.
         """
         # Take the previous requestsize in account calculating the desired
         # delay this time
         thisdelay = self.get_delay(write=write)
         now = time.time()
-        ago = now - (self.last_write if write else self.last_read)
+
+        if write:
+            last = self.last_write
+        else:
+            last = max(self.last_read, self.last_write)
+
+        ago = now - last
         return max(0.0, thisdelay - ago)
 
     def drop(self) -> None:
