@@ -62,7 +62,7 @@ jobs:
           echo "maximum_GET_length = 5000" >> user-config.py
           echo "transliteration_target = None"  >> user-config.py
           echo "console_encoding = 'utf8'" >> user-config.py
-          echo "minthrottle = 1" >> user-config.py
+          echo "minthrottle = 0.5" >> user-config.py
           echo "import os" >> user-config.py
           echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
           echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile

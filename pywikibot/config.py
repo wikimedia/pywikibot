@@ -709,7 +709,7 @@ upload_to_commons = False
 #
 # 'maxlag' is used to control the rate of server access (see below).
 # Set minthrottle to non-zero to use a throttle on read access.
-minthrottle = 0
+minthrottle = 0.0
 maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
