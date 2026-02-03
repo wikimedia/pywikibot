@@ -1,6 +1,6 @@
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -138,6 +138,7 @@ library_test_modules = {
     'wikibase_edit',
     'wikiblame',
     'wikistats',
+    'wikiwho',
     'xmlreader'
 }
 
@@ -165,6 +166,7 @@ script_test_modules = {
     'script',
     'template_bot',
     'uploadscript',
+    'weblinkchecker',
 }
 
 disabled_test_modules = {
