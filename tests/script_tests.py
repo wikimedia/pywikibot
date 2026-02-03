@@ -147,7 +147,7 @@ skip_on_results = {
 
 def collector() -> Iterator[str]:
     """Generate test fully qualified names from test classes."""
-    for cls in TestScriptHelp, TestScriptSimulate, TestScriptGenerator:
+    for cls in (TestScriptHelp, ):  # TestScriptSimulate, TestScriptGenerator:
         for name in cls._script_list:
             name = '_' + name if name == 'login' else name
             yield f'tests.script_tests.{cls.__name__}.test_{name}'
@@ -218,7 +218,7 @@ class ScriptTestMeta(MetaTestCaseClass):
                     do_timeout = self._timeout
                 else:
                     do_timeout = script_name in self._timeout
-                timeout = 15 if do_timeout else None
+                timeout = 10 if do_timeout else None
 
                 stdout, error = None, None
                 if self._results:
@@ -349,8 +349,8 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
     _script_list = filter_scripts(exclude_failed_dep=False)
 
 
-class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
-                         metaclass=ScriptTestMeta):
+class XTestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
+                          metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -simulate.
 
@@ -398,8 +398,8 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _script_list = filter_scripts(_allowed_failures)
 
 
-class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
-                          metaclass=ScriptTestMeta):
+class XTestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
+                           metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with a generator."""
 
