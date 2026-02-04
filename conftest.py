@@ -3,15 +3,24 @@
 .. versionadded:: 10.3
 """
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import re
+import time
 from pathlib import Path
 from typing import Literal
+
+from pywikibot.tools import SPHINX_RUNNING
+
+
+try:
+    import pytest
+except ModuleNotFoundError:
+    pytest = None
 
 
 EXCLUDE_PATTERN = re.compile(
@@ -58,3 +67,48 @@ def pytest_ignore_collect(collection_path: Path,
 
     return None
     # no cover: stop
+
+
+def pytest_addoption(parser) -> None:
+    """Add CLI option --doctest-wait to pause between doctests.
+
+    If the option is given without parameter, the default value is 0.5
+    seconds.
+
+    .. versionadded:: 11.0
+
+    :param parser: The pytest parser object used to add CLI options.
+    :type parser: _pytest.config.argparsing.Parser
+    """
+    parser.addoption(
+        '--doctest-wait',
+        action='store',
+        nargs='?',
+        type=float,
+        const=0.5,
+        default=0.0,
+        help='Pause (seconds) between doctests only. Default is 0.5 s.',
+    )
+
+
+if pytest or SPHINX_RUNNING:
+
+    @pytest.fixture(autouse=True)
+    def pause_between_doctests(request) -> None:
+        """Insert a pause after each doctest if enabled.
+
+        .. versionadded:: 11.0
+
+        :param request: The pytest FixtureRequest object providing test
+            context.
+        :type request: _pytest.fixtures.FixtureRequest
+        """
+        # Handle Doctests only
+        if type(request.node).__name__ != 'DoctestItem':
+            yield
+            return
+
+        yield
+        wait_time = request.config.getoption('--doctest-wait')
+        if wait_time > 0:
+            time.sleep(wait_time)
