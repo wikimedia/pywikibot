@@ -114,6 +114,9 @@ These arguments control miscellaneous bot behaviour:
                 bot action. This will only be used in non-autonomous
                 mode.
 
+-graph          Save a graph of interwiki conflicts in PNG format.
+                This requires the `pydot` Python package.
+
 -hintsonly      The bot does not ask for a page to work on, even if none
                 of the above page sources was specified. This will make
                 the first existing page of -hint or -hinfile slip in as
