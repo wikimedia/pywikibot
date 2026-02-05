@@ -347,7 +347,7 @@ To run the script on all pages on a language, run it with option
    default site only, instead of the origin page.
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -487,6 +487,7 @@ class InterwikiBotConfig:
     summary = ''
     untranslated = False
     untranslatedonly = False
+    graph = config.interwiki_graph
 
     def note(self, text: str) -> None:
         """Output a notification message with.
@@ -548,8 +549,7 @@ class InterwikiBotConfig:
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':
-            # override configuration
-            config.interwiki_graph = True
+            self.graph = True
         elif arg == 'bracket':
             self.parenthesesonly = True
         elif arg == 'localright':
@@ -1207,7 +1207,7 @@ class Subject(interwiki_graph.Subject):
                     f.write(
                         f'* {self.origin} '
                         f'{{Found more than one link for {page.site}}}')
-                    if config.interwiki_graph and config.interwiki_graph_url:
+                    if self.conf.graph and config.interwiki_graph_url:
                         filename = interwiki_graph.getFilename(
                             self.origin,
                             extension=config.interwiki_graph_formats[0])
@@ -1355,7 +1355,7 @@ class Subject(interwiki_graph.Subject):
             return {site: pages[0] for site, pages in new.items()}
 
         # There are any errors.
-        if config.interwiki_graph:
+        if self.conf.graph:
             graphDrawer = interwiki_graph.GraphDrawer(self)
             graphDrawer.createGraph()
 
