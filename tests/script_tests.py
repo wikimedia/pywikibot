@@ -147,7 +147,8 @@ skip_on_results = {
 
 def collector() -> Iterator[str]:
     """Generate test fully qualified names from test classes."""
-    for cls in (TestScriptHelp, ):  # TestScriptSimulate, TestScriptGenerator:
+    test_cls = TestScriptHelp, TestScriptSimulate, TestScriptGenerator
+    for cls in test_cls[:1]:  # ignore tests on unittest due to T414170
         for name in cls._script_list:
             name = '_' + name if name == 'login' else name
             yield f'tests.script_tests.{cls.__name__}.test_{name}'
@@ -349,8 +350,8 @@ class TestScriptHelp(PwbTestCase, metaclass=ScriptTestMeta):
     _script_list = filter_scripts(exclude_failed_dep=False)
 
 
-class XTestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
-                          metaclass=ScriptTestMeta):
+class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
+                         metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with -simulate.
 
@@ -359,6 +360,8 @@ class XTestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     that Site.login() is called in the test runner, which means that the
     scripts run in pwb can automatically login using the saved cookies.
     """
+
+    __test__ = False  # Ignore this test on pytest due to T414170
 
     login = True
 
@@ -398,10 +401,12 @@ class XTestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     _script_list = filter_scripts(_allowed_failures)
 
 
-class XTestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
-                           metaclass=ScriptTestMeta):
+class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
+                          metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with a generator."""
+
+    __test__ = False  # Ignore this test on pytest due to T414170
 
     login = True
 
