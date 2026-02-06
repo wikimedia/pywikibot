@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test pwb.py."""
 #
 # (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test pwb.py."""
+
 from __future__ import annotations
 
 import io

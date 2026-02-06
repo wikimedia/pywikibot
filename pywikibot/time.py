@@ -1,12 +1,12 @@
-"""Time handling module.
-
-.. versionadded:: 7.5
-"""
 #
 # (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Time handling module.
+
+.. versionadded:: 7.5
+"""
 from __future__ import annotations
 
 import datetime

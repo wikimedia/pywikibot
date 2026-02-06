@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Basic HTTP access interface.
 
 This module handles communication between the bot and the HTTP threads.
@@ -24,11 +29,7 @@ To enable access via cookies, assign cookie handling class::
 .. versionchanged:: 8.0
    Cookies are lazy loaded when logging to site.
 """
-#
-# (C) Pywikibot team, 2007-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import atexit

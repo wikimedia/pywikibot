@@ -1,9 +1,10 @@
-"""Objects representing API requests."""
 #
 # (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API requests."""
+
 from __future__ import annotations
 
 import datetime
