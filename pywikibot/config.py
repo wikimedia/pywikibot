@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Module to define pywikibot configuration default and user preferences.
 
 User preferences are loaded from a python file called `user-config.py`,
@@ -32,11 +37,6 @@ utility methods to build paths relative to base_dir:
    Editor settings has been revised. *editor* variable is None by
    default. Editor detection functions were moved to :mod:`editor`.
 """
-#
-# (C) Pywikibot team, 2003-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import collections

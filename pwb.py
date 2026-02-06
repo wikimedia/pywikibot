@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2022-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """PWB caller script to invoke the :mod:`pywikibot.scripts.wrapper` script.
 
 .. versionadded:: 8.0
 """
-#
-# (C) Pywikibot team, 2022-2025
-#
-# Distributed under the terms of the MIT license.
-#
 import runpy
 import sys
 
