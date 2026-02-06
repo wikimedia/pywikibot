@@ -118,13 +118,13 @@ from __future__ import annotations
 import re
 import signal
 import sys
+from collections.abc import Generator
 from typing import Any
 
 import pywikibot
 from pywikibot import WbTime
 from pywikibot import pagegenerators as pg
 from pywikibot import textlib
-from collections.abc import Generator
 from pywikibot.bot import ConfigParserBot, OptionHandler, WikidataBot
 from pywikibot.exceptions import (
     APIError,

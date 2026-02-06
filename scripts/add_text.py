@@ -63,18 +63,18 @@ category:
    -summary:"Bot: Aggiungo template Categorizzare"
 """
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from pathlib import Path
 
 import pywikibot
 from pywikibot import config, pagegenerators, textlib
-from collections.abc import Sequence
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
