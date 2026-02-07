@@ -172,7 +172,7 @@ UserWarning: warnings targeted at users
    instead.
 """
 #
-# (C) Pywikibot team, 2008-2026
+# (C) Pywikibot team, 2008-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,8 +182,6 @@ import re
 from typing import Any
 
 import pywikibot
-from pywikibot.backports import BaseError as _BaseError
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools._deprecate import _NotImplementedWarning
 
 
@@ -202,23 +200,16 @@ class FamilyMaintenanceWarning(UserWarning):
     """Family class is missing definitions."""
 
 
-class Error(_BaseError):
+class Error(Exception):
 
     """Pywikibot error."""
 
     def __init__(self, arg: Exception | str) -> None:
         """Initializer."""
-        super().__init__(arg)
         self.unicode = str(arg)
 
     def __str__(self) -> str:
         """Return a string representation."""
-        # On Python < 3.11, we must manually append notes because this method
-        # overrides the BaseError.__str__ backport logic.
-        if PYTHON_VERSION < (3, 11) and hasattr(self, '__notes__') \
-           and self.__notes__:
-            return self.unicode + '\n' + '\n'.join(self.__notes__)
-
         return self.unicode
 
 

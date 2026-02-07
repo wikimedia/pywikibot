@@ -83,7 +83,6 @@ library_test_modules = {
     'edit',
     'edit_failure',
     'eventstreams',
-    'exceptions',
     'family',
     'file',
     'fixes',

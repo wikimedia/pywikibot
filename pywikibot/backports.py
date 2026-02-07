@@ -202,33 +202,3 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
 
 else:
     from threading import RLock  # type: ignore[assignment]
-
-
-# gh-100588
-if PYTHON_VERSION < (3, 11) or SPHINX_RUNNING:
-    class BaseError(Exception):
-
-        """Backport for Python 3.11 Exception.add_note logic."""
-
-        def __init__(self, *args, **kwargs) -> None:
-            """Initializer."""
-            super().__init__(*args, **kwargs)
-            self.__notes__: list = []
-
-        def add_note(self, note: str) -> None:
-            """Add a note to the exception."""
-            if not isinstance(note, str):
-                raise TypeError(
-                    f"note must be a str, not '{type(note).__name__}'")
-            self.__notes__.append(note)
-
-        def __str__(self) -> str:
-            """Return string representation including notes."""
-            s = super().__str__()
-            if self.__notes__:
-                return f'{s}\n' + '\n'.join(self.__notes__)
-            return s
-else:
-    class BaseError(Exception):  # type: ignore[no-redef]
-
-        """BaseError alias for Python 3.11+."""
