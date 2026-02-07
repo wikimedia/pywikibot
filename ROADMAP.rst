@@ -3,10 +3,21 @@ Release 11 (in development)
 
 **Improvements**
 
+* Show Pywikibot version in deprecation warnings for :mod:`config` variables.
 * :ref:`config.pickle_protocol<Further Settings>` was updated from version `2` to `5`. Older pickle
   files are still readable.
+* Enhance :meth:`throttle.Throttle.waittime` for read requests. (:phab:`T415891`)
+* :ref:`config.minthrottle<Settings to Avoid Server Overload>` may me a ``float``.
+  (:phab:`T414170`, :phab:`T416145`)
+* Implement :meth:`Site.abuselog()<pywikibot.site._generators.GeneratorsMixin.abuselog>` site
+  generator for :api:`AbuseLog` and :meth:`page.User.last_activity` method.
+  (:phab:`T396297`, :phab:`T396298`)
+* Use explicit utf-8 encoding with class:`GraphSavingThread.graph.write
+  <interwiki_graph.GraphSavingThread>` (:phab:`T415891`)
+* Optimize pickle file storage of :class:`WikiWho<page._toolforge.WikiWhoMixin>`
+  with subdirectory structure (:phab:`T414087`)
 * Make :class:`textlib.TimeStripper` more resilient for itwiki. (:phab:`T415880`)
-* Add WikiWho API support. (:phab:`T414071`)
+* Add :class:`WikiWho<page._toolforge.WikiWhoMixin>` API support. (:phab:`T414071`)
 * Never use None as key in WeakKeyDictionary within :class:`proofreadpage.TagAttrDesc`.
   Class-level access returns the descriptor itself. (:phab:`T413563`)
 * *text_a* and *text_b* of :class:`diff.PatchManager` are positional-only parameters.

@@ -7,6 +7,11 @@ Scripts Changelog
 * L10N and i18n updates
 * ``create_isbn_edition`` script was removed from scripts package (:phab:`T398140`)
 
+addwikis:
+^^^^^^^^^
+
+* Show the difference instead of the new list.
+
 archivebot
 ^^^^^^^^^^
 
