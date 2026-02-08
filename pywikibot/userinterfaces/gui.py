@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """A window with a textfield where the user can edit.
 
 Useful for editing the contents of an article.
@@ -11,11 +16,7 @@ Useful for editing the contents of an article.
 
 .. seealso:: :mod:`editor`
 """
-#
-# (C) Pywikibot team, 2003-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import pywikibot

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to check language links for general pages.
 
 Uses existing translations of a page, plus hints from the command line,
@@ -349,11 +354,7 @@ To run the script on all pages on a language, run it with option
    The ``-localonly`` option now restricts page processing to the
    default site only, instead of the origin page.
 """
-#
-# (C) Pywikibot team, 2003-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import os

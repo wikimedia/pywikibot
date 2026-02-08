@@ -1,9 +1,10 @@
-"""Date data and manipulation module."""
 #
 # (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Date data and manipulation module."""
+
 from __future__ import annotations
 
 import calendar

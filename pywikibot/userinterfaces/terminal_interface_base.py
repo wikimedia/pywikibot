@@ -1,9 +1,10 @@
-"""Base for terminal user interfaces."""
 #
 # (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Base for terminal user interfaces."""
+
 from __future__ import annotations
 
 import getpass

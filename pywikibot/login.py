@@ -1,9 +1,10 @@
-"""Library to log the bot in to a wiki account."""
 #
 # (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Library to log the bot in to a wiki account."""
+
 from __future__ import annotations
 
 import datetime

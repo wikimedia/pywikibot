@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to log the bot in to a wiki account.
 
 Suggestion is to make a special account to use for bot use only. Make
@@ -51,11 +56,7 @@ subdirectory.
 .. versionchanged:: 10.3
    the -cookies option
 """
-#
-# (C) Pywikibot team, 2003-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import datetime
