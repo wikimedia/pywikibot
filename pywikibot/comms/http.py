@@ -160,7 +160,10 @@ class _UserAgentFormatter(Formatter):
     """User-agent formatter to load version/revision only if necessary."""
 
     def get_value(self, key, args, kwargs):
-        """Lazy load revision key. Also replace deprecated variables."""
+        """Lazy load revision key. Also replace deprecated variables.
+
+        See :func:`user_agent` for the deprecated variables.
+        """
         replacements = {
             'script_product': 'script',
             'version': 'revision',
@@ -230,9 +233,16 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     """Generate the user agent string for a given site and format.
 
     .. versionchanged:: 11.0
-       ``code``, ``lang`` and ``family`` variables within format string
-       are no longer supported. They will be replaced  by ``site``
-       during deprecation period.
+       The ``code``, ``lang`` and ``family`` variables in the format
+       string are deprecated and replaced by ``site``. The
+       ``script_version`` and ``version`` variables are deprecated and
+       replaced by ``script`` and ``revision`` respectively.
+
+       If *site* is provided and a username is returned by the helper
+       function :func:`user_agent_username`, the URL to the user's wiki
+       page is added to ``script_comments`` when the sitename does not
+       start with "wiki" (e.g., commons or wiktionary) or the site code
+       has more than two characters.
 
     :param site: The site for which this user agent is intended. May be
         None.
@@ -241,6 +251,7 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
         empty.
     :return: The formatted user agent
     """
+    # NOTE: only BaseSite methods can be used here
     values = USER_AGENT_PRODUCTS.copy()
     values['script'] = pywikibot.bot.calledModuleName()
     values['site'] = ''
@@ -253,10 +264,15 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
 
     if site:
         values['site'] = site.sitename
-        script_comments.append(site.sitename)
-
-        if username:
-            script_comments.append('User:' + username)
+        if site.sitename.startswith('wiki') and len(site.code) == 2:
+            # use "sitename:code; User:username"
+            script_comments.append(site.sitename)
+            if username:
+                script_comments.append('User:' + username)
+        elif username:
+            # use url to user wikipage
+            full_url = site.base_url(f'wiki/User:{username}')
+            script_comments.append(full_url)
 
     values['username'] = username
     values['script_comments'] = '; '.join(script_comments)

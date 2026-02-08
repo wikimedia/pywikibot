@@ -108,10 +108,16 @@ class TestDrySite(DefaultDrySiteTestCase):
         x._username = None
 
         # user_agent_username() may set ua_username from environment variable
-        ua_username = user_agent_username()
-        self.assertEqual(f'Foo {ua_username}'.strip(),
+        ua_user = user_agent_username()
+        self.assertEqual(f'Foo {ua_user}'.strip(),
                          user_agent(x, format_string='Foo {username}'))
-        res = f'Foo ({x}; User:{ua_username})' if ua_username else f'Foo ({x})'
+
+        if self.site.sitename.startswith('wiki') and len(self.site.code) == 2:
+            res = f'Foo ({x}; User:{ua_user})' if ua_user else f'Foo ({x})'
+        else:
+            full_url = self.site.base_url(f'wiki/User:{ua_user}')
+            res = f'Foo ({full_url})' if ua_user else 'Foo'
+
         self.assertEqual(
             res, user_agent(x, format_string='Foo ({script_comments})'))
 
