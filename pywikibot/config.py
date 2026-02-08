@@ -707,11 +707,12 @@ upload_to_commons = False
 # 'minthrottle' seconds. This delay may be increased if the server is slow
 # or requests are limited by bot policy, but never beyond 'maxthrottle'
 # seconds. When running multiple bots in parallel, the effective waiting
-# time is increased accordingly.
+# time is increased accordingly. The default setting is 0.1 seconds per
+# https://wikitech.wikimedia.org/wiki/Robot_policy.
 #
 # 'maxlag' is used to control the rate of server access (see below).
 # Set minthrottle to non-zero to use a throttle on read access.
-minthrottle = 0.0
+minthrottle = 0.1
 maxthrottle = 60
 
 # Slow down the robot such that it never makes a second page edit within
