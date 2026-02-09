@@ -4,7 +4,7 @@
    in :mod:`backports`
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,62 +13,20 @@ from __future__ import annotations
 import collections
 import heapq
 import itertools
+from collections.abc import Callable, Generator, Hashable, Iterable, Iterator
 from contextlib import suppress
 from typing import Any
 
-from pywikibot.backports import (
-    Callable,
-    Generator,
-    Iterable,
-    Iterator,
-    batched,
-)
 from pywikibot.logging import debug
-from pywikibot.tools import deprecated
 
 
 __all__ = (
     'filter_unique',
     'intersect_generators',
     'islice_with_ellipsis',
-    'itergroup',
     'roundrobin_generators',
     'union_generators',
 )
-
-
-@deprecated('backports.batched()', since='8.2.0')
-def itergroup(iterable,
-              size: int,
-              strict: bool = False) -> Generator[list[Any], None, None]:
-    """Make an iterator that returns lists of (up to) size items from iterable.
-
-    Example:
-
-    >>> i = itergroup(range(25), 10)
-    >>> print(next(i))
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> print(next(i))
-    [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-    >>> print(next(i))
-    [20, 21, 22, 23, 24]
-    >>> print(next(i))
-    Traceback (most recent call last):
-     ...
-    StopIteration
-
-    .. versionadded:: 7.6
-       The *strict* parameter.
-    .. deprecated:: 8.2
-       Use :func:`backports.batched` instead.
-
-    :param size: How many items of the iterable to get in one chunk
-    :param strict: If True, raise a ValueError if length of iterable is
-        not divisible by `size`.
-    :raises ValueError: iterable is not divisible by size
-    """
-    for group in batched(iterable, size, strict=strict):
-        yield list(group)
 
 
 def islice_with_ellipsis(iterable, *args, marker: str = '…'):
@@ -80,12 +38,12 @@ def islice_with_ellipsis(iterable, *args, marker: str = '…'):
     Function takes the
     and the additional keyword marker.
 
-    :param iterable: the iterable to work on
-    :type iterable: iterable
-    :param args: same args as:
+    :param iterable: The iterable to work on
+    :type iterable: Iterable
+    :param args: Same args as:
         - ``itertools.islice(iterable, stop)``
         - ``itertools.islice(iterable, start, stop[, step])``
-    :param marker: element to yield if iterable still contains elements
+    :param marker: Element to yield if iterable still contains elements
         after showing the required number. Default value: '…'
     """
     s = slice(*args)
@@ -106,7 +64,7 @@ def union_generators(*iterables: Iterable[Any],
     duplicates. The input iterables must already be sorted according to
     the same *key* and direction. For descending direction, *reverse*
     must be ``True``. The generator will yield each element only once,
-    even if it appears in multiple iterables. This behaves similarly to:
+    even if it appears in multiple iterables. This behaves similarly to::
 
         sorted(set(itertools.chain(*iterables)), key=key, reverse=reverse)
 
@@ -174,8 +132,8 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
        Iterable elements may consist of lists or tuples
        ``allow_duplicates`` is a keyword-only argument
 
-    :param iterables: page generators
-    :param allow_duplicates: optional keyword argument to allow duplicates
+    :param iterables: Page generators
+    :param allow_duplicates: Optional keyword argument to allow duplicates
         if present in all generators
     """
     if not iterables:
@@ -194,6 +152,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     # Item is cached to check that it is found n_gen times
     # before being yielded.
+    cache: collections.defaultdict[Hashable, collections.Counter[int]]
     cache = collections.defaultdict(collections.Counter)
     n_gen = len(iterables)
 
@@ -238,7 +197,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 return
 
 
-def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
+def roundrobin_generators(*iterables) -> Generator[Any]:
     """Yield simultaneous from each iterable.
 
     Sample:
@@ -251,9 +210,9 @@ def roundrobin_generators(*iterables) -> Generator[Any, None, None]:
        A sentinel variable is used to determine the end of an iterable
        instead of None.
 
-    :param iterables: any iterable to combine in roundrobin way
-    :type iterables: iterable
-    :return: the combined generator of iterables
+    :param iterables: Any iterable to combine in roundrobin way
+    :type iterables: Iterable
+    :return: The combined generator of iterables
     :rtype: generator
     """
     sentinel = object()
@@ -291,14 +250,14 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     .. versionadded:: 3.0
 
-    :param iterable: the source iterable
-    :type iterable: collections.abc.Iterable
-    :param container: storage of seen items
-    :type container: type
-    :param key: function to convert the item to a key
-    :type key: callable
-    :param add: function to add an item to the container
-    :type add: callable
+    :param iterable: The source iterable
+    :type iterable: Collections.abc.Iterable
+    :param container: Storage of seen items
+    :type container: Type
+    :param key: Function to convert the item to a key
+    :type key: Callable
+    :param add: Function to add an item to the container
+    :type add: Callable
     """
     if container is None:
         container = set()

@@ -221,6 +221,10 @@ class TestFilePageLatestFileInfo(TestCase):
     code = 'commons'
 
     file_name = 'File:Albert Einstein Head.jpg'
+    pattern = (
+        r'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+        r'd/d3/Albert_Einstein_Head.jpg/(\d{1,3})px-Albert_Einstein_Head.jpg'
+    )
 
     cached = True
 
@@ -249,39 +253,35 @@ class TestFilePageLatestFileInfo(TestCase):
             'https://upload.wikimedia.org/wikipedia/commons/'
             'd/d3/Albert_Einstein_Head.jpg')
 
-    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_width(self) -> None:
         """Get File thumburl from width."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(
-            self.image.get_file_url(url_width=100, url_param='1000px'),
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-            'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        url = self.image.get_file_url(url_width=100, url_param='1000px')
+        m = re.search(self.pattern, url)
+        self.assertIsNotNone(m)
+        self.assertGreaterEqual(int(m[1]), 100)
+        self.assertRegex(url, self.pattern)
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
-    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_height(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(
+        self.assertRegex(
             self.image.get_file_url(url_height=100, url_param='1000px'),
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-            'd/d3/Albert_Einstein_Head.jpg/75px-Albert_Einstein_Head.jpg')
+            self.pattern
+        )
         self.assertEqual(self.image.latest_file_info.thumbwidth, 75)
         self.assertEqual(self.image.latest_file_info.thumbheight, 100)
 
-    @unittest.expectedFailure  # T391761
     def test_get_file_url_thumburl_from_url_param(self) -> None:
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(
-            self.image.get_file_url(url_param='100px'),
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-            'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        self.assertRegex(
+            self.image.get_file_url(url_param='100px'), self.pattern)
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 

@@ -31,14 +31,15 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
     python pwb.py templatecount -list -namespace:14 cfd cfdu
 """
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+from collections.abc import Generator
+
 import pywikibot
-from pywikibot.backports import Generator
 
 
 class TemplateCountRobot:
@@ -113,7 +114,7 @@ class TemplateCountRobot:
 
     @staticmethod
     def template_dict_generator(templates, namespaces) -> Generator[
-            tuple[str, list[pywikibot.Page]], None, None]:
+            tuple[str, list[pywikibot.Page]]]:
         """Yield transclusions of each template in 'templates'.
 
         For each template in 'templates', yield a tuple (template,

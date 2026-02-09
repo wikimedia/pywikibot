@@ -1,6 +1,6 @@
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,18 +10,18 @@ import os
 import re
 import subprocess
 from collections import Counter
+from collections.abc import Sequence
 
 import pywikibot
-from pywikibot.backports import Sequence
 
 
 def _call_cmd(args: str | Sequence[str],
               lib: str = 'djvulibre') -> tuple[bool, str]:
     """Tiny wrapper around subprocess.Popen().
 
-    :param args: same as Popen()
-    :param lib: library to be logged in logging messages
-    :return: returns a tuple (res, stdoutdata), where res is True if
+    :param args: Same as Popen()
+    :param lib: Library to be logged in logging messages
+    :return: Returns a tuple (res, stdoutdata), where res is True if
         dp.returncode != 0 else False
     """
     # upcast any param in sequence args to str
@@ -55,7 +55,7 @@ class DjVuFile:
     def __init__(self, file: str) -> None:
         """Initializer.
 
-        :param file: filename (including path) to djvu file
+        :param file: Filename (including path) to djvu file
         """
         self._filename = file
         filename = os.path.expanduser(file)
@@ -109,7 +109,7 @@ class DjVuFile:
     def number_of_images(self, force: bool = False):
         """Return the number of images in the djvu file.
 
-        :param force: if True, refresh the cached data
+        :param force: If True, refresh the cached data
         """
         if not hasattr(self, '_page_count'):
             res, stdoutdata = _call_cmd(['djvused', '-e', 'n', self.file])
@@ -122,8 +122,8 @@ class DjVuFile:
     def page_info(self, n: int, force: bool = False):
         """Return a tuple (id, (size, dpi)) for page n of djvu file.
 
-        :param n: page n of djvu file
-        :param force: if True, refresh the cached data
+        :param n: Page n of djvu file
+        :param force: If True, refresh the cached data
         """
         if not hasattr(self, '_page_info') or force:
             self._get_page_info(force=force)
@@ -134,7 +134,7 @@ class DjVuFile:
         """Return a dict of tuples for all pages of djvu file.
 
         The tuples consist of (id, (size, dpi)).
-        :param force: if True, refresh the cached data
+        :param force: If True, refresh the cached data
         """
         if not hasattr(self, '_page_info'):
             self._page_info = {}
@@ -180,7 +180,7 @@ class DjVuFile:
     def has_text(self, force: bool = False):
         """Test if the djvu file has a text-layer.
 
-        :param force: if True, refresh the cached data
+        :param force: If True, refresh the cached data
         """
         if not hasattr(self, '_has_text'):
             self._get_page_info(force=force)
@@ -193,7 +193,7 @@ class DjVuFile:
         See http://djvu.sourceforge.net/doc/man/djvused.html for control
         chars.
 
-        :param data: the data checked for djvu format control characters
+        :param data: The data checked for djvu format control characters
         """
         txt = data.decode('utf-8')
         # vertical tab (\013=\x0b): remove
@@ -211,8 +211,8 @@ class DjVuFile:
     def get_page(self, n: int, force: bool = False):
         """Get page n for djvu file.
 
-        :param n: page n of djvu file
-        :param force: if True, refresh the cached data
+        :param n: Page n of djvu file
+        :param force: If True, refresh the cached data
         """
         if not self.has_text(force=force):
             raise ValueError(f'Djvu file {self.file} has no text layer.')
@@ -223,11 +223,10 @@ class DjVuFile:
         return self._remove_control_chars(stdoutdata)
 
     @check_page_number
-    def whiten_page(self, n) -> bool:
+    def whiten_page(self, n: int) -> bool:
         """Replace page 'n' of djvu file with a blank page.
 
-        :param n: page n of djvu file
-        :type n: int
+        :param n: Page n of djvu file
         """
         # tmp files for creation/insertion of a white page.
         white_ppm = os.path.join(self.dirname, 'white_page.ppm')
@@ -274,11 +273,10 @@ class DjVuFile:
         return True
 
     @check_page_number
-    def delete_page(self, n) -> bool:
+    def delete_page(self, n: int) -> bool:
         """Delete page 'n' of djvu file.
 
-        :param n: page n of djvu file
-        :type n: int
+        :param n: Page n of djvu file
         """
         n_tot = self.number_of_images()
 

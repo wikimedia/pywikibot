@@ -1,13 +1,15 @@
 """Object representing a Wiki user."""
 #
-# (C) Pywikibot team, 2009-2025
+# (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+from collections.abc import Generator
+from typing import Any
+
 import pywikibot
-from pywikibot.backports import Generator
 from pywikibot.exceptions import (
     APIError,
     AutoblockUserError,
@@ -74,7 +76,7 @@ class User(Page):
 
         .. seealso:: :meth:`isAnonymous`
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         # T135828: the registration timestamp may be None but the key exists
         return (not self.isAnonymous()
@@ -101,16 +103,18 @@ class User(Page):
         """
         return is_ip_network(self.username)
 
-    def getprops(self, force: bool = False) -> dict:
+    def getprops(self, force: bool = False) -> dict[str, Any]:
         """Return a properties about the user.
 
         .. versionchanged:: 9.0
            detect range blocks
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         if force and hasattr(self, '_userprops'):
+            self._userprops: dict[str, Any]
             del self._userprops
+
         if not hasattr(self, '_userprops'):
             self._userprops = next(self.site.users([self.username]))
             if self.isAnonymous() or self.is_CIDR():
@@ -119,13 +123,14 @@ class User(Page):
                 if r:
                     self._userprops['blockedby'] = r['by']
                     self._userprops['blockreason'] = r['reason']
+
         return self._userprops
 
     def registration(self,
                      force: bool = False) -> pywikibot.Timestamp | None:
         """Fetch registration date for this user.
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         if not self.isAnonymous():
             reg = self.getprops(force).get('registration')
@@ -138,35 +143,79 @@ class User(Page):
 
         Always returns 0 for 'anonymous' users.
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         return self.getprops(force).get('editcount', 0)
 
     def is_blocked(self, force: bool = False) -> bool:
         """Determine whether the user is currently blocked.
 
+        .. seealso::
+           - :meth:`is_partial_blocked`
+           - :meth:`get_block_info`
+
         .. versionchanged:: 7.0
            renamed from :meth:`isBlocked` method
         .. versionchanged:: 9.0
            can also detect range blocks.
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         return 'blockedby' in self.getprops(force)
+
+    def is_partial_blocked(self, *, force: bool = False) -> bool:
+        """Return True if this user is partially blocked, False otherwise.
+
+        .. seealso::
+           - :meth:`get_block_info`
+           - :meth:`APISite.is_partial_blocked()
+             <pywikibot.site._apisite.APISite.is_partial_blocked>`
+
+        .. versionadded:: 11.0
+
+        :param force: If True, forces reloading the data from API
+        """
+        return 'blockpartial' in self.getprops(force)
+
+    def get_block_info(self, *, force: bool = False) -> dict[str, Any] | None:
+        """Return a dictionary of block information if the user is blocked.
+
+        Returns None if the user is not blocked.
+        The returned dictionary contains keys like:
+
+        - blockid
+        - blockedby
+        - blockreason
+        - blockexpiry
+        - blockpartial (only if partial block)
+
+        .. seealso::
+           - :meth:`getprops`
+           - :meth:`is_partial_blocked`
+
+        .. versionadded:: 11.0
+
+        :param force: If True, forces reloading the data from API
+        """
+        props = self.getprops(force)
+        if 'blockid' not in props:
+            return None
+
+        return {k: v for k, v in props.items() if k.startswith('block')}
 
     def is_locked(self, force: bool = False) -> bool:
         """Determine whether the user is currently locked globally.
 
         .. versionadded:: 7.0
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         return self.site.is_locked(self.username, force)
 
     def isEmailable(self, force: bool = False) -> bool:  # noqa: N802
         """Determine whether emails may be send to this user through MediaWiki.
 
-        :param force: if True, forces reloading the data from API
+        :param force: If True, forces reloading the data from API
         """
         return not self.isAnonymous() and 'emailable' in self.getprops(force)
 
@@ -175,16 +224,16 @@ class User(Page):
 
         The list of groups may be empty.
 
-        :param force: if True, forces reloading the data from API
-        :return: groups property
+        :param force: If True, forces reloading the data from API
+        :return: Groups property
         """
         return self.getprops(force).get('groups', [])
 
     def gender(self, force: bool = False) -> str:
         """Return the gender of the user.
 
-        :param force: if True, forces reloading the data from API
-        :return: return 'male', 'female', or 'unknown'
+        :param force: If True, forces reloading the data from API
+        :return: Return 'male', 'female', or 'unknown'
         """
         if self.isAnonymous():
             return 'unknown'
@@ -193,15 +242,15 @@ class User(Page):
     def rights(self, force: bool = False) -> list:
         """Return user rights.
 
-        :param force: if True, forces reloading the data from API
-        :return: return user rights
+        :param force: If True, forces reloading the data from API
+        :return: Return user rights
         """
         return self.getprops(force).get('rights', [])
 
     def getUserPage(self, subpage: str = '') -> Page:  # noqa: N802
         """Return a Page object relative to this user's main page.
 
-        :param subpage: subpage part to be appended to the main page
+        :param subpage: Subpage part to be appended to the main page
             title (optional)
         :return: Page object of user page or user subpage
         """
@@ -217,7 +266,7 @@ class User(Page):
     def getUserTalkPage(self, subpage: str = '') -> Page:  # noqa: N802
         """Return a Page object relative to this user's main talk page.
 
-        :param subpage: subpage part to be appended to the main talk
+        :param subpage: Subpage part to be appended to the main talk
             page title (optional)
         :return: Page object of user talk page or user talk subpage
         """
@@ -234,14 +283,14 @@ class User(Page):
     def send_email(self, subject: str, text: str, ccme: bool = False) -> bool:
         """Send an email to this user via MediaWiki's email interface.
 
-        :param subject: the subject header of the mail
-        :param text: mail body
-        :param ccme: if True, sends a copy of this email to the bot
-        :raises NotEmailableError: the user of this User is not
+        :param subject: The subject header of the mail
+        :param text: Mail body
+        :param ccme: If True, sends a copy of this email to the bot
+        :raises NotEmailableError: The user of this User is not
             emailable
-        :raises UserRightsError: logged in user does not have
+        :raises UserRightsError: Logged in user does not have
             'sendemail' right
-        :return: operation successful indicator
+        :return: Operation successful indicator
         """
         if not self.isEmailable():
             raise NotEmailableError(self)
@@ -284,51 +333,75 @@ class User(Page):
         """
         self.site.unblockuser(self, reason)
 
-    def logevents(self, **kwargs):
+    def logevents(self, **kwargs) -> Generator[pywikibot.logentries.LogEntry]:
         """Yield user activities.
 
-        :keyword logtype: only iterate entries of this type (see
+        :keyword str logtype: Only iterate entries of this type (see
             mediawiki api documentation for available types)
-        :type logtype: str
-        :keyword page: only iterate entries affecting this page
+        :keyword page: Only iterate entries affecting this page
         :type page: Page or str
-        :keyword namespace: namespace to retrieve logevents from
+        :keyword namespace: Namespace to retrieve logevents from
         :type namespace: int or Namespace
-        :keyword start: only iterate entries from and after this
+        :keyword start: Only iterate entries from and after this
             Timestamp
         :type start: Timestamp or ISO date string
-        :keyword end: only iterate entries up to and through this
+        :keyword end: Only iterate entries up to and through this
             Timestamp
         :type end: Timestamp or ISO date string
-        :keyword reverse: if True, iterate oldest entries first
+        :keyword bool reverse: If True, iterate oldest entries first
             (default: newest)
-        :type reverse: bool
-        :keyword tag: only iterate entries tagged with this tag
-        :type tag: str
-        :keyword total: maximum number of events to iterate
-        :type total: int
+        :keyword str tag: Only iterate entries tagged with this tag
+        :keyword int total: Maximum number of events to iterate
         :rtype: iterable
         """
         return self.site.logevents(user=self.username, **kwargs)
 
     @property
-    def last_event(self):
-        """Return last user activity.
+    def last_event(self) -> pywikibot.logentries.LogEntry | None:
+        """Return last user log event.
 
-        :return: last user log entry
-        :rtype: LogEntry or None
+        :return: Last user log entry
         """
         return next(self.logevents(total=1), None)
+
+    @property
+    def last_activity(self) -> pywikibot.Timestamp | None:
+        """Return timestamp of last user activity.
+
+        This includes the last log event, last edit, last deleted
+        contribution, and last abuse log entry.
+
+        .. versionadded:: 11.0
+
+        :return: Timestamp of last user activity
+        """
+        last = set()
+
+        if last_event := self.last_event:
+            last.add(last_event.timestamp())
+
+        if last_edit := self.last_edit:
+            last.add(last_edit[2])
+
+        if last_deleted_contrib := self.deleted_contributions(total=1):
+            last.add(next(last_deleted_contrib)[1]['timestamp'])
+
+        if last_abuse_log := self.site.abuselog(
+            user=self.username, total=1, aflprop='timestamp'
+        ):
+            last.add(
+                pywikibot.Timestamp.fromISOformat(
+                    next(last_abuse_log)['timestamp']
+                )
+            )
+
+        return max(last) if last else None
 
     def contributions(
         self,
         total: int | None = 500,
         **kwargs
-    ) -> Generator[
-        tuple[Page, int, pywikibot.Timestamp, str | None],
-        None,
-        None
-    ]:
+    ) -> Generator[tuple[Page, int, pywikibot.Timestamp, str | None]]:
         """Yield tuples describing this user edits.
 
         Each tuple is composed of a pywikibot.Page object, the revision
@@ -354,19 +427,19 @@ class User(Page):
         .. seealso:: :meth:`Site.usercontribs()
            <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
 
-        :param total: limit result to this number of pages
+        :param total: Limit result to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
         :keyword end: Iterate contributions ending at this Timestamp
         :keyword reverse: Iterate oldest contributions first (default: newest)
-        :keyword namespaces: only iterate pages in these namespaces
-        :type namespaces: iterable of str or Namespace key,
+        :keyword namespaces: Only iterate pages in these namespaces
+        :type namespaces: Iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :keyword showMinor: if True, iterate only minor edits; if False and
+        :keyword showMinor: If True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
-        :keyword top_only: if True, iterate only edits which are the latest
+        :keyword top_only: If True, iterate only edits which are the latest
             revision (default: False)
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        :return: Tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         """
         for contrib in self.site.usercontribs(
                 user=self.username, total=total, **kwargs):
@@ -382,8 +455,8 @@ class User(Page):
     ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return first user contribution.
 
-        :return: first user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp,
+        :return: First user contribution entry
+        :return: Tuple of pywikibot.Page, revid, pywikibot.Timestamp,
             comment
         """
         return next(self.contributions(reverse=True, total=1), None)
@@ -394,8 +467,8 @@ class User(Page):
     ) -> tuple[Page, int, pywikibot.Timestamp, str | None] | None:
         """Return last user contribution.
 
-        :return: last user contribution entry
-        :return: tuple of pywikibot.Page, revid, pywikibot.Timestamp,
+        :return: Last user contribution entry
+        :return: Tuple of pywikibot.Page, revid, pywikibot.Timestamp,
             comment
         """
         return next(self.contributions(total=1), None)
@@ -405,7 +478,7 @@ class User(Page):
         *,
         total: int | None = 500,
         **kwargs,
-    ) -> Generator[tuple[Page, Revision], None, None]:
+    ) -> Generator[tuple[Page, Revision]]:
         """Yield tuples describing this user's deleted edits.
 
         .. versionadded:: 5.5
@@ -429,7 +502,7 @@ class User(Page):
         in ISO8601 format), comment (str) and a bool for pageid > 0.
         Pages returned are not guaranteed to be unique.
 
-        :param total: limit result to this number of pages
+        :param total: Limit result to this number of pages
         """
         if not self.isRegistered():
             return
@@ -478,7 +551,7 @@ class User(Page):
 
         .. versionadded:: 9.4
 
-        :raises NoRenameTargetError: user was not renamed
+        :raises NoRenameTargetError: User was not renamed
         """
         gen = iter(self.site.logevents(logtype='renameuser',
                                        page=self, total=1))

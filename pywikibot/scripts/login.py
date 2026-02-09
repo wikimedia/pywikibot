@@ -13,7 +13,7 @@ The following parameters are supported:
 
 -logout      Log out of the current site. Combine with ``-all`` to log
              out of all sites, or with :ref:`global options` ``-family``,
-             ``-lang`` or ``-site`` to log out of a specific site.
+             ``-code`` or ``-site`` to log out of a specific site.
 
 -oauth       Generate OAuth authentication information.
 
@@ -52,7 +52,7 @@ subdirectory.
    the -cookies option
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -135,7 +135,7 @@ def main(*args: str) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    :param args: command line arguments
+    :param args: Command line arguments
     """
     logall = False
     logout = False

@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 import re
+import unittest
 import warnings
 from contextlib import suppress
 from http import HTTPStatus
+from platform import python_implementation
 from unittest.mock import patch
 
 import requests
@@ -19,9 +21,14 @@ import pywikibot
 from pywikibot import config
 from pywikibot.comms import http
 from pywikibot.exceptions import FatalServerError, Server504Error
-from pywikibot.tools import PYTHON_VERSION, suppress_warnings
-from tests import join_images_path
-from tests.aspects import HttpbinTestCase, TestCase, require_modules, unittest
+from pywikibot.tools import PYTHON_VERSION, THREADING_FREE, suppress_warnings
+from tests import join_images_path, utils
+from tests.aspects import (
+    DeprecationTestCase,
+    HttpbinTestCase,
+    TestCase,
+    require_modules,
+)
 
 
 class HttpTestCase(TestCase):
@@ -84,6 +91,7 @@ class TestGetAuthenticationConfig(TestCase):
                 self.assertEqual(http.get_authentication(url), auth)
 
 
+@utils.expected_failure_if(THREADING_FREE)  # T412603
 class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""
@@ -173,7 +181,7 @@ class TestHttpStatus(HttpbinTestCase):
                          'https://community.fandom.com/wiki/Community_Central')
 
 
-class UserAgentTestCase(TestCase):
+class UserAgentTestCase(DeprecationTestCase):
 
     """User agent formatting tests using a format string."""
 
@@ -185,17 +193,22 @@ class UserAgentTestCase(TestCase):
         self.assertEqual('', http.user_agent(format_string=' '))
         self.assertEqual('a', http.user_agent(format_string=' a '))
 
-        # if there is no site, these can't have a value
-        self.assertEqual('', http.user_agent(format_string='{username}'))
+        # if there is no site, these can't have a value except for username
+        self.assertEqual(http.user_agent_username(),
+                         http.user_agent(format_string='{username}'))
         self.assertEqual('', http.user_agent(format_string='{family}'))
+        self.assertOneDeprecationParts(
+            '{family} value for user_agent', '{site}')
         self.assertEqual('', http.user_agent(format_string='{lang}'))
+        self.assertOneDeprecationParts('{lang} value for user_agent', '{site}')
+        self.assertEqual('', http.user_agent(format_string='{site}'))
 
         self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          http.user_agent(format_string='{pwb}'))
         self.assertNotIn(' ', http.user_agent(format_string=' {pwb} '))
 
         self.assertIn('Pywikibot/' + pywikibot.__version__,
-                      http.user_agent(format_string='SVN/1.7.5 {pwb}'))
+                      http.user_agent(format_string='Git/2.52.0 {pwb}'))
 
     def test_user_agent_username(self) -> None:
         """Test http.user_agent_username function."""
@@ -432,13 +445,13 @@ class CharsetTestCase(TestCase):
         self.assertEqual(resp.content, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(resp.text, CharsetTestCase.STR)
 
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T414220')
     def test_invalid_charset(self) -> None:
         """Test decoding with different and invalid charsets."""
         invalid_charsets = ('utf16', 'win-1251')
         for charset in invalid_charsets:
             with self.subTest(charset=charset):
-                resp = CharsetTestCase._create_response(
-                    data=CharsetTestCase.LATIN1_BYTES)
+                resp = self._create_response(data=CharsetTestCase.LATIN1_BYTES)
 
                 with patch('pywikibot.warning'):  # Ignore WARNING:
                     resp.encoding = http._decide_encoding(resp, charset)

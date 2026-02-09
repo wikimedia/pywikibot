@@ -1,16 +1,16 @@
 """Object representing a MediaWiki category page."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Generator
 from typing import Any
 
 import pywikibot
-from pywikibot.backports import Generator
 from pywikibot.page._page import Page
 
 
@@ -61,7 +61,7 @@ class Category(Page):
 
     def subcategories(self, *,
                       recurse: int | bool = False,
-                      **kwargs: Any) -> Generator[Category, None, None]:
+                      **kwargs: Any) -> Generator[Category]:
         """Yield all subcategories of the current category.
 
         **Usage:**
@@ -111,10 +111,10 @@ class Category(Page):
            yielded was changed. The old order was
            *B, E, H, F, G, C, I, E, H, J, K, L, G, D*
 
-        :param recurse: if not False or 0, also iterate articles in
+        :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: ``recurse=1`` will iterate articles in
-            first-level subcats, but no deeper.)
+            levels, e.g. ``recurse=1`` will iterate articles in
+            first-level subcats but no deeper.
         :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
             <pywikibot.site._generators.GeneratorsMixin.categorymembers>`
@@ -136,7 +136,7 @@ class Category(Page):
     def articles(self, *,
                  recurse: int | bool = False,
                  total: int | None = None,
-                 **kwargs: Any) -> Generator[Page, None, None]:
+                 **kwargs: Any) -> Generator[Page]:
         """Yield all articles in the current category.
 
         Yields all pages in the category that are not subcategories.
@@ -165,11 +165,11 @@ class Category(Page):
         .. versionchanged:: 8.0
            all parameters are keyword arguments only.
 
-        :param recurse: if not False or 0, also iterate articles in
+        :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: ``recurse=1`` will iterate articles in
-            first-level subcats, but no deeper.)
-        :param total: iterate no more than this number of pages in
+            levels; e.g. ``recurse=1`` will iterate articles in
+            first-level subcats but no deeper.
+        :param total: Iterate no more than this number of pages in
             total (at all levels)
         :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
@@ -202,7 +202,7 @@ class Category(Page):
     def members(self, *,
                 recurse: int | bool = False,
                 total: int | None = None,
-                **kwargs: Any) -> Generator[Page, None, None]:
+                **kwargs: Any) -> Generator[Page]:
         """Yield all category contents (subcats, pages, and files).
 
         **Usage:**
@@ -231,11 +231,11 @@ class Category(Page):
            all parameters are keyword arguments only. Additional
            parameters are supported.
 
-        :param recurse: if not False or 0, also iterate articles in
+        :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: ``recurse=1`` will iterate articles in
-            first-level subcats, but no deeper.)
-        :param total: iterate no more than this number of pages in
+            levels, e.g. ``recurse=1`` will iterate articles in
+            first-level subcats but no deeper.
+        :param total: Iterate no more than this number of pages in
             total (at all levels)
         :param kwargs: Additional parameters. Refer to
             :meth:`APISite.categorymembers()
@@ -288,7 +288,7 @@ class Category(Page):
     def newest_pages(
         self,
         total: int | None = None
-    ) -> Generator[Page, None, None]:
+    ) -> Generator[Page]:
         """Return pages in a category ordered by the creation date.
 
         If two or more pages are created at the same time, the pages are

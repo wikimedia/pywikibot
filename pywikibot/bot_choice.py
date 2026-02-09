@@ -1,6 +1,6 @@
 """Options and Choices for :py:meth:`pywikibot.input_choice`."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,11 +8,11 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
+from collections.abc import Iterable, Mapping, Sequence
 from textwrap import fill
 from typing import TYPE_CHECKING
 
 import pywikibot
-from pywikibot.backports import Iterable, Mapping, Sequence
 
 
 __all__ = (
@@ -78,7 +78,7 @@ class Option(ABC):
 
         :param text: Text into which options are to be formatted
         :param options: Option instances to be formatted
-        :param default: filler for any option's 'default' placeholder
+        :param default: Filler for any option's 'default' placeholder
 
         :return: Text with the options formatted into it
         """
@@ -168,7 +168,7 @@ class StandardOption(Option):
     def __init__(self, option: str, shortcut: str, **kwargs: Any) -> None:
         """Initializer.
 
-        :param option: option string
+        :param option: Option string
         :param shortcut: Shortcut of the option
         """
         super().__init__(**kwargs)

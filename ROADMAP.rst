@@ -1,8 +1,145 @@
-Current Release Changes
-=======================
+Release 11 (in development)
+===========================
 
-* Add support for pplwiki. (:phab:`T415048`)
+**Improvements**
 
+* Use URL to bot's wiki page in :ref:`user_agent_format<Account Settings>` due to `Foundation UA
+  Policy <https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy>`_.
+  (:phab:`T414173`, :phab:`T414201`)
+* Show Pywikibot version in deprecation warnings for :mod:`config` variables.
+* :ref:`config.pickle_protocol<Further Settings>` was updated from version `2` to `5`. Older pickle
+  files are still readable.
+* Enhance :meth:`throttle.Throttle.waittime` for read requests. (:phab:`T415891`)
+* :ref:`config.minthrottle<Settings to Avoid Server Overload>` may me a ``float``.
+  (:phab:`T414170`, :phab:`T416145`)
+* Implement :meth:`Site.abuselog()<pywikibot.site._generators.GeneratorsMixin.abuselog>` site
+  generator for :api:`AbuseLog` and :meth:`page.User.last_activity` method.
+  (:phab:`T396297`, :phab:`T396298`)
+* Use explicit utf-8 encoding with class:`GraphSavingThread.graph.write
+  <interwiki_graph.GraphSavingThread>` (:phab:`T415891`)
+* Optimize pickle file storage of :class:`WikiWho<page._toolforge.WikiWhoMixin>`
+  with subdirectory structure (:phab:`T414087`)
+* Make :class:`textlib.TimeStripper` more resilient for itwiki. (:phab:`T415880`)
+* Add :class:`WikiWho<page._toolforge.WikiWhoMixin>` API support. (:phab:`T414071`)
+* Never use None as key in WeakKeyDictionary within :class:`proofreadpage.TagAttrDesc`.
+  Class-level access returns the descriptor itself. (:phab:`T413563`)
+* *text_a* and *text_b* of :class:`diff.PatchManager` are positional-only parameters.
+  *by_letter* and *replace_invisible* are keyword-only parameters.
+* Optimize :func:`pagegenerators.SubCategoriesPageGenerator`
+* Consider ``retry_after`` in delay calculation of :meth:`throttle.Throttle.get_delay`.
+  (:phab:`T414354`)
+* Remove protocol swapping in :class:`data.api.Request`. (:phab:`T414369`)
+* Use environment variables ``PYWIKIBOT_USERNAME`` or ``PWB_USERNAME`` for ``User-Agent`` username
+  if username isn't set in :mod:`user-config.py<config>` for a given site. (:phab:`T414201`)
+* Add support for beta site in :class:`families.meta_family.Family` (:phab:`T413060`)
+* Add user agent to :class:`data.api.Request` error log (:phab:`T414170`)
+* Increase performance of delegation for :class:`BaseSite<pywikibot.site._basesite.BaseSite>`
+  methods to :class:`family.Family` methods (:phab:`T413398`)
+* Use ``queue.shutdown()``  for the async_manager queue
+* Use :class:`backports.RLock` instead of Queue to signal async_manager activity (:phab:`T147178`)
+* Add :meth:`User.is_partial_blocked()<pywikibot.User.is_partial_blocked>` and methods
+  :meth:`APISite.is_partial_blocked()<pywikibot.site._apisite.APISite.is_partial_blocked>` to detect
+  partial blocks. (:phab:`T412613`)
+* Add :meth:`get_block_info()<pywikibot.User.get_block_info>` method to :class:`pywikibot.User`
+  class to retrieve detailed block information including block ID, reason, expiry, and restrictions
+  (:phab:`T412613`)
+* Java based GraalPy is supported but Pillow cannot be used (:phab:`T412739`)
+* Free threading Python is supported with some restrictions.
+  (:phab:`T408131`, :phab:`T412605`, :phab:`T412624`)
+* i18n updates.
+* Provide a security policy with Pywikibot. (:phab:`T410753`)
+* Show a friendly install message with :mod:`pwb<pywikibot.scripts.wrapper>` wrapper
+  when mandatory packages are missing (:phab:`T409662`).
+* Update `tools._unidata.__category_cf` dict for :func:`tools.chars.contains_invisible` and
+  :func:`tools.chars.replace_invisible` to unicode version 17.0.0.
+* Update Docker files to Python 3.12. (:phab:`T408997`)
+
+**Bugfixes**
+
+* Remove invisible chars from :attr:`textlib.Section.heading`. (:phab:`T411307`)
+* Do not raise :exc:`exceptions.UnknownExtensionError` within
+  :meth:`APISite.page_from_repository()<pywikibot.site._apisite.APISite.page_from_repository>`
+  on non-Wikibase sites (:phab:`T414068`)
+* Handle retry-after value gracefully if it is a float instead an int (:phab:`T414197`)
+* Handle limit value gracefully if it is an int instead a str (:phab:`T414168`)
+* Handle `lockmanager-fail-conflict` API error in :meth:`data.api.Request.submit` as retryable
+  (:phab:`T396984`)
+* Prevent login loop in :mod:`data.superset` with unsupported auth methods (:phab:`T408287`)
+
+**Code cleanups**
+
+* ``{httplib2}`` user_agent_format variable is no longer supported (:phab:`T98439`)
+* The undocumented ``page_put_queue_busy`` was removed without deprecation period.
+* Dysfunctional :meth:`APISite.alllinks()
+  <pywikibot.site._generators.GeneratorsMixin.alllinks>` was removed.
+  (:phab:`T359427`, :phab:`T407708`)
+* The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
+  :exc:`exceptions.NoPageError` was removed
+* The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class was
+  removed in favour of the *expiry* class attribute.
+* The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
+  the :class:`textlib.TimeStripper` class was removed in favour of the ``patterns`` attribute,
+  which is a :class:`textlib.TimeStripperPatterns` object.
+* The ``groups`` attribute of the :class:`textlib.TimeStripper` was removed in favour
+  of the :data:`textlib.TIMEGROUPS` constant.
+* The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
+  :func:`textlib.replaceCategoryLinks` was dropped in favour of ``add_only``.
+* ``load_tokens`` method of :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` was
+  removed; ``clear`` method can be used instead.
+* No longer support legacy API tokens of MediaWiki 1.23 and older. (:phab:`270380`, :phab:`306637`)
+* ``use_hard_category_redirect`` Site and Family properties were removed. (:phab:`T348953`)
+* The *all* parameter of :meth:`APISite.get_tokens()<pywikibot.site._apisite.APISite.get_tokens>``
+  was removed; use an empty string instead.
+* ``APISite.validate_tokens()`` method was removed.
+* ``APISite.messages()`` method was removed in favour of the
+  :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>` attribute
+* ``Page.editTime()`` method was removed; :attr:`Page.latest_revision.timestamp
+  <page.BasePage.latest_revision>` attribute can be used instead
+* ``data.api.QueryGenerator.continuekey`` was be removed in favour of
+  :attr:`data.api.QueryGenerator.modules`
+* The ``Timestamp.clone()`` method was removed in favour of the ``Timestamp.replace()`` method
+* The ``tools.itertools.itergroup`` function was removed in favour of the
+  :func:`backports.batched` or :pylib:`itertools.batched<itertools#itertools.batched>` function.
+* The ``get_login_token()`` method of :class:`login.ClientLoginManager`
+  was removed and can be replaces by ``login.LoginManager.site.tokens['login']``
+* The :meth:`family.Family.maximum_GET_length` method was removed in favour of the
+  :ref:`config.maximum_GET_length<Account Settings>` configuration option (:phab:`T325957`)
+* The ``exceptions.Server414Error`` exception was replaced by
+  :exc:`exceptions.Client414Error` exception
+* The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
+  *paraminfo_keys* class attribute, and its ``preloaded_modules`` property was removed
+* The ``data.api.LoginManager()`` constructor was removed in favour of the
+  :class:`login.ClientLoginManager` class
+* The `normalize` parameter was removed from the
+  :meth:`pywikibot.WbTime.toTimestr` and :meth:`pywikibot.WbTime.toWikibase`
+  methods in Pywikibot 8.2. Since Pywikibot 11, passing `normalize` as an argument
+  raises an error, because support for legacy arguments via was removed.
+* Several typing types were removed from :mod:`backports`.
+* The ``cache`` decorator was removed from :mod:`backports`. The :pylib:`@functools.cache()
+  <functools#functools.cache>` can be used instead. (:phab:`T401802`)
+* The functions ``removeprefix`` and ``removesuffix`` were removed from :mod:`backports`. The
+  :pylib:`stdlib methods<stdtypes.html#str.removeprefix>` can be used instead. (:phab:`T401802`)
+
+**Other breaking changes**
+
+* Set :ref:`minthrottle<Settings to Avoid Server Overload>` to 0.1 due to `Wikimedia Bot Policy
+  <https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy>`_.
+  (:phab:`T414170`)
+* Clean up :ref:`user_agent_format<Account Settings>` string.
+  Replace the first occurrence of "family", "code", or "lang" with "site".
+  The "lang" variable never worked properly. All of these can be replaced
+  with "site", which is recognized by Wikimedia traffic management.
+  Also replace "script_product" by "script" and "version" by "revision".
+  Replace {script_product} with {username}/{script} in user_agent_format. (:phab:`T414201`)
+* Use global ``-code`` instead of ``-lang`` to determine a site.
+  The old ``-lang`` option is kept for backward compatibility.
+* Protocol swapping in :class:`data.api.Request` was removed. Family files should provide
+  the correct protocol. (:phab:`T414369`)
+* Package requirements were updated (``beautifulsoup4``, ``fake-useragent``, ``mwoauth``,
+  ``mwparserfromhell``, ``packaging``, ``Pillow``, ``pydot``, ``PyMySQL``, ``python-stdnum``,
+  ``requests``, ``requests-sse``, ``wikitextparser``)
+* Python 3.8 support was dropped. (:phab:`T401802`)
+* Remove predefined ``yu-tld`` fix in :mod:`fixes`. (:phab:`T402088`)
 
 Deprecations
 ============
@@ -15,49 +152,6 @@ Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
 removed in in the third subsequent major release, remaining available for the two releases in between.
-
-
-Pending removal in Pywikibot 11
--------------------------------
-
-* 10.7.0: Dysfunctional :meth:`APISite.alllinks()
-  <pywikibot.site._generators.GeneratorsMixin.alllinks>` will be removed.
-  (:phab:`T359427`, :phab:`T407708`)
-* 10.6.0: Python 3.8 support is deprecated and will be dropped soon
-* 8.4.0: :attr:`data.api.QueryGenerator.continuekey` will be removed in favour of
-  :attr:`data.api.QueryGenerator.modules`
-* 8.4.0: The *modules_only_mode* parameter in the :class:`data.api.ParamInfo` class, its
-  *paraminfo_keys* class attribute, and its ``preloaded_modules`` property will be removed
-* 8.4.0: The *dropdelay* and *releasepid* attributes of the :class:`throttle.Throttle` class will be
-  removed in favour of the *expiry* class attribute
-* 8.2.0: The :func:`tools.itertools.itergroup` function will be removed in favour of the
-  :func:`backports.batched` function
-* 8.2.0: The *normalize* parameter in the :meth:`pywikibot.WbTime.toTimestr` and
-  :meth:`pywikibot.WbTime.toWikibase` methods will be removed
-* 8.1.0: The inheritance of the :exc:`exceptions.NoSiteLinkError` exception from
-  :exc:`exceptions.NoPageError` will be removed
-* 8.1.0: The ``exceptions.Server414Error`` exception is deprecated in favour of the
-  :exc:`exceptions.Client414Error` exception
-* 8.0.0: The :meth:`Timestamp.clone()<pywikibot.time.Timestamp.clone>` method is deprecated in
-  favour of the ``Timestamp.replace()`` method
-* 8.0.0: The :meth:`family.Family.maximum_GET_length` method is deprecated in favour of the
-  :ref:`config.maximum_GET_length<Account Settings>` configuration option (:phab:`T325957`)
-* 8.0.0: The ``addOnly`` parameter in the :func:`textlib.replaceLanguageLinks` and
-  :func:`textlib.replaceCategoryLinks` functions is deprecated in favour of ``add_only``
-* 8.0.0: The regex attributes ``ptimeR``, ``ptimeznR``, ``pyearR``, ``pmonthR``, and ``pdayR`` of
-  the :class:`textlib.TimeStripper` class are deprecated in favour of the ``patterns`` attribute,
-  which is a :class:`textlib.TimeStripperPatterns` object
-* 8.0.0: The ``groups`` attribute of the :class:`textlib.TimeStripper` class is deprecated in favour
-  of the :data:`textlib.TIMEGROUPS` constant
-* 8.0.0: The :meth:`LoginManager.get_login_token<login.ClientLoginManager.get_login_token>` method
-  has been replaced by ``login.ClientLoginManager.site.tokens['login']``
-* 8.0.0: The ``data.api.LoginManager()`` constructor is deprecated in favour of the
-  :class:`login.ClientLoginManager` class
-* 8.0.0: The :meth:`APISite.messages()<pywikibot.site._apisite.APISite.messages>` method is
-  deprecated in favour of the :attr:`userinfo['messages']<pywikibot.site._apisite.APISite.userinfo>`
-  attribute
-* 8.0.0: The :meth:`Page.editTime()<page.BasePage.editTime>` method is deprecated and should be
-  replaced by the :attr:`Page.latest_revision.timestamp<page.BasePage.latest_revision>` attribute
 
 
 Pending removal in Pywikibot 12
@@ -143,3 +237,9 @@ Pending removal in Pywikibot 13
   'millennium' must be used instead
 * 10.0.0: *includeredirects* parameter of :func:`pagegenerators.AllpagesPageGenerator` and
   :func:`pagegenerators.PrefixingPageGenerator` is deprecated and should be replaced by *filterredir*
+
+Pending removal in Pywikibot 14
+-------------------------------
+
+* Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
+  Positional parameters for *by_letter* and *replace_invisible* are deprecated.

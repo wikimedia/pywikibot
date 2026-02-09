@@ -183,9 +183,12 @@ Version historty:
    If ``archiveheader`` is not set, the bot now attempts to retrieve a
    localized template from Wikidata (based on known item IDs). If none is
    found, ``{{talkarchive}}`` is used as fallback.
+
+.. versionchanged:: 11.0
+   The ``-namespace`` option is now respected by ``-page`` option.
 """
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -208,7 +211,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Pattern, pairwise
+from pywikibot.backports import pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,
@@ -218,7 +221,6 @@ from pywikibot.textlib import (
     to_local_digits,
 )
 from pywikibot.time import MW_KEYS, parse_duration, str2timedelta
-from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.threading import BoundedPoolExecutor
 
 
@@ -298,7 +300,7 @@ def str2size(string: str) -> tuple[int, str]:
     return val, unit
 
 
-def template_title_regex(tpl_page: pywikibot.Page) -> Pattern:
+def template_title_regex(tpl_page: pywikibot.Page) -> re.Pattern:
     """Return a regex that matches to variations of the template title.
 
     It supports the transcluding variant as well as localized namespaces
@@ -467,6 +469,10 @@ class DiscussionPage(pywikibot.Page):
            the current timestamp to the previous if the current is lower.
         .. versionchanged:: 7.7
            Load unsigned threads using timestamp of the next thread.
+        .. versionchanged:: 11.0
+           Use explicit check for 'archiveheader' to avoid eager
+           evaluation of :meth:`get_header_template` when an
+           archiveheader exists within archive template.
         """
         self.header = ''
         self.threads = []
@@ -474,8 +480,16 @@ class DiscussionPage(pywikibot.Page):
         try:
             text = self.get()
         except NoPageError:
-            self.header = self.archiver.get_attr('archiveheader',
-                                                 self.get_header_template())
+            # Use explicit check for 'archiveheader' instead of passing it as
+            # a default to get_attr(), because get_attr evaluates the default
+            # eagerly. Without this, get_header_template() would always be
+            # called, even when an archiveheader exists within archive
+            # template, defeating lazy fallback.
+            if 'archiveheader' in self.archiver.attributes:
+                self.header = self.archiver.get_attr('archiveheader')
+            else:
+                self.header = self.get_header_template()
+
             if self.params:
                 self.header = self.header % self.params
             return
@@ -1064,7 +1078,7 @@ def main(*args: str) -> None:
         elif option == 'page':
             pagename = value
         elif option == 'namespace':
-            namespace = value
+            namespace = int(value)
         elif option == 'keep':
             keep = True
         elif option == 'sort':
@@ -1094,7 +1108,7 @@ def main(*args: str) -> None:
             with open(filename) as f:
                 gen = [pywikibot.Page(site, line, ns=10) for line in f]
         elif pagename:
-            gen = [pywikibot.Page(site, pagename, ns=3)]
+            gen = [pywikibot.Page(site, pagename, ns=namespace or 3)]
         else:
 
             ns = [str(namespace)] if namespace is not None else []
@@ -1107,31 +1121,18 @@ def main(*args: str) -> None:
 
         botargs = tmpl, salt, force, keep, sort
         botkwargs = {'asynchronous': asynchronous}
-        futures = []  # needed for Python < 3.9
         with context as executor:
             for pg in gen:
                 if asynchronous:
-                    future = executor.submit(
-                        process_page, pg, *botargs, **botkwargs)
+                    executor.submit(process_page, pg, *botargs, **botkwargs)
 
-                    if PYTHON_VERSION < (3, 9):
-                        futures.append(future)
-
-                    if not exiting.is_set():
-                        continue
-
-                    pywikibot.info(
-                        '<<lightyellow>>Canceling pending Futures...')
-
-                    if PYTHON_VERSION < (3, 9):
-                        canceled = sum(future.cancel() for future in futures)
-                        pywikibot.info(f'{canceled} canceled')
-                    else:
+                    if exiting.is_set():
+                        pywikibot.info(
+                            '<<lightyellow>>Canceling pending Futures...')
                         executor.shutdown(cancel_futures=True)
+                        break
 
-                    break
-
-                if not process_page(pg, *botargs, **botkwargs):
+                elif not process_page(pg, *botargs, **botkwargs):
                     break
 
 

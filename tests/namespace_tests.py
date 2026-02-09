@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import unittest
 from collections.abc import Iterable
 from contextlib import suppress
 
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.site._namespace import BuiltinNamespace
-from tests.aspects import TestCase, unittest
+from tests.aspects import TestCase
 
 
 # Default namespaces which should work in any MW wiki

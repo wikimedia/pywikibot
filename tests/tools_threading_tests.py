@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for threading tools."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -122,7 +122,10 @@ class BoundedThreadPoolTests(TestCase):
                                     r"'concurrent\.futures\.Executor'"):
             BoundedPoolExecutor(Executor)
         with self.assertRaisesRegex(
-                TypeError, "duplicate base class '?BoundedPoolExecutor'?"):
+            TypeError,
+            r'(duplicate base class |Cannot create a consistent method[\s\S]*)'
+            "'?BoundedPoolExecutor'?"
+        ):
             BoundedPoolExecutor(BoundedPoolExecutor)
         with self.assertRaisesRegex(ValueError, "Minimum 'max_bound' is 1"):
             BoundedPoolExecutor('ThreadPoolExecutor', 0)

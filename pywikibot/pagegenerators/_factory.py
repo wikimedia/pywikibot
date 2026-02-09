@@ -1,6 +1,6 @@
 """GeneratorFactory module which handles pagegenerators options."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from __future__ import annotations
 import itertools
 import re
 import sys
+from collections.abc import Callable, Iterable, Sequence
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
@@ -16,7 +17,6 @@ from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import Callable, Iterable, Sequence, removeprefix
 from pywikibot.bot import ShowingListOption
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -94,11 +94,11 @@ class GeneratorFactory:
         """Initializer.
 
         :param site: Site for generator results
-        :param positional_arg_name: generator to use for positional
+        :param positional_arg_name: Generator to use for positional
             args, which do not begin with a hyphen
-        :param enabled_options: only enable options given by this
+        :param enabled_options: Only enable options given by this
             Iterable. This is priorized over disabled_options
-        :param disabled_options: disable these given options and let
+        :param disabled_options: Disable these given options and let
             them be handled by scripts options handler
         """
         self.gens: list[Iterable[pywikibot.page.BasePage]] = []
@@ -186,9 +186,9 @@ class GeneratorFactory:
         which is lazy loaded to avoid being cached before the global
         arguments are handled.
 
-        :return: namespaces selected using arguments
-        :raises KeyError: a namespace identifier was not resolved
-        :raises TypeError: a namespace identifier has an inappropriate
+        :return: Namespaces selected using arguments
+        :raises KeyError: A namespace identifier was not resolved
+        :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
         """
         if isinstance(self._namespaces, list):
@@ -211,7 +211,7 @@ class GeneratorFactory:
            <tools.itertools.roundrobin_generators>` way.
 
         :param gen: Another generator to be combined with
-        :param preload: preload pages using PreloadingGenerator
+        :param preload: Preload pages using PreloadingGenerator
             unless self.nopreload is True
         """
         if gen:
@@ -317,7 +317,7 @@ class GeneratorFactory:
                     ) -> tuple[pywikibot.Category, str | None]:
         """Return Category and start as defined by category.
 
-        :param category: category name with start parameter
+        :param category: Category name with start parameter
         """
         if not category:
             category = i18n.input('pywikibot-enter-category-name')
@@ -346,12 +346,12 @@ class GeneratorFactory:
                        gen_func: Callable | None = None) -> Any:
         """Return generator based on Category defined by category and gen_func.
 
-        :param category: category name with start parameter
-        :param recurse: if not False or 0, also iterate articles in
+        :param category: Category name with start parameter
+        :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
-            levels. (Example: recurse=1 will iterate articles in first-
-            level subcats, but no deeper.)
-        :param content: if True, retrieve the content of the current
+            levels. E.g. recurse=1 will iterate articles in first-level
+            subcats but no deeper.
+        :param content: If True, retrieve the content of the current
             version of each page (default False)
         """
         if gen_func is None:
@@ -636,7 +636,7 @@ class GeneratorFactory:
             value = pywikibot.input('What namespace are you filtering on?')
         not_key = 'not:'
         if value.startswith(not_key):
-            value = removeprefix(value, not_key)
+            value = value.removeprefix(not_key)
             resolve = self.site.namespaces.resolve
             not_ns = set(resolve(value.split(',')))
             if not self._namespaces:

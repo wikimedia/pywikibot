@@ -80,6 +80,7 @@ To complete a move of a page, one can use:
 from __future__ import annotations
 
 import re
+from collections.abc import Generator
 from contextlib import suppress
 from itertools import chain
 from pathlib import Path
@@ -88,7 +89,6 @@ import pywikibot
 from pywikibot import config
 from pywikibot import editor as editarticle
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import Generator
 from pywikibot.bot import (
     HighlightContextOption,
     ListOption,

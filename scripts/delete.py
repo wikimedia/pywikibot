@@ -52,7 +52,7 @@ Delete everything in the category "To delete" without prompting:
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,6 @@ import collections
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.backports import DefaultDict
 from pywikibot.bot import CurrentPageBot
 from pywikibot.page import Page
 from pywikibot.site import Namespace
@@ -73,7 +72,7 @@ from pywikibot.tools.itertools import islice_with_ellipsis
 # with the parameter -help.
 docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
-RefTable = DefaultDict[Namespace, Page]
+RefTable = collections.defaultdict[Namespace, Page]
 
 
 class PageWithRefs(Page):

@@ -20,45 +20,44 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 100
+    timeout-minutes: 90
     strategy:
       fail-fast: false
-      max-parallel: 19
       matrix:
-        python-version: [pypy3.10, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: [pypy3.9, pypy3.10, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         site: ['wikipedia:en', 'wikisource:zh']
         include:
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikipedia:test
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: en
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
-          - python-version: '3.9'
-            site: wsbeta:en
-          - python-version: '3.8'
-            site: wikidata:test
           - python-version: '3.10'
+            site: wsbeta:en
+          - python-version: '3.9'
+            site: wikidata:test
+          - python-version: '3.11'
             site: wiktionary:ar
             test_no_rc: true
-          - python-version: '3.8'
-            site: wikidata:wikidata
           - python-version: '3.9'
+            site: wikidata:wikidata
+          - python-version: '3.10'
             site: wowwiki:uk
           - python-version: '3'
             site: wikipedia:de
             os: macOS-latest
-          # ubuntu-22.04 required for pypy3.8 and 3.14-dev due to T382214
-          - python-version: pypy3.8
-            site: wikipedia:en
-            os: ubuntu-22.04
-          - python-version: pypy3.8
-            site: wikisource:zh
-            os: ubuntu-22.04
+          - python-version: 3.13t
+            site: wikipedia:test
+            experimental: true
+          - python-version: 3.14t
+            site: wikipedia:test
+            experimental: true
+          # ubuntu-22.04 required 3.15-dev due to T382214
           - python-version: 3.15-dev
             site: wikipedia:en
             os: ubuntu-22.04
@@ -67,21 +66,14 @@ jobs:
             os: ubuntu-22.04
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
-        if: "!endsWith(matrix.python-version, '-dev')"
         with:
           python-version: ${{ matrix.python-version }}
-
-      # use deadsnakes/action for development releases
-      - name: Set up development Python ${{ matrix.python-version }}
-        uses: deadsnakes/action@v3.2.0
-        if: endsWith(matrix.python-version, '-dev')
-        with:
-          python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -105,7 +97,7 @@ jobs:
           if [ ${{matrix.site}} != false ]; then
             python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           else
-            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -code:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           fi
           echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
@@ -114,6 +106,7 @@ jobs:
           echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "noisysleep = float('inf')" >> user-config.py
+          echo "minthrottle = 0.2" >> user-config.py
           echo "maximum_GET_length = 5000" >> user-config.py
           echo "console_encoding = 'utf8'" >> user-config.py
           echo "import os" >> user-config.py
@@ -122,9 +115,11 @@ jobs:
       - name: Test with unittest or pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 90
+        timeout-minutes: 60
         env:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+          # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
+          PYTHON_GIL: ${{ endsWith(matrix.python-version, 't') && '0' || '1' }}
         run: |
           python pwb.py version
           if [ ${{matrix.site || 0}} != 'wikisource:zh' ]; then

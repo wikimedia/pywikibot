@@ -1,6 +1,6 @@
 """Page filter generators provided by the pagegenerators module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,12 +8,12 @@ from __future__ import annotations
 
 import datetime
 import re
+from collections.abc import Generator, Iterable, Sequence
 from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Generator, Iterable, Pattern, Sequence
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools.itertools import filter_unique
@@ -28,9 +28,9 @@ if TYPE_CHECKING:
                              list[pywikibot.page.BasePage]]
     PATTERN_STR_OR_SEQ_TYPE = Union[
         str,
-        Pattern[str],
+        re.Pattern[str],
         Sequence[str],
-        Sequence[Pattern[str]],
+        Sequence[re.Pattern[str]],
     ]
 
 
@@ -51,7 +51,7 @@ def NamespaceFilterPageGenerator(
     | Namespace
     | Sequence[str | Namespace],
     site: BaseSite | None = None,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """A generator yielding pages from another generator in given namespaces.
 
     If a site is provided, the namespaces are validated using the namespaces
@@ -61,11 +61,11 @@ def NamespaceFilterPageGenerator(
     .. note:: API-based generators that have a "namespaces" parameter
        perform namespace filtering more efficiently than this generator.
 
-    :param namespaces: list of namespace identifiers to limit results
+    :param namespaces: List of namespace identifiers to limit results
     :param site: Site for generator results; mandatory if
         namespaces contains namespace names. Defaults to the default site.
-    :raises KeyError: a namespace identifier was not resolved
-    :raises TypeError: a namespace identifier has an inappropriate
+    :raises KeyError: A namespace identifier was not resolved
+    :raises TypeError: A namespace identifier has an inappropriate
         type such as NoneType or bool, or more than one namespace
         if the API module does not support multiple namespaces
     """
@@ -87,10 +87,10 @@ def NamespaceFilterPageGenerator(
 def PageTitleFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     ignore_list: dict[str, dict[str, str]],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Yield only those pages are not listed in the ignore list.
 
-    :param ignore_list: family names are mapped to dictionaries in which
+    :param ignore_list: Family names are mapped to dictionaries in which
         language codes are mapped to lists of page titles. Each title must
         be a valid regex as they are compared using :py:obj:`re.search`.
     """
@@ -114,7 +114,7 @@ def RedirectFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     no_redirects: bool = True,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Yield pages from another generator that are redirects or not.
 
     :param no_redirects: Exclude redirects if True, else only include
@@ -151,8 +151,8 @@ class ItemClaimFilter:
                        qualifiers: dict[str, str]) -> bool:
         """Return true if the page contains the claim given.
 
-        :param page: the page to check
-        :return: true if page contains the claim, false otherwise
+        :param page: The page to check
+        :return: True if page contains the claim, false otherwise
         """
         if not isinstance(page, pywikibot.page.WikibasePage):  # T175151
             try:
@@ -182,20 +182,20 @@ class ItemClaimFilter:
         cls,
         generator: Iterable[pywikibot.page.WikibasePage],
         prop: str,
-        claim: str,
+        claim,
         qualifiers: dict[str, str] | None = None,
         negate: bool = False,
-    ) -> Generator[pywikibot.page.WikibasePage, None, None]:
+    ) -> Generator[pywikibot.page.WikibasePage]:
         """Yield all ItemPages which contain certain claim in a property.
 
-        :param prop: property id to check
-        :param claim: value of the property to check. Can be exact value
-            (for instance, ItemPage instance) or a string (e.g.
-            'Q37470').
-        :param qualifiers: dict of qualifiers that must be present, or
+        :param prop: Property id to check
+        :param claim: Value of the property to check. An ItemPage
+            instance or a string, e.g. 'Q37470'.
+        :type claim: Itempage | str
+        :param qualifiers: Dict of qualifiers that must be present, or
             None if qualifiers are irrelevant
-        :param negate: true if pages that do *not* contain specified
-            claim should be yielded, false otherwise
+        :param negate: True if pages that do *not* contain the specified
+            claim should be yielded; otherwise False
         """
         qualifiers = qualifiers or {}
         for page in generator:
@@ -210,7 +210,7 @@ ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 def SubpageFilterGenerator(generator: Iterable[pywikibot.page.BasePage],
                            max_depth: int = 0,
                            show_filtered: bool = False
-                           ) -> Generator[pywikibot.page.BasePage, None, None]:
+                           ) -> Generator[pywikibot.page.BasePage]:
     """Generator which filters out subpages based on depth.
 
     It looks at the namespace of each page and checks if that namespace
@@ -236,11 +236,11 @@ class RegexFilter:
     """Regex filter."""
 
     @classmethod
-    def __filter_match(cls, regex: Sequence[Pattern[str]],
+    def __filter_match(cls, regex: Sequence[re.Pattern[str]],
                        string: str, quantifier: str) -> bool:
         """Return True if string matches precompiled regex list.
 
-        :param quantifier: a qualifier
+        :param quantifier: A qualifier
         """
         if quantifier == 'all':
             match = all(r.search(string) for r in regex)
@@ -250,7 +250,7 @@ class RegexFilter:
 
     @classmethod
     def __precompile(cls, regex: PATTERN_STR_OR_SEQ_TYPE,
-                     flag: int) -> list[Pattern[str]]:
+                     flag: int) -> list[re.Pattern[str]]:
         """Precompile the regex list if needed."""
         if isinstance(regex, list):
             regex_list = regex
@@ -271,7 +271,7 @@ class RegexFilter:
                     regex: PATTERN_STR_OR_SEQ_TYPE,
                     quantifier: str = 'any',
                     ignore_namespace: bool = True
-                    ) -> Generator[pywikibot.page.BasePage, None, None]:
+                    ) -> Generator[pywikibot.page.BasePage]:
         """Yield pages from another generator whose title matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier parameter.
@@ -281,14 +281,14 @@ class RegexFilter:
         .. note:: if you want to check for a match at the beginning of
            the title, you have to start the regex with "^"
 
-        :param generator: another generator
-        :param regex: a regex which should match the page title
-        :param quantifier: must be one of the following values:
+        :param generator: Another generator
+        :param regex: A regex which should match the page title
+        :param quantifier: Must be one of the following values:
             'all' - yields page if title is matched by all regexes
             'any' - yields page if title is matched by any regexes
             'none' - yields page if title is NOT matched by any regexes
-        :param ignore_namespace: ignore the namespace when matching the title
-        :return: return a page depending on the matching parameters
+        :param ignore_namespace: Ignore the namespace when matching the title
+        :return: Return a page depending on the matching parameters
         """
         # for backwards compatibility with compat for inverse parameter
         if quantifier is False:
@@ -306,7 +306,7 @@ class RegexFilter:
                       generator: Iterable[pywikibot.page.BasePage],
                       regex: PATTERN_STR_OR_SEQ_TYPE,
                       quantifier: str = 'any'
-                      ) -> Generator[pywikibot.page.BasePage, None, None]:
+                      ) -> Generator[pywikibot.page.BasePage]:
         """Yield pages from another generator whose body matches regex.
 
         Uses regex option re.IGNORECASE depending on the quantifier
@@ -322,14 +322,14 @@ class RegexFilter:
 def QualityFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     quality: list[int],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages according to quality levels.
 
     This is possible only for pages with content_model 'proofread-page'.
     In all the other cases, no filter is applied.
 
     :param generator: A generator object
-    :param quality: proofread-page quality levels (valid range 0-4)
+    :param quality: Any proofread-page quality levels (valid range 0-4)
     """
     for page in generator:
         if page.namespace() == page.site.proofread_page_ns:
@@ -343,11 +343,11 @@ def QualityFilterPageGenerator(
 def CategoryFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     category_list: Sequence[pywikibot.page.Category],
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages by categories specified.
 
     :param generator: A generator object
-    :param category_list: categories used to filter generated pages
+    :param category_list: Categories used to filter generated pages
     """
     for page in generator:
         if all(x in page.categories() for x in category_list):
@@ -372,7 +372,7 @@ def EdittimeFilterPageGenerator(
     first_edit_start: datetime.datetime | None = None,
     first_edit_end: datetime.datetime | None = None,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Wrap a generator to filter pages outside last or first edit range.
 
     :param generator: A generator object
@@ -431,7 +431,7 @@ def UserEditFilterGenerator(
     skip: bool = False,
     max_revision_depth: int | None = None,
     show_filtered: bool = False
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """Generator which will yield Pages modified by username.
 
     It only looks at the last editors given by max_revision_depth. If
@@ -440,8 +440,8 @@ def UserEditFilterGenerator(
     otherwise only pages edited by this user are given back.
 
     :param generator: A generator object
-    :param username: user name which edited the page
-    :param timestamp: ignore edits which are older than this timestamp
+    :param username: User name which edited the page
+    :param timestamp: Ignore edits which are older than this timestamp
     :param skip: Ignore pages edited by the given user
     :param max_revision_depth: It only looks at the last editors given
         by max_revision_depth
@@ -464,7 +464,7 @@ def WikibaseItemFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
     has_item: bool = True,
     show_filtered: bool = False,
-) -> Generator[pywikibot.page.BasePage, None, None]:
+) -> Generator[pywikibot.page.BasePage]:
     """A wrapper generator used to exclude if page has a Wikibase item or not.
 
     :param generator: Generator to wrap.

@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import MutableMapping
 
 import pywikibot
-from pywikibot.backports import Set
 from pywikibot.tools import deprecate_arg
 
 
@@ -51,8 +50,8 @@ class OptionSet(MutableMapping):
             :meth:`from_dict`
         """
         self._site_set = False
-        self._enabled: Set[str] = set()
-        self._disabled: Set[str] = set()
+        self._enabled: set[str] = set()
+        self._disabled: set[str] = set()
         self._set_site(site, module, param)
         if data:
             self.from_dict(data)

@@ -10,7 +10,8 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from typing import Callable, Union
+    from collections.abc import Callable
+    from typing import Union
     PluralRule = dict[str, Union[int, Callable[[int], Union[bool, int]]]]
 
 plural_rules: dict[str, PluralRule] = {

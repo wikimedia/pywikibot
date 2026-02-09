@@ -11,7 +11,7 @@
    ``user-password.cfg``
 """
 #
-# (C) Pywikibot team, 2010-2025
+# (C) Pywikibot team, 2010-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,11 +20,11 @@ from __future__ import annotations
 import os
 import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from textwrap import fill
 from typing import NamedTuple
 
-from pywikibot.backports import Callable
 from pywikibot.scripts import _import_with_no_user_config
 
 
@@ -241,7 +241,7 @@ def parse_sections() -> list:
     config.py will be in the pywikibot/ directory whereas
     generate_user_files script is in pywikibot/scripts.
 
-    :return: a list of _ConfigSection named tuples.
+    :return: A list of _ConfigSection named tuples.
     """
     data = []
 
@@ -271,7 +271,7 @@ def copy_sections(force: bool = False, default: str = 'n') -> str | None:
     :param force: Copy all sections if force is True
     :param default: Default answer for input_sections.
         Should be 'a' for all or 'n' for none to copy.
-    :return: config text of all selected sections.
+    :return: Config text of all selected sections.
     """
     sections = parse_sections()
     if not sections:  # Something is wrong with the regex
@@ -304,7 +304,7 @@ def input_sections(variant: str,
     :param variant: Variant of the setting section. Either 'framework'
         or 'scripts'
     :param sections: A sections list previously read from the config file
-    :param skip: a filter function
+    :param skip: A filter function
     :param force: Force input if True
     """
     # First ask what to do which the whole section type variant
@@ -446,8 +446,8 @@ def save_botpasswords(botpasswords: str,
                       path: Path) -> None:
     """Write botpasswords to file.
 
-    :param botpasswords: botpasswords for password file
-    :param path: file path for password file
+    :param botpasswords: Botpasswords for password file
+    :param path: File path for password file
     :raises OSError: OSError during writing the file
     """
     if botpasswords:
@@ -470,7 +470,7 @@ def save_botpasswords(botpasswords: str,
             raise
 
 
-def ask_for_dir_change(force) -> tuple[bool, bool]:
+def ask_for_dir_change(force: bool) -> tuple[bool, bool]:
     """Ask whether the base directory is has to be changed.
 
     Only give option for directory change if user-config.py or user-
@@ -478,8 +478,7 @@ def ask_for_dir_change(force) -> tuple[bool, bool]:
     config.py also exists in the requested directory.
 
     :param force: Skip asking for directory change
-    :type force: bool
-    :return: whether user file or password file exists already
+    :return: Whether user file or password file exists already
     """
     global base_dir
 
@@ -506,10 +505,10 @@ def main(*args: str) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    :param args: command line arguments
+    :param args: Command line arguments
     """
     # set the config family and mylang values to an invalid state so that
-    # the script can detect that the command line arguments -family & -lang
+    # the script can detect that the command line arguments -family & -code
     # or -site were used and handle_args has updated these config values,
     # and 'force' mode can be activated below.
     config.family, config.mylang = 'wikipedia', None

@@ -1,6 +1,6 @@
 """Decorators used by site models."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,8 +23,8 @@ def must_be(group: str | None = None):
 
     :param group: The group the logged in user should belong to. This
         parameter can be overridden by keyword argument 'as_group'.
-    :return: method decorator
-    :raises UserRightsError: user is not part of the required user
+    :return: Method decorator
+    :raises UserRightsError: User is not part of the required user
         group.
     """
     def decorator(fn):
@@ -49,8 +49,8 @@ def must_be(group: str | None = None):
 def need_extension(extension: str):
     """Decorator to require a certain MediaWiki extension.
 
-    :param extension: the MediaWiki extension required
-    :return: a decorator to make sure the requirement is satisfied when
+    :param extension: The MediaWiki extension required
+    :return: A decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
     def decorator(fn):
@@ -71,8 +71,8 @@ def need_right(right: str | None = None):
     """Decorator to require a certain user right when method is called.
 
     :param right: The right the logged in user should have.
-    :return: method decorator
-    :raises UserRightsError: user has insufficient rights.
+    :return: Method decorator
+    :raises UserRightsError: User has insufficient rights.
     """
     def decorator(fn):
         def callee(self, *args, **kwargs):
@@ -101,8 +101,8 @@ def need_right(right: str | None = None):
 def need_version(version: str):
     """Decorator to require a certain MediaWiki version number.
 
-    :param version: the mw version number required
-    :return: a decorator to make sure the requirement is satisfied when
+    :param version: The mw version number required
+    :return: A decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
     def decorator(fn):

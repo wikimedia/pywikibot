@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2024
+# (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 from unittest.mock import patch
 
 import pywikibot
 from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUserError
-from tests.aspects import DefaultSiteTestCase, TestCase, unittest
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class TestUserClass(TestCase):
@@ -166,6 +167,44 @@ class TestUserClass(TestCase):
         """Test global lock."""
         user = User(self.site, 'TonjaHeritage2')
         self.assertTrue(user.is_locked())
+
+    def test_block_info(self) -> None:
+        """Test block information methods."""
+        # 1. Test partial block detection
+        user = User(self.site, 'PartialUser')
+        user._userprops = {
+            'userid': 1234,
+            'blockid': 12345,
+            'blockpartial': '',
+            'blockreason': 'Test partial'
+        }
+
+        self.assertTrue(user.is_partial_blocked())
+        info = user.get_block_info()
+        self.assertIsNotNone(info)
+        self.assertIn('blockpartial', info)
+        self.assertEqual(info['blockid'], 12345)
+
+        # 2. Test full block (not partial)
+        user = User(self.site, 'FullUser')
+        user._userprops = {
+            'userid': 5678,
+            'blockid': 67890,
+            'blockreason': 'Test full'
+        }
+
+        self.assertFalse(user.is_partial_blocked())
+        info = user.get_block_info()
+        self.assertIsNotNone(info)
+        self.assertNotIn('blockpartial', info)
+        self.assertEqual(info['blockid'], 67890)
+
+        # 3. Test unblocked user
+        user = User(self.site, 'NormalUser')
+        user._userprops = {'userid': 999}
+
+        self.assertFalse(user.is_partial_blocked())
+        self.assertIsNone(user.get_block_info())
 
 
 class TestUserMethods(DefaultSiteTestCase):

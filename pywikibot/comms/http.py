@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Basic HTTP access interface.
 
 This module handles communication between the bot and the HTTP threads.
@@ -24,15 +29,12 @@ To enable access via cookies, assign cookie handling class::
 .. versionchanged:: 8.0
    Cookies are lazy loaded when logging to site.
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import atexit
 import codecs
+import os
 import re
 import sys
 import threading
@@ -54,7 +56,7 @@ from pywikibot.exceptions import (
     ServerError,
 )
 from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import file_mode_checker
+from pywikibot.tools import file_mode_checker, issue_deprecation_warning
 
 
 try:
@@ -158,17 +160,41 @@ class _UserAgentFormatter(Formatter):
     """User-agent formatter to load version/revision only if necessary."""
 
     def get_value(self, key, args, kwargs):
-        """Get field as usual except for version and revision."""
-        # This is the Pywikibot version; also map it to {revision} at present.
+        """Lazy load revision key. Also replace deprecated variables.
+
+        See :func:`user_agent` for the deprecated variables.
+        """
+        replacements = {
+            'script_product': 'script',
+            'version': 'revision',
+        }
+        replacements.update(dict.fromkeys(['code', 'lang', 'family'], 'site'))
+
+        revision: str = ''
         if key in ('version', 'revision'):
-            return pywikibot.version.getversiondict()['rev']
+            # lazy load the revision
+            revision = pywikibot.version.getversiondict()['rev']
+            if key == 'revision':
+                return revision
+
+        if key in ('code', 'lang', 'family', 'script_product', 'version'):
+            repl = replacements[key]
+            issue_deprecation_warning(
+                f'{{{key}}} value for user_agent',
+                f'{{{repl}}}',
+                depth=7,
+                since='11.0.0'
+            )
+            if key == 'version':
+                return revision
+            return super().get_value(repl, args, kwargs)
         return super().get_value(key, args, kwargs)
 
 
 _USER_AGENT_FORMATTER = _UserAgentFormatter()
 
 
-def user_agent_username(username=None):
+def user_agent_username(username=None) -> str:
     """Reduce username to a representation permitted in HTTP headers.
 
     To achieve that, this function:
@@ -176,7 +202,14 @@ def user_agent_username(username=None):
     - replaces spaces (' ') with '_'
     - encodes the username as 'utf-8' and if the username is not ASCII
     - URL encodes the username if it is not ASCII, or contains '%'
+
+    .. versionchanged:: 11.0
+       If *username* is not given, get it from environment variables
+       'PYWIKIBOT_USERNAME' usually used by tests or 'PWB_USERNAME' used
+       on toolforge.
     """
+    if not username:
+        username = os.getenv('PYWIKIBOT_USERNAME') or os.getenv('PWB_USERNAME')
     if not username:
         return ''
 
@@ -199,6 +232,18 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
                format_string: str | None = '') -> str:
     """Generate the user agent string for a given site and format.
 
+    .. versionchanged:: 11.0
+       The ``code``, ``lang`` and ``family`` variables in the format
+       string are deprecated and replaced by ``site``. The
+       ``script_version`` and ``version`` variables are deprecated and
+       replaced by ``script`` and ``revision`` respectively.
+
+       If *site* is provided and a username is returned by the helper
+       function :func:`user_agent_username`, the URL to the user's wiki
+       page is added to ``script_comments`` when the sitename does not
+       start with "wiki" (e.g., commons or wiktionary) or the site code
+       has more than two characters.
+
     :param site: The site for which this user agent is intended. May be
         None.
     :param format_string: The string to which the values will be added
@@ -206,32 +251,28 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
         empty.
     :return: The formatted user agent
     """
+    # NOTE: only BaseSite methods can be used here
     values = USER_AGENT_PRODUCTS.copy()
-    values.update(dict.fromkeys(['script', 'script_product'],
-                                pywikibot.bot.calledModuleName()))
-    values.update(dict.fromkeys(['family', 'code', 'lang', 'site'], ''))
+    values['script'] = pywikibot.bot.calledModuleName()
+    values['site'] = ''
 
     script_comments: list[str] = []
     if config.user_agent_description:
         script_comments.append(config.user_agent_description)
 
-    username = ''
+    username = user_agent_username(site.username() if site else None)
+
     if site:
-        script_comments.append(str(site))
-
-        # TODO: there are several ways of identifying a user, and username
-        # is not the best for a HTTP header if the username isn't ASCII.
-        if site.username():
-            username = user_agent_username(site.username())
-            script_comments.append('User:' + username)
-
-        values.update({
-            'family': site.family.name,
-            'code': site.code,
-            'lang': (site.lang if site.siteinfo.is_cached('lang')
-                     else f'({site.code})'),
-            'site': str(site),
-        })
+        values['site'] = site.sitename
+        if site.sitename.startswith('wiki') and len(site.code) == 2:
+            # use "sitename:code; User:username"
+            script_comments.append(site.sitename)
+            if username:
+                script_comments.append('User:' + username)
+        elif username:
+            # use url to user wikipage
+            full_url = site.base_url(f'wiki/User:{username}')
+            script_comments.append(full_url)
 
     values['username'] = username
     values['script_comments'] = '; '.join(script_comments)
@@ -269,11 +310,11 @@ def request(site: pywikibot.site.BaseSite,
        :meth:`family.Family.base_url` method.
 
     :param site: The Site to connect to
-    :param uri: the URI to retrieve
+    :param uri: The URI to retrieve
     :keyword CodecInfo or str or None charset: Either a valid charset
         (usable for `str.decode()`) or None to automatically chose the
         charset from the returned header (defaults to latin-1).
-    :keyword str | None protocol: a url scheme
+    :keyword str | None protocol: A url scheme
     :return: The received data Response
     """
     kwargs.setdefault('verify', site.verify_SSL_certificate())
@@ -286,15 +327,17 @@ def request(site: pywikibot.site.BaseSite,
 
     baseuri = site.base_url(uri, protocol=kwargs.pop('protocol', None))
     r = fetch(baseuri, headers=headers, **kwargs)
-    site.throttle.retry_after = int(r.headers.get('retry-after', 0))
+    retry_after = r.headers.get('retry-after', '0')
+    # literal of retry_after may int or float (T414197)
+    site.throttle.retry_after = int(float(retry_after))
     return r
 
 
 def get_authentication(uri: str) -> tuple[str, str] | None:
     """Retrieve authentication token.
 
-    :param uri: the URI to access
-    :return: authentication token
+    :param uri: The URI to access
+    :return: Authentication token
     """
     parsed_uri = urlparse(uri)
     netloc_parts = parsed_uri.netloc.split('.')
@@ -313,11 +356,11 @@ def get_authentication(uri: str) -> tuple[str, str] | None:
     return None
 
 
-def error_handling_callback(response) -> None:
+def error_handling_callback(response: requests.Response | Exception) -> None:
     """Raise exceptions and log alerts.
 
-    :param response: Response returned by Session.request().
-    :type response: :py:obj:`requests.Response`
+    :param response: Response returned by Session.request() or Exception
+        raised during request.
     """
     # TODO: do some error correcting stuff
     if isinstance(response, requests.exceptions.SSLError) \
@@ -366,30 +409,32 @@ def error_handling_callback(response) -> None:
         warning(f'Http response status {response.status_code}')
 
 
-def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
+def fetch(uri: str,
+          method: str = 'GET',
+          headers: dict[str, str] | None = None,
           default_error_handling: bool = True,
-          use_fake_user_agent: bool | str = False, **kwargs):
+          use_fake_user_agent: bool | str = False,
+          **kwargs) -> requests.Response:
     """HTTP request.
 
     See :py:obj:`requests.Session.request` for parameters.
 
     :param uri: URL to send
     :param method: HTTP method of the request (default: GET)
-    :param headers: dictionary of headers of the request
+    :param headers: Dictionary of headers of the request
     :param default_error_handling: Use default error handling
     :param use_fake_user_agent: Set to True to use fake UA, False to use
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
 
-    :keyword charset: Either a valid charset (usable for str.decode()) or None
-        to automatically chose the charset from the returned header (defaults
-        to latin-1)
+    :keyword charset: Either a valid charset (usable for str.decode())
+        or None to automatically chose the charset from the returned
+        header (defaults to latin-1)
     :type charset: CodecInfo, str, None
-    :keyword verify: verify the SSL certificate (default is True)
+    :keyword verify: Verify the SSL certificate (default is True)
     :type verify: bool or path to certificates
     :keyword callbacks: Methods to call once data is fetched
     :type callbacks: list of callable
-    :rtype: :py:obj:`requests.Response`
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
@@ -457,6 +502,7 @@ def fetch(uri: str, method: str = 'GET', headers: dict | None = None,
         response.encoding = _decide_encoding(response, charset)
 
     for callback in callbacks:
+        # Note: error_handling_callback raises the Exception
         callback(response)
 
     return response

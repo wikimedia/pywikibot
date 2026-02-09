@@ -3,7 +3,15 @@
 
 Usage:
 
-    python pwb.py addwikis [-family:<family>] {<wiki>}
+    python pwb.py addwikis [-family:<fam>] {<wiki>} {-family:<fam> {<wiki>}}
+
+
+Example:
+
+    :code:`python pwb.py addwikis foo -family:wikisource bar baz`
+
+    adds code ``foo`` to the default (wikipedia) family, and codes ``bar``
+    and ``baz`` to wikisource.
 
 
 .. versionadded:: 9.2
@@ -11,6 +19,9 @@ Usage:
    The options ``-h``, ``-help`` and ``--help`` display the help message.
 .. deprecated:: 10.4
    The ``help`` option
+.. versionchanged:: 11.0
+   Multiple families can be given with one run. The difference is shown
+   instead of the new list.
 """
 #
 # (C) Pywikibot team, 2024-2025
@@ -21,6 +32,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import pywikibot
@@ -42,7 +54,7 @@ families_list = [
 ]
 
 
-def update_family(family, wikis) -> None:
+def update_family(family: str, wikis: set) -> None:
     """Update codes set in family file."""
     joined_wikis = "', '".join(wikis)
     pywikibot.info(f"Adding '{joined_wikis}' to {family} family...\n")
@@ -62,7 +74,7 @@ def update_family(family, wikis) -> None:
 
     # combine new codes set
     new = sorted(original | new_codes)
-    pywikibot.info("The lists don't match, the new list is:\n")
+    pywikibot.info("The lists don't match, the updated list is:\n")
     text = '    codes = {\n'
     line = ' ' * 7
     for code in new:
@@ -72,14 +84,14 @@ def update_family(family, wikis) -> None:
         line += f" '{code}',"
     text += line + '\n'
     text += '    }'
-    pywikibot.info(text)
 
     # update codes
     filepath = Path(f'pywikibot/families/{family}_family.py')
-    family_text = filepath.read_text(encoding='utf8')
-    family_text = re.sub(r'(?ms)^ {4}codes = \{.+?\}',
-                         text, family_text, count=1)
-    filepath.write_text(family_text, encoding='utf8')
+    old_family_text = filepath.read_text(encoding='utf8')
+    new_family_text = re.sub(r'(?ms)^ {4}codes = \{.+?\}',
+                             text, old_family_text, count=1)
+    pywikibot.showDiff(old_family_text, new_family_text)
+    filepath.write_text(new_family_text, encoding='utf8')
 
 
 def main(*args: str) -> None:
@@ -88,11 +100,11 @@ def main(*args: str) -> None:
         args = sys.argv[1:]
         sys.argv = [sys.argv[0]]
 
-    family = 'wikipedia'
-    wikis = []
+    current_family = 'wikipedia'
+    wikis = defaultdict(set)
     for arg in args:
         if arg.startswith('-family'):
-            family = arg.split(':')[1]
+            current_family = arg.split(':')[1]
         elif arg in ('help', '-h', '-help', '--help'):
             if arg == 'help':
                 issue_deprecation_warning(
@@ -104,16 +116,18 @@ def main(*args: str) -> None:
             pywikibot.show_help()
             return
         else:
-            wikis.append(arg)
+            wikis[current_family].add(arg)
 
     if not wikis:
         pywikibot.bot.suggest_help(
             additional_text='No wiki is specified to be added.')
-    elif family not in families_list:
-        pywikibot.bot.suggest_help(
-            additional_text=f'Script cannot be used for {family} family.')
-    else:
-        update_family(family, wikis)
+
+    for family, codes in wikis.items():
+        if family not in families_list:
+            pywikibot.bot.suggest_help(
+                additional_text=f'Script cannot be used for {family} family.')
+        else:
+            update_family(family, codes)
 
 
 if __name__ == '__main__':

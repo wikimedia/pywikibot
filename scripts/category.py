@@ -163,6 +163,7 @@ import math
 import os
 import pickle
 import re
+from collections.abc import Sequence
 from contextlib import suppress
 from itertools import chain
 from operator import methodcaller
@@ -170,7 +171,6 @@ from textwrap import fill
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
-from pywikibot.backports import Sequence  # skipcq: PY-W2000
 from pywikibot.bot import (
     BaseBot,
     Bot,

@@ -14,13 +14,8 @@ from itertools import chain
 from types import TracebackType
 from typing import Any, NamedTuple
 
-from pywikibot.backports import Generator as GeneratorType
 from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    deprecated_args,
-    issue_deprecation_warning,
-)
+from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 
 __all__ = (
@@ -258,7 +253,7 @@ class GeneratorWrapper(ABC, Generator):
 
     @property
     @abstractmethod
-    def generator(self) -> GeneratorType[Any, Any, Any]:
+    def generator(self) -> Generator[Any, Any, Any]:
         """Abstract generator property."""
         yield from ()
 
@@ -276,7 +271,7 @@ class GeneratorWrapper(ABC, Generator):
 
         :raises TypeError: generator property is not a generator
         """
-        if not isinstance(self.generator, GeneratorType):
+        if not isinstance(self.generator, Generator):
             raise TypeError('generator property is not a generator but '
                             f'{type(self.generator).__name__}')
         if not hasattr(self, '_started_gen'):
@@ -314,8 +309,7 @@ class GeneratorWrapper(ABC, Generator):
             self._started_gen.throw(value)
             return
 
-        if PYTHON_VERSION > (3, 8) and not (value is None
-                                            and traceback is None):
+        if value is not None or traceback is not None:
             # Old-style (type, value, traceback) signature
             issue_deprecation_warning(
                 'The (type, value, traceback) signature of throw()',

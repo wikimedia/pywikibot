@@ -44,7 +44,7 @@ Note that the ordering of the letters in the 'exists' argument does not matter,
 but 'p' must be included.
 """
 #
-# (C) Pywikibot team, 2013-2024
+# (C) Pywikibot team, 2013-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,7 +52,7 @@ from __future__ import annotations
 
 import pywikibot
 from pywikibot import WikidataBot, pagegenerators
-from pywikibot.backports import batched, removeprefix
+from pywikibot.backports import batched
 
 
 # This is required for the text that is shown when you run this script
@@ -114,7 +114,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         # Handle args specifying how to handle duplicate claims
         if arg.startswith('-exists:'):
-            exists_arg = removeprefix(arg, '-exists:')
+            exists_arg = arg.removeprefix('-exists:')
             continue
         # Handle page generator args
         if gen.handle_arg(arg):

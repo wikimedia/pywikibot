@@ -11,12 +11,13 @@ A
     adiyetichaves
     Ævar Arnfjörð Bjarmason
     akashagarwal
+    Akaza24
     AkshitKumar
     Alangi Derick
     Alex Shih-Han Lin
     Alexander Jones
     Alexander Shtyrov
-    Alexander Vorwerk
+    Alexander Vorwerk (Zabe)
     Alfio
     Allen Guo
     Amir Sarabadani
@@ -28,6 +29,7 @@ A
     Andrei Cipu
     Andrew Harris
     Anirudh GP
+    Anotida Expected
     Anshoe
     Antoine Musso
     Anton
@@ -76,14 +78,17 @@ D
     David Wood
     David-Sarah Hopwood
     dennisroczek
+    DerIch27
     Denny Vrandecic
-    DMaggot
     Didicodes
+    Dikkulah
     Diwanshu Mittal
+    DMaggot
     Dmytro Dziuma
     Dr03ramos
     Draco flavus
     DrTrigon
+    Dumbledore
     Dvorapa
 
 E
@@ -98,12 +103,12 @@ E
     Eric Pien
     Erwin
     Evrifaessa
+    Ezra Yendau
 
 F
 -
 
 ::
-
 
     Fabian Neundorf
     Federico Leva
@@ -118,7 +123,6 @@ G
 
 ::
 
-
     Gallaecio
     Geoffrey Mon
     georggi
@@ -132,7 +136,7 @@ H
 
 ::
 
-
+    Harshita
     Hazard-SJ
     Huji
     Homeboy445
@@ -142,14 +146,13 @@ I
 
 ::
 
-
+    Ignacio Rodríguez
     Inductiveload
 
 J
 -
 
 ::
-
 
     James Michael DuPont
     Jamison Lofthouse
@@ -174,7 +177,6 @@ K
 
 ::
 
-
     Kaleem Bhatti
     Karl Eichwalder
     Kasper Souren
@@ -190,20 +192,19 @@ L
 
 ::
 
-
     Lars G
     Legoktm
     Leonardo Gregianin
     Lewis Cawte
     Lichinsol
     Linedwell
+    Louperivois
     luzpaz
 
 M
 -
 
 ::
-
 
     m4tx
     Maarten Dammers
@@ -225,6 +226,7 @@ M
     mjbmr
     mloc-gci
     Mohamed Magdy
+    MonAx the Developer
     Mpaa
     murfel
     MuhammadShuaib
@@ -233,7 +235,6 @@ N
 -
 
 ::
-
 
     Nicolas Dumazet
     Nikhil Prakash
@@ -247,14 +248,12 @@ O
 
 ::
 
-
     opensourceware
 
 P
 -
 
 ::
-
 
     Pamputt
     pere prlpz
@@ -278,7 +277,6 @@ R
 
 ::
 
-
     Reza
     RichardL
     ricordisamoa
@@ -294,8 +292,8 @@ S
 
 ::
 
-
     Sanjai Siddharthan
+    Sarthak Singh
     Serio Santoro
     Scot Wilcoxon
     Shardul C
@@ -309,6 +307,7 @@ S
     Stanislav Malyshev
     Stefan Oderbolz
     Steve Sanbeg
+    Stitipragyan Barik
     Strainu
     Sumana Harihareswara
 
@@ -317,8 +316,8 @@ T
 
 ::
 
-
     Tacsipacsi
+    Tbodt
     Tejashxv
     Tgr
     TheRogueMule
@@ -335,7 +334,6 @@ U
 
 ::
 
-
     Udoka
 
 V
@@ -343,8 +341,8 @@ V
 
 ::
 
-
     Vadiraja K
+    Vadivelu Murali Pranavan
     VcamX
     Victor Vasiliev
     Vldandrew
@@ -355,8 +353,8 @@ W
 
 ::
 
-
     Warddr
+    WASP-Outis
     Wieland Hoffmann
     Wikihermit
     Wikipedian
@@ -370,14 +368,12 @@ X
 
 ::
 
-
     xqt
 
 Y
 -
 
 ::
-
 
     Yifei He
     Yongmin Hong
@@ -390,8 +386,6 @@ Z
 
 ::
 
-
-    Zabe
     Zaher Kadour
     zhuyifei1999
     Zoran Dori

@@ -18,22 +18,23 @@ jobs:
   build:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 100
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8.0, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: [3.9.0, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         python-arch: [x64, x86]
         site: ['wikipedia:en']
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
           architecture: ${{ matrix.python-arch }}
       - name: Install dependencies
         shell: powershell
@@ -61,13 +62,13 @@ jobs:
           echo "maximum_GET_length = 5000" >> user-config.py
           echo "transliteration_target = None"  >> user-config.py
           echo "console_encoding = 'utf8'" >> user-config.py
+          echo "minthrottle = 0.5" >> user-config.py
           echo "import os" >> user-config.py
           echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
           echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
       - name: Test with unittest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 90
         env:
           PYTHONIOENCODING: utf-8
         run: |

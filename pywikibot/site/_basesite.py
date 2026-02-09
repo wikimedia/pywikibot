@@ -1,6 +1,6 @@
 """Objects with site methods independent of the communication interface."""
 #
-# (C) Pywikibot team, 2008-2024
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ import threading
 from warnings import warn
 
 import pywikibot
-from pywikibot.backports import Pattern
 from pywikibot.exceptions import (
     Error,
     FamilyMaintenanceWarning,
@@ -36,15 +35,13 @@ class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
 
-    def __init__(self, code: str, fam=None, user=None) -> None:
+    def __init__(self, code: str, fam=None, user: str | None = None) -> None:
         """Initializer.
 
-        :param code: the site's language code
-        :type code: str
-        :param fam: wiki family name (optional)
-        :type fam: str or pywikibot.family.Family
-        :param user: bot user name (optional)
-        :type user: str
+        :param code: The site's language code
+        :param fam: Wiki family name (optional)
+        :type fam: str or pywikibot.family.Family or None
+        :param user: Bot user name (optional)
         """
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
@@ -94,19 +91,6 @@ class BaseSite(ComparableMixin):
         # following are for use with lock_page and unlock_page methods
         self._pagemutex = threading.Condition()
         self._locked_pages: set[str] = set()
-
-    @property
-    @deprecated(since='8.5.0')
-    def use_hard_category_redirects(self) -> bool:
-        """Hard redirects are used for this site.
-
-        Originally create as property for future use for a proposal to
-        replace category redirect templates with hard redirects. This
-        was never implemented and is not used inside the framework.
-
-        .. deprecated:: 8.5
-        """
-        return False
 
     @property
     @cached
@@ -199,21 +183,38 @@ class BaseSite(ComparableMixin):
     def __getattr__(self, name: str):
         """Delegate undefined methods calls to the Family object.
 
+        Only public :class:`Family instance methods are delegated.
+
+        A method is considered delegatable if:
+        - it is a bound instance method of Family,
+        - it is public (name does not start with '_'),
+        - its first logical parameter is *code*.
+
+        .. note::
+           For performance reasons, the method signature is inspected
+           via the method's ``__code__`` object instead of
+           ``inspect.signature()``. This avoids expensive generic
+           introspection in this hot path and is safe because Family
+           methods are guaranteed to be pure Python.
+
         .. versionchanged:: 9.0
            Only delegate to public Family methods which have ``code`` as
            first parameter.
+        .. versionchanged:: 11.0
+           Use direct ``__code__`` inspection instead of
+           ``inspect.signature()`` to significantly improve attribute
+           access performance.
         """
         if not name.startswith('_'):
             obj = getattr(self.family, name, None)
             if inspect.ismethod(obj):
-                params = inspect.signature(obj).parameters
-                if params:
-                    parameter = next(iter(params))
-                    if parameter == 'code':
-                        method = functools.partial(obj, self.code)
-                        if hasattr(obj, '__doc__'):
-                            method.__doc__ = obj.__doc__
-                        return method
+                code = obj.__code__
+                params = code.co_varnames[:code.co_argcount]
+                if len(params) > 1 and params[1] == 'code':
+                    method = functools.partial(obj, self.code)
+                    if hasattr(obj, '__doc__'):
+                        method.__doc__ = obj.__doc__
+                    return method
 
         raise AttributeError(f'{type(self).__name__} instance has no '
                              f'attribute {name!r}') from None
@@ -316,9 +317,9 @@ class BaseSite(ComparableMixin):
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
 
-        :param page: the page to be locked
+        :param page: The page to be locked
         :type page: pywikibot.Page
-        :param block: if true, wait until the page is available to be
+        :param block: If true, wait until the page is available to be
             locked; otherwise, raise an exception if page can't be
             locked
         """
@@ -333,7 +334,7 @@ class BaseSite(ComparableMixin):
     def unlock_page(self, page) -> None:
         """Unlock page. Call as soon as a write operation has completed.
 
-        :param page: the page to be locked
+        :param page: The page to be locked
         :type page: pywikibot.Page
         """
         with self._pagemutex:
@@ -380,7 +381,7 @@ class BaseSite(ComparableMixin):
         return linkfam != self.family.name or linkcode != self.code
 
     @property
-    def redirect_regex(self) -> Pattern[str]:
+    def redirect_regex(self) -> re.Pattern[str]:
         """Return a compiled regular expression matching on redirect pages.
 
         Group 1 in the regex match object will be the target title.

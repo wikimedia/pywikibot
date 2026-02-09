@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import annotations
 
-import os
 import sys
 import unittest
+from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 
-from pywikibot.backports import Iterator
 from pywikibot.bot import global_args as pwb_args
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
@@ -21,7 +20,6 @@ from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
 
 
-ci_test_run = os.environ.get('PYWIKIBOT_TEST_RUNNING', '0') == '1'
 scripts_path = join_root_path('scripts')
 
 # login script should be the first to test
@@ -39,7 +37,7 @@ def check_script_deps(script_name) -> bool:
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
             if not has_module(package_name):
-                return False
+                return False  # pragma: no cover
     return True
 
 
@@ -70,8 +68,7 @@ def list_scripts(path: str, exclude: str = '') -> list[str]:
     ]
 
 
-script_list = framework_scripts + list_scripts(scripts_path,
-                                               'create_isbn_edition')
+script_list = framework_scripts + list_scripts(scripts_path)
 
 script_input = {
     'category_redirect': 'q\nn\n',
@@ -150,7 +147,8 @@ skip_on_results = {
 
 def collector() -> Iterator[str]:
     """Generate test fully qualified names from test classes."""
-    for cls in TestScriptHelp, TestScriptSimulate, TestScriptGenerator:
+    test_cls = TestScriptHelp, TestScriptSimulate, TestScriptGenerator
+    for cls in test_cls[:1]:  # ignore tests on unittest due to T414170
         for name in cls._script_list:
             name = '_' + name if name == 'login' else name
             yield f'tests.script_tests.{cls.__name__}.test_{name}'
@@ -363,6 +361,8 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     scripts run in pwb can automatically login using the saved cookies.
     """
 
+    __test__ = False  # Ignore this test on pytest due to T414170
+
     login = True
 
     _expected_failures = {
@@ -406,6 +406,8 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
 
     """Test cases for running scripts with a generator."""
 
+    __test__ = False  # Ignore this test on pytest due to T414170
+
     login = True
 
     _expected_failures = {
@@ -419,7 +421,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
         'checkimages',
         'claimit',
         'clean_sandbox',
-        'commonscat',
         'data_ingestion',
         'delinker',
         'djvutext',

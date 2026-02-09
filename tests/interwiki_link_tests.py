@@ -7,13 +7,14 @@
 #
 from __future__ import annotations
 
+import unittest
 from contextlib import suppress
 
 from pywikibot import config
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import Link
 from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase
-from tests.aspects import TestCase, unittest
+from tests.aspects import TestCase
 
 
 class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):

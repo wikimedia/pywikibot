@@ -1,6 +1,6 @@
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,6 +14,8 @@ import os
 import re
 import stat
 import subprocess
+import sys
+from collections.abc import Callable
 from contextlib import suppress
 from functools import total_ordering, wraps
 from types import TracebackType
@@ -23,7 +25,6 @@ from warnings import catch_warnings, showwarning, warn
 import packaging.version
 
 import pywikibot  # T306760
-from pywikibot.backports import PYTHON_VERSION, SPHINX_RUNNING, Callable
 from pywikibot.tools._deprecate import (
     ModuleDeprecationWrapper,
     add_decorated_full_name,
@@ -67,6 +68,7 @@ __all__ = (
     # other tools
     'PYTHON_VERSION',
     'SPHINX_RUNNING',
+    'THREADING_FREE',
     'as_filename',
     'is_ip_address',
     'is_ip_network',
@@ -86,6 +88,14 @@ __all__ = (
     'cached',
 )
 
+PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
+SPHINX_RUNNING: bool = 'sphinx' in sys.modules
+THREADING_FREE: bool
+if PYTHON_VERSION >= (3, 13):
+    THREADING_FREE = not sys._is_gil_enabled()
+else:
+    THREADING_FREE = False
+
 
 def is_ip_address(value: str) -> bool:
     """Check if a value is a valid IPv4 or IPv6 address.
@@ -94,7 +104,7 @@ def is_ip_address(value: str) -> bool:
        Was renamed from ``is_IP()``.
     .. seealso:: :func:`is_ip_network`
 
-    :param value: value to check
+    :param value: Value to check
     """
     with suppress(ValueError):
         ipaddress.ip_address(value)
@@ -109,7 +119,7 @@ def is_ip_network(value: str) -> bool:
     .. versionadded:: 9.0
     .. seealso:: :func:`is_ip_address`
 
-    :param value: value to check
+    :param value: Value to check
     """
     with suppress(ValueError):
         ipaddress.ip_network(value)
@@ -202,7 +212,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
     def __init__(
         self,
         message: str = '',
-        category=Warning,
+        category: type[Warning] = Warning,
         filename: str = ''
     ) -> None:
         """Initialize the object.
@@ -215,7 +225,6 @@ class suppress_warnings(catch_warnings):  # noqa: N801
             (case-insensitive)
         :param category: A class (a subclass of Warning) of which the
             warning category must be a subclass in order to match.
-        :type category: type
         :param filename: A string containing a regular expression that
             the start of the path to the warning module must match.
             (case-sensitive)
@@ -364,8 +373,8 @@ def as_filename(string: str, repl: str = '_') -> str:
 
     .. versionadded:: 8.0
 
-    :param string: the string to be modified
-    :param repl: the replacement character
+    :param string: The string to be modified
+    :param repl: The replacement character
     :raises ValueError: Invalid repl parameter
     """
     pattern = r':*?/\\" '
@@ -450,7 +459,7 @@ class MediaWikiVersion:
     def __init__(self, version_str: str) -> None:
         """Initializer.
 
-        :param version_str: version to parse
+        :param version_str: Version to parse
         """
         self._parse(version_str)
 
@@ -546,12 +555,12 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     .. versionadded:: 3.0
 
     :param filename: The filename.
-    :param use_extension: Use the file extension instead of the magic
-        number to determine the type of compression (default True). Must
-        be True when writing or appending.
     :param mode: The mode in which the file should be opened. It may
         either be 'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the
         file in binary mode. It defaults to 'rb'.
+    :param use_extension: Use the file extension instead of the magic
+        number to determine the type of compression (default True). Must
+        be True when writing or appending.
     :raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     :raises FileNotFoundError: When the filename doesn't exist and it
@@ -667,10 +676,10 @@ def file_mode_checker(
 
     .. versionadded:: 3.0
 
-    :param filename: filename path
-    :param mode: requested file mode
-    :param quiet: warn about file mode change if False.
-    :param create: create the file if it does not exist already
+    :param filename: Filename path
+    :param mode: Requested file mode
+    :param quiet: Warn about file mode change if False.
+    :param create: Create the file if it does not exist already
     :raise IOError: The file does not exist and `create` is False.
     """
     try:
@@ -698,22 +707,22 @@ def compute_file_hash(filename: str | os.PathLike,
     Result is expressed as hexdigest().
 
     .. versionadded:: 3.0
-    .. versionchanged:: 8.2
-       *sha* may be  also a hash constructor, or a callable that returns
-       a hash object.
+     .. versionchanged:: 8.2
+         The *sha* parameter may also be a hash constructor, or a callable
+         that returns a hash object.
 
 
-    :param filename: filename path
-    :param sha: hash algorithm available with hashlib: ``sha1()``,
+    :param filename: Filename path
+    :param sha: Hash algorithm available with hashlib: ``sha1()``,
         ``sha224()``, ``sha256()``, ``sha384()``, ``sha512()``,
         ``blake2b()``, and ``blake2s()``. Additional algorithms like
         ``md5()``, ``sha3_224()``, ``sha3_256()``, ``sha3_384()``,
         ``sha3_512()``, ``shake_128()`` and ``shake_256()`` may also be
-        available. *sha* must either be a hash algorithm name as a str
-        like ``'sha1'`` (default), a hash constructor like
+        available. The *sha* parameter must either be a hash algorithm
+        name as a str like ``'sha1'`` (default), a hash constructor like
         ``hashlib.sha1``, or a callable that returns a hash object like
         ``lambda: hashlib.sha1()``.
-    :param bytes_to_read: only the first bytes_to_read will be
+    :param bytes_to_read: Only the first bytes_to_read will be
         considered; if file size is smaller, the whole file will be
         considered.
     """
@@ -758,7 +767,7 @@ def cached(*arg: Callable) -> Any:
        functions.
     .. versionadded:: 7.3
 
-    :raises TypeError: decorator must be used without arguments
+    :raises TypeError: Decorator must be used without arguments
     """
     fn = arg and arg[0]
     if not callable(fn):

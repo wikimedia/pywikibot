@@ -9,7 +9,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://gitlab.wikimedia.org/repos/ci-tools/commit-message-validator
-    rev: v2.1.0
+    rev: v2.2.0
     hooks:
       - id: commit-message-validator
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -42,8 +42,6 @@ repos:
         # list required for tab
         args: [--autofix, --indent, "\t", --no-ensure-ascii]
       - id: trailing-whitespace
-        args:
-          - --markdown-linebreak-ext=rst
         exclude: ^tests/data/
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -65,18 +63,18 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.1
+    rev: v0.15.0
     hooks:
       - id: ruff-check
         alias: ruff
         args:
           - --fix
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args:
-          - --py38-plus
+          - --py39-plus
   - repo: https://github.com/PyCQA/autoflake
     rev: v2.3.1
     hooks:
@@ -89,12 +87,18 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
       - id: isort
-        exclude: ^pwb\.py$
+        name: isort
+        args:
+          - -a from __future__ import annotations
+        exclude: ^(pwb|pywikibot/config)\.py$
+      - id: isort
+        name: isort (skip future annotations)
+        files: ^(pwb|pywikibot/config)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.71.0
+    rev: v0.77.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
@@ -113,7 +117,7 @@ repos:
           - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
     hooks:
       - id: mypy
         args:
@@ -131,10 +135,10 @@ repos:
             comms/eventstreams|
             data/(api/(__init__|_optionset)|citoid|memento|wikistats)|
             families/[a-z][a-z\d]+_family|
-            page/(__init__|_decorators|_page|_revision)|
+            page/(__init__|_decorators|_page|_revision|_user)|
             pagegenerators/(__init__|_filters)|
             scripts/(?:i18n/)?__init__|
             site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|
-            tools/(_deprecate|_logging|_unidata|chars|formatter)|
+            tools/(_deprecate|_logging|_unidata|chars|formatter|itertools)|
             userinterfaces/(__init__|_interface_base|buffer_interface|terminal_interface|transliteration)
           )\.py$

@@ -1,5 +1,9 @@
 """Superset Query interface.
 
+.. attention::
+   This module only works with a *client login* (including 2FA).
+   It does **not** work with BotPassword or OAuth accounts.
+
 .. versionadded:: 9.2
 """
 #
@@ -13,9 +17,11 @@ from http import HTTPStatus
 from textwrap import fill
 from typing import TYPE_CHECKING, Any
 
+import requests
+
 import pywikibot
 from pywikibot.comms import http
-from pywikibot.exceptions import NoUsernameError, ServerError
+from pywikibot.exceptions import NoUsernameError, ServerError, UserRightsError
 
 
 if TYPE_CHECKING:
@@ -88,7 +94,15 @@ class SupersetQuery:
 
         # Test if uset has been successfully logged in
         url = f'{self.superset_url}/api/v1/me/'
-        self.last_response = http.fetch(url)
+        try:
+            self.last_response = http.fetch(url)
+        except requests.TooManyRedirects:
+            raise UserRightsError(
+                'Superset authentication does not support OAuth'
+                ' or BotPassword. Please use standard username/password'
+                ' authentication in user-config.py:'
+                ' usernames["meta"]["meta"] = "WIKIMEDIA_USERNAME"'
+            )
 
         # Handle error cases
         if self.last_response.status_code == HTTPStatus.OK:

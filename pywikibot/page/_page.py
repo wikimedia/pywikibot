@@ -9,7 +9,7 @@ various pages for Proofread Extensions are defined in
    itself, including its contents.
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,7 +26,7 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.page._basepage import BasePage
-from pywikibot.page._toolforge import WikiBlameMixin
+from pywikibot.page._toolforge import WikiBlameMixin, WikiWhoMixin
 from pywikibot.site import Namespace
 from pywikibot.tools import cached, deprecated_args
 
@@ -34,7 +34,7 @@ from pywikibot.tools import cached, deprecated_args
 __all__ = ['Page']
 
 
-class Page(BasePage, WikiBlameMixin):
+class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
 
     """Page: A MediaWiki page."""
 
@@ -136,15 +136,15 @@ class Page(BasePage, WikiBlameMixin):
         .. versionchanged:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
 
-        :param target_page: target of the redirect, this argument is
+        :param target_page: Target of the redirect, this argument is
             required.
-        :param create: if true, it creates the redirect even if the page
+        :param create: If true, it creates the redirect even if the page
             doesn't exist.
-        :param force: if true, it set the redirect target even the page
+        :param force: If true, it set the redirect target even the page
             doesn't exist or it's not redirect.
-        :param keep_section: if the old redirect links to a section
+        :param keep_section: If the old redirect links to a section
             and the new one doesn't it uses the old redirect's section.
-        :param save: if true, it saves the page immediately.
+        :param save: If true, it saves the page immediately.
         :param kwargs: Arguments which are used for saving the page
             directly afterwards, like *summary* for edit summary.
         """

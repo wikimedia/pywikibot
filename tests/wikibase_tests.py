@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,6 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
-    UnknownExtensionError,
     WikiBaseError,
 )
 from pywikibot.page import ItemPage, PropertyPage, WikibasePage
@@ -228,6 +227,9 @@ class TestItemLoad(WikidataTestCase):
         }
     }
 
+    keys = 'en', 'mul'  # either en or mul may missing
+    labels = 'New York', 'New York City'  # label could change
+
     @classmethod
     def setUpClass(cls) -> None:
         """Set up test class."""
@@ -237,7 +239,7 @@ class TestItemLoad(WikidataTestCase):
     def setUp(self) -> None:
         """Set up test."""
         super().setUp()
-        self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
+        self.nyc = pywikibot.Page(pywikibot.page.Link(self.labels[1],
                                                       self.site))
 
     def test_item_normal(self) -> None:
@@ -283,9 +285,11 @@ class TestItemLoad(WikidataTestCase):
         self.assertNotHasAttr(item, '_content')
         item.get()
         self.assertHasAttr(item, '_content')
-        self.assertIn('mul', item.labels)
+        key = next((k for k in self.keys if k in item.labels), None)
+        self.assertIsNotNone(key,
+                             f'Expected one of {self.keys} in item.labels')
         # label could change
-        self.assertIn(item.labels['mul'], ['New York', 'New York City'])
+        self.assertIn(item.labels[key], self.labels)
         self.assertEqual(item.title(), 'Q60')
 
     def test_reuse_item_set_id(self) -> None:
@@ -295,12 +299,13 @@ class TestItemLoad(WikidataTestCase):
         work but modifying item.id does not currently work, and this
         test highlights that it breaks silently.
         """
-        # label could change
-        label = ['New York', 'New York City']
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
         item.get()
-        self.assertIn(item.labels['mul'], label)
+        key = next((k for k in self.keys if k in item.labels), None)
+        self.assertIsNotNone(key,
+                             f'Expected one of {self.keys} in item.labels')
+        old_label = item.labels[key]
 
         # When the id attribute is modified, the ItemPage goes into
         # an inconsistent state.
@@ -312,7 +317,8 @@ class TestItemLoad(WikidataTestCase):
         # it doesn't help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
-        self.assertIn(item.labels['mul'], label)
+        self.assertEqual(item.labels[key], old_label)
+        self.assertIn(item.labels[key], self.labels)
 
     def test_empty_item(self) -> None:
         """Test empty wikibase item.
@@ -452,10 +458,11 @@ class TestItemLoad(WikidataTestCase):
 
     def test_fromPage_lazy(self) -> None:
         """Test item from page with lazy_load."""
-        page = pywikibot.Page(pywikibot.page.Link('New York City', self.site))
+        title = self.labels[1]
+        page = pywikibot.Page(pywikibot.page.Link(title, self.site))
         item = ItemPage.fromPage(page, lazy_load=True)
         self.assertEqual(item._defined_by(),
-                         {'sites': 'enwiki', 'titles': 'New York City'})
+                         {'sites': 'enwiki', 'titles': title})
         self.assertEqual(item._link._title, '-1')
         self.assertNotHasAttr(item, 'id')
         self.assertNotHasAttr(item, '_content')
@@ -1417,18 +1424,12 @@ class TestUnconnectedClient(TestCase):
         with self.assertRaisesRegex(WikiBaseError, regex):
             self.wdp.data_item()
 
-    def test_has_data_repository(self, key) -> None:
-        """Test that site has no data repository."""
-        site = self.get_site(key)
-        self.assertFalse(site.has_data_repository)
-
-    def test_page_from_repository_fails(self, key) -> None:
-        """Test that page_from_repository method fails."""
+    def test_missing_data_repository(self, key) -> None:
+        """Test page_from_repository with no data repository."""
         site = self.get_site(key)
         dummy_item = 'Q1'
-        regex = r'^Wikibase is not implemented for .+\.$'
-        with self.assertRaisesRegex(UnknownExtensionError, regex):
-            site.page_from_repository(dummy_item)
+        self.assertFalse(site.has_data_repository)
+        self.assertIsNone(site.page_from_repository(dummy_item))
 
 
 class TestJSON(WikidataTestCase):

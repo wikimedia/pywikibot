@@ -32,7 +32,7 @@ The entire suite of tests may be run in the following ways from the root directo
 
 ::
 
-    pip install pytest
+    pip install "pytest != 9.0.0"
     pytest
 
 **tox**
@@ -45,7 +45,7 @@ Run specific tests
 ------------------
 
 Individual test components can be run using unittest, pytest or pwb.
-With -lang and -family or -site options pwb can be used to specify a site.
+With -code and -family or -site options pwb can be used to specify a site.
 
 
 **unittest**
@@ -69,7 +69,7 @@ With -lang and -family or -site options pwb can be used to specify a site.
     python pwb.py tests/api_tests -v
     python pwb.py tests/site_tests -v
     python pwb.py tests/api_tests -v TestParamInfo.test_init
-    python pwb.py -lang:de -family:wikipedia tests/page_tests -v TestPageObject
+    python pwb.py -site:wikipedia:de tests/page_tests -v TestPageObject
 
 **env**
 
@@ -124,10 +124,10 @@ Environment variables
         PYWIKIBOT_TEST_QUIET=1
 
 **PYWIKIBOT_TEST_RUNNING**
-  This environment variable skips tests instead of raising
+  This environment variable ignores some passwordfile checks in
+  :meth:`login.LoginManager.readPassword` and skips some tests instead of raising
   :exc:`exceptions.MaxlagTimeoutError` when maximum retries attempted due to
-  maxlag without success. It is also used by :source:`tests/script_tests` for code
-  coverage. GitHub actions and AppVeyor tests activate this variable::
+  maxlag without success. GitHub actions and Jenkins tests activate this variable::
 
     PYWIKIBOT_TEST_RUNNING=1
 

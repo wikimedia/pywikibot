@@ -7,11 +7,11 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from contextlib import suppress
 from typing import cast
 from urllib.parse import unquote
 
-from pywikibot.backports import Iterable
 from pywikibot.tools._unidata import _category_cf
 
 

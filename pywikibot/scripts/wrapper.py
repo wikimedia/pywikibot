@@ -29,7 +29,7 @@ will fix up search paths so the package does not need to be installed, etc.
 Currently, `<pwb options>` are :ref:`global options`. This can be used
 for tests to set the default site (see :phab:`T216825`)::
 
-    python pwb.py -lang:de bot_tests -v
+    python pwb.py -code:de bot_tests -v
 
 .. seealso:: :mod:`pwb` entry point
 .. versionchanged:: 7.0
@@ -43,7 +43,7 @@ for tests to set the default site (see :phab:`T216825`)::
    enable external scripts via entry points.
 """
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -121,7 +121,7 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
 
     :param filename: The path to the file to execute, it need not be a
         .py file.
-    :param args: is the argument list to present as sys.argv, as strings.
+    :param args: Is the argument list to present as sys.argv, as strings.
     :param package: The package of the script. Used for checks.
     :type package: Optional[module]
     """
@@ -181,7 +181,7 @@ def handle_args(
     .. versionchanged:: 7.7
        Catch ``PYWIKIBOT_TEST_...`` environment variables.
 
-    :return: filename, script args, local pwb args, environment variables
+    :return: Filename, script args, local pwb args, environment variables
     """
     fname = None
     local = []
@@ -220,8 +220,9 @@ def _print_requirements(requirements,
     else:
         format_string = '\nA package necessary for {} is {}.'
     print(format_string.format(script or 'pywikibot', variant))
-    print('Please update required module{} with:\n\n'
-          .format('s' if len(requirements) > 1 else ''))
+    print('Please {} required module{} with:\n\n'
+          .format('install' if variant == 'missing' else 'update',
+                  's' if len(requirements) > 1 else ''))
 
     for requirement in requirements:
         print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
@@ -237,7 +238,11 @@ def check_modules(script: str | None = None) -> bool:
     :return: True if all dependencies are installed
     :raise RuntimeError: wrong Python version found in setup.py
     """
-    from packaging.requirements import Requirement
+    try:
+        from packaging.requirements import Requirement
+    except ModuleNotFoundError:
+        _print_requirements(['packaging'], None, 'missing')
+        sys.exit()
 
     from setup import script_deps
 
@@ -288,6 +293,9 @@ def check_modules(script: str | None = None) -> bool:
 
     return not missing_requirements
 
+
+if not check_modules():
+    sys.exit()
 
 filename, script_args, global_args, environ = handle_args(*sys.argv)
 

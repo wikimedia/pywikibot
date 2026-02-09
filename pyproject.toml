@@ -1,5 +1,5 @@
 [build-system]
-requires = ["packaging", "setuptools", "wheel"]
+requires = ["packaging", "setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
@@ -17,18 +17,18 @@ maintainers = [
     {name = "The Pywikibot team", email = "pywikibot@lists.wikimedia.org"},
 ]
 description = "Python MediaWiki Bot Framework"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 keywords = [
     "API", "bot", "client", "framework", "mediawiki", "pwb", "pybot", "python",
     "pywiki", "pywikibase", "pywikibot", "pywikipedia", "pywikipediabot",
     "wiki", "wikibase", "wikidata", "wikimedia", "wikipedia",
 ]
-license = {text = "MIT License"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: Afrikaans",
     "Natural Language :: Arabic",
     "Natural Language :: Basque",
@@ -92,7 +92,6 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -101,6 +100,7 @@ classifiers=[
     "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: GraalPy",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -165,8 +165,6 @@ disable = [
     "SIG202",
     "SIG203",
     "SIG301",
-    "SIG402",
-    "SIG404",
     "SIG501",
     "SIG503",
     "SIG505",
@@ -174,8 +172,7 @@ disable = [
 
 
 [tool.isort]
-py_version = 38
-add_imports = ["from __future__ import annotations"]
+py_version = 39
 atomic = true
 ensure_newline_before_comments = true
 force_grid_wrap = 0
@@ -206,7 +203,6 @@ ignore = ["D105", "D211", "D213", "D214", "D401", "D404", "D406", "D407", "D412"
 
 [tool.ruff.lint.per-file-ignores]
 "pywikibot/families/*" = ["D102"]
-"scripts/dataextend.py" = ["D101", "D102"]
 "tests/ui_tests.py" = ["D102", "D103"]
 
 [tool.ruff.lint.flake8-quotes]

@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.12
 
 WORKDIR /code
 
@@ -8,7 +8,7 @@ RUN pip install -r requirements.txt
 RUN pip install -r dev-requirements.txt
 
 COPY . .
-RUN pip3 install .
+RUN pip install .
 
 ENV PYTHONPATH=/code:/code/scripts
 ENTRYPOINT ["python", "/code/pwb.py"]

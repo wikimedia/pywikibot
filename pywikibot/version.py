@@ -1,9 +1,10 @@
-"""Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module to determine the pywikibot version (tag, revision and date)."""
+
 from __future__ import annotations
 
 import datetime
@@ -16,13 +17,13 @@ import sys
 import sysconfig
 import time
 from contextlib import suppress
+from functools import cache
 from importlib import import_module
 from pathlib import Path
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import cache
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
 from pywikibot.tools import deprecated
@@ -108,7 +109,7 @@ def getversiondict() -> dict[str, str]:
              UserWarning, stacklevel=2)
         exceptions = None
 
-    # Git and SVN can silently fail, as it may be a nightly.
+    # Git can silently fail, as it may be a nightly.
     if exceptions:  # pragma: no cover
         pywikibot.debug(f'version algorithm exceptions:\n{exceptions!r}')
 
@@ -126,7 +127,7 @@ def getversiondict() -> dict[str, str]:
 def getversion_git(path=None):
     """Get version info for a Git clone.
 
-    :param path: directory of the Git checkout
+    :param path: Directory of the Git checkout
     :return:
         - tag (name for the repository),
         - rev (current revision identifier),
@@ -185,7 +186,7 @@ def getversion_nightly(path: str | Path | None = None):
        the version information of the nightly dump is stored in the
        ``version`` file within the ``pywikibot`` folder.
 
-    :param path: directory of the uncompressed nightly.
+    :param path: Directory of the uncompressed nightly.
     :return:
         - tag (name for the repository),
         - rev (current revision identifier),
@@ -348,12 +349,17 @@ def package_versions(
                 path = _file
 
             info['path'] = path
-            assert path not in paths, (
-                f'Path {path} of the package {name} is in defined paths as '
-                f'{paths[path]}'
-            )
+            if path in paths:
+                msg = (
+                    f'Path {path} of the package {name} is already in defined '
+                    f'paths as {paths[path]}'
+                )
+                if sys.version_info.releaselevel == 'final':
+                    raise RuntimeError(msg)
 
-            paths[path] = name
+                pywikibot.debug(msg)
+            else:
+                paths[path] = name
 
         if '__version__' in package.__dict__:
             info['ver'] = package.__version__

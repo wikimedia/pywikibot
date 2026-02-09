@@ -6,18 +6,13 @@
 #
 from __future__ import annotations
 
-from collections.abc import Container, Sized
+from collections.abc import Container, Iterable, Sized
 from typing import Any
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Dict, Iterable, Set, batched
-from pywikibot.tools import (
-    classproperty,
-    deprecated,
-    deprecated_args,
-    remove_last_args,
-)
+from pywikibot.backports import batched
+from pywikibot.tools import deprecated_args
 
 
 __all__ = ['ParamInfo']
@@ -37,9 +32,8 @@ class ParamInfo(Sized, Container):
     param_modules = ('list', 'meta', 'prop')
 
     _action_modules: frozenset[str]
-    _modules: Dict[str, Set[str] | Dict[str, str]]
+    _modules: dict[str, set[str] | dict[str, str]]
 
-    @remove_last_args(['modules_only_mode'])
     def __init__(self,
                  site,
                  preloaded_modules: set[str] | None = None) -> None:
@@ -444,21 +438,3 @@ class ParamInfo(Sized, Container):
 
         return {mod: self[mod][attribute]
                 for mod in modules if attribute in self[mod]}
-
-    @classproperty
-    @deprecated(since='8.4.0')
-    def paraminfo_keys(cls) -> frozenset[str]:
-        """Return module types.
-
-        .. deprecated:: 8.4
-        """
-        return frozenset(['modules'])
-
-    @property
-    @deprecated(since='8.4.0')
-    def preloaded_modules(self) -> frozenset[str] | set[str]:
-        """Return set of preloaded modules.
-
-        .. deprecated:: 8.4
-        """
-        return self._preloaded_modules

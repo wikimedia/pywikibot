@@ -37,62 +37,54 @@ jobs:
     name: Run Login/Logout Tests
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     needs: wait_for_all
-    timeout-minutes: 30
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
-        python-version: [pypy3.8, pypy3.11, '3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
+        python-version: [pypy3.9, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
         site: ['wikipedia:en', 'wikisource:zh', 'wikipedia:test']
         include:
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: en
             os: ubuntu-22.04
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
             os: ubuntu-22.04
-          - python-version: '3.9'
+          - python-version: '3.10'
             site: wsbeta:en
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikidata:test
             os: ubuntu-22.04
-          - python-version: '3.10'
+          - python-version: '3.11'
             site: wiktionary:ar
-          - python-version: '3.8'
+          - python-version: '3.9'
             site: wikidata:wikidata
             os: ubuntu-22.04
-          - python-version: '3.9'
+          - python-version: '3.10'
             site: wowwiki:uk
           - python-version: 3
             site: wikipedia:de
             os: macOS-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
-        if: "!endsWith(matrix.python-version, '-dev')"
         with:
           python-version: ${{ matrix.python-version }}
-
-      # use deadsnakes/action for development releases
-      - name: Set up development Python ${{ matrix.python-version }}
-        uses: deadsnakes/action@v3.2.0
-        if: endsWith(matrix.python-version, '-dev')
-        with:
-          python-version: ${{ matrix.python-version }}
+          allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip --version
-          pip install "coverage == 7.6.1; python_version < '3.9'"
-          pip install "coverage >= 7.6.10; python_version > '3.8'"
+          pip install coverage
           pip install "tomli; python_version < '3.11'"
           pip install mwparserfromhell
           pip install packaging
@@ -110,7 +102,7 @@ jobs:
           if [ ${{matrix.site}} != false ]; then
             python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           else
-            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -lang:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -code:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           fi
           echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py

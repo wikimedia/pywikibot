@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import logging
 import queue
+from collections.abc import Sequence
 from typing import Any
 
 from pywikibot import config
-from pywikibot.backports import Sequence
 from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
 

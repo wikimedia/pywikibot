@@ -15,7 +15,7 @@ __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2025
+# (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,23 +26,15 @@ import os
 import pkgutil
 import re
 from collections import abc, defaultdict
+from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import suppress
+from functools import cache
 from pathlib import Path
 from textwrap import fill
 from typing import Any
 
 import pywikibot
 from pywikibot import __url__, config
-from pywikibot.backports import (
-    Generator,
-    Iterable,
-    Iterator,
-    Mapping,
-    Match,
-    Sequence,
-    cache,
-    removesuffix,
-)
 from pywikibot.plural import plural_rule
 
 
@@ -413,7 +405,7 @@ def _altlang(lang: str) -> list[str]:
     This code is used by other translating methods below.
 
     :param lang: The language code
-    :return: language codes
+    :return: Language codes
     """
     return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
 
@@ -451,8 +443,8 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
                     ) -> str:
     """Check for the plural variants in message and replace them.
 
-    :param message: the message to be replaced
-    :param parameters: plural parameters passed from other methods
+    :param message: The message to be replaced
+    :param parameters: Plural parameters passed from other methods
     :return: The message with the plural instances replaced
     """
     def static_plural_value(n: int) -> int:
@@ -460,7 +452,7 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         assert not callable(plural_rule)
         return plural_rule
 
-    def replace_plural(match: Match[str]) -> str:
+    def replace_plural(match: re.Match[str]) -> str:
         selector = match[1]
         variants = match[2]
         num = parameters[selector]
@@ -585,14 +577,14 @@ def translate(code: str | pywikibot.site.BaseSite,
         extended dictionary the Site object should be used in favour of
         the code string. Otherwise localizations from a wrong family
         might be used.
-    :param xdict: dictionary with language codes as keys or extended
+    :param xdict: Dictionary with language codes as keys or extended
         dictionary with family names as keys containing code
         dictionaries or a single string. May contain PLURAL tags as
         described in twtranslate
     :param parameters: For passing (plural) parameters
     :param fallback: Try an alternate language code. If it's iterable
         it'll also try those entries and choose the first match.
-    :return: the localized value, usually a string
+    :return: The localized value, usually a string
     :raise IndexError: If the language supports and requires more
         plurals than defined for the given PLURAL pattern.
     :raise KeyError: No fallback key found if fallback is not False
@@ -870,7 +862,7 @@ def twget_keys(twtitle: str) -> list[str]:
 
     :param twtitle: The TranslateWiki string title, in <package>-<key>
         format
-    :raises OSError: the package i18n cannot be loaded
+    :raises OSError: The package i18n cannot be loaded
     """
     # obtain the directory containing all the json files for this package
     package = twtitle.split('-')[0]
@@ -878,7 +870,7 @@ def twget_keys(twtitle: str) -> list[str]:
     pathname = os.path.join(next(iter(mod.__path__)), package)
 
     # build a list of languages in that directory
-    langs = [removesuffix(filename, '.json')
+    langs = [filename.removesuffix('.json')
              for filename in sorted(os.listdir(pathname))
              if filename.endswith('.json')]
 
@@ -888,7 +880,7 @@ def twget_keys(twtitle: str) -> list[str]:
             if lang != 'qqq' and _get_translation(lang, twtitle)]
 
 
-def bundles(stem: bool = False) -> Generator[Path | str, None, None]:
+def bundles(stem: bool = False) -> Generator[Path | str]:
     """A generator which yields message bundle names or its path objects.
 
     The bundle name usually corresponds with the script name which is
@@ -917,7 +909,7 @@ def bundles(stem: bool = False) -> Generator[Path | str, None, None]:
 
     .. versionadded:: 7.0
 
-    :param stem: yield the Path.stem if True and the Path object otherwise
+    :param stem: Yield the Path.stem if True and the Path object otherwise
     """
     for dirpath in Path(*_messages_package_name.split('.')).iterdir():
         if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache

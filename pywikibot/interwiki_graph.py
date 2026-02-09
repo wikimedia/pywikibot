@@ -1,6 +1,6 @@
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2024
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,14 +41,19 @@ class GraphSavingThread(threading.Thread):
         self.origin = origin
 
     def run(self) -> None:
-        """Write graphs to the data directory."""
+        """Write graphs to the data directory.
+
+        .. versionchanged:: 11.0
+           use explicit ``utf-8`` encoding.
+        """
         for fmt in config.interwiki_graph_formats:
             filename = config.datafilepath(
                 'interwiki-graphs/' + getFilename(self.origin, fmt))
-            if self.graph.write(filename, prog='dot', format=fmt):
-                pywikibot.info('Graph saved as ' + filename)
+            if self.graph.write(filename, prog='dot', format=fmt,
+                                encoding='utf-8'):
+                pywikibot.info(f'Graph saved as {filename}')
             else:
-                pywikibot.info('Graph could not be saved as ' + filename)
+                pywikibot.info(f'Graph could not be saved as {filename}')
 
 
 class Subject:
@@ -58,7 +63,7 @@ class Subject:
     def __init__(self, origin: pywikibot.page.Page | None = None) -> None:
         """Initializer.
 
-        :param origin: the page on the 'origin' wiki
+        :param origin: The page on the 'origin' wiki
         """
         # Remember the "origin page"
         self.origin = origin
@@ -79,7 +84,7 @@ class GraphDrawer:
     def __init__(self, subject: pywikibot.interwiki_graph.Subject) -> None:
         """Initializer.
 
-        :param subject: page data to graph :raises ImportError if pydot
+        :param subject: Page data to graph :raises ImportError if pydot
             is not installed
         """
         if PYDOT_ERROR:
@@ -201,9 +206,9 @@ def getFilename(page: pywikibot.page.Page,
                 extension: str | None = None) -> str:
     """Create a filename that is unique for the page.
 
-    :param page: page used to create the new filename
-    :param extension: file extension
-    :return: filename of <family>-<lang>-<page>.<ext>
+    :param page: Page used to create the new filename
+    :param extension: File extension
+    :return: Filename of <family>-<lang>-<page>.<ext>
     """
     filename = '-'.join((page.site.family.name,
                          page.site.code,

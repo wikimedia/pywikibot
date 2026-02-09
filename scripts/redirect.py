@@ -78,6 +78,7 @@ Furthermore the following options are provided:
 from __future__ import annotations
 
 import datetime
+from collections.abc import Generator
 from contextlib import suppress
 from textwrap import fill
 from typing import Any
@@ -85,7 +86,6 @@ from typing import Any
 import pywikibot
 import pywikibot.data
 from pywikibot import i18n, pagegenerators, xmlreader
-from pywikibot.backports import Generator
 from pywikibot.bot import ExistingPageBot, OptionHandler, suggest_help
 from pywikibot.exceptions import (
     CircularRedirectError,

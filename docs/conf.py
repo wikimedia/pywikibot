@@ -1,6 +1,6 @@
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,6 +21,7 @@ from __future__ import annotations
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use Path.resolve() to make it absolute, like shown here.
 #
+import inspect
 import os
 import re
 import sys
@@ -52,17 +53,17 @@ needs_sphinx = '8.2.3'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx_copybutton',
-    'sphinx_tabs.tabs',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
+    'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
+    'sphinx_copybutton',
+    'sphinx_tabs.tabs',
     'sphinxext.opengraph',
 ]
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -468,8 +469,13 @@ numfig = True
 show_authors = True
 todo_include_todos = True
 autodoc_typehints = 'description'
+autodoc_use_legacy_class_based = True  # T413563
+
 # autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = [
+    'autosectionlabel.*',
+    'sphinx.ext.napoleon.RemovedInSphinx11Warning',
+]
 toc_object_entries_show_parents = 'hide'
 
 # Napoleon settings
@@ -508,6 +514,63 @@ extlinks = {
         '%s'),
     'wiki': ('https://en.wikipedia.org/wiki/%s', '%s')
 }
+
+
+def linkcode_resolve(domain, info) -> str | None:
+    """Provide external Phabricator links for @property objects only.
+
+    This function uses ``sphinx.ext.linkcode`` and is a workaround for
+    the following Sphinx issue: `sphinx-doc/sphinx#11279
+    <https://github.com/sphinx-doc/sphinx/issues/11279>`_
+
+    ..note: These links point directly to diffusion repository.
+    .. seealso:: :phab:`T333762`
+    .. versionadded:: 11.0
+    """
+    if domain != 'py':
+        return None
+
+    module_name = info.get('module')
+    fullname = info.get('fullname')
+    if not (module_name and fullname):
+        return None
+
+    # Load the module
+    module = sys.modules.get(module_name)
+    if module is None:
+        return None
+
+    # Traverse the object
+    obj = module
+    for part in fullname.split('.'):
+        if isinstance(obj, type):
+            obj = vars(obj).get(part)
+        else:
+            obj = getattr(obj, part, None)
+
+        if obj is None:
+            return None
+
+    # Only generate link for properties
+    if not isinstance(obj, property):
+        return None
+
+    # Use the getter function for source
+    obj = obj.fget
+
+    source_file = inspect.getsourcefile(obj)
+
+    # Convert absolute path to repo-relative path
+    repo_root = Path(__file__).resolve().parents[1]
+    relative_path = Path(source_file).resolve().relative_to(repo_root)
+
+    _, lineno = inspect.getsourcelines(obj)
+
+    # Build Phabricator URL
+    return (
+        'https://phabricator.wikimedia.org/diffusion/PWBC/browse/master/'
+        f'{relative_path}#L{lineno}'
+    )
 
 
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines) -> None:
@@ -549,7 +612,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options,
         # add link for fixes
         if name == 'scripts.replace' and line == '&fixes-help;':
             newlines.append('                  The available fixes are '
-                            'listed in :mod:`pywikibot.fixes`.')
+                            'listed in :mod:`fixes`.')
             continue
 
         # replace cosmetic changes warning

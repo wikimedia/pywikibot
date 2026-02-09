@@ -236,6 +236,12 @@ placeBeforeSections = {
         'ดูเพิ่ม',
         'หมายเหตุ',
     ],
+    'uk': [
+        'Література',
+        'Посилання',
+        'Зовнішні посилання',
+        'Джерела',
+    ],
     'ur': [              # no explicit policy on where to put the references
         'مزید دیکھیے',
         'حوالہ جات',
@@ -434,6 +440,10 @@ referencesSections = {
             'เชิงอรรถ',
             'หมายเหตุ',
         ],
+        'uk': [
+            'Примітки',
+            'Виноски',
+        ],
         'ur': [
             'حوالہ جات',
             'حوالہ',
@@ -509,6 +519,8 @@ referencesTemplates = {
         'sr': ['Reflist', 'Референце', 'Извори', 'Рефлист'],
         'szl': ['Przipisy', 'Připisy'],
         'th': ['รายการอ้างอิง'],
+        'uk': ['Reflist', 'References', 'Примітки', 'Зноски', 'Виноски',
+               'Ref-list', 'Примечания', 'Przypisy', 'Reflist+'],
         'ur': ['Reflist', 'Refs', 'Reference',
                'حوالہ جات', 'حوالے'],
         'zh': ['Reflist', 'RefFoot', 'NoteFoot'],
@@ -543,6 +555,7 @@ referencesSubstitute = {
         'sr': '{{reflist}}',
         'szl': '{{Przipisy}}',
         'th': '{{รายการอ้างอิง}}',
+        'uk': '{{Reflist}}',
         'ur': '{{حوالہ جات}}',
         'zh': '{{reflist}}',
     },

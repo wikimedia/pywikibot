@@ -1,6 +1,13 @@
 Release History
 ===============
 
+10.7.6
+------
+*31 January 2026*
+
+* Add support for pplwiki. (:phab:`T415048`)
+
+
 10.7.5
 ------
 *28 January 2026*
@@ -302,7 +309,6 @@ Release History
 * Require ``requests >= 2.31.0`` (:phab:`T347031`).
 * Python 3.7 support was dropped (:phab:`T378893`), including *importlib_metadata* of
   :mod:`backports`.
-* See also Current Deprecations below.
 
 
 9.6.3
@@ -1532,7 +1538,8 @@ Release History
 * LoginManager.getCookie() was renamed to login_to_site()
 * Deprecation warning for MediaWiki < 1.23 (:phab:`T268979`)
 * Add backports to support some Python 3.9 changes
-* Desupported shared_image_repository() and nocapitalize() methods were removed (:phab:`T89451`)
+* Desupported ``iwkeys()``, ``nicepath()``, ``nice_get_address``, ``shared_data_repository()``
+  methods and ``nocapitalize`` attribute were removed (:phab:`T89451`)
 * pywikibot.cookie_jar was removed in favour of pywikibot.comms.http.cookie_jar
 * Align http.fetch() params with requests and rename 'disable_ssl_certificate_validation' to 'verify' (:phab:`T265206`)
 * Deprecated compat BasePage.getRestrictions() method was removed
@@ -1586,7 +1593,7 @@ Release History
 * Do not strip all whitespaces from Link.title (:phab:`T197642`)
 * Introduce a common BaseDataDict as parent for LanguageDict and AliasesDict
 * Replaced PageNotSaved by PageSaveRelatedError (:phab:`T267821`)
-* Add -site option as -family -lang shortcut
+* Add -site option as -family -code shortcut
 * Enable APISite.exturlusage() with default parameters (:phab:`T266989`)
 * Update tools._unidata._category_cf from Unicode version 13.0.0
 * Move TokenWallet to site/_tokenwallet.py file
@@ -1702,7 +1709,7 @@ Release History
 
 * Add support for ja.wikivoyage (:phab:`T261450`)
 * Only run cosmetic changes on wikitext pages (:phab:`T260489`)
-* Leave a script gracefully for wrong -lang and -family option (:phab:`T259756`)
+* Leave a script gracefully for wrong -code and -family option (:phab:`T259756`)
 * Change meaning of BasePage.text (:phab:`T260472`)
 * site/family methods code2encodings() and code2encoding() has been removed in favour of encoding()/encodings() methods
 * Site.getExpandedString() method was removed in favour of expand_text
@@ -2557,7 +2564,7 @@ Release History
    - added ISBN support
    - added redirect support
 * Optionally uses external library for improved isbn validation
-* Automatically generating user files when -user, -family and -lang are
+* Automatically generating user files when -user, -family and -code are
   provided to a script
 * Page.content_model added
 * Page.contributors() and Page.revision_count() added

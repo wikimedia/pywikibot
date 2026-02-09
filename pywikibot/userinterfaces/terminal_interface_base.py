@@ -1,6 +1,6 @@
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,17 +11,12 @@ import logging
 import re
 import sys
 import threading
+from collections.abc import Iterable, Sequence
 from typing import Any, Literal, NoReturn, TextIO
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import (
-    Iterable,
-    RLock,
-    Sequence,
-    batched,
-    removeprefix,
-)
+from pywikibot.backports import RLock, batched
 from pywikibot.bot_choice import (
     ChoiceException,
     Option,
@@ -349,7 +344,7 @@ class UI(ABUIC):
         recognises a trailing question mark.
 
         :param question: The question, without trailing whitespace.
-        :param password: if True, hides the user's input (for password
+        :param password: If True, hides the user's input (for password
             entry).
         :param default: The default answer if none was entered. None to
             require an answer.
@@ -445,7 +440,7 @@ class UI(ABUIC):
         :return: If return_shortcut the shortcut of options or the value of
             default (if it's not None). Otherwise the index of the answer in
             options. If default is not a shortcut, it'll return -1.
-        :raises ValueError: invalid or no *default* value is given with
+        :raises ValueError: Invalid or no *default* value is given with
             *force* or no or an invalid option is given.
         :raises TypeError: *default* value is neither None nor str
         """
@@ -505,7 +500,7 @@ class UI(ABUIC):
                         if force:
                             raise ValueError(
                                 f'{default!r} is not a valid Option for '
-                                f'{removeprefix(output, question).lstrip()}')
+                                f'{output.removeprefix(question).lstrip()}')
 
         if isinstance(answer, ChoiceException):
             raise answer
@@ -560,11 +555,11 @@ class UI(ABUIC):
 
         Uses a Tkinter edit box because we don't have a console editor
 
-        :param text: the text to be edited
-        :param jumpIndex: position at which to put the caret
-        :param highlight: each occurrence of this substring will be
+        :param text: The text to be edited
+        :param jumpIndex: Position at which to put the caret
+        :param highlight: Each occurrence of this substring will be
             highlighted
-        :return: the modified text, or None if the user didn't save the
+        :return: The modified text, or None if the user didn't save the
             text file in his text editor
         """
         try:

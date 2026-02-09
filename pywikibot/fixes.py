@@ -1,4 +1,8 @@
-"""File containing all standard fixes."""
+"""File containing all standard fixes.
+
+.. versionremoved:: 11.0
+   The ``yu-tld`` predefined fix was removed.
+"""
 #
 # (C) Pywikibot team, 2008-2025
 #
@@ -7,6 +11,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from textwrap import dedent
 
 from pywikibot import config
 
@@ -14,29 +19,26 @@ from pywikibot import config
 parameter_help = """
                   Currently available predefined fixes:
 
-                  * HTML        - Convert HTML tags to wiki syntax, and
+                  * HTML        - Convert HTML tags to wiki syntax, and \
                                   fix XHTML.
                   * isbn        - Fix badly formatted ISBNs.
-                  * syntax      - Try to fix bad wiki markup. Do not run
-                                  this in automatic mode, as the bot may
+                  * syntax      - Try to fix bad wiki markup. Do not run \
+                                  this in automatic mode, as the bot may \
                                   make mistakes.
-                  * syntax-safe - Like syntax, but less risky; can be run
+                  * syntax-safe - Like syntax, but less risky; can be run \
                                   in automatic mode.
                   * case-de     - Fix upper/lower case errors in German.
                   * grammar-de  - Fix grammar and typography in German.
-                  * vonbis      - Replace hyphens or dashes with "bis"
+                  * vonbis      - Replace hyphens or dashes with "bis" \
                                   in German.
                   * music       - Links to disambiguation pages in German.
                   * datum       - Specific date formats in German.
-                  * correct-ar  - Typo corrections for Arabic Wikipedia
+                  * correct-ar  - Typo corrections for Arabic Wikipedia \
                                   and other Arabic wikis.
-                  * yu-tld      - Fix links to .yu domains, which are disabled.
-                                  See:
-                                  https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
                   * fckeditor   - Convert FCKeditor HTML tags to wiki syntax.
 """
 
-__doc__ += parameter_help
+__doc__ += dedent(parameter_help)
 
 fixes = {
     # These replacements will convert HTML to wiki syntax where possible, and
@@ -602,67 +604,6 @@ fixes = {
             ('Special:Userlogin',       'Special:UserLogin'),
             ('Special:Userlogout',      'Special:UserLogout'),
             ('Special:Whatlinkshere',   'Special:WhatLinksHere'),
-        ],
-    },
-    # yu top-level domain will soon be disabled, see
-    # https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
-    # The following are domains that are often-used.
-    'yu-tld': {
-        'regex': False,
-        'nocase': True,
-        'msg': {
-            'ar':  'روبوت: إصلاح الوصلات إلى نطاقات .yu',
-            'arz':  'روبوت: تصليح اللينكات للدومين .yu',
-            'de':  'Bot: Ersetze Links auf .yu-Domains',
-            'en':  'Robot: Replacing links to .yu domains',
-            'fa':  'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
-            'fr':  ('Robot: Correction des liens pointant vers le domaine '
-                    '.yu, qui expire en 2009'),
-            'ksh': 'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
-            'sr': 'Бот: Исправљање линкова ка .yu домену',
-        },
-        'replacements': [
-            ('www.budva.cg.yu',             'www.budva.rs'),
-            ('spc.org.yu',                  'spc.rs'),
-            ('www.oks.org.yu',              'www.oks.org.rs'),
-            ('www.kikinda.org.yu',          'www.kikinda.rs'),
-            ('www.ds.org.yu',               'www.ds.org.rs'),
-            ('www.nbs.yu',                  'www.nbs.rs'),
-            ('www.serbia.sr.gov.yu',        'www.srbija.gov.rs'),
-            ('eunet.yu',                    'eunet.rs'),
-            ('www.zastava-arms.co.yu',      'www.zastava-arms.co.rs'),
-            ('www.airportnis.co.yu',        'www.airportnis.rs'),
-            ('www.belex.co.yu',             'www.belex.rs'),
-            ('beograd.org.yu',              'beograd.rs'),
-            ('www.vlada.cg.yu',             'www.vlada.me'),
-            ('webrzs.statserb.sr.gov.yu',   'webrzs.stat.gov.rs'),
-            ('www.statserb.sr.gov.yu',      'webrzs.stat.gov.rs'),
-            ('www.rastko.org.yu',           'www.rastko.org.rs'),
-            ('www.reprezentacija.co.yu',    'www.reprezentacija.rs'),
-            ('www.blic.co.yu',              'www.blic.co.rs'),
-            ('www.beograd.org.yu',          'www.beograd.org.rs'),
-            ('arhiva.glas-javnosti.co.yu',  'arhiva.glas-javnosti.rs'),
-            ('www.srpsko-nasledje.co.yu',   'www.srpsko-nasledje.co.rs'),
-            ('www.dnevnik.co.yu',           'www.dnevnik.rs'),
-            ('www.srbija.sr.gov.yu',        'www.srbija.gov.rs'),
-            ('www.kurir-info.co.yu/Arhiva', 'arhiva.kurir-info.rs/Arhiva'),
-            ('www.kurir-info.co.yu/arhiva', 'arhiva.kurir-info.rs/arhiva'),
-            ('www.kurir-info.co.yu',        'www.kurir-info.rs'),
-            ('arhiva.kurir-info.co.yu',     'arhiva.kurir-info.rs'),
-            ('www.prvaliga.co.yu',          'www.prvaliga.rs'),
-            ('www.mitropolija.cg.yu',       'www.mitropolija.me'),
-            ('www.spc.yu/sr',               'www.spc.rs/sr'),
-            ('www.sk.co.yu',                'www.sk.co.rs'),
-            ('www.ekoforum.org.yu',         'www.ekoforum.org'),
-            ('www.svevlad.org.yu',          'www.svevlad.org.rs'),
-            ('www.posta.co.yu',             'www.posta.rs'),
-            ('www.glas-javnosti.co.yu',     'www.glas-javnosti.rs'),
-            ('www.fscg.cg.yu',              'www.fscg.co.me'),
-            ('ww1.rts.co.yu/euro',          'ww1.rts.co.rs/euro'),
-            ('www.rtv.co.yu',               'www.rtv.rs'),
-            ('www.politika.co.yu',          'www.politika.rs'),
-            ('www.mfa.gov.yu',              'www.mfa.gov.rs'),
-            ('www.drzavnauprava.sr.gov.yu', 'www.drzavnauprava.gov.rs'),
         ],
     },
     # These replacements will convert HTML tag from FCK-editor to wiki syntax.

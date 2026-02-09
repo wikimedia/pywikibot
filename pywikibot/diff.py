@@ -1,6 +1,6 @@
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,14 +9,14 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
+from collections.abc import Iterable, Sequence
 from difflib import _format_range_unified  # type: ignore[attr-defined]
 from difflib import SequenceMatcher
 from heapq import nlargest
 from itertools import zip_longest
 
 import pywikibot
-from pywikibot.backports import Iterable, Sequence
-from pywikibot.tools import chars
+from pywikibot.tools import chars, deprecated_signature
 
 
 __all__ = [
@@ -31,7 +31,7 @@ class Hunk:
 
     """One change hunk between a and b.
 
-    .. note:: parts of this code are taken from by
+    .. note:: Parts of this code are taken from
        `difflib.get_grouped_opcodes()`.
     """
 
@@ -45,9 +45,9 @@ class Hunk:
                  ) -> None:
         """Initializer.
 
-        :param a: sequence of lines
-        :param b: sequence of lines
-        :param grouped_opcode: list of 5-tuples describing how to turn a
+        :param a: Sequence of lines
+        :param b: Sequence of lines
+        :param grouped_opcode: List of 5-tuples describing how to turn a
             into b. It has the same format as returned by
             difflib.get_opcodes().
         """
@@ -242,21 +242,36 @@ class PatchManager:
     """Apply patches to text_a to obtain a new text.
 
     If all hunks are approved, text_b will be obtained.
+
+    .. versionchanged:: 11.0
+       *text_a* and *text_b* are positional-only parameters.
+       *by_letter* and *replace_invisible* are keyword-only parameters.
     """
 
-    def __init__(self, text_a: str, text_b: str, context: int = 0,
-                 by_letter: bool = False,
-                 replace_invisible: bool = False) -> None:
+    @deprecated_signature(since='11.0.0')
+    def __init__(
+        self,
+        text_a: str,
+        text_b: str,
+        /,
+        context: int = 0,
+        *,
+        by_letter: bool | None = None,
+        replace_invisible: bool = False,
+    ) -> None:
         """Initializer.
 
-        :param text_a: base text
-        :param text_b: target text
-        :param context: number of lines which are context
-        :param by_letter: if text_a and text_b are single lines,
+        :param text_a: Base text
+        :param text_b: Target text
+        :param context: Number of lines which are context
+        :param by_letter: If text_a and text_b are single lines,
             comparison can be done letter by letter.
         :param replace_invisible: Replace invisible characters like
             U+200e with the charnumber in brackets (e.g. <200e>).
         """
+        self.context = context
+        self._replace_invisible = replace_invisible
+
         self.a: str | list[str] = text_a.splitlines(True)
         self.b: str | list[str] = text_b.splitlines(True)
         if by_letter and len(self.a) <= 1 and len(self.b) <= 1:
@@ -281,9 +296,7 @@ class PatchManager:
         # blocks are a superset of hunk, as include also parts not
         # included in any hunk.
         self.blocks = self.get_blocks()
-        self.context = context
         self._super_hunks = self._generate_super_hunks()
-        self._replace_invisible = replace_invisible
 
     def get_blocks(self) -> list[tuple[int, tuple[int, int], tuple[int, int]]]:
         """Return list with blocks of indexes.
@@ -382,6 +395,7 @@ class PatchManager:
         output += extend_context(hunks[-1].a_rng[1], context_range[0][1])
         if self._replace_invisible:
             output = chars.replace_invisible(output)
+
         return output
 
     def review_hunks(self) -> None:
@@ -597,7 +611,7 @@ def html_comparator(compare_string: str) -> dict[str, list[str]]:
     .. note:: ``beautifulsoup4`` package is needed for this function.
 
     :param compare_string: HTML string from MediaWiki API
-    :return: deleted and added list of contexts
+    :return: Deleted and added list of contexts
     """
     from bs4 import BeautifulSoup
 
@@ -621,17 +635,17 @@ def get_close_matches_ratio(
     cutoff: float = 0.6,
     ignorecase: bool = False
 ) -> list[tuple[float, str]]:
-    """Return a list of the best “good enough” matches and its ratio.
+    """Return a list of the best “good enough” matches and their ratio.
 
     This method is similar to Python's :pylib:`difflib.get_close_matches()
     <difflib#difflib.get_close_matches>` but also gives ratio back and
-    has a *ignorecase* parameter to compare case-insensitive.
+    has an *ignorecase* parameter to compare case-insensitive.
 
     SequenceMatcher is used to return a list of the best "good enough"
     matches together with their ratio. The ratio is computed by the
     :wiki:`Gestalt pattern matching` algorithm. The best (no more than
-    *n*) matches among the *possibilities* with their ratio are returned
-    in a list, sorted by similarity score, most similar first.
+    *n*) matches among the *possibilities* with their ratio are returned.
+    In a list, sorted by similarity score, most similar first.
 
     >>> get_close_matches_ratio('appel', ['ape', 'apple', 'peach', 'puppy'])
     [(0.8, 'apple'), (0.75, 'ape')]
@@ -645,17 +659,17 @@ def get_close_matches_ratio(
     .. note:: Most code is incorporated from Python software under the
        `PSF`_ license.
 
-    :param word: a sequence for which close matches are desired
+    :param word: A sequence for which close matches are desired
         (typically a string)
-    :param possibilities: a list of sequences against which to match
+    :param possibilities: A list of sequences against which to match
         *word* (typically a list of strings)
-    :param n: optional arg (default 3) which is the maximum number of
-        close matches to return. *n* must be :code:`> 0`.
-    :param cutoff: optional arg (default 0.6) is a float in :code:`[0, 1]`.
-        *possibilities* that don't score at least that similar to *word*
-        are ignored.
-    :param ignorecase: if false, compare case sensitive
-    :raises ValueError: invalid value for *n* or *catoff*
+    :param n: Optional arg (default 3) which is the maximum number of
+        close matches to return; *n* must be :code:`> 0`.
+    :param cutoff: Optional arg (default 0.6) is a float in
+        :code:`[0, 1]`; sequences in *possibilities* that don't score at
+        least that similar to *word* are ignored.
+    :param ignorecase: If False, compare case-sensitive
+    :raises ValueError: Invalid value for *n* or *catoff*
 
     .. _PSF:
        https://docs.python.org/3/license.html#psf-license-agreement-for-python-release

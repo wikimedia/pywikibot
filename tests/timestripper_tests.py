@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for archivebot.py/Timestripper."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2025
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,11 +9,12 @@ from __future__ import annotations
 
 import datetime
 import re
+import unittest
 from contextlib import suppress
 
 from pywikibot.textlib import TimeStripper
 from pywikibot.time import TZoneFixedOffset
-from tests.aspects import TestCase, unittest
+from tests.aspects import TestCase
 
 
 MatchObject = type(re.search('', ''))

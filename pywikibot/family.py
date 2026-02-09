@@ -1,6 +1,6 @@
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2025
+# (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,6 +14,7 @@ import sys
 import types
 import urllib.parse as urlparse
 import warnings
+from collections.abc import Mapping, Sequence
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
@@ -22,7 +23,6 @@ from typing import TYPE_CHECKING, NoReturn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import DefaultDict, Mapping, Sequence, removesuffix
 from pywikibot.data import wikistats
 from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.tools import classproperty, deprecated
@@ -31,7 +31,7 @@ from pywikibot.tools import classproperty, deprecated
 logger = logging.getLogger('pywiki.wiki.family')
 
 if TYPE_CHECKING:
-    CrossnamespaceType = DefaultDict[str, dict[str, list[int]]]
+    CrossnamespaceType = collections.defaultdict[str, dict[str, list[int]]]
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
@@ -336,9 +336,9 @@ class Family:
     def load(fam: str | None = None):
         """Import the named family.
 
-        :param fam: family name (if omitted, uses the configured
+        :param fam: Family name (if omitted, uses the configured
             default)
-        :return: a Family instance configured for the named family.
+        :return: A Family instance configured for the named family.
         :raises pywikibot.exceptions.UnknownFamilyError: family not
             known
         """
@@ -444,7 +444,7 @@ class Family:
     def disambig(self, code, fallback: str | None = '_default') -> list[str]:
         """Return list of disambiguation templates.
 
-        :raises KeyError: unknown title for disambig template
+        :raises KeyError: Unknown title for disambig template
         """
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
@@ -464,8 +464,8 @@ class Family:
         .. versionchanged:: 8.2
            ``https`` is returned instead of ``http``.
 
-        :param code: language code
-        :return: protocol that this family uses
+        :param code: Language code
+        :return: Protocol that this family uses
         """
         return 'https'
 
@@ -475,8 +475,8 @@ class Family:
         .. versionadded:: 5.3
            renamed from ignore_certificate_error
 
-        :param code: language code
-        :return: flag to verify the SSL certificate;
+        :param code: Language code
+        :return: Flag to verify the SSL certificate;
                  set it to False to allow access if certificate has an error.
         """
         return True
@@ -501,7 +501,7 @@ class Family:
         uses a different value.
 
         :param code: Site code
-        :raises KeyError: code is not recognised
+        :raises KeyError: Code is not recognised
         :return: URL path without ending '/'
         """
         return '/w'
@@ -598,7 +598,7 @@ class Family:
         .. versionchanged:: 10.3
            accept a trailing slash in *url* after domain.
 
-        :param url: the URL which may contain a ``$1``. If it's missing
+        :param url: The URL which may contain a ``$1``. If it's missing
             it is assumed to be at the end.
         :return: The language code of the URL. None if that URL is not
             from his family.
@@ -651,15 +651,6 @@ class Family:
         raise RuntimeError(
             'Found multiple matches for URL "{}": {}'
             .format(url, ', '.join(str(s) for s in matched_sites)))
-
-    @deprecated('config.maximum_GET_length', since='8.0.0')
-    def maximum_GET_length(self, code):
-        """Return the maximum URL length for GET instead of POST.
-
-        .. deprecated:: 8.0
-           Use :ref:`config.maximum_GET_length<Account Settings>` instead.
-        """
-        return config.maximum_GET_length
 
     def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
@@ -733,7 +724,7 @@ class Family:
 
         Interwiki replacements override removals for the same code.
 
-        :return: mapping of old codes to new codes (or None)
+        :return: Mapping of old codes to new codes (or None)
         """
         data = dict.fromkeys(self.interwiki_removals)
         data.update(self.code_aliases)
@@ -1195,7 +1186,7 @@ def AutoFamily(name: str, url: str) -> SingleSiteFamily:
     def scriptpath(self, code):
         """Extract the script path from the URL."""
         if self.url.path.endswith('/api.php'):
-            return removesuffix(self.url.path, '/api.php')
+            return self.url.path.removesuffix('/api.php')
 
         # AutoFamily refers to the variable set below, not the function
         # but the reference must be given here

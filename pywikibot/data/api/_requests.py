@@ -1,31 +1,32 @@
-"""Objects representing API requests."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API requests."""
+
 from __future__ import annotations
 
 import datetime
 import hashlib
 import inspect
+import math
 import os
 import pickle
 import pprint
 import re
 import sys
 import traceback
-from collections.abc import MutableMapping
+from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import Any, NoReturn
-from urllib.parse import unquote, urlencode, urlparse
+from typing import TYPE_CHECKING, Any, NoReturn
+from urllib.parse import unquote, urlencode
 from warnings import warn
 
 import pywikibot
 from pywikibot import config
-from pywikibot.backports import Callable, Match, removeprefix
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -41,6 +42,9 @@ from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import deprecated
 
+
+if TYPE_CHECKING:
+    import requests
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
@@ -239,7 +243,8 @@ class Request(MutableMapping, WaitingMixin):
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
-        self._warning_handler: Callable[[str, str], Match[str] | bool | None] | None = None  # noqa: E501
+        self._warning_handler: Callable[
+            [str, str], re.Match[str] | bool | None] | None = None
         self.write = self.action in WRITE_ACTIONS
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
@@ -677,31 +682,58 @@ class Request(MutableMapping, WaitingMixin):
                         f'Headers: {headers!r}\nURI: {uri!r}\nBody: {body!r}')
         return use_get, uri, body, headers
 
-    def _http_request(self, use_get: bool, uri: str, data, headers,
-                      paramstring) -> tuple:
-        """Get or post a http request with exception handling.
+    def _http_request(
+        self,
+        use_get: bool,
+        uri: str,
+        data: dict[str, str | int | float | bool] | None,
+        headers: dict[str, str] | None,
+        paramstring: str
+    ) -> tuple[requests.Response | None, bool]:
+        """Send an HTTP GET or POST request with exception handling.
+
+        This method wraps :func:`comms.http.request` to send a request
+        to the site's server, handle common HTTP errors, and optionally
+        retry using an alternative scheme or method.
+
+        .. note::
+           ImportError during request handling will terminate the
+           program; it is not propagated as an exception. Any other
+           unexpected exceptions are logged and trigger a wait  before
+           retrying; they are not propagated to the caller.
 
         .. versionchanged:: 8.2
            change the scheme if the previous request didn't have json
            content.
         .. versionchanged:: 9.2
            no wait cycles for :exc:`ImportError` and :exc:`NameError`.
+        .. versionchanged:: 11.0
+           The scheme swapping introduced in version 8.2 was removed.
+           Any :class:`Family<family.Family>` file must provide a
+           correct :meth:`protocol()<family.Family.protocol>` method.
 
+        :param use_get: If True, send a GET request; otherwise send POST.
+        :param uri: The URI path to request on the site.
+        :param data: The data to send in the request body (for POST) or
+            query string (for GET).
+        :param headers: HTTP headers to include in the request.
+        :param paramstring: A string representing the request parameters
+            (used for logging/debug).
         :return: a tuple containing requests.Response object from
             :func:`comms.http.request` and *use_get* value
 
+        :raises Client414Error: If a 414 URI Too Long occurs on a POST
+            request after GET retry failed.
+        :raises ConnectionError: For network connection errors.
+        :raises FatalServerError: For critical server errors.
+        :raises NameError: If a NameError occurs during request handling.
+
         :meta public:
         """
-        kwargs = {}
-        schemes = ('http', 'https')
-        if self.json_warning and self.site.protocol() in schemes:
-            # retry with other scheme
-            kwargs['protocol'] = schemes[self.site.protocol() == 'http']
-
         try:
             response = http.request(self.site, uri=uri,
                                     method='GET' if use_get else 'POST',
-                                    data=data, headers=headers, **kwargs)
+                                    data=data, headers=headers)
         except Server504Error:
             pywikibot.log('Caught HTTP 504 error; retrying')
 
@@ -746,8 +778,11 @@ class Request(MutableMapping, WaitingMixin):
         """Return a dict from requests.Response.
 
         .. versionchanged:: 8.2
-           show a warning to add a ``protocol()`` method to the family
-           file if suitable.
+           show a warning to add a :meth:`protocol()
+           <family.Family.protocol>` method to the family file if suitable.
+        .. versionchanged:: 11.0
+           The warning about missing or wrong ``protocol()`` method
+           introduced in version 8.2 was removed.
 
         :param response: a requests.Response object
         :type response: requests.Response
@@ -766,11 +801,13 @@ class Request(MutableMapping, WaitingMixin):
             text = removeDisabledParts(response.text, ['script'])
             text = re.sub('\n{2,}', '\n',
                           '\n'.join(removeHTMLParts(text).splitlines()[:20]))
+            ua = response.request.headers.get('User-Agent')
             msg = f"""\
 Non-JSON response received from server {self.site} for url
 {response.url}
 The server may be down.
 Status code: {response.status_code}
+User agent: {ua}
 
 The text message is:
 {text}
@@ -797,22 +834,12 @@ The text message is:
             # there might also be an overflow, so try a smaller limit
             for param in self._params:
                 if param.endswith('limit'):
-                    # param values are stored a list of str
-                    value = self[param][0]
-                    if value.isdigit():
-                        self[param] = [str(int(value) // 2)]
+                    # param values are stored a list of str or int (T414168)
+                    with suppress(ValueError):
+                        value = int(self[param][0])
+                        self[param] = [str(math.ceil(value / 2))]
                         pywikibot.info(f'Set {param} = {self[param]}')
         else:
-            scheme = urlparse(response.url).scheme
-            if self.json_warning and scheme != self.site.protocol():
-                warn(f"""
-Your {self.site.family} family uses a wrong scheme {self.site.protocol()!r}
-but {scheme!r} is required. Please add the following code to your family file:
-
-    def protocol(self, code: str) -> str:
-        return '{scheme}'
-
-""", stacklevel=2)
             return result or {}
 
         self.wait()
@@ -945,7 +972,7 @@ but {scheme!r} is required. Please add the following code to your family file:
             return False
 
         # T154011
-        class_name = code if code == 'readonly' else removeprefix(code, iae)
+        class_name = code if code == 'readonly' else code.removeprefix(iae)
 
         del error['code']  # is added via class_name
         e = pywikibot.exceptions.APIMWError(class_name, **error)
@@ -1148,6 +1175,10 @@ but {scheme!r} is required. Please add the following code to your family file:
                 raise NoUsernameError(f'Failed {msg}')
 
             if code == 'cirrussearch-too-busy-error':  # T170647
+                self.wait()
+                continue
+
+            if code == 'lockmanager-fail-conflict':  # T396984
                 self.wait()
                 continue
 

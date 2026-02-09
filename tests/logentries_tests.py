@@ -77,7 +77,7 @@ class TestLogentriesBase(TestCase):
         self.assertEqual(logentry._expected_type, logtype)
 
         if logtype not in LogEntryFactory._logtypes:
-            self.assertIsInstance(logentry, OtherLogEntry)
+            self.assertIsInstance(logentry, OtherLogEntry)  # pragma: no cover
 
         # check that we only have the new implementation
         self.assertNotIn(logentry.type(), logentry.data)
@@ -112,7 +112,7 @@ class TestLogentriesBase(TestCase):
             self.assertGreaterEqual(logentry.ns(), -2)
             self.assertGreaterEqual(logentry.pageid(), 0)
             if logtype == 'block' and logentry.isAutoblockRemoval:
-                self.assertIsInstance(logentry.page(), int)
+                self.assertIsInstance(logentry.page(), int)  # pragma: no cover
             elif isinstance(logentry, UserTargetLogEntry):
                 self.assertIsInstance(logentry.page(), pywikibot.User)
             elif logtype == 'upload':

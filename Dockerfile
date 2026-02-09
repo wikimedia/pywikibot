@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.12-slim
 
 WORKDIR /code
 
@@ -6,7 +6,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN pip3 install .
+RUN pip install .
 
 ENV PYTHONPATH=/code:/code/scripts
 

@@ -100,7 +100,7 @@ class FamilyFileGenerator:
     @staticmethod
     def show(*args, **kwargs):
         """Wrapper around print to be mocked in tests."""
-        print(*args, **kwargs)
+        print(*args, **kwargs)  # pragma: no cover
 
     def get_params(self) -> bool:
         """Ask for parameters if necessary."""

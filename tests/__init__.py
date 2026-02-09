@@ -1,9 +1,10 @@
-"""Package tests."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Package tests."""
+
 from __future__ import annotations
 
 
@@ -30,7 +31,6 @@ import requests  # noqa: F401
 
 import pywikibot.data.api
 from pywikibot import config
-from pywikibot.backports import removesuffix
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
 
@@ -139,6 +139,7 @@ library_test_modules = {
     'wikibase_edit',
     'wikiblame',
     'wikistats',
+    'wikiwho',
     'xmlreader'
 }
 
@@ -166,6 +167,7 @@ script_test_modules = {
     'script',
     'template_bot',
     'uploadscript',
+    'weblinkchecker',
 }
 
 disabled_test_modules = {
@@ -180,7 +182,7 @@ disabled_tests: dict[str, list[str]] = {}
 def _unknown_test_modules():
     """List tests which are to be executed."""
     dir_list = os.listdir(join_tests_path())
-    all_test_set = {removesuffix(name, '_tests.py') for name in dir_list
+    all_test_set = {name.removesuffix('_tests.py') for name in dir_list
                     if name.endswith('_tests.py')
                     and not name.startswith('_')}  # skip __init__.py and _*
 

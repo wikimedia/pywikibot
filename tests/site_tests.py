@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -60,26 +60,26 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def test_constructors(self) -> None:
         """Test cases for site constructors."""
-        test_list = [
-            ['alswiki', 'wikipedia:als'],  # see T345036
-            ['commonswiki', 'commons:commons'],
-            ['dewikinews', 'wikinews:de'],
-            ['enwiki', 'wikipedia:en'],
-            ['eswikisource', 'wikisource:es'],
-            ['metawiki', 'meta:meta'],
-            ['roa_rupwiki', 'wikipedia:roa-rup'],  # see T345036
-            ['sourceswiki', 'wikisource:mul'],  # see T226960
-            ['test2wiki', 'wikipedia:test2'],  # see T225729
-            ['testwiki', 'wikipedia:test'],  # see T225729, T228300
-            ['testwikidatawiki', 'wikidata:test'],
-            ['ukwikivoyage', 'wikivoyage:uk'],
-            ['wikidatawiki', 'wikidata:wikidata'],
-        ]
+        test_dict = {
+            'alswiki': 'wikipedia:als',  # see T345036
+            'commonswiki': 'commons:commons',
+            'dewikinews': 'wikinews:de',
+            'enwiki': 'wikipedia:en',
+            'eswikisource': 'wikisource:es',
+            'metawiki': 'meta:meta',
+            'roa_rupwiki': 'wikipedia:roa-rup',  # see T345036
+            'sourceswiki': 'wikisource:mul',  # see T226960
+            'test2wiki': 'wikipedia:test2',  # see T225729
+            'testwiki': 'wikipedia:test',  # see T225729, T228300
+            'testwikidatawiki': 'wikidata:test',
+            'ukwikivoyage': 'wikivoyage:uk',
+            'wikidatawiki': 'wikidata:wikidata',
+        }
         if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
             site = self.site
         else:
             site = None
-        for dbname, sitename in test_list:
+        for dbname, sitename in test_dict.items():
             with self.subTest(dbname=dbname):
                 self.assertIs(
                     pywikibot.site.APISite.fromDBName(dbname, site),
@@ -339,12 +339,6 @@ class SiteUserTestCase(DefaultSiteTestCase, DeprecationTestCase):
         for rgt in ('read', 'edit', 'move', 'delete', 'rollback', 'block',
                     'nosuchright'):
             self.assertIsInstance(mysite.has_right(rgt), bool)
-
-    def test_deprecated_methods(self) -> None:
-        """Test deprecated user related methods."""
-        mysite = self.get_site()
-        self.assertIsInstance(mysite.messages(), bool)
-        self.assertOneDeprecation()
 
     def test_logevents(self) -> None:
         """Test the site.logevents() method."""

@@ -114,6 +114,9 @@ These arguments control miscellaneous bot behaviour:
                 bot action. This will only be used in non-autonomous
                 mode.
 
+-graph          Save a graph of interwiki conflicts in PNG format.
+                This requires the `pydot` Python package.
+
 -hintsonly      The bot does not ask for a page to work on, even if none
                 of the above page sources was specified. This will make
                 the first existing page of -hint or -hinfile slip in as
@@ -347,7 +350,7 @@ To run the script on all pages on a language, run it with option
    default site only, instead of the origin page.
 """
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -357,6 +360,7 @@ import os
 import re
 import sys
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from contextlib import suppress
 from pathlib import Path
 from textwrap import fill
@@ -370,7 +374,6 @@ from pywikibot import (
     textlib,
     titletranslate,
 )
-from pywikibot.backports import Iterable
 from pywikibot.bot import (
     ListOption,
     OptionHandler,
@@ -487,6 +490,7 @@ class InterwikiBotConfig:
     summary = ''
     untranslated = False
     untranslatedonly = False
+    graph = config.interwiki_graph
 
     def note(self, text: str) -> None:
         """Output a notification message with.
@@ -548,8 +552,7 @@ class InterwikiBotConfig:
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':
-            # override configuration
-            config.interwiki_graph = True
+            self.graph = True
         elif arg == 'bracket':
             self.parenthesesonly = True
         elif arg == 'localright':
@@ -679,6 +682,15 @@ class Subject(interwiki_graph.Subject):
         # default site for -localonly option
         self.site = pywikibot.Site()
 
+    @staticmethod
+    def is_not_redirect(page):
+        """Check whether *page* is not a redirect page.
+
+        .. versionadded:: 11.0
+        """
+        return page.exists() and not (page.isRedirectPage()
+                                      or page.isCategoryRedirect())
+
     def getFoundDisambig(self, site):
         """Return the first disambiguation found.
 
@@ -703,10 +715,7 @@ class Subject(interwiki_graph.Subject):
         """
         for tree in [self.done, self.pending]:
             for page in tree.filter(site):
-                if page.exists() \
-                   and not page.isDisambig() \
-                   and not page.isRedirectPage() \
-                   and not page.isCategoryRedirect():
+                if self.is_not_redirect(page) and not page.isDisambig():
                     return page
         return None
 
@@ -724,9 +733,7 @@ class Subject(interwiki_graph.Subject):
                 # do.
                 if self.origin \
                    and page.namespace() == self.origin.namespace() \
-                   and page.exists() \
-                   and not page.isRedirectPage() \
-                   and not page.isCategoryRedirect():
+                   and self.is_not_redirect(page):
                     return page
         return None
 
@@ -1021,13 +1028,13 @@ class Subject(interwiki_graph.Subject):
 
     def askForHints(self, counter) -> None:
         """Ask for hints to other sites."""
-        if (not self.workonme  # we don't work on it anyway
+        if (
+            not self.workonme  # we don't work on it anyway
             or not self.untranslated and not self.conf.askhints
             or self.hintsAsked
             or not self.origin
-            or not self.origin.exists()
-            or self.origin.isRedirectPage()
-                or self.origin.isCategoryRedirect()):
+            or not self.is_not_redirect(self.origin)
+        ):
             return
 
         self.hintsAsked = True
@@ -1203,7 +1210,7 @@ class Subject(interwiki_graph.Subject):
                     f.write(
                         f'* {self.origin} '
                         f'{{Found more than one link for {page.site}}}')
-                    if config.interwiki_graph and config.interwiki_graph_url:
+                    if self.conf.graph and config.interwiki_graph_url:
                         filename = interwiki_graph.getFilename(
                             self.origin,
                             extension=config.interwiki_graph_formats[0])
@@ -1351,7 +1358,7 @@ class Subject(interwiki_graph.Subject):
             return {site: pages[0] for site, pages in new.items()}
 
         # There are any errors.
-        if config.interwiki_graph:
+        if self.conf.graph:
             graphDrawer = interwiki_graph.GraphDrawer(self)
             graphDrawer.createGraph()
 

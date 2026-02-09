@@ -474,11 +474,10 @@ class TestPageObject(DefaultSiteTestCase):
 
         with suppress_warnings(
             r'pywikibot\.page\._basepage.BasePage\.\w+ is deprecated since '
-            r'release [89]\.[03]\.0; use latest_revision\..+ instead\.',
+            r'release 9\.3\.0; use latest_revision\..+ instead\.',
                 FutureWarning):
             self.assertIsInstance(mainpage.userName(), str)
             self.assertIsInstance(mainpage.isIpEdit(), bool)
-            self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
 
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
@@ -1106,8 +1105,13 @@ class TestPageUserAction(DefaultSiteTestCase):
         rv = userpage.watch(expiry='5 seconds')
         self.assertTrue(rv)
         self.assertIn(userpage, userpage.site.watched_pages(**wp_params))
-        time.sleep(10)
-        self.assertNotIn(userpage, userpage.site.watched_pages(**wp_params))
+        # Retry check for unwatch to propagate for up to 30 seconds
+        for _ in range(6):
+            time.sleep(5)  # Wait for the expiry to pass
+            if userpage not in userpage.site.watched_pages(**wp_params):
+                break
+        else:
+            self.fail('unwatch failed')
 
 
 class TestPageDelete(TestCase):
