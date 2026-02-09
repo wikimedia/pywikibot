@@ -98,7 +98,7 @@ repos:
         name: isort (skip future annotations)
         files: ^(pwb|pywikibot/config)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.77.0
+    rev: v0.78.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)

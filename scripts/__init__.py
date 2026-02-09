@@ -25,7 +25,7 @@ The advantages of pwb.py wrapper script are:
   due to spelling mistake
 """
 #
-# (C) Pywikibot team, 2021-2025
+# (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,7 +34,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
-__version__ = '11.0.0'
+__version__ = '11.1.0'
 
 #: defines the entry point for pywikibot-scripts package
 base_dir = Path(__file__).parent
