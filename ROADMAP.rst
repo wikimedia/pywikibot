@@ -3,6 +3,9 @@ Release 11 (in development)
 
 **Improvements**
 
+* Use URL to bot's wiki page in :ref:`user_agent_format<Account Settings>` due to `Foundation UA
+  Policy <https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy>`_.
+  (:phab:`T414173`, :phab:`T414201`)
 * Show Pywikibot version in deprecation warnings for :mod:`config` variables.
 * :ref:`config.pickle_protocol<Further Settings>` was updated from version `2` to `5`. Older pickle
   files are still readable.
@@ -119,6 +122,15 @@ Release 11 (in development)
 
 **Other breaking changes**
 
+* Set :ref:`minthrottle<Settings to Avoid Server Overload>` to 0.1 due to `Wikimedia Bot Policy
+  <https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy>`_.
+  (:phab:`T414170`)
+* Clean up :ref:`user_agent_format<Account Settings>` string.
+  Replace the first occurrence of "family", "code", or "lang" with "site".
+  The "lang" variable never worked properly. All of these can be replaced
+  with "site", which is recognized by Wikimedia traffic management.
+  Also replace "script_product" by "script" and "version" by "revision".
+  Replace {script_product} with {username}/{script} in user_agent_format. (:phab:`T414201`)
 * Use global ``-code`` instead of ``-lang`` to determine a site.
   The old ``-lang`` option is kept for backward compatibility.
 * Protocol swapping in :class:`data.api.Request` was removed. Family files should provide

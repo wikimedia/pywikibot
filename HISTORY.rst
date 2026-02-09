@@ -1538,7 +1538,8 @@ Release History
 * LoginManager.getCookie() was renamed to login_to_site()
 * Deprecation warning for MediaWiki < 1.23 (:phab:`T268979`)
 * Add backports to support some Python 3.9 changes
-* Desupported shared_image_repository() and nocapitalize() methods were removed (:phab:`T89451`)
+* Desupported ``iwkeys()``, ``nicepath()``, ``nice_get_address``, ``shared_data_repository()``
+  methods and ``nocapitalize`` attribute were removed (:phab:`T89451`)
 * pywikibot.cookie_jar was removed in favour of pywikibot.comms.http.cookie_jar
 * Align http.fetch() params with requests and rename 'disable_ssl_certificate_validation' to 'verify' (:phab:`T265206`)
 * Deprecated compat BasePage.getRestrictions() method was removed
