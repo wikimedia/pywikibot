@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to check recently uploaded files.
 
 This script checks if a file description is present and if there are
@@ -74,11 +79,7 @@ take the right parameter:
 .. versionchanged:: 8.4
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
-#
-# (C) Pywikibot team, 2006-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import collections

@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
@@ -49,11 +54,7 @@ or by adding a list to the given one::
     cosmetic_changes_deny_script += ['your_script_name_1',
                                      'your_script_name_2']
 """
-#
-# (C) Pywikibot team, 2006-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import re

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """archivebot.py - Discussion page archiving bot.
 
 usage:
@@ -187,11 +192,7 @@ Version historty:
 .. versionchanged:: 11.0
    The ``-namespace`` option is now respected by ``-page`` option.
 """
-#
-# (C) Pywikibot team, 2006-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import datetime

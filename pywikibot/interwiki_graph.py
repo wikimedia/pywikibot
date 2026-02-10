@@ -1,9 +1,10 @@
-"""Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module with the Graphviz drawing calls."""
+
 from __future__ import annotations
 
 import itertools

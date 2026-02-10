@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to welcome new users.
 
 This script works out of the box for Wikis that have been defined in the
@@ -170,11 +175,7 @@ using without adding or deleting.
 Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
 aren't badwords at all but can be used for some bad-nickname.
 """
-#
-# (C) Pywikibot team, 2006-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import locale
