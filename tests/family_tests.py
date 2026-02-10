@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for the family module."""
 #
 # (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the family module."""
+
 from __future__ import annotations
 
 import unittest

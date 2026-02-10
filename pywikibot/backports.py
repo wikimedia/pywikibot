@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This module contains backports to support older Python versions.
 
 .. caution:: This module is not part of the public pywikibot API.
@@ -7,11 +12,7 @@
 .. versionchanged:: 10.0
    This module is 'private'.
 """
-#
-# (C) Pywikibot team, 2014-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import re

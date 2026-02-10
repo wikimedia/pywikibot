@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2017-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Server-Sent Events client.
 
 This file is part of the Pywikibot framework.
@@ -10,11 +15,7 @@ This module requires requests-sse to be installed::
 .. versionchanged:: 10.0
    ``requests-sse`` package is required instead of ``sseclient``.
 """
-#
-# (C) Pywikibot team, 2017-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import json

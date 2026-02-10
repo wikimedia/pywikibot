@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2015-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects used with ProofreadPage Extension.
 
 OCR support of page scans via:
@@ -9,11 +14,7 @@ OCR support of page scans via:
 
 .. seealso:: https://wikisource.org/wiki/Wikisource:Google_OCR
 """
-#
-# (C) Pywikibot team, 2015-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import collections.abc

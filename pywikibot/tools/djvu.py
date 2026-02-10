@@ -1,9 +1,10 @@
-"""Wrapper around djvulibre to access djvu files properties and content."""
 #
 # (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Wrapper around djvulibre to access djvu files properties and content."""
+
 from __future__ import annotations
 
 import os

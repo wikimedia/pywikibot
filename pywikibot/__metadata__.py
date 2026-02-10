@@ -1,12 +1,13 @@
-"""Pywikibot metadata file.
-
-.. versionadded:: 4.0
-"""
 #
 # (C) Pywikibot team, 2020-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Pywikibot metadata file.
+
+.. versionadded:: 4.0
+"""
+
 from __future__ import annotations
 
 from time import strftime

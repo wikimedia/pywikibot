@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test that each script can be compiled and executed."""
 #
 # (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test that each script can be compiled and executed."""
+
 from __future__ import annotations
 
 import sys

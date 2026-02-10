@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for threading tools."""
 #
 # (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for threading tools."""
+
 from __future__ import annotations
 
 import time
