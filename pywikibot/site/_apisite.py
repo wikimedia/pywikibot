@@ -1,9 +1,10 @@
-"""Objects representing API interface to MediaWiki site."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API interface to MediaWiki site."""
+
 from __future__ import annotations
 
 import datetime

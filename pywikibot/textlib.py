@@ -1,9 +1,10 @@
-"""Functions for manipulating wiki-text."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Functions for manipulating wiki-text."""
+
 from __future__ import annotations
 
 import itertools

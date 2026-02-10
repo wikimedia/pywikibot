@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing MediaWiki File pages.
 
 This module includes objects:
@@ -5,11 +10,7 @@ This module includes objects:
 * FilePage: A subclass of Page representing a file description page
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 from collections.abc import Iterable

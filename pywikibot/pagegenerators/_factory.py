@@ -1,9 +1,10 @@
-"""GeneratorFactory module which handles pagegenerators options."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""GeneratorFactory module which handles pagegenerators options."""
+
 from __future__ import annotations
 
 import itertools

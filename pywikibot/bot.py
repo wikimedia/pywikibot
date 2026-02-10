@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """User-interface related functions for building bots.
 
 This module supports several different bot classes which could be used in
@@ -79,11 +84,7 @@ when :meth:`put_current` is used.
    :class:`NoRedirectPageBot` are deprecated. Use
    :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 

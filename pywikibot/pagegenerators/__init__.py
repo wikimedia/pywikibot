@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This module offers a wide variety of page generators.
 
 A page generator is an object that is iterable (see :pep:`255`) and
@@ -11,11 +16,7 @@ These parameters are supported to specify which pages titles to be used:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 from collections.abc import Callable, Generator, Iterable

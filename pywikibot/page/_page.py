@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing a MediaWiki page.
 
 Various Wikibase pages are defined in ``page._wikibase.py``,
@@ -8,11 +13,7 @@ various pages for Proofread Extensions are defined in
    :class:`pywikibot.Page` objects (defined here) represent the page
    itself, including its contents.
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import pywikibot

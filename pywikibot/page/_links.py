@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing internal or interwiki link in wikitext.
 
 .. note::
@@ -5,11 +10,7 @@
    :class:`pywikibot.Page` objects represent the page itself, including
    its contents.
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import re
