@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2010-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to create user-config.py. Other file names are not supported.
 
 .. versionchanged:: 7.0
@@ -10,11 +15,7 @@
    Default ``PASS_BASENAME`` was changed from ``user-password.py`` to
    ``user-password.cfg``
 """
-#
-# (C) Pywikibot team, 2010-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import os

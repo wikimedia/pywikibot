@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2012-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Wrapper script to invoke pywikibot-based scripts.
 
 This wrapper script invokes script by its name in this search order:
@@ -42,11 +47,7 @@ for tests to set the default site (see :phab:`T216825`)::
 .. versionchanged:: 9.4
    enable external scripts via entry points.
 """
-#
-# (C) Pywikibot team, 2012-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import importlib.metadata

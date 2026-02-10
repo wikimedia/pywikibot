@@ -1,9 +1,10 @@
-"""Object representing a Wiki user."""
 #
 # (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Object representing a Wiki user."""
+
 from __future__ import annotations
 
 from collections.abc import Generator

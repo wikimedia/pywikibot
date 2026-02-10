@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of MIT license.
+#
 r"""Template harvesting script.
 
 Usage (see below for explanations and examples):
@@ -108,11 +113,7 @@ is already there:
 .. versionadded:: 7.5
    the -inverse option.
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of MIT license.
-#
+
 from __future__ import annotations
 
 import re

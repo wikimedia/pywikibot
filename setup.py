@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2009-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Installer script for Pywikibot framework.
 
 **How to create a new distribution:**
@@ -19,11 +24,7 @@
 
 .. warning:: do not upload a development release to pypi.
 """
-#
-# (C) Pywikibot team, 2009-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import configparser

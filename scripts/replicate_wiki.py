@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2012-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
@@ -41,11 +46,7 @@ The following parameters are supported:
 
 destination_wiki        destination wiki(s)
 """
-#
-# (C) Pywikibot team, 2012-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import sys

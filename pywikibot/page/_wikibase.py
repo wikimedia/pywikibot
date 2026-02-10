@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing various types of Wikibase pages and structures.
 
 This module also includes objects:
@@ -7,11 +12,7 @@ This module also includes objects:
 * Property: a type of semantic data.
 * WikibaseEntity: base interface for Wikibase entities.
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import json as jsonlib

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests against a fake Site object."""
 #
 # (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests against a fake Site object."""
+
 from __future__ import annotations
 
 import unittest

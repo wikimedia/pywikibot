@@ -1,9 +1,10 @@
-"""Wikibase data type classes."""
 #
 # (C) Pywikibot team, 2013-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Wikibase data type classes."""
+
 from __future__ import annotations
 
 import abc

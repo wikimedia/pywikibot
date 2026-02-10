@@ -1,9 +1,10 @@
-"""Objects representing API interface to Wikibase site."""
 #
 # (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API interface to Wikibase site."""
+
 from __future__ import annotations
 
 import datetime

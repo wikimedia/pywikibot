@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of MIT license.
+#
 r"""Coordinate importing script.
 
 Usage:
@@ -41,11 +46,7 @@ The following command line parameters are supported:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of MIT license.
-#
+
 from __future__ import annotations
 
 import pywikibot
