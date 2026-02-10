@@ -1,13 +1,14 @@
-"""Iterator functions.
-
-.. note:: ``pairwise()`` function introduced in Python 3.10 is backported
-   in :mod:`backports`
-"""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Iterator functions.
+
+.. note:: ``pairwise()`` function introduced in Python 3.10 is backported
+   in :mod:`backports`
+"""
+
 from __future__ import annotations
 
 import collections

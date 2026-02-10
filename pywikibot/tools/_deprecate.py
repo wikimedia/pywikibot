@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Module providing deprecation decorators.
 
 Decorator functions without parameters are _invoked_ differently from
@@ -18,11 +23,7 @@ a deprecator without any arguments.
 .. versionchanged:: 6.4
    deprecation decorators moved to _deprecate submodule
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import collections

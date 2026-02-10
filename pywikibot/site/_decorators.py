@@ -1,9 +1,10 @@
-"""Decorators used by site models."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Decorators used by site models."""
+
 from __future__ import annotations
 
 import os

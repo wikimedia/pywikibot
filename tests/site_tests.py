@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for the site module."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the site module."""
+
 from __future__ import annotations
 
 import pickle

@@ -1,9 +1,10 @@
-"""Objects with site methods independent of the communication interface."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects with site methods independent of the communication interface."""
+
 from __future__ import annotations
 
 import functools
