@@ -1,9 +1,10 @@
-"""Objects representing MediaWiki families."""
 #
 # (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing MediaWiki families."""
+
 from __future__ import annotations
 
 import collections

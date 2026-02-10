@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Various i18n functions.
 
 Helper functions for both the internal localization system and for
@@ -14,11 +19,7 @@ The default message location may be changed by calling
 __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
-#
-# (C) Pywikibot team, 2004-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import json

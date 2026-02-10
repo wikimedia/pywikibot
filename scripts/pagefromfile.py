@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 r"""Bot to upload pages from a text file.
 
 This bot takes its input from the UTF-8 text file that contains a number
@@ -70,11 +75,7 @@ added between the existing and the new text. For example a parameter
 ``-appendtop:foo`` would add 'foo' between them. A new line can be added
 between them by specifying '\n' as a value.
 """
-#
-# (C) Pywikibot team, 2004-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import os
