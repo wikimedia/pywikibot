@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 r"""Append text to the top or bottom of a page.
 
 By default this adds the text to the bottom above the categories and
@@ -62,11 +67,7 @@ category:
    -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat
    -summary:"Bot: Aggiungo template Categorizzare"
 """
-#
-# (C) Pywikibot team, 2007-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import re
