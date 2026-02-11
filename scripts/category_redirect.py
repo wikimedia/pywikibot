@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot will move pages out of redirected categories.
 
 The bot will look for categories that are marked with a category
@@ -34,11 +39,6 @@ Usage:
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
 """
-#
-# (C) Pywikibot team, 2008-2023
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pickle

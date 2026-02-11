@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the Category class."""
 from __future__ import annotations
 
 import unittest

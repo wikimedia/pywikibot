@@ -1,9 +1,9 @@
-"""Interface of various types of MediaWiki pages."""
 #
-# (C) Pywikibot team, 2022-2023
+# (C) Pywikibot team, 2022-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Interface of various types of MediaWiki pages."""
 from __future__ import annotations
 
 from typing import Union

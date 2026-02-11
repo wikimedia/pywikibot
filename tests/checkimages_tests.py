@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Unit tests for checkimages script."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Unit tests for checkimages script."""
 from __future__ import annotations
 
 import unittest

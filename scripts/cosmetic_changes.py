@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
@@ -30,11 +35,6 @@ The following generators and filters are supported:
 
 For further information see pywikibot/cosmetic_changes.py
 """
-#
-# (C) Pywikibot team, 2006-2022
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot
