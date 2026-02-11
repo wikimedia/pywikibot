@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test add_text script."""
 #
 # (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test add_text script."""
+
 from __future__ import annotations
 
 import unittest

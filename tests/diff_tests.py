@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Test diff module."""
 #
 # (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
+"""Test diff module."""
+
 from __future__ import annotations
 
 import unittest

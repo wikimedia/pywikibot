@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for the eventstreams module."""
 #
 # (C) Pywikibot team, 2017-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the eventstreams module."""
+
 from __future__ import annotations
 
 import json

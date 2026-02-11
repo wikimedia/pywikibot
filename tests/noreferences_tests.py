@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test noreferences bot module."""
 #
 # (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test noreferences bot module."""
+
 from __future__ import annotations
 
 import unittest

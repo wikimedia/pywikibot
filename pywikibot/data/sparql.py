@@ -1,9 +1,10 @@
-"""SPARQL Query interface."""
 #
 # (C) Pywikibot team, 2016-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""SPARQL Query interface."""
+
 from __future__ import annotations
 
 from textwrap import fill

@@ -1,12 +1,13 @@
-"""Object representing interface to toolforge tools.
-
-.. versionadded:: 7.7
-"""
 #
 # (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Object representing interface to toolforge tools.
+
+.. versionadded:: 7.7
+"""
+
 from __future__ import annotations
 
 import collections

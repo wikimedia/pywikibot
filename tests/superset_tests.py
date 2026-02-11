@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Tests for superset module.
-
-.. versionadded:: 9.2
-"""
 #
 # (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for superset module.
+
+.. versionadded:: 9.2
+"""
+
 from __future__ import annotations
 
 import unittest

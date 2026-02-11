@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test generate_family_file script."""
 #
 # (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test generate_family_file script."""
+
 from __future__ import annotations
 
 import unittest

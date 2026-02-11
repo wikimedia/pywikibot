@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2024-2025
+#
+# Distributed under the terms of the MIT license.
+#
 """Script that adds new wikis to the codes set in Wikimedia family files.
 
 Usage:
@@ -23,11 +28,7 @@ Example:
    Multiple families can be given with one run. The difference is shown
    instead of the new list.
 """
-#
-# (C) Pywikibot team, 2024-2025
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import re

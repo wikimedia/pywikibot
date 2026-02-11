@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test generate_user_files script."""
 #
 # (C) Pywikibot team, 2018-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test generate_user_files script."""
+
 from __future__ import annotations
 
 import re

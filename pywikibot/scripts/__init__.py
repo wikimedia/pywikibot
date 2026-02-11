@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2021-2025
+#
+# Distributed under the terms of the MIT license.
+#
 """Folder which holds framework scripts.
 
 .. versionadded:: 7.0
@@ -5,11 +10,7 @@
    ``preload_sites`` script, previously added in release 6.0
    (:phab:`T226157`), was removed (:phab:`T348925`).
 """
-#
-# (C) Pywikibot team, 2021-2025
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 from os import environ, getenv

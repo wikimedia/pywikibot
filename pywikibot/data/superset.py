@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2024-2025
+#
+# Distributed under the terms of the MIT license.
+#
 """Superset Query interface.
 
 .. attention::
@@ -6,11 +11,7 @@
 
 .. versionadded:: 9.2
 """
-#
-# (C) Pywikibot team, 2024-2025
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 from http import HTTPStatus

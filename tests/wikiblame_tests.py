@@ -1,9 +1,10 @@
-"""Tests for the WikiHistoryMixin."""
 #
 # (C) Pywikibot team, 2022-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the WikiHistoryMixin."""
+
 from __future__ import annotations
 
 import re

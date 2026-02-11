@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2022-2025
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to create a new distribution.
 
 The following options are supported:
@@ -51,11 +56,7 @@ Usage::
 .. versionchanged:: 9.4
    The pywikibot-scripts distribution can be created.
 """
-#
-# (C) Pywikibot team, 2022-2025
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import abc

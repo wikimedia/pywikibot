@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test setup.py."""
 #
 # (C) Pywikibot team, 2024-2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test setup.py."""
+
 from __future__ import annotations
 
 import unittest
