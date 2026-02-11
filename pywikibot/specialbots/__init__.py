@@ -1,9 +1,10 @@
-"""Module containing special bots reusable by scripts."""
 #
 # (C) Pywikibot team, 2020-2022
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module containing special bots reusable by scripts."""
+
 from __future__ import annotations
 
 from pywikibot.specialbots._unlink import BaseUnlinkBot, InteractiveUnlink

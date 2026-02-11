@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for the weblinkchecker script."""
 #
 # (C) Pywikibot team, 2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the weblinkchecker script."""
+
 from __future__ import annotations
 
 import unittest

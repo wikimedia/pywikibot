@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-"""Pre-commit hook to set the leftmost copyright year.
-
-.. versionadded:: 10.3
-"""
 #
 # (C) Pywikibot team, 2025
 #
 # Distributed under the terms of the MIT license.
 #
+"""Pre-commit hook to set the leftmost copyright year.
+
+.. versionadded:: 10.3
+"""
+
 from __future__ import annotations
 
 import re

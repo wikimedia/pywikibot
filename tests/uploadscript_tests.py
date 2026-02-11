@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""upload.py script test."""
 #
 # (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
+"""upload.py script test."""
+
 from __future__ import annotations
 
 import unittest

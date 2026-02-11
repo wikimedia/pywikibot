@@ -1,12 +1,13 @@
-"""Configuration file for pytest.
-
-.. versionadded:: 10.3
-"""
 #
 # (C) Pywikibot team, 2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Configuration file for pytest.
+
+.. versionadded:: 10.3
+"""
+
 from __future__ import annotations
 
 import re

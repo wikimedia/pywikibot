@@ -1,12 +1,13 @@
-"""Abstract base user interface module.
-
-.. versionadded:: 6.2
-"""
 #
 # (C) Pywikibot team, 2021
 #
 # Distributed under the terms of the MIT license.
 #
+"""Abstract base user interface module.
+
+.. versionadded:: 6.2
+"""
+
 from __future__ import annotations
 
 import sys

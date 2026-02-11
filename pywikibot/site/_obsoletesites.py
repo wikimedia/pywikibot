@@ -1,9 +1,10 @@
-"""Objects representing obsolete MediaWiki sites."""
 #
 # (C) Pywikibot team, 2019-2022
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing obsolete MediaWiki sites."""
+
 from __future__ import annotations
 
 import pywikibot
