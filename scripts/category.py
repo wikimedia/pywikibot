@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to manage categories.
 
 Syntax:
@@ -152,11 +157,6 @@ are also in 'Pneumatics' category.
 .. versionchanged:: 8.0
    :mod:`pagegenerators` are supported with "move" and "remove" action.
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import math

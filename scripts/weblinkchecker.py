@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2005-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot is used for checking external links found at the wiki.
 
 It checks several pages at once, with a limit set by the config variable

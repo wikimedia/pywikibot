@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2005-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Allows access to the bot account's watchlist.
 
 The watchlist can be updated manually by running this script.
@@ -24,11 +29,6 @@ Command line options:
 .. versionchanged:: 7.7
    watchlist is retrieved in parallel tasks.
 """
-#
-# (C) Pywikibot team, 2005-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime

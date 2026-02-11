@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Delink removed files from wiki.
 
 This script keeps track of image deletions and delinks removed files
@@ -35,11 +40,6 @@ The following parameters are supported:
 .. versionchanged:: 9.4
    *-category* option was added.
 """
-#
-# (C) Pywikibot team, 2006-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import configparser

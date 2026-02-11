@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Module to daemonize the current process on POSIX systems.
 
 This module provides a function :func:`daemonize` to turn the current
@@ -49,11 +54,6 @@ Example usage:
        # This code only runs in the daemon process
        background_task()
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os

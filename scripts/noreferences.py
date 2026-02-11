@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script adds a missing references section to pages.
 
 It goes over multiple pages, searches for pages where <references />
@@ -27,11 +32,6 @@ namespace (using the -start) parameter, as that would consume too much
 bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

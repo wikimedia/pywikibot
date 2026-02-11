@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to determine the Pywikibot version (tag, revision and date).
 
 The following option is supported:
@@ -26,11 +31,6 @@ The following option is supported:
       ``True`` or to a custom UA string, or if
       *fake_user_agent_exceptions* is defined in the :mod:`config` file.
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os

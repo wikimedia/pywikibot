@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot resets a (user) sandbox with predefined text.
 
 This script understands the following command-line arguments:
@@ -43,11 +48,6 @@ For example:
 .. seealso:: :python:`Supported .ini File Structure
    <library/configparser.html#supported-ini-file-structure>`
 """
-#
-# (C) Pywikibot team, 2006-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime

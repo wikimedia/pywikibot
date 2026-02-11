@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to resolve double redirects, and to delete broken redirects.
 
 Requires access to MediaWiki's maintenance pages or to a XML dump file.
@@ -70,11 +75,6 @@ Furthermore the following options are provided:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime

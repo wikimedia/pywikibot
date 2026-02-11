@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to help a human solve disambiguations by presenting a set of options.
 
 Specify the disambiguation page on the command line.
@@ -72,11 +77,6 @@ To complete a move of a page, one can use:
 
     python pwb.py solve_disambiguation -just -pos:New_Name Old_Name
 """
-#
-# (C) Pywikibot team, 2003-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

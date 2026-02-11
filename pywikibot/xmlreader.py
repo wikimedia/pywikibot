@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2005-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """XML reading module.
 
 Each XmlEntry object represents a page, as read from an XML source
@@ -10,11 +15,6 @@ XmlEntry objects which can be used by other bots.
    *defusedxml* is used in favour of *xml.etree* if present to prevent
    vulnerable XML attacks. *defusedxml* 0.7.1 or higher is recommended.
 """
-#
-# (C) Pywikibot team, 2005-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

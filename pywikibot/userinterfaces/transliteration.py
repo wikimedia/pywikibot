@@ -1,9 +1,9 @@
-"""Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module to transliterate text."""
 from __future__ import annotations
 
 from pywikibot.tools import (
