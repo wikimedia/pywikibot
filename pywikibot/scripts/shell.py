@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Spawns an interactive Python shell and imports the pywikibot library.
 
 To exit the shell, type :kbd:`ctrl-D` (Linux) or :kbd:`ctrl-Z` (Windows)
@@ -16,10 +20,6 @@ Usage::
 .. versionchanged:: 7.0
    moved to pywikibot.scripts
 """
-# (C) Pywikibot team, 2014-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import code

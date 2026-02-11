@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Site upload test.
 
 These tests write to the wiki.
 """
-#
-# (C) Pywikibot team, 2014-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import unittest

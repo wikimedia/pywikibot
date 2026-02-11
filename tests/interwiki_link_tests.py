@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test Interwiki Link functionality."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test Interwiki Link functionality."""
 from __future__ import annotations
 
 import unittest

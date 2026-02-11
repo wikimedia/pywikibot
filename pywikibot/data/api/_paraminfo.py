@@ -1,9 +1,9 @@
-"""Object representing API parameter information."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Object representing API parameter information."""
 from __future__ import annotations
 
 from collections.abc import Container, Iterable, Sized

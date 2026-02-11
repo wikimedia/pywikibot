@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Maintenance scripts.
 
 .. versionremoved:: 3.0.20190430
@@ -13,10 +18,3 @@
    ``wikimedia_sites`` script was removed (:phab:`T78396`).
 """
 from __future__ import annotations
-
-
-#
-# (C) Pywikibot team, 2014-2025
-#
-# Distributed under the terms of the MIT license.
-#

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test for site detection."""
 from __future__ import annotations
 
 import os

@@ -1,9 +1,9 @@
-"""Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing WikiStats API."""
 from __future__ import annotations
 
 from csv import DictReader

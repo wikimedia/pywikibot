@@ -1,9 +1,9 @@
-"""Classes and functions for working with the Echo extension."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Classes and functions for working with the Echo extension."""
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""FilePage tests."""
 from __future__ import annotations
 
 import os
