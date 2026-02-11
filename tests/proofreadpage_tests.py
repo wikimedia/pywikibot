@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the proofreadpage module."""
 from __future__ import annotations
 
 import difflib

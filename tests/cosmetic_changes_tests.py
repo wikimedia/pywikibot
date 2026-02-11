@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test cosmetic_changes module."""
 from __future__ import annotations
 
 import unittest

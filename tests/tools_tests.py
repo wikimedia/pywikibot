@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
+"""Test tools package alone which don't fit into other tests."""
 from __future__ import annotations
 
 import decimal

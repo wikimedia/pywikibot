@@ -1,9 +1,9 @@
-"""Character based helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Character based helper functions (not wiki-dependent)."""
 from __future__ import annotations
 
 import re

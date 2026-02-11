@@ -1,3 +1,13 @@
+#
+# (C) Shawn M. Jones, Harihar Shankar, Herbert Van de Sompel.
+#     -- Los Alamos National Laboratory, 2013
+# Parts of MementoClient class codes are
+# licensed under the BSD open source software license.
+#
+# (C) Pywikibot team, 2015-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Fix ups for memento-client package version 0.6.1.
 
 .. versionadded:: 7.4
@@ -5,16 +15,6 @@
    Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
 .. seealso:: https://github.com/mementoweb/py-memento-client#readme
 """
-#
-# (C) Shawn M. Jones, Harihar Shankar, Herbert Van de Sompel.
-#     -- Los Alamos National Laboratory, 2013
-# Parts of MementoClient class codes are
-# licensed under the BSD open source software license.
-#
-# (C) Pywikibot team, 2015-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from datetime import datetime

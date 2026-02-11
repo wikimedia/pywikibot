@@ -1,9 +1,9 @@
-"""BasePage tests subclasses."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""BasePage tests subclasses."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
