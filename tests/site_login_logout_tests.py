@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2022-2024
+#
+# Distributed under the terms of the MIT license.
+#
 """Test for login and logout methods.
 
 These tests are separated from others because they should not be run in
 paralled CI test tasks. Any logout could lead other parallel tests to
 fail.
 """
-#
-# (C) Pywikibot team, 2022-2024
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import os

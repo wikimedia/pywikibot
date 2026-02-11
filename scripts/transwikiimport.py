@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2023-2024
+#
+# Distributed under the terms of the MIT license.
+#
 """This script transfers pages from a source wiki to a target wiki.
 
 It uses :api:`Import` and it is also able to copy the full edit history.
@@ -137,11 +142,7 @@ administrator, transwiki importer or importer.
 
 .. versionadded:: 8.2
 """
-#
-# (C) Pywikibot team, 2023-2024
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import pywikibot

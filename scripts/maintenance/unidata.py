@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2018-2024
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to update :mod:`pywikibot.tools._unidata`.
 
 This script is for updating ``_first_upper_exception_dict``.
@@ -9,11 +14,7 @@ This script is for updating ``_first_upper_exception_dict``.
 
 .. versionadded:: 8.4
 """
-#
-# (C) Pywikibot team, 2018-2024
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 from json import dump, load

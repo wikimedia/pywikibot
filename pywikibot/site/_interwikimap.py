@@ -1,9 +1,10 @@
-"""Objects representing interwiki map of MediaWiki site."""
 #
 # (C) Pywikibot team, 2015-2024
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing interwiki map of MediaWiki site."""
+
 from __future__ import annotations
 
 import pywikibot

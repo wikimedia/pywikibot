@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for fixes module."""
 #
 # (C) Pywikibot team, 2022-2024
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for fixes module."""
+
 from __future__ import annotations
 
 import sys

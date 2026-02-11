@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# (C) Pywikibot team, 2015-2024
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to handle interwiki links based on Wikibase.
 
 This script connects pages to Wikibase items using language links on the
@@ -30,10 +34,7 @@ Furthermore, the following command line parameters are supported:
    default.
 """
 
-# (C) Pywikibot team, 2015-2024
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import pywikibot

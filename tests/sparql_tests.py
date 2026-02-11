@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Test cases for the SPARQL API."""
 #
 # (C) Pywikibot team, 2016-2024
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test cases for the SPARQL API."""
+
 from __future__ import annotations
 
 import json

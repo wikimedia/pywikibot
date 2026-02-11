@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2017-2024
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot downloads dump from dumps.wikimedia.org.
 
 This script supports the following command line parameters:
@@ -15,11 +20,7 @@ This script supports the following command line parameters:
    within a settings file which is scripts.ini by default.
 .. versionadded:: 3.0.20180108
 """
-#
-# (C) Pywikibot team, 2017-2024
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import binascii
