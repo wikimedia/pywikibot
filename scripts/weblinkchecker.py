@@ -249,11 +249,13 @@ class LinkCheckThread(threading.Thread):
         self.page = page
         self.url = url
         self.history = history
+        # use preferred site encodings
+        encodings = ','.join(self.page.site.encodings())
         self.header = {
             'Accept': 'text/xml,application/xml,application/xhtml+xml,'
                       'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
-            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Accept-Charset': f'{encodings};q=0.8,*;q=0.7',
             'Keep-Alive': '30',
             'Connection': 'keep-alive',
         }
