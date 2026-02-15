@@ -12,7 +12,6 @@
 .. versionchanged:: 10.0
    This module is 'private'.
 """
-
 from __future__ import annotations
 
 import re

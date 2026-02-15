@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Base for terminal user interfaces."""
-
 from __future__ import annotations
 
 import getpass

@@ -34,7 +34,6 @@ Furthermore, the following command line parameters are supported:
    default.
 """
 
-
 from __future__ import annotations
 
 import pywikibot

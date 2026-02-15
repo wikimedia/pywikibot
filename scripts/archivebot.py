@@ -192,7 +192,6 @@ Version historty:
 .. versionchanged:: 11.0
    The ``-namespace`` option is now respected by ``-page`` option.
 """
-
 from __future__ import annotations
 
 import datetime

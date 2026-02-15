@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2024-2025
+# (C) Pywikibot team, 2024-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,7 +28,6 @@ Example:
    Multiple families can be given with one run. The difference is shown
    instead of the new list.
 """
-
 from __future__ import annotations
 
 import re

@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects representing MediaWiki families."""
-
 from __future__ import annotations
 
 import collections

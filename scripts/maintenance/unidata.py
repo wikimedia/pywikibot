@@ -14,7 +14,6 @@ This script is for updating ``_first_upper_exception_dict``.
 
 .. versionadded:: 8.4
 """
-
 from __future__ import annotations
 
 from json import dump, load

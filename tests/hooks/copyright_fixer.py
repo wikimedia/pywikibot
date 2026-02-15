@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -8,7 +8,6 @@
 
 .. versionadded:: 10.3
 """
-
 from __future__ import annotations
 
 import re

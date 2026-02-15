@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects representing API generators to MediaWiki site."""
-
 from __future__ import annotations
 
 import heapq

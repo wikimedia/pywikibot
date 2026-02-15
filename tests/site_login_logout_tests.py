@@ -10,7 +10,6 @@ These tests are separated from others because they should not be run in
 paralled CI test tasks. Any logout could lead other parallel tests to
 fail.
 """
-
 from __future__ import annotations
 
 import os

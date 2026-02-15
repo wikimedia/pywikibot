@@ -8,7 +8,6 @@
 .. note:: ``pairwise()`` function introduced in Python 3.10 is backported
    in :mod:`backports`
 """
-
 from __future__ import annotations
 
 import collections

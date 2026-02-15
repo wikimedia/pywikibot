@@ -29,7 +29,6 @@ The advantages of pwb.py wrapper script are:
 - find a script even if given script name does not match a filename e.g.
   due to spelling mistake
 """
-
 from __future__ import annotations
 
 from pathlib import Path

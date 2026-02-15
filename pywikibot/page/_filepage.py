@@ -10,7 +10,6 @@ This module includes objects:
 * FilePage: A subclass of Page representing a file description page
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
-
 from __future__ import annotations
 
 from collections.abc import Iterable

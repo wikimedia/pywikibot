@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Test cases for the SPARQL API."""
-
 from __future__ import annotations
 
 import json

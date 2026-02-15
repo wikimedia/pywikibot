@@ -12,7 +12,6 @@ This module also includes objects:
 * Property: a type of semantic data.
 * WikibaseEntity: base interface for Wikibase entities.
 """
-
 from __future__ import annotations
 
 import json as jsonlib

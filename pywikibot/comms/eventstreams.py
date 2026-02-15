@@ -15,7 +15,6 @@ This module requires requests-sse to be installed::
 .. versionchanged:: 10.0
    ``requests-sse`` package is required instead of ``sseclient``.
 """
-
 from __future__ import annotations
 
 import json

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2019-2022
+# (C) Pywikibot team, 2019-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Test echo module."""
-
 from __future__ import annotations
 
 import unittest

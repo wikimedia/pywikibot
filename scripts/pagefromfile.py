@@ -75,7 +75,6 @@ added between the existing and the new text. For example a parameter
 ``-appendtop:foo`` would add 'foo' between them. A new line can be added
 between them by specifying '\n' as a value.
 """
-
 from __future__ import annotations
 
 import os

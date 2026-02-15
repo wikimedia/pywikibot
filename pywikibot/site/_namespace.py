@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects representing Namespaces of MediaWiki site."""
-
 from __future__ import annotations
 
 from abc import ABCMeta

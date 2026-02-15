@@ -23,7 +23,6 @@ a deprecator without any arguments.
 .. versionchanged:: 6.4
    deprecation decorators moved to _deprecate submodule
 """
-
 from __future__ import annotations
 
 import collections

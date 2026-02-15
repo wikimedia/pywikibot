@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Tests against a fake Site object."""
-
 from __future__ import annotations
 
 import unittest

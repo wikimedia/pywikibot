@@ -14,7 +14,6 @@ OCR support of page scans via:
 
 .. seealso:: https://wikisource.org/wiki/Wikisource:Google_OCR
 """
-
 from __future__ import annotations
 
 import collections.abc

@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Tests for threading tools."""
-
 from __future__ import annotations
 
 import time

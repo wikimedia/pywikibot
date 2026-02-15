@@ -1,5 +1,5 @@
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -7,7 +7,6 @@
 
 .. versionadded:: 6.2
 """
-
 from __future__ import annotations
 
 import sys

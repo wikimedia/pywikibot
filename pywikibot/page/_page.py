@@ -13,7 +13,6 @@ various pages for Proofread Extensions are defined in
    :class:`pywikibot.Page` objects (defined here) represent the page
    itself, including its contents.
 """
-
 from __future__ import annotations
 
 import pywikibot

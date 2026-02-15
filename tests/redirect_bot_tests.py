@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2017-2025
+# (C) Pywikibot team, 2017-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Tests for the redirect.py script."""
-
 from __future__ import annotations
 
 import unittest

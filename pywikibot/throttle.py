@@ -14,7 +14,6 @@ shared control file ``throttle.ctrl``.
 It supports both read and write throttling, automatic adjustment based
 on the number of concurrent bot instances, and optional lag-aware delays.
 """
-
 from __future__ import annotations
 
 import hashlib

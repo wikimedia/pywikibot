@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects with site methods independent of the communication interface."""
-
 from __future__ import annotations
 
 import functools

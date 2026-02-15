@@ -20,7 +20,6 @@ This script supports the following command line parameters:
    within a settings file which is scripts.ini by default.
 .. versionadded:: 3.0.20180108
 """
-
 from __future__ import annotations
 
 import binascii

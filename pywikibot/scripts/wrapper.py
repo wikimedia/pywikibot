@@ -47,7 +47,6 @@ for tests to set the default site (see :phab:`T216825`)::
 .. versionchanged:: 9.4
    enable external scripts via entry points.
 """
-
 from __future__ import annotations
 
 import importlib.metadata

@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Tests for thanks-related code."""
-
 from __future__ import annotations
 
 import unittest

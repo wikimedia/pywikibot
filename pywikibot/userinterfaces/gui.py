@@ -16,7 +16,6 @@ Useful for editing the contents of an article.
 
 .. seealso:: :mod:`editor`
 """
-
 from __future__ import annotations
 
 import pywikibot

@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Utility to show pywikibot colors."""
-
 from __future__ import annotations
 
 import pywikibot

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2024
+# (C) Pywikibot team, 2024-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Test cases for the :mod:`version` module."""
-
 from __future__ import annotations
 
 import time

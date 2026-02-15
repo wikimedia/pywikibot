@@ -84,7 +84,6 @@ when :meth:`put_current` is used.
    :class:`NoRedirectPageBot` are deprecated. Use
    :attr:`use_redirects<BaseBot.use_redirects>` attribute instead.
 """
-
 from __future__ import annotations
 
 

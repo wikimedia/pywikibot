@@ -142,7 +142,6 @@ administrator, transwiki importer or importer.
 
 .. versionadded:: 8.2
 """
-
 from __future__ import annotations
 
 import pywikibot

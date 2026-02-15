@@ -10,7 +10,6 @@
    :class:`pywikibot.Page` objects represent the page itself, including
    its contents.
 """
-
 from __future__ import annotations
 
 import re

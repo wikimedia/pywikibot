@@ -15,7 +15,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 """Configuration file for Sphinx."""
-
 from __future__ import annotations
 
 # If extensions (or modules to document with autodoc) are in another directory,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2018-2025
+# (C) Pywikibot team, 2018-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,7 +27,6 @@ Furthermore, the following command line parameters are supported:
    within a settings file which is scripts.ini by default.
 .. versionadded:: 5.1
 """
-
 from __future__ import annotations
 
 import pywikibot

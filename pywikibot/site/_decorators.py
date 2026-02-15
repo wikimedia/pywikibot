@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Decorators used by site models."""
-
 from __future__ import annotations
 
 import os

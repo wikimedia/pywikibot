@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects representing MediaWiki log entries."""
-
 from __future__ import annotations
 
 import datetime

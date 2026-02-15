@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Functions for manipulating wiki-text."""
-
 from __future__ import annotations
 
 import itertools

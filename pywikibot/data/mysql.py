@@ -1,10 +1,9 @@
 #
-# (C) Pywikibot team, 2016-2025
+# (C) Pywikibot team, 2016-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Miscellaneous helper functions for mysql queries."""
-
 from __future__ import annotations
 
 import pywikibot

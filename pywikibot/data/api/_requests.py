@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Objects representing API requests."""
-
 from __future__ import annotations
 
 import datetime

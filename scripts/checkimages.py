@@ -79,7 +79,6 @@ take the right parameter:
 .. versionchanged:: 8.4
    Welcome messages are imported from :mod:`scripts.welcome` script.
 """
-
 from __future__ import annotations
 
 import collections

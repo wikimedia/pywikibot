@@ -1,5 +1,5 @@
 #
-# (C) Pywikibot team, 2022-2025
+# (C) Pywikibot team, 2022-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -7,7 +7,6 @@
 
 .. versionadded:: 7.7
 """
-
 from __future__ import annotations
 
 import collections

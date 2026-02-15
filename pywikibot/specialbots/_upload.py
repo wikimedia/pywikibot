@@ -7,7 +7,6 @@
 
 Do not import classes directly from here but from specialbots.
 """
-
 from __future__ import annotations
 
 import os

@@ -6,7 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Unit tests for tools.djvu.py."""
-
 from __future__ import annotations
 
 import os

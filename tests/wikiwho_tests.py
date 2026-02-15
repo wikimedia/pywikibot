@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Tests for WikiWhoMixin pickle subdirectory structure."""
-
 from __future__ import annotations
 
 import unittest

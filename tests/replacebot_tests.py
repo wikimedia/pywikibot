@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Tests for the replace script and ReplaceRobot class."""
-
 from __future__ import annotations
 
 import unittest

@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Miscellaneous helper functions (not wiki-dependent)."""
-
 from __future__ import annotations
 
 import abc

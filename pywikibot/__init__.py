@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """The initialization file for the Pywikibot framework."""
-
 from __future__ import annotations
 
 import atexit

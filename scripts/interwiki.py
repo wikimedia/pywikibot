@@ -354,7 +354,6 @@ To run the script on all pages on a language, run it with option
    The ``-localonly`` option now restricts page processing to the
    default site only, instead of the origin page.
 """
-
 from __future__ import annotations
 
 import os

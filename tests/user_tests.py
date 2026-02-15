@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2016-2025
+# (C) Pywikibot team, 2016-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Tests for the User page."""
-
 from __future__ import annotations
 
 import unittest

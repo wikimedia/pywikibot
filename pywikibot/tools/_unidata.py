@@ -1,10 +1,9 @@
 #
-# (C) Pywikibot team, 2018-2025
+# (C) Pywikibot team, 2018-2026
 #
 # Distributed under the terms of the MIT license.
 #
 """Helper function which holds data from unicodedata library."""
-
 from __future__ import annotations
 
 

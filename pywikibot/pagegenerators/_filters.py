@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Page filter generators provided by the pagegenerators module."""
-
 from __future__ import annotations
 
 import datetime

@@ -8,7 +8,6 @@
 .. note:: This module uses :mod:`userinterfaces.gui` and has dependencies
    from other partially external modules.
 """
-
 from __future__ import annotations
 
 import os

@@ -5,7 +5,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Test pwb.py."""
-
 from __future__ import annotations
 
 import io

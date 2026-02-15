@@ -175,7 +175,6 @@ using without adding or deleting.
 Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
 aren't badwords at all but can be used for some bad-nickname.
 """
-
 from __future__ import annotations
 
 import locale

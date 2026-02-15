@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Options and Choices for :py:meth:`pywikibot.input_choice`."""
-
 from __future__ import annotations
 
 import re

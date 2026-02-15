@@ -16,7 +16,6 @@ These parameters are supported to specify which pages titles to be used:
 
 &params;
 """
-
 from __future__ import annotations
 
 from collections.abc import Callable, Generator, Iterable

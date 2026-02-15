@@ -7,7 +7,6 @@
 
 .. versionadded:: 4.0
 """
-
 from __future__ import annotations
 
 from time import strftime

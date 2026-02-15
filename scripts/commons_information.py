@@ -63,7 +63,6 @@ Example for going through all files:
    accelerate script with preloading pages; use ``commons`` as default
    site; use transcluded pages of ``Information`` template.
 """
-
 from __future__ import annotations
 
 from textwrap import fill

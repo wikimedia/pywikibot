@@ -15,7 +15,6 @@
    Default ``PASS_BASENAME`` was changed from ``user-password.py`` to
    ``user-password.cfg``
 """
-
 from __future__ import annotations
 
 import os

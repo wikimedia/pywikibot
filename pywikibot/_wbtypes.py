@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Wikibase data type classes."""
-
 from __future__ import annotations
 
 import abc

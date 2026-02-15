@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Object representing a MediaWiki category page."""
-
 from __future__ import annotations
 
 from collections import defaultdict

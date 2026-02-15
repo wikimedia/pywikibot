@@ -46,7 +46,6 @@ The following parameters are supported:
 
 destination_wiki        destination wiki(s)
 """
-
 from __future__ import annotations
 
 import sys

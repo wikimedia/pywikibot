@@ -113,7 +113,6 @@ is already there:
 .. versionadded:: 7.5
    the -inverse option.
 """
-
 from __future__ import annotations
 
 import re

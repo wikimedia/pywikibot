@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# (C) Pywikibot team, 2022-2025
+# (C) Pywikibot team, 2022-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,7 +56,6 @@ Usage::
 .. versionchanged:: 9.4
    The pywikibot-scripts distribution can be created.
 """
-
 from __future__ import annotations
 
 import abc

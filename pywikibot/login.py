@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Library to log the bot in to a wiki account."""
-
 from __future__ import annotations
 
 import datetime

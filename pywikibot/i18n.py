@@ -19,7 +19,6 @@ The default message location may be changed by calling
 __init__.py, and a message bundle called 'pywikibot' containing messages.
 See :py:obj:`twtranslate` for more information on the messages.
 """
-
 from __future__ import annotations
 
 import json

@@ -29,7 +29,6 @@ To enable access via cookies, assign cookie handling class::
 .. versionchanged:: 8.0
    Cookies are lazy loaded when logging to site.
 """
-
 from __future__ import annotations
 
 import atexit
