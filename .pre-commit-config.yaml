@@ -93,10 +93,10 @@ repos:
         name: isort
         args:
           - -a from __future__ import annotations
-        exclude: ^(pwb|pywikibot/config)\.py$
+        exclude: ^pwb\.py$
       - id: isort
         name: isort (skip future annotations)
-        files: ^(pwb|pywikibot/config)\.py$
+        files: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
     rev: v0.78.0
     hooks:
