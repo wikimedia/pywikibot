@@ -23,8 +23,8 @@ from sys import maxunicode
 from threading import Thread
 
 from pywikibot import Site
-from pywikibot.comms.http import session
 from pywikibot.family import Family
+from pywikibot.tools._unidata import _first_upper_exception_dict
 
 
 NUMBER_OF_THREADS = 26
@@ -45,38 +45,39 @@ families_list = [
 
 def chars_uppers_wikilinks():
     """Retrieve upper chars from MediaWiki using page titles."""
-    n = 0
     chars = []
     uppers = []
-    wikilinks = ''
-    for i in range(maxunicode + 1):
+    wikilinks = []
+    for i in range(32, maxunicode + 1):
         c = chr(i)
         uc = c.upper()
-        if uc != c:
-            n += 1
+        if uc != c or c in _first_upper_exception_dict:
             chars.append(c)
             uppers.append(uc)
             # MediaWiki is first-letter case
-            wikilinks += '[[MediaWiki:' + c + ']]\n'
-    return chars, uppers, wikilinks
+            wikilinks.append(f'[[MediaWiki:{c}]]')
+    return chars, uppers, '\n'.join(wikilinks)
 
 
 def process_site(fam_name, site_code):
     """Process title for a single site."""
-    j = session.post(
-        f'https://{site_code}.{fam_name}.org/w/api.php?'
-        f'action=parse&contentmodel=wikitext&prop=text'
-        f'&format=json&utf8',
-        data={'text': wikilinks},
-        timeout=10,
-    ).json()
-    parsed_text = j['parse']['text']['*']
+    site = Site(site_code, fam_name)
+    result = site.simple_request(
+        action='parse',
+        text=wikilinks,
+        contentmodel='wikitext',
+        prop='text'
+    ).submit()
+
+    parsed_text = result['parse']['text']['*']
     titles = findall(r'title="[^:]*:(.)', parsed_text)
-    site_excepts = {}
-    for i, original_char in enumerate(chars):
-        title_char = titles[i]
-        if uppers[i] != title_char:
-            site_excepts[original_char] = title_char
+
+    site_excepts = {
+        orig: title
+        for orig, upper, title in zip(chars, uppers, titles)
+        if upper != title
+    }
+
     return site_excepts
 
 
@@ -162,4 +163,6 @@ if __name__ == '__main__':
     # families_excepts = load_json(FILEPATH)
     # main()
     # save_json(families_excepts, FILEPATH)
-    print(process_site('wiktionary', 'fr'))  # noqa: T201
+    mapping = process_site('wiktionary', 'fr')
+    print(len(mapping), 'entries found')  # noqa: T201
+    print(mapping)  # noqa: T201
