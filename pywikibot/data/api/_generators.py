@@ -5,7 +5,7 @@
    They are subclassed from :class:`tools.collections.GeneratorWrapper`
 """
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -481,19 +481,31 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
 
-        .. note:: this function will be removed when
-           :meth:`set_namespace` will throw TypeError() instead of just
-           giving a warning. See :phab:`T196619`.
+        .. versionadded:: 3.0.20190430
+        .. versionchanged:: 11.1
+           Return False if module has no prefix instead raising
+           AttributeError.
 
         :return: True if yes, False otherwise
         """
-        assert self.limited_module  # some modules do not have a prefix
+        if not self.limited_module:
+            return False  # some modules do not have a prefix
+
         return bool(
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
 
-    def set_namespace(self, namespaces) -> bool | None:
+    def set_namespace(self, namespaces) -> None:
         """Set a namespace filter on this query.
+
+        .. versionchanged:: 3.0.20190430
+           No longer raises TypeError if module does not support a
+           namespace parameter bug gives a FutureWarning. Return False
+           in that case.
+        .. versionchanged:: 11.1
+           Again raises TypeError if module does not support a namespace
+           parameter. Check it with :meth:`support_namespace` first.
+           No longer raises AttributeError if module has no prefix.
 
         :param namespaces: namespace identifiers to limit query results
         :type namespaces: iterable of str or Namespace key, or a single
@@ -501,35 +513,21 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             namespace identifiers. An empty iterator clears any
             namespace restriction.
         :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: module does not support a namespace parameter
+            or a namespace identifier has an inappropriate type such as
+            NoneType or bool, or more than one namespace if the API
+            module does not support multiple namespaces
         """
-        # TODO: T196619
-        # :raises TypeError: module does not support a namespace parameter
-        #    or a namespace identifier has an inappropriate
-        #    type such as NoneType or bool, or more than one namespace
-        #    if the API module does not support multiple namespaces
-        assert self.limited_module  # some modules do not have a prefix
+        if not self.support_namespace():
+            raise TypeError(f'{self.limited_module or self.modules} module'
+                            ' does not support a namespace parameter')
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
-        if not param:
-            pywikibot.warning(f'{self.limited_module} module does not support'
-                              ' a namespace parameter')
-            warn('set_namespace() will be modified to raise TypeError '
-                 'when namespace parameter is not supported. '
-                 'It will be a Breaking Change, please update your code '
-                 'ASAP, due date July, 31st 2019.', FutureWarning, 2)
-
-            # TODO: T196619
-            # raise TypeError('{} module does not support a namespace '
-            #                 'parameter'.format(self.limited_module))
-
-            return False
-
         if isinstance(namespaces, str):
             namespaces = namespaces.split('|')
 
         # Use Namespace id (int) here; Request will cast int to str
-        namespaces = [ns.id for ns in
-                      self.site.namespaces.resolve(namespaces)]
+        namespaces = [ns.id for ns in self.site.namespaces.resolve(namespaces)]
 
         if 'multi' not in param and len(namespaces) != 1:
             if self._check_result_namespace is NotImplemented:
@@ -542,8 +540,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             self.request[self.prefix + 'namespace'] = namespaces
         elif self.prefix + 'namespace' in self.request:
             del self.request[self.prefix + 'namespace']
-
-        return None
 
     def continue_update(self) -> None:
         """Update query with continue parameters.

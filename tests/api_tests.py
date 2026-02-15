@@ -29,6 +29,7 @@ SET_NAMESPACE_TYPE_MSG = (
     r'int\(\) argument must be a string, a bytes-like object '
     r"or (?:a real number|a number), not '?NoneType'?"
 )
+SET_NAMESPACE_MODULE = 'module does not support a namespace parameter'
 
 
 class TestApiFunctions(DefaultSiteTestCase):
@@ -464,7 +465,7 @@ class TestDryPageGenerator(TestCase):
         """Test PageGenerator set_namespace."""
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                    self.assertRaises(AssertionError):
+                 self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
                 self.gen.set_namespace(namespace)
 
 
@@ -621,17 +622,15 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
                                      parameters={'titles': 'test'})
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                    self.assertRaises(AssertionError):
+                    self.assertRaises(TypeError, ):
                 self.gen.set_namespace(namespace)
 
-    @suppress_warnings(
-        r'^set_namespace\(\) will be modified to raise TypeError*',
-        FutureWarning)
     def test_namespace_param_is_not_settable(self) -> None:
         """Test ListGenerator support_namespace."""
         self.gen = api.ListGenerator(listaction='querypage', site=self.site)
         self.assertFalse(self.gen.support_namespace())
-        self.assertFalse(self.gen.set_namespace([0, 1]))
+        with self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
+            self.gen.set_namespace([0, 1])
 
     def test_namespace_none(self) -> None:
         """Test ListGenerator set_namespace with None."""
