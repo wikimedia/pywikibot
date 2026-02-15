@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-r"""Bot to upload pages from a text file.
+"""Bot to upload pages from a text file.
 
 This bot takes its input from the UTF-8 text file that contains a number
 of pages to be put on the wiki. The pages should all have the same

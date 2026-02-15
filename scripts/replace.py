@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""This bot will make direct text replacements.
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""This bot will make direct text replacements.
 
 It will retrieve information on which pages might need changes either from
 an XML dump or a text file, or only change a single page.
@@ -108,7 +113,7 @@ Furthermore, the following command line parameters are supported:
     The First argument is the old text to be replaced, the second
     argument is the new text. If the ``-regex`` argument is given, the
     first argument will be regarded as a regular expression, and the
-    second argument might contain expressions like ``\1`` or ``\g<name>``.
+    second argument might contain expressions like ``\1`` or ``\\g<name>``.
     The second parameter can also be specified as empty string, usually
     ``""``. It is possible to introduce more than one pair of
     replacement parameters.
@@ -142,7 +147,7 @@ articles, e.g. Errror -> Error, use this:
 
 If you want to do more than one replacement at a time, use this:
 
-    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
+    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \\
     -namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs,
@@ -160,11 +165,6 @@ talk about HTTP, where the typo has become part of the standard:
 .. Please type "python pwb.py replace -help | more" if you can't read
    the top of the help.
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

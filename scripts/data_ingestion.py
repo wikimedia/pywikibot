@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""A generic bot to do data ingestion (batch uploas) of photos or other files.
+#
+# (C) Pywikibot team, 2012-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""A generic bot to do data ingestion (batch uploas) of photos or other files.
 
 In addition it installs related metadata. The uploading is primarily from a url
 to a wiki-site.
@@ -88,11 +93,6 @@ Example
 
 .. warning:: Put it in one line, otherwise it won't work correctly.
 """  # noqa: E501,W505
-#
-# (C) Pywikibot team, 2012-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import base64

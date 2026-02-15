@@ -4,18 +4,18 @@
 #
 # Distributed under the terms of MIT license.
 #
-r"""Template harvesting script.
+"""Template harvesting script.
 
 Usage (see below for explanations and examples):
 
-    python pwb.py harvest_template -transcludes:"..." \
-    [default optional arguments] template_parameter PID \
-    [local optional arguments] \
+    python pwb.py harvest_template -transcludes:"..." \\
+    [default optional arguments] template_parameter PID \\
+    [local optional arguments] \\
     [template_parameter PID [local optional arguments]]
 
-    python pwb.py harvest_template [generators] -template:"..." \
-    [default optional arguments] template_parameter PID \
-    [local optional arguments] \
+    python pwb.py harvest_template [generators] -template:"..." \\
+    [default optional arguments] template_parameter PID \\
+    [local optional arguments] \\
     [template_parameter PID [local optional arguments]]
 
 This will work on all pages that transclude the template in the article
@@ -57,27 +57,27 @@ The following command will try to import existing images from "image"
 parameter of "Infobox person" on English Wikipedia as Wikidata property
 "P18" (image):
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" image P18
 
 The following command will behave the same as the previous example and
 also try to import [[links]] from "birth_place" parameter of the same
 template as Wikidata property "P19" (place of birth):
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" image P18 birth_place P19
 
 The following command will import both "birth_place" and "death_place"
 params with -islink modifier, ie. the bot will try to import values,
 even if it doesn't find a [[link]]:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" -islink birth_place P19 death_place P20
 
 The following command will do the same but only "birth_place" can be
 imported without a link:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" birth_place P19 -islink death_place P20
 
 The following command will import an occupation from "occupation"
@@ -85,7 +85,7 @@ parameter of "Infobox person" on English Wikipedia as Wikidata property
 "P106" (occupation). The page won't be skipped if the item already has
 that property but there is not the new value:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" occupation P106 -exists:p
 
 The following command will import band members from the "current_members"
@@ -93,7 +93,7 @@ parameter of "Infobox musical artist" on English Wikipedia as Wikidata
 property "P527" (has part). This will only extract multiple band members
 if each is linked, and will not add duplicate claims for the same member:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox musical artist" current_members P527 -exists:p -multi
 
 The following command will import the category's main topic from the
@@ -103,7 +103,7 @@ imported, the inverse claim is imported to the topic item as Wikidata
 property "P910" (topic's main category) unless a claim of that property
 is already there:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:14 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:14 \\
     -template:"Cat main" 1 P301 -inverse:P910 -islink
 
 

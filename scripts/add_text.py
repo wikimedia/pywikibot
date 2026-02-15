@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-r"""Append text to the top or bottom of a page.
+"""Append text to the top or bottom of a page.
 
 By default this adds the text to the bottom above the categories and
 interwiki.
@@ -56,18 +56,17 @@ Add a template to the top of the pages with 'category:catname':
 .. code-block:: batch
 
    python pwb.py add_text -cat:catname -summary:"Bot: Adding a template"
-   -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
+   -text:"{{Something}}" -except:"\\{\\{([Tt]emplate:|)[Ss]omething" -up
 
 Command used on it.wikipedia to put the template in the page without any
 category:
 
 .. code-block:: batch
 
-   python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare"
+   python pwb.py add_text -except:"\\{\\{([Tt]emplate:|)[Cc]ategorizzare"
    -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat
    -summary:"Bot: Aggiungo template Categorizzare"
 """
-
 from __future__ import annotations
 
 import re

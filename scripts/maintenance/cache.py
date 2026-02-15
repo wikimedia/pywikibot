@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""This script runs commands on each entry in the API caches.
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""This script runs commands on each entry in the API caches.
 
 Syntax:
 
@@ -62,11 +67,6 @@ Available output commands:
 
     uniquedesc(entry)
 """
-#
-# (C) Pywikibot team, 2014-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime

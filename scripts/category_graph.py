@@ -4,7 +4,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-r"""Visualizes category hierarchy.
+"""Visualizes category hierarchy.
 
 Generates graphical representation in formats dot, svg and html5
 of category hierarchy.
@@ -43,14 +43,13 @@ Visualizes main category:
 
 Extended example with style settings:
 
-    pwb.py category_graph -from Life -downsize 1.5 \
-    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \
+    pwb.py category_graph -from Life -downsize 1.5 \\
+    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \\
     fillcolor=green] edge[style=dashed penwidth=3]'
 
 
 .. versionadded:: 8.0
 """
-
 from __future__ import annotations
 
 import argparse

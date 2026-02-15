@@ -40,7 +40,6 @@ and override its `callback` method. Here is a sample:
                 return bool(pattern.search(text))
             return False
 """
-
 from __future__ import annotations
 
 from collections.abc import Container
