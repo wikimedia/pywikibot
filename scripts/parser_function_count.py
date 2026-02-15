@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Used to find expensive templates that are subject to be converted to Lua.
 
 It counts parser functions and then orders templates by number of these
@@ -42,11 +47,6 @@ if atleast is used as well).
 Should you specify neither first nor atleast, all templates using parser
 functions will be listed.
 """
-#
-# (C) Pywikibot team, 2013-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

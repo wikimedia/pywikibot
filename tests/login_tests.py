@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2012-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Tests for LoginManager classes.
 
 e.g. used to test password-file based login.
 """
-#
-# (C) Pywikibot team, 2012-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import builtins

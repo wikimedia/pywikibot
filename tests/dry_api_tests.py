@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""API tests which do not interact with a site."""
 from __future__ import annotations
 
 import datetime

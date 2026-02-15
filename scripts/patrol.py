@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2011-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """The bot is meant to mark the edits based on info obtained by whitelist.
 
 This bot obtains a list of recent changes and newpages and marks the
@@ -39,11 +44,6 @@ Commandline parameters:
                    (default for any project except Wikipedia Projects)
 -usercontribs      Filter generators above to the given user
 """
-#
-# (C) Pywikibot team, 2011-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import time

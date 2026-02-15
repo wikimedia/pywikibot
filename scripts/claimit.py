@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """A script that adds claims to Wikidata items based on a list of pages.
 
 These command line parameters can be used to specify which pages to work on:
@@ -43,11 +48,6 @@ property and target and some qualifiers already exists:
 Note that the ordering of the letters in the 'exists' argument does not matter,
 but 'p' must be included.
 """
-#
-# (C) Pywikibot team, 2013-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

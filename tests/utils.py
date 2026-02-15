@@ -1,9 +1,9 @@
-"""Test utilities."""
 #
-# (C) Pywikibot team, 2013-2025
+# (C) Pywikibot team, 2013-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test utilities."""
 from __future__ import annotations
 
 import inspect

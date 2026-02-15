@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2010-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script generates a family file from a given URL.
 
 This script must be invoked with the pwb wrapper script/code entry point.
@@ -31,11 +36,6 @@ base directory.
 .. versionchanged:: 8.4
    If the url scheme is missing, ``https`` will be used.
 """
-#
-# (C) Pywikibot team, 2010-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

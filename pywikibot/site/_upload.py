@@ -1,9 +1,9 @@
-"""Objects representing API upload to MediaWiki sites."""
 #
-# (C) Pywikibot team, 2009-2025
+# (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API upload to MediaWiki sites."""
 from __future__ import annotations
 
 import mimetypes

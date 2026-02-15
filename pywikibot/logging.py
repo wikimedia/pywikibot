@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2010-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """User output/logging functions.
 
 Six output functions are defined. Each requires a ``msg`` argument
@@ -23,11 +28,6 @@ argument, which is a string indicating the debugging layer.
    - :pyhow:`Logging HOWTO<logging>`
    - :python:`Logging Cookbook<howto/logging-cookbook.html>`
 """
-#
-# (C) Pywikibot team, 2010-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 

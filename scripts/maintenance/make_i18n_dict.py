@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Generate an i18n file from a given script.
 
 Run IDLE at topmost level:
@@ -29,11 +34,6 @@ instantiating the bot. It also calls ``bot.run()`` to create the dictionaries:
 
 >>> bot.to_json()
 """
-#
-# (C) Pywikibot team, 2013-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import json
