@@ -196,6 +196,11 @@ class GeneratorFactory:
                 self.site.namespaces.resolve(self._namespaces))
         return self._namespaces
 
+    @namespaces.deleter
+    def namespaces(self) -> None:
+        """Deleter of namespaces property."""
+        self._namespaces = frozenset()
+
     def getCombinedGenerator(self,  # noqa: N802
                              gen: OPT_GENERATOR_TYPE = None,
                              preload: bool = False) -> OPT_GENERATOR_TYPE:
@@ -346,6 +351,11 @@ class GeneratorFactory:
                        gen_func: Callable | None = None) -> Any:
         """Return generator based on Category defined by category and gen_func.
 
+        .. versionchanged::11.1
+           *gen_func* is now called with the ``namespaces`` parameter
+           using the value from :attr:`namespaces`, because the namespace
+           option is prioritized in :meth:`handle_args`.
+
         :param category: Category name with start parameter
         :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
@@ -359,10 +369,17 @@ class GeneratorFactory:
 
         cat, startfrom = self.getCategory(category)
 
-        return gen_func(cat,
-                        start=startfrom,
-                        recurse=recurse,
-                        content=content)
+        ns = self.namespaces or None
+        # reset namespaces property to avoid filtering by getCombinedGenerator
+        del self.namespaces
+
+        return gen_func(
+            cat,
+            start=startfrom,
+            recurse=recurse,
+            content=content,
+            namespaces=ns
+        )
 
     @staticmethod
     def _parse_log_events(

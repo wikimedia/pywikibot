@@ -338,6 +338,7 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
                              ) -> Generator[pywikibot.page.Page]:
     """Yield all pages in a specific category.
 
+    :param category: The Category object to generate subcategories from
     :param recurse: If not False or 0, also iterate articles in
         subcategories. If an int, limit recursion to this number of
         levels, e.g. recurse=1 will iterate articles in first-level
@@ -348,6 +349,8 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
         all levels)
     :param content: If True, retrieve the content of the current version
         of each page (default False)
+    :param namespaces: List of namespaces to search in (default is None,
+        meaning all namespaces)
     """
     yield from category.articles(
         content=content,
@@ -358,13 +361,18 @@ def CategorizedPageGenerator(category: pywikibot.page.Category,
     )
 
 
-def SubCategoriesPageGenerator(category: pywikibot.page.Category,
-                               recurse: int | bool = False,
-                               start: str | None = None,
-                               total: int | None = None,
-                               content: bool = False,
-                               ) -> Generator[pywikibot.page.Page]:
+def SubCategoriesPageGenerator(
+    category: pywikibot.page.Category,
+    recurse: int | bool = False,
+    start: str | None = None,
+    total: int | None = None,
+    content: bool = False,
+    namespaces: NamespaceArgType = None,
+) -> Generator[pywikibot.page.Page]:
     """Yield all subcategories in a specific category.
+
+    .. versionchanged:: 11.1
+       *namespaces* parameter was added
 
     :param category: The Category object to generate subcategories from
     :param recurse: If not False or 0, also iterate articles in
@@ -377,10 +385,16 @@ def SubCategoriesPageGenerator(category: pywikibot.page.Category,
         all levels)
     :param content: If True, retrieve the content of the current version
         of each page (default False)
+    :param namespaces: List of namespaces to search in (default is None,
+        meaning all namespaces)
     """
-    return category.subcategories(recurse=recurse,
-                                  total=total, content=content,
-                                  startprefix=start)
+    return category.subcategories(
+        recurse=recurse,
+        total=total,
+        content=content,
+        startprefix=start,
+        namespaces=namespaces
+    )
 
 
 def LinkedPageGenerator(
