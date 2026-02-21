@@ -10,13 +10,22 @@ Useful for editing the contents of an article.
 .. note:: idlelib, tkinter and pillow modules are required.
 
 .. caution::
-   Pillow probably cannot be installed with GraalPy. PyPy 3.9 needs
-   Pillow 10.4.0, PyPy 3.10 needs Pillow 11.3.0. CPython and other
-   Python versions needs Pillow >= 10.4.0 to use this module.
+   Pillow may not be installable on GraalPy.
+   PyPy 3.9 needs Pillow 10.4.0, PyPy 3.10 needs Pillow 11.3.0.
+   CPython and other Python versions needs Pillow >= 11.3.0 to use this
+   module.
+
+.. danger::
+   Due to security vulnerability, use Pillow >= 12.1.1.
+   Requires PyPy >= 3.11 or CPython >= 3.10.
 
 .. seealso:: :mod:`editor`
 """
 from __future__ import annotations
+
+import pathlib
+
+from packaging.version import Version
 
 import pywikibot
 
@@ -508,16 +517,32 @@ class Tkdialog:
         self.description_scrollbar.grid(row=14, column=5)
 
     @staticmethod
-    def get_image(photo, width, height):
-        """Take the BytesIO object and build an imageTK thumbnail."""
+    def get_image(photo: str, width, height):
+        """Take the BytesIO object and build an imageTK thumbnail.
+
+        .. versionchanged:: 11.1
+           PSD files are not allowed for ``Pillow < 12.1.1``.
+
+        :raises ImportError: Pillow is not installed
+        :raises ValueError: if a PSD file is passed and Pillow < 12.1.1
+        """
         try:
-            from PIL import Image, ImageTk
+            from PIL import Image, ImageTk, __version__
         except ImportError:
             pywikibot.warning('This script requires ImageTk from the'
                               'Python Imaging Library (PIL).')
             raise
 
-        image = Image.open(photo)
+        path = pathlib.Path(photo)
+        pil_version = Version(__version__)
+        if pil_version < Version('12.1.1') and path.suffix.lower() == '.psd':
+            raise ValueError(
+                f'PSD files are not allowed with Pillow {pil_version} due to'
+                ' Pillow security advisory. Please update your Pillow and'
+                ' if necessary your Python.'
+            )
+
+        image = Image.open(path)
         image.thumbnail((width, height))
         return ImageTk.PhotoImage(image)
 

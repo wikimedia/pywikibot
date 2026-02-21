@@ -51,11 +51,11 @@ extra_deps = {
         'and python_version == "3.9"',
         'Pillow==11.3.0; platform_python_implementation == "PyPy" '
         'and python_version == "3.10"',
-        'Pillow==12.1.0; platform_python_implementation == "PyPy" '
+        'Pillow>=12.1.1; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
         'Pillow==11.3.0; platform_python_implementation == "CPython" '
         'and python_version == "3.9"',
-        'Pillow>=12.1.0; platform_python_implementation == "CPython" '
+        'Pillow>=12.1.1; platform_python_implementation == "CPython" '
         'and  python_version >= "3.10"',
     ],
     'mwoauth': [
