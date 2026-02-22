@@ -75,23 +75,23 @@ class TestDjVuFile(TestCase):
     def test_get_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test error is raised if djvu page number is out of range."""
         self.assertTrue(self.djvu.has_text())
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
             self.djvu.get_page(100)
 
     def test_get_not_existing_page(self) -> None:  # pragma: no cover
         """Test error is raised if djvu file has no text."""
-        self.assertFalse(self.djvu.has_text())
-        with self.assertRaises(ValueError):
-            self.djvu.get_page(1)
+        self.assertTrue(self.djvu.has_text())
+        with self.assertRaisesRegex(ValueError, 'Page 0 not in file'):
+            self.djvu.get_page(0)
 
     def test_whiten_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test djvu page cannot be whitend if page number is out of range."""
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
             self.djvu.whiten_page(100)
 
     def test_delete_not_existing_page_number(self) -> None:  # pragma: no cover
         """Test djvu page cannot be deleted if page number is out of range."""
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
             self.djvu.delete_page(100)
 
     def test_clear_cache(self) -> None:  # pragma: no cover
