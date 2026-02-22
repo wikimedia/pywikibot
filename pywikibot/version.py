@@ -193,10 +193,10 @@ def getversion_nightly(path: str | Path | None = None):
         - hash (git hash for the current revision)
     :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
-    file = Path(path or _get_program_dir())
-    if not path:
-        file /= 'pywikibot'  # pragma: no cover
-    file /= 'version'
+    folder = Path(path or _get_program_dir())
+    file = folder / 'version'
+    if not file.exists():
+        file = folder / 'pywikibot' / 'version'
 
     with file.open() as data:
         (tag, rev, date, hsh) = data.read().splitlines()
