@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+#
+# Created by modifying delete.py
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script can be used to protect and unprotect pages en masse.
 
 Of course, you will need an admin account on the relevant wiki.
@@ -53,13 +60,6 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 
     python pwb.py protect -file:unprotect.txt -unprotect -always
 """
-#
-# Created by modifying delete.py
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

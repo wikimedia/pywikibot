@@ -1,14 +1,14 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing API/Query generators.
 
 .. versionchanged:: 7.6
    All Objects were changed from Iterable object to a Generator object.
    They are subclassed from :class:`tools.collections.GeneratorWrapper`
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

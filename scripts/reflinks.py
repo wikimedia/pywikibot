@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Fetch and add titles for bare links in references.
 
 This bot will search for references which are only made of a link
@@ -45,10 +49,6 @@ The following generators and filters are supported:
 
 &params;
 """
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import http.client as httplib

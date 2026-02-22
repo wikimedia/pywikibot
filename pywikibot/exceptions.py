@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """**Pywikibot Exceptions** and warning classes.
 
 This module contains all exception and warning classes used throughout
@@ -171,11 +176,6 @@ UserWarning: warnings targeted at users
    ``Server414Error`` class is deprecated; use :class:`Client414Error`
    instead.
 """
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

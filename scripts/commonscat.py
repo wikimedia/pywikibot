@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+# Commonscat bot:
+#
+# Take a page. Follow the interwiki's and look for the commonscat template
+# *Found zero templates. Done.
+# *Found one template. Add this template
+# *Found more templates. Ask the user <- still have to implement this
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """With this tool you can add the template {{commonscat}} to categories.
 
 The tool works by following the interwiki links. If the template is
@@ -33,17 +44,6 @@ For example to go through all categories:
 
     python pwb.py commonscat -start:Category:!
 """
-# Commonscat bot:
-#
-# Take a page. Follow the interwiki's and look for the commonscat template
-# *Found zero templates. Done.
-# *Found one template. Add this template
-# *Found more templates. Ask the user <- still have to implement this
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

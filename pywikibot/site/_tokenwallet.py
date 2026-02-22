@@ -1,9 +1,9 @@
-"""Objects representing api tokens."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing api tokens."""
 from __future__ import annotations
 
 from collections.abc import Container

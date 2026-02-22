@@ -1,13 +1,13 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """File containing all standard fixes.
 
 .. versionremoved:: 11.0
    The ``yu-tld`` predefined fix was removed.
 """
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from pathlib import Path

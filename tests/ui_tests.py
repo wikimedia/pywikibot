@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the user interface."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the user interface."""
 from __future__ import annotations
 
 import io

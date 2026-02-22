@@ -1,9 +1,9 @@
-"""Objects representing site info data contents."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing site info data contents."""
 from __future__ import annotations
 
 import copy
