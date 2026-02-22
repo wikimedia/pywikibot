@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2009-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot goes over multiple pages of a wiki, and edits them without changes.
 
 This is for example used to get category links in templates working.
@@ -22,11 +27,6 @@ Command-line arguments:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2009-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from collections import defaultdict

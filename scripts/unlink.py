@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot unlinks a page on every page that links to it.
 
 This script understands this command-line argument:
@@ -27,11 +32,6 @@ descriptions:
 .. versionchanged:: 9.4
    script was recovered.
 """
-#
-# (C) Pywikibot team, 2007-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

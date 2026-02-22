@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script can be used to change one image to another or remove an image.
 
 Syntax:
@@ -37,11 +42,6 @@ obsolete:
 
     python pwb.py image Flag.jpg Flag.svg
 """
-#
-# (C) Pywikibot team, 2013-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

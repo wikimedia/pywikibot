@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
@@ -19,11 +24,6 @@ by default:
 
 -usertemplate:  [str] Use a custom template to warn the uploader.
 """
-#
-# (C) Pywikibot team, 2007-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

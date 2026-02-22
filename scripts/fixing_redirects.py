@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Correct all redirect links in featured pages or only one page of each wiki.
 
 Can be used with:
@@ -15,11 +20,6 @@ Can be used with:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2004-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

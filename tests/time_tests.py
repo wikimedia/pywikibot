@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the Timestamp class."""
 #
-# (C) Pywikibot team, 2014-2024
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the Timestamp class."""
 from __future__ import annotations
 
 import calendar

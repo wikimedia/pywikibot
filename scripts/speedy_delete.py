@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Help sysops to quickly check and/or delete pages listed for speedy deletion.
 
 This bot trawls through candidates for speedy deletion in a fast
@@ -20,11 +25,6 @@ it just to the first so many bytes.
 
 .. note:: This script currently only works for the Wikipedia project.
 """
-#
-# (C) Pywikibot team, 2007-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import time

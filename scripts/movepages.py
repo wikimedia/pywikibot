@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script can move pages.
 
 These command line parameters can be used to specify which pages to work
@@ -35,11 +40,6 @@ Furthermore, the following command line parameters are supported:
                 [[topage]] ... Argument can also be given as
                 ``-pairsfile:filename``
 """
-#
-# (C) Pywikibot team, 2006-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

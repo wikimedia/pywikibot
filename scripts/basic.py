@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """An incomplete sample script.
 
 This is not a complete bot; rather, it is a template from which simple
@@ -43,11 +48,6 @@ cannot be set by settings file:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2006-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

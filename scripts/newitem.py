@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script creates new items on Wikidata based on certain criteria.
 
 * When was the (Wikipedia) page created?
@@ -17,11 +22,6 @@ This script understands various command-line arguments:
                   Be careful, this option can trigger edit rates or captchas
                   if your account is not autoconfirmed.
 """
-#
-# (C) Pywikibot team, 2014-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from datetime import timedelta
