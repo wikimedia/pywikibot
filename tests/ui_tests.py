@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -412,7 +412,6 @@ class TestTransliteration(TestCase):
         self.assertEqual(self.t('ຫ'), 'h')
 
 
-# TODO: add tests for background colors.
 class FakeUITest(TestCase):
 
     """Test case to allow doing uncolorized general UI tests."""
@@ -493,6 +492,14 @@ class FakeUITest(TestCase):
             self.ui_obj._print('Hello <<red>>world you!\n',
                                self.ui_obj.stdout)
         self.assertEqual(f.getvalue(), self.expected + '\n')
+
+    def test_background_color(self) -> None:
+        """Test a string using both foreground and background colors."""
+        self._colors = (('red;yellow', 6), ('default', 10))
+        with redirect_stdout(self.redirect) as f:
+            self.ui_obj._print('Hello <<red;yellow>>world you!',
+                               self.ui_obj.stdout)
+        self.assertEqual(f.getvalue(), self.expected)
 
 
 class FakeUIColorizedTestBase(TestCase):
