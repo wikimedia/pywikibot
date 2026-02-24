@@ -31,6 +31,7 @@ class TestDjVuFile(TestCase):
 
     file_djvu_wo_text = join_djvu_data_path('myfile_wo_text.djvu')
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
+    err_msg = 'Page 100 not in file'
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -42,59 +43,62 @@ class TestDjVuFile(TestCase):
                                   stderr=subprocess.PIPE)
             dp.communicate()
 
-    def setUp(self) -> None:  # pragma: no cover
+    def setUp(self) -> None:
         """Set up test."""
         super().setUp()
         self.djvu = DjVuFile(file_djvu)
 
-    def test_number_of_images(self) -> None:  # pragma: no cover
+    def test_number_of_images(self) -> None:
         """Test page number generator."""
         self.assertEqual(self.djvu.number_of_images(), 4)
 
-    def test_page_info(self) -> None:  # pragma: no cover
+    def test_page_info(self) -> None:
         """Test page info retrieval."""
         self.assertEqual(self.djvu.page_info(1),
                          ('{myfile.djvu}', ('1092x221', 600)))
 
-    def test_get_most_common_info(self) -> None:  # pragma: no cover
+    def test_get_most_common_info(self) -> None:
         """Test that most common (size, dpi) are returned."""
         self.assertEqual(self.djvu.get_most_common_info(), ('1092x221', 600))
 
-    def test_has_text(self) -> None:  # pragma: no cover
+    def test_has_text(self) -> None:
         """Test if djvu file contains text."""
         self.assertTrue(self.djvu.has_text())
         djvu = DjVuFile(self.file_djvu_wo_text)
         self.assertFalse(djvu.has_text())
 
-    def test_get_existing_page_number(self) -> None:  # pragma: no cover
+    def test_get_existing_page_number(self) -> None:
         """Test text is returned for existing page number."""
         self.assertTrue(self.djvu.has_text())
         txt = self.djvu.get_page(1)
         self.assertEqual(txt, self.test_txt)
 
-    def test_get_not_existing_page_number(self) -> None:  # pragma: no cover
+    def test_get_not_existing_page_number(self) -> None:
         """Test error is raised if djvu page number is out of range."""
         self.assertTrue(self.djvu.has_text())
-        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
+        with self.assertRaisesRegex(ValueError, self.err_msg):
             self.djvu.get_page(100)
 
-    def test_get_not_existing_page(self) -> None:  # pragma: no cover
+    def test_get_not_existing_page(self) -> None:
         """Test error is raised if djvu file has no text."""
-        self.assertTrue(self.djvu.has_text())
-        with self.assertRaisesRegex(ValueError, 'Page 0 not in file'):
-            self.djvu.get_page(0)
+        djvu = DjVuFile(self.file_djvu_wo_text)
+        self.assertFalse(djvu.has_text())
+        with self.assertRaisesRegex(
+            ValueError,
+                f'Djvu file {self.file_djvu_wo_text} has no text layer'):
+            djvu.get_page(1)
 
-    def test_whiten_not_existing_page_number(self) -> None:  # pragma: no cover
+    def test_whiten_not_existing_page_number(self) -> None:
         """Test djvu page cannot be whitend if page number is out of range."""
-        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
+        with self.assertRaisesRegex(ValueError, self.err_msg):
             self.djvu.whiten_page(100)
 
-    def test_delete_not_existing_page_number(self) -> None:  # pragma: no cover
+    def test_delete_not_existing_page_number(self) -> None:
         """Test djvu page cannot be deleted if page number is out of range."""
-        with self.assertRaisesRegex(ValueError, 'Page 100 not in file'):
+        with self.assertRaisesRegex(ValueError, self.err_msg):
             self.djvu.delete_page(100)
 
-    def test_clear_cache(self) -> None:  # pragma: no cover
+    def test_clear_cache(self) -> None:
         """Test if djvu file contains text."""
         self.assertTrue(self.djvu.has_text())
         self.djvu._has_text = False
