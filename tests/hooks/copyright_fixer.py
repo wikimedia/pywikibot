@@ -37,6 +37,11 @@ def get_patched_files():
         subprocess.check_output(diff_cmd + ['--staged'], encoding='utf-8')
     )
     captures.append(
+        subprocess.check_output(
+            diff_cmd + ['HEAD~1', 'HEAD'], encoding='utf-8'
+        )
+    )
+    captures.append(
         subprocess.check_output(show_cmd + ['HEAD'], encoding='utf-8')
     )
     return {Path(path) for capture in captures for path in capture.splitlines()
