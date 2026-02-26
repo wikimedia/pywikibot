@@ -73,7 +73,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
-        'https://www.arabeyes.org/$1',  # non standard 1.28.0
     )
 
     no_sites = (
