@@ -107,11 +107,6 @@ Loads all wiki pages where dead links were found during a prior run:
 
     python pwb.py weblinkchecker -repeat
 """
-#
-# (C) Pywikibot team, 2005-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pickle
