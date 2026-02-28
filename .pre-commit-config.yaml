@@ -63,7 +63,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.2
+    rev: v0.15.4
     hooks:
       - id: ruff-check
         alias: ruff
@@ -87,7 +87,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
         name: isort
@@ -98,7 +98,7 @@ repos:
         name: isort (skip future annotations)
         files: ^pwb\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.78.0
+    rev: v0.79.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
