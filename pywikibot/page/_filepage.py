@@ -413,6 +413,12 @@ class FilePage(Page):
         path = path.with_suffix(Path(urlparse(url).path).suffix)
         # adjust user path
         path = path.expanduser()
+        # use read throttle per Wikitech robot policy for download (T418672)
+        # multiply minthrottle by 25 to get an functional delay
+        self.site.throttle.set_delays(delay=25 * self.site.throttle.delay)
+        self.site.throttle()
+        self.site.throttle.set_delays()
+
         req = http.fetch(url, stream=True)
         if req.status_code == HTTPStatus.OK:
             with open(path, 'wb') as f:
