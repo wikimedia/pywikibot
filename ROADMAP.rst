@@ -1,6 +1,11 @@
-Release 11.1 (in development)
-=============================
-* (no changes yet)
+Release 11.1
+============
+
+* Add *namespaces* parameter to :func:`pagegenerators.SubCategoriesPageGenerator` (:phab:`T417961`)
+* Fix nightly package version detection in :meth:`version.getversion_nightly`
+* Remove warning in :attr:`data.api.QueryGenerator.set_namespace` (:phab:`T196619`, :phab:`T198452`)
+* Prefer Pillow 12.1.1 or above due to security vulnerability (:phab:`T418046`)
+* Updated localization (L10N) files.
 
 
 Deprecations

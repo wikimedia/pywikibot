@@ -1,6 +1,15 @@
 Scripts Changelog
 =================
 
+11.1.0
+------
+
+weblinkchecker
+^^^^^^^^^^^^^^
+
+* Use preferred site encodings for Accept-Charset (:phab:`T417142`)
+* Fix i18n message key (:phab:`T416785`)
+
 11.0.0
 ------
 
