@@ -33,7 +33,40 @@ from pywikibot.tools import (
 
 class BaseSite(ComparableMixin):
 
-    """Site methods that are independent of the communication interface."""
+    """Site methods that are independent of the communication interface.
+
+    .. hint::
+       :class:`BaseSite` delegates undefined method calls to the
+       corresponing :class:`family.Family` object by its
+       :meth:`__getattr__` method. The working method is described below.
+
+       Only public Family instance methods are delegated. A method is
+       considered delegatable if:
+
+       - it is a bound instance method of Family,
+       - it is public (name does not start with '_'),
+       - its first logical parameter is *code*.
+
+       .. note::
+          For performance reasons, the method signature is inspected
+          via the method's ``__code__`` object instead of
+          ``inspect.signature()``. This avoids expensive generic
+          introspection in this hot path and is safe because Family
+          methods are guaranteed to be pure Python.
+
+       .. versionchanged:: 9.0
+          Only delegate to public Family methods which have ``code`` as
+          first parameter.
+       .. versionchanged:: 11.0
+          Use direct ``__code__`` inspection instead of
+          ``inspect.signature()`` to significantly improve attribute
+          access performance.
+       .. versionchanged:: 11.1
+          :meth:`__getattr__` raises NotImplementedError instead of
+          AttributeError if a Family method or attribute exists but
+          cannot be delegated. This can happen if *name* is not a method
+          or the first parameter is not *code*.
+    """
 
     def __init__(self, code: str, fam=None, user: str | None = None) -> None:
         """Initializer.
@@ -181,32 +214,14 @@ class BaseSite(ComparableMixin):
         return self._username
 
     def __getattr__(self, name: str):
-        """Delegate undefined methods calls to the Family object.
-
-        Only public :class:`Family instance methods are delegated.
-
-        A method is considered delegatable if:
-        - it is a bound instance method of Family,
-        - it is public (name does not start with '_'),
-        - its first logical parameter is *code*.
-
-        .. note::
-           For performance reasons, the method signature is inspected
-           via the method's ``__code__`` object instead of
-           ``inspect.signature()``. This avoids expensive generic
-           introspection in this hot path and is safe because Family
-           methods are guaranteed to be pure Python.
-
-        .. versionchanged:: 9.0
-           Only delegate to public Family methods which have ``code`` as
-           first parameter.
-        .. versionchanged:: 11.0
-           Use direct ``__code__`` inspection instead of
-           ``inspect.signature()`` to significantly improve attribute
-           access performance.
-        """
+        """Delegate undefined methods calls to the Family object."""
+        # See description in BaseSite class documentation
+        msg = f'{type(self).__name__} instance has no attribute {name!r}'
         if not name.startswith('_'):
             obj = getattr(self.family, name, None)
+            if not obj:
+                raise AttributeError(msg) from None
+
             if inspect.ismethod(obj):
                 code = obj.__code__
                 params = code.co_varnames[:code.co_argcount]
@@ -216,8 +231,13 @@ class BaseSite(ComparableMixin):
                         method.__doc__ = obj.__doc__
                     return method
 
-        raise AttributeError(f'{type(self).__name__} instance has no '
-                             f'attribute {name!r}') from None
+            raise NotImplementedError(
+                f"'{name}()' method of {type(self).__name__} is not "
+                f'implemented. Maybe the {self.family}_family.py family file'
+                ' is malformed'
+            ) from None
+
+        raise AttributeError(msg) from None
 
     def __str__(self) -> str:
         """Return string representing this Site's name and code."""
