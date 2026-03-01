@@ -82,6 +82,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install wikitextparser
       - name: Install DjVuLibre
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y djvulibre-bin
