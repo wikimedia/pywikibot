@@ -20,8 +20,20 @@ from pywikibot.tools import SPHINX_RUNNING
 try:
     import pytest
 except ModuleNotFoundError:
-    pytest = None
+    if SPHINX_RUNNING:
 
+        class _DummyPytest:
+
+            def fixture(self, *args, **kwargs):
+
+                def wrapper(func):
+                    return func
+
+                return wrapper
+
+        pytest = _DummyPytest()
+    else:
+        pytest = None
 
 EXCLUDE_PATTERN = re.compile(
     r'(?:'
@@ -91,7 +103,7 @@ def pytest_addoption(parser) -> None:
     )
 
 
-if pytest or SPHINX_RUNNING:
+if pytest:
 
     @pytest.fixture(autouse=True)
     def pause_between_doctests(request) -> None:
