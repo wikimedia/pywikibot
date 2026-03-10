@@ -112,7 +112,6 @@ repos:
         additional_dependencies:
           # Due to incompatibilities between packages the order matters.
           - flake8-bugbear>=24.12.12
-          - flake8-mock-x2
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
