@@ -164,20 +164,19 @@ class TemplateRobot(ReplaceBot):
         replacements = []
         exceptions = {}
         builder = textlib.MultiTemplateMatchBuilder(self.site)
+        inside_tags_exceptions = ['ref', 'gallery', 'poem', 'pagelist']
         for old, new in self.templates.items():
             template_regex = builder.pattern(old)
 
             if self.opt.subst and self.opt.remove:
                 replacements.append((template_regex,
                                      r'{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
-                                             'pagelist', ]
+                exceptions['inside-tags'] = inside_tags_exceptions
             elif self.opt.subst:
                 replacements.append(
                     (template_regex, r'{{%s:%s\g<parameters>}}' %
                      (self.opt.subst, old)))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
-                                             'pagelist', ]
+                exceptions['inside-tags'] = inside_tags_exceptions
             elif self.opt.remove:
                 separate_line_regex = re.compile(
                     fr'^[*#:]* *{template_regex.pattern} *\n',

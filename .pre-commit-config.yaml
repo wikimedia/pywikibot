@@ -114,7 +114,6 @@ repos:
           - flake8-bugbear>=24.12.12
           - flake8-mock-x2
           - flake8-print>=5.0.0
-          - flake8-tuple>=0.4.1
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
