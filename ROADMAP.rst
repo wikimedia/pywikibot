@@ -108,5 +108,5 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
-* Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
+* 11.0.0: Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
   Positional parameters for *by_letter* and *replace_invisible* are deprecated.
