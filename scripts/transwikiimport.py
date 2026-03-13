@@ -140,7 +140,7 @@ For transwikiimport script and even to access the ``Special:Import``
 page the appropriate flag on the account must be set, usually
 administrator, transwiki importer or importer.
 
-.. versionadded:: 8.2
+.. version-added:: 8.2
 """
 from __future__ import annotations
 

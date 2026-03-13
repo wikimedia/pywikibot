@@ -122,7 +122,7 @@ class TagAttr:
     >>> a.value
     'A123'
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     def __init__(self, attr, value) -> None:
@@ -173,8 +173,8 @@ class TagAttrDesc:
     to a single attribute value via a WeakKeyDictionary to store
     per-instance da
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 11.0
+    .. version-added:: 8.0
+    .. version-changed:: 11.0
        Never use None as key in WeakKeyDictionary. Class-level access
        returns the descriptor itself.
     """
@@ -189,7 +189,7 @@ class TagAttrDesc:
     def __get__(self, obj, objtype=None):
         """Retrieve the value of the attribute for a given instance.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            If *obj* is None (e.g., when accessed via the class rather
            than an instance), return the descriptor itself instead of
            attempting to use None as a key in the WeakKeyDictionary.
@@ -279,8 +279,8 @@ class PagesTagParser(collections.abc.Container):
     >>> 'step' in tp
     False
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 8.1
+    .. version-added:: 8.0
+    .. version-changed:: 8.1
        *text* parameter is defaulted to ``'<pages />'``.
     """
 
@@ -827,7 +827,7 @@ class ProofreadPage(pywikibot.Page):
     def _url_image_lt_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         :return: File url of the scan ProofreadPage or None.
 
@@ -864,7 +864,7 @@ class ProofreadPage(pywikibot.Page):
     def _url_image_ge_140(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         :return: File url of the scan of ProofreadPage or None.
         :raises ValueError: In case of no image found for scan
@@ -995,9 +995,9 @@ class ProofreadPage(pywikibot.Page):
         .. warning:: It is the user's responsibility to reset quality
            level accordingly.
 
-        .. versionchanged:: 9.2
+        .. version-changed:: 9.2
            default for *ocr_tool* is `wmfOCR`.
-        .. versionremoved:: 9.2
+        .. version-removed:: 9.2
            `phetools` support is not available anymore.
 
         :param ocr_tool: Either 'wmfOCR' or 'googleOCR'; default is 'wmfOCR'
@@ -1284,7 +1284,7 @@ class IndexPage(pywikibot.Page):
 
         Range is [start ... end], extremes included.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            The *content* parameter was removed
 
         :param start: First page, defaults to 1

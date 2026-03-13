@@ -520,7 +520,7 @@ class Tkdialog:
     def get_image(photo: str, width, height):
         """Take the BytesIO object and build an imageTK thumbnail.
 
-        .. versionchanged:: 11.1
+        .. version-changed:: 11.1
            PSD files are not allowed for ``Pillow < 12.1.1``.
 
         :raises ImportError: Pillow is not installed

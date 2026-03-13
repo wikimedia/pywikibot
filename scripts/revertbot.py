@@ -101,7 +101,7 @@ class BaseRevertBot(OptionHandler):
     def local_timestamp(self, ts) -> str:
         """Convert Timestamp to a localized timestamp string.
 
-        .. versionadded:: 7.0
+        .. version-added:: 7.0
         """
         year = formatYear(self.site.lang, ts.year)
         date = format_date(ts.month, ts.day, self.site)

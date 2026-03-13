@@ -6,7 +6,7 @@
 #
 """PWB caller script to invoke the :mod:`pywikibot.scripts.wrapper` script.
 
-.. versionadded:: 8.0
+.. version-added:: 8.0
 """
 import runpy
 import sys

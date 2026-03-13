@@ -59,7 +59,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     """The bot for interwiki.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        IWBot is a ConfigParserBot
     """
 

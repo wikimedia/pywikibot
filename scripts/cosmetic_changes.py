@@ -71,7 +71,7 @@ class CosmeticChangesBot(AutomaticTWSummaryBot, ExistingPageBot):
     def treat_page(self) -> None:
         """Treat page with the cosmetic toolkit.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            skip if InvalidPageError is raised
         """
         cc_toolkit = CosmeticChangesToolkit(self.current_page,

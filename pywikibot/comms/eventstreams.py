@@ -11,8 +11,8 @@ This module requires requests-sse to be installed::
 
     pip install "requests-sse>=0.5.0"
 
-.. versionadded:: 3.0
-.. versionchanged:: 10.0
+.. version-added:: 3.0
+.. version-changed:: 10.0
    ``requests-sse`` package is required instead of ``sseclient``.
 """
 from __future__ import annotations
@@ -111,9 +111,9 @@ class EventStreams(GeneratorWrapper):
      'wiki': 'wikidatawiki'}
     >>> del stream
 
-    .. versionchanged:: 7.6
+    .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`.
-    .. versionchanged:: 10.0
+    .. version-changed:: 10.0
        *retry* value is doubled for each consecutive connect try.
     """
 
@@ -136,7 +136,7 @@ class EventStreams(GeneratorWrapper):
             by including a 'retry' line in a message. Retries are handled
             automatically.
 
-            .. versionchanged:: 10.0
+            .. version-changed:: 10.0
                5 seconds are used instead of 3 seconds as default.
 
         :keyword pywikibot.Timestamp | str since: a timestamp for older
@@ -169,7 +169,7 @@ class EventStreams(GeneratorWrapper):
         :keyword int chunk_size: [*requests*] A maximum size of the chunk
             for chunk-encoded requests.
 
-            .. versionchanged:: 10.0
+            .. version-changed:: 10.0
                None is used instead of 1024 as default value.
 
         :param kwargs: Other keyword arguments passed to `requests_sse`
@@ -374,7 +374,7 @@ class EventStreams(GeneratorWrapper):
     def generator(self):
         """Inner generator.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            changed from iterator method to generator property
         """
         n = 0

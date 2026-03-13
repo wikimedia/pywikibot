@@ -5,7 +5,7 @@
 #
 """Object representing interface to toolforge tools.
 
-.. versionadded:: 7.7
+.. version-added:: 7.7
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ class WikiBlameMixin:
 
     """Page mixin for main authorship.
 
-    .. versionadded:: 7.7
+    .. version-added:: 7.7
     """
 
     #: Supported wikipedia site codes
@@ -63,7 +63,7 @@ class WikiBlameMixin:
         >>> auth.most_common(1)
         [('DrTrigon', 37)]
 
-        .. deprecated:: 9.3
+        .. version-deprecated:: 9.3
            use :meth:`authorship` instead.
         .. seealso:: :meth:`authorship` for further informations
 
@@ -103,10 +103,10 @@ class WikiBlameMixin:
         .. important:: Only implemented for pages in Main, Project,
            Category and Template namespaces and only wikipedias of
            :attr:`WIKIBLAME_CODES` are supported.
-        .. versionadded:: 9.3
+        .. version-added:: 9.3
            XTools is used to retrieve authors. This method replaces
            :meth:`main_authors`.
-        .. versionchanged:: 10.1
+        .. version-changed:: 10.1
            WikiHistory is used to retrieve authors due to :phab:`T392694`.
 
         Here are the differences between these two implementations:
@@ -115,7 +115,7 @@ class WikiBlameMixin:
 
            .. tab:: WikiHistory
 
-              .. versionadded:: 10.1
+              .. version-added:: 10.1
 
               - Implemented from version 7.7 until 9.2 (with
                 :meth:`main_authors` method) and from 10.1.
@@ -135,7 +135,7 @@ class WikiBlameMixin:
 
            .. tab:: XTools
 
-              .. versionremoved:: 10.1
+              .. version-removed:: 10.1
 
               - Implemented from version 9.3 until 10.0.
               - Only Main namespace is supported.
@@ -221,7 +221,7 @@ class WikiWhoMixin:
     This implementation uses an optimized subdirectory structure for pickle
     caching to avoid filesystem performance issues with millions of files.
 
-    .. versionadded:: 11.0
+    .. version-added:: 11.0
     """
 
     #: Supported WikiWho API language codes
@@ -233,7 +233,7 @@ class WikiWhoMixin:
     def _check_wikiwho_supported(self) -> None:
         """Check if WikiWho API is supported.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
 
         :raise NotImplementedError: unsupported site, language, or namespace
         :raise NoPageError: page does not exist
@@ -256,7 +256,7 @@ class WikiWhoMixin:
     def _build_wikiwho_url(self, endpoint: str) -> str:
         """Build WikiWho API URL for the given endpoint.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
 
         :param endpoint: API endpoint (all_content, rev_content,
             edit_persistence)
@@ -288,7 +288,7 @@ class WikiWhoMixin:
 
         .. important:: Only implemented for main namespace pages and only
            Wikipedias of :attr:`WIKIWHO_CODES` are supported.
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
         .. seealso::
            - https://wikiwho-api.wmcloud.org
            - https://www.mediawiki.org/wiki/WikiWho
@@ -359,7 +359,7 @@ class WikiWhoMixin:
 
         This reduces files per directory from ~7M to ~7K for large wikis.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
 
         :param lang: Language code (e.g., 'en', 'de', 'fi')
         :param page_id: Wikipedia page ID

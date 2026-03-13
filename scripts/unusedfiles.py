@@ -76,7 +76,7 @@ class UnusedFilesBot(SingleSiteBot,
 
     """Unused files bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        UnusedFilesBot is a ConfigParserBot
     """
 

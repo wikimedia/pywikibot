@@ -37,15 +37,15 @@
                 aliases['yue'] = 'zh-yue'
                 cls.code_aliases = aliases
 
-         .. versionadded:: 8.3
+         .. version-added:: 8.3
 
       .. method:: nicepath(code)
 
          Return nice path prefix, e.g. `'/wiki/'`.
 
-         .. deprecated:: 2.0
+         .. version-deprecated:: 2.0
             Use :meth:`APISite.articlepath<pywikibot.site._apisite.APISite.articlepath>` instead.
-         .. versionremoved:: 5.4
+         .. version-removed:: 5.4
 
          :param str code: The site code
          :rtype: str

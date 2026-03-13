@@ -13,7 +13,7 @@ class WaitingMixin:
 
     """A mixin to implement wait cycles.
 
-    .. versionadded:: 8.4
+    .. version-added:: 8.4
 
     :ivar int max_retries: Maximum number of times to retry an API
         request before quitting. Defaults to ``config.max_retries`` if

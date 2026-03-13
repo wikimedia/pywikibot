@@ -115,7 +115,7 @@ class Option(ABC):
     def result(self, value: str) -> Any:
         """Return the actual value which is associated by the given one.
 
-        .. versionadded:: 6.2
+        .. version-added:: 6.2
            *result()* is an abstract method and must be defined in
            subclasses
         """
@@ -156,7 +156,7 @@ class OutputOption(Option):
            <userinterfaces._interface_base.ABUIC.input_choice>`
            instead of deprecated :meth:`output`.
 
-        .. versionadded:: 6.2
+        .. version-added:: 6.2
         """
         return ''
 
@@ -508,7 +508,7 @@ class ShowingListOption(ListOption, OutputOption):
 
     """An option to show a list and select an item.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     before_question = True
@@ -548,7 +548,7 @@ class MultipleChoiceList(ListOption):
 
     """An option to select multiple items from a list.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
     def test(self, value: str) -> bool:
@@ -579,7 +579,7 @@ class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
 
     """An option to show a list and select multiple items.
 
-    .. versionadded:: 3.0
+    .. version-added:: 3.0
     """
 
 

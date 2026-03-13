@@ -5,7 +5,7 @@
 #
 """Configuration file for pytest.
 
-.. versionadded:: 10.3
+.. version-added:: 10.3
 """
 from __future__ import annotations
 
@@ -87,7 +87,7 @@ def pytest_addoption(parser) -> None:
     If the option is given without parameter, the default value is 0.5
     seconds.
 
-    .. versionadded:: 11.0
+    .. version-added:: 11.0
 
     :param parser: The pytest parser object used to add CLI options.
     :type parser: _pytest.config.argparsing.Parser
@@ -109,7 +109,7 @@ if pytest:
     def pause_between_doctests(request) -> None:
         """Insert a pause after each doctest if enabled.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
 
         :param request: The pytest FixtureRequest object providing test
             context.

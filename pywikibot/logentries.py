@@ -97,7 +97,7 @@ class LogEntry(UserDict):
     def params(self) -> dict[str, Any]:
         """Additional data for some log entry types.
 
-        .. versionadded:: 9.4
+        .. version-added:: 9.4
            private *_param* attribute became a public property
         """
         return self.get('params', {})
@@ -211,7 +211,7 @@ class RightsEntry(LogEntry):
     def oldgroups(self) -> list[str]:
         """Return old rights groups.
 
-        .. versionchanged:: 7.5
+        .. version-changed:: 7.5
            No longer raise KeyError if `oldgroups` does not exists or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
@@ -222,7 +222,7 @@ class RightsEntry(LogEntry):
     def newgroups(self) -> list[str]:
         """Return new rights groups.
 
-        .. versionchanged:: 7.5
+        .. version-changed:: 7.5
            No longer raise KeyError if `oldgroups` does not exists or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.

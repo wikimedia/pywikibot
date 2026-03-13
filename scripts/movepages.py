@@ -61,7 +61,7 @@ class MovePagesBot(CurrentPageBot):
 
     """Page move bot.
 
-    .. versionchanged:: 7.2
+    .. version-changed:: 7.2
        `movesubpages` option was added
     """
 

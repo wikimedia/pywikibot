@@ -26,7 +26,7 @@ Command line options:
 -new        Load watchlists for all wikis where accounts is set in user
             config file
 
-.. versionchanged:: 7.7
+.. version-changed:: 7.7
    watchlist is retrieved in parallel tasks.
 """
 from __future__ import annotations

@@ -13,7 +13,7 @@ class Family(family.WikimediaFamily):
 
     """Family class for Meta Wiki.
 
-    .. versionchanged:: 11.0
+    .. version-changed:: 11.0
        beta site code was added.
     """
 

@@ -292,7 +292,7 @@ class DummySiteinfo:
     def is_cached(self, key: str) -> bool:
         """Return whether the key is cached.
 
-        .. versionadded:: 8.3
+        .. version-added:: 8.3
         """
         return key in self._cache
 
@@ -416,7 +416,7 @@ class DrySite(pywikibot.site.APISite):
     def login(self, *args, cookie_only=False, **kwargs) -> None:
         """Overwrite login which is called when a site is initialized.
 
-        .. versionadded:: 8.0.4
+        .. version-added:: 8.0.4
         """
         if cookie_only:
             return
@@ -467,9 +467,9 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
 def execute(command: list[str], *, data_in=None, timeout=None):
     """Execute a command and capture outputs.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        *error* parameter was removed.
-    .. versionchanged:: 9.1
+    .. version-changed:: 9.1
        parameters except *command* are keyword only.
 
     :param command: executable to run and arguments to use
@@ -518,11 +518,11 @@ def execute_pwb(args: list[str], *,
                 overrides: dict[str, str] | None = None) -> dict[str, Any]:
     """Execute the pwb.py script and capture outputs.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        the *error* parameter was removed.
-    .. versionchanged:: 9.1
+    .. version-changed:: 9.1
        parameters except *args* are keyword only.
-    .. versionchanged:: 10.4
+    .. version-changed:: 10.4
        coverage is used if running github actions and a temporary file
        is used for overrides.
 
@@ -612,8 +612,8 @@ def skipping(*exceptions: BaseException,
 
     .. note:: The last sample uses Python 3.10 syntax.
 
-    .. versionadded:: 6.2
-    .. versionchanged:: 9.3
+    .. version-added:: 6.2
+    .. version-changed:: 9.3
        *code* parameter was added
 
     :param exceptions: Exceptions to let test skip

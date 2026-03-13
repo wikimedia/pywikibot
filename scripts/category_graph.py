@@ -48,7 +48,7 @@ Extended example with style settings:
     fillcolor=green] edge[style=dashed penwidth=3]'
 
 
-.. versionadded:: 8.0
+.. version-added:: 8.0
 """
 from __future__ import annotations
 

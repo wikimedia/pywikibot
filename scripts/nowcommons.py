@@ -187,7 +187,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
     """Bot to delete migrated files.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        NowCommonsDeleteBot is a ConfigParserBot
     """
 

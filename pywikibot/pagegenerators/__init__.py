@@ -213,7 +213,7 @@ GENERATOR OPTIONS
 
                         logevent,username,start,end
 
-                    .. deprecated:: 9.2
+                    .. version-deprecated:: 9.2
                        backward compatible *total* argument like
                        ``logevent,username,total``; use ``-limit`` filter
                        option instead (see below).

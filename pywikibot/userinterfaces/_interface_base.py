@@ -5,7 +5,7 @@
 #
 """Abstract base user interface module.
 
-.. versionadded:: 6.2
+.. version-added:: 6.2
 """
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ class ABUIC(ABC):
     Every user interface should derive from it to ensure that all
     required methods are implemented.
 
-    .. versionadded:: 6.2
+    .. version-added:: 6.2
     """
 
     def argvu(self) -> list[str]:

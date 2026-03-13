@@ -5,7 +5,7 @@
 #
 """Pywikibot metadata file.
 
-.. versionadded:: 4.0
+.. version-added:: 4.0
 """
 from __future__ import annotations
 

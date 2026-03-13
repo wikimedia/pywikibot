@@ -61,7 +61,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
     """A bot to import coordinates to Wikidata.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CoordImportRobot is a ConfigParserBot
     """
 

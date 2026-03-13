@@ -25,11 +25,11 @@ descriptions:
     python pwb.py unlink "Foo bar" -namespace:0 -namespace:6
 
 
-.. versionchanged:: 6.0
+.. version-changed:: 6.0
    script was archived.
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    script was deleted.
-.. versionchanged:: 9.4
+.. version-changed:: 9.4
    script was recovered.
 """
 from __future__ import annotations

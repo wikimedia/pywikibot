@@ -58,8 +58,8 @@ Example for going through all files:
 
     python pwb.py commons_information -start:File:!
 
-.. versionadded:: 6.0
-.. versionchanged:: 9.2
+.. version-added:: 6.0
+.. version-changed:: 9.2
    accelerate script with preloading pages; use ``commons`` as default
    site; use transcluded pages of ``Information`` template.
 """
@@ -190,7 +190,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         Combine all nodes and replace the last with new created
         Template while removing the remaining from *wikicode*.
 
-        .. versionadded:: 9.2
+        .. version-added:: 9.2
 
         :param wikicode: The Wikicode of the parsed page text.
         :param nodes: wikitext nodes to be processed

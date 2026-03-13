@@ -6,7 +6,7 @@
 #
 """Script that forms part of pwb_tests.
 
-.. versionadded:: 7.0
+.. version-added:: 7.0
 """
 from __future__ import annotations
 

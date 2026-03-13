@@ -26,7 +26,7 @@ To enable access via cookies, assign cookie handling class::
 
     session.cookies = http.cookie_jar
 
-.. versionchanged:: 8.0
+.. version-changed:: 8.0
    Cookies are lazy loaded when logging to site.
 """
 from __future__ import annotations
@@ -68,8 +68,8 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
 
     """CookieJar which create the filename and checks file permissions.
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 10.2
+    .. version-added:: 8.0
+    .. version-changed:: 10.2
        use `threading.Lock` in :meth:`load` and :meth`save` to be thread
        safe.
     """
@@ -120,7 +120,7 @@ session.cookies = cookie_jar
 def flush() -> None:  # pragma: no cover
     """Close the session object. This is called when the module terminates.
 
-    .. versionchanged:: 8.1
+    .. version-changed:: 8.1
        log the traceback and show the exception value in the critical
        message
     """
@@ -202,7 +202,7 @@ def user_agent_username(username=None) -> str:
     - encodes the username as 'utf-8' and if the username is not ASCII
     - URL encodes the username if it is not ASCII, or contains '%'
 
-    .. versionchanged:: 11.0
+    .. version-changed:: 11.0
        If *username* is not given, get it from environment variables
        'PYWIKIBOT_USERNAME' usually used by tests or 'PWB_USERNAME' used
        on toolforge.
@@ -231,7 +231,7 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
                format_string: str | None = '') -> str:
     """Generate the user agent string for a given site and format.
 
-    .. versionchanged:: 11.0
+    .. version-changed:: 11.0
        The ``code``, ``lang`` and ``family`` variables in the format
        string are deprecated and replaced by ``site``. The
        ``script_version`` and ``version`` variables are deprecated and
@@ -304,7 +304,7 @@ def request(site: pywikibot.site.BaseSite,
     The optional uri is a relative uri from site base uri including the
     document root '/'.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        a *protocol* parameter can be given which is passed to the
        :meth:`family.Family.base_url` method.
 
@@ -517,7 +517,7 @@ CHARSET_RE = re.compile(
 def get_charset_from_content_type(content_type: str) -> str | None:
     """Get charset from the content-type header.
 
-    .. versionadded:: 7.3
+    .. version-added:: 7.3
     """
     m = CHARSET_RE.search(content_type)
     if not m:
@@ -567,7 +567,7 @@ def _decide_encoding(response: requests.Response,
                      charset: str | None = None) -> str | None:
     """Detect the response encoding.
 
-    .. versionchanged:: 10.1
+    .. version-changed:: 10.1
        retrieve charset from `Accept-Charset` list which may look like
        `'ISO-8859-1,utf-8;q=0.7,*;q=0.7'`.
 

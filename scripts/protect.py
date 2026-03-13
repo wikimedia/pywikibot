@@ -76,7 +76,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
 
     """This bot allows protection of pages en masse.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CheckerBot is a ConfigParserBot
     """
 

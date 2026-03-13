@@ -6,7 +6,7 @@
 #
 """Tests for superset module.
 
-.. versionadded:: 9.2
+.. version-added:: 9.2
 """
 from __future__ import annotations
 

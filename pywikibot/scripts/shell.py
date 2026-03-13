@@ -17,7 +17,7 @@ Usage::
 
     python pwb.py shell [args]
 
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    moved to pywikibot.scripts
 """
 from __future__ import annotations
@@ -29,7 +29,7 @@ import sys
 def main(*args: str) -> None:
     """Script entry point.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        *exitmsg* was added for :func:`code.interact`.
     """
     args = list(args)

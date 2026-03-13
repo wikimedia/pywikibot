@@ -496,7 +496,7 @@ globalvar = Global()
 def get_welcome_text(site: pywikibot.site.BaseSite, *, sign: str = '') -> str:
     """Return the fully composed welcome text for the given site.
 
-    .. versionchanged:: 11.0
+    .. version-changed:: 11.0
        *sign* parameteer was added, return the fully composed welcome text.
 
     :param site: The target site where the script is running.
@@ -783,7 +783,7 @@ class WelcomeBot(SingleSiteBot):
     def define_sign(self) -> list[str]:
         """Setup signature.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            The unused *force* parameter was removed.
         """
         sign_text = ''
@@ -828,7 +828,7 @@ class WelcomeBot(SingleSiteBot):
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            also skip if user is locked globally
         """
         if user.is_blocked() or user.is_locked():

@@ -6,7 +6,7 @@
 #
 """Pre-commit hook to set the leftmost copyright year.
 
-.. versionadded:: 10.3
+.. version-added:: 10.3
 """
 from __future__ import annotations
 

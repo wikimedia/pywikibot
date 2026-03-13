@@ -424,7 +424,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
 
     """References bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        ReferencesRobot is a ConfigParserBot
     """
 

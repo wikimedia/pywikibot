@@ -524,7 +524,7 @@ def linkcode_resolve(domain, info) -> str | None:
 
     ..note: These links point directly to diffusion repository.
     .. seealso:: :phab:`T333762`
-    .. versionadded:: 11.0
+    .. version-added:: 11.0
     """
     if domain != 'py':
         return None
@@ -575,7 +575,7 @@ def linkcode_resolve(domain, info) -> str | None:
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines) -> None:
     """Remove plain 'Initializer.' or 'Allocator.' docstring.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        remove 'Allocator.' docstring too.
     """
     if what not in ('class', 'exception'):
