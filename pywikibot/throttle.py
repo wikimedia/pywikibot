@@ -90,7 +90,10 @@ class Throttle:
         self.last_write = 0.0
 
         self.retry_after = 0  # set by http.request
-        self.delay = 0
+
+        #: the minimum access delay, usually set by config.minthrottle
+        self.delay: int = 0
+
         self.checktime = 0.0
         self.modules: Counter[str] = Counter()
 

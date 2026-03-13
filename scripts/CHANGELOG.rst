@@ -4,6 +4,8 @@ Scripts Changelog
 11.1.0
 ------
 
+* i18n updates
+
 weblinkchecker
 ^^^^^^^^^^^^^^
 

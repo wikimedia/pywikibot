@@ -365,6 +365,9 @@ class FilePage(Page):
         .. version-changed:: 8.2
            *filename* argument may be also a path-like object or an
            iterable of path segments.
+        .. version-changed:: 11.1
+           Use a read throttle for download per Wikitech robot policy.
+           Set it to 25 times of :attr:`throttle.Throttle.delay`.
         .. note:: filename suffix is adjusted if target url's suffix is
            different which may be the case if a thumbnail is loaded.
         .. warning:: If a file already exists, it will be overridden
