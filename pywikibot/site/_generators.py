@@ -21,6 +21,7 @@ from pywikibot.exceptions import (
     APIError,
     Error,
     InconsistentTitleError,
+    InterwikiRedirectPageError,
     InvalidTitleError,
     NoPageError,
     UserRightsError,
@@ -296,7 +297,12 @@ class GeneratorsMixin:
                     # was created) they can be returned as redirects to
                     # themselves; skip these
                     continue
-                if redir.getRedirectTarget() == page:
+                try:
+                    target = redir.getRedirectTarget()
+                except InterwikiRedirectPageError:
+                    target = None
+
+                if target and target == page:
                     genlist[redir.title()] = self.pagebacklinks(
                         redir, follow_redirects=True,
                         filter_redirects=filter_redirects,
