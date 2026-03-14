@@ -59,6 +59,7 @@ Usage::
 from __future__ import annotations
 
 import abc
+import os
 import shutil
 import sys
 from contextlib import suppress
@@ -70,6 +71,9 @@ from subprocess import check_call, run
 from pywikibot import __version__, error, info, input_yn, warning
 
 
+pip = f'{sys.executable} -m pip'
+
+
 @dataclass
 class SetupBase(abc.ABC):
 
@@ -78,6 +82,9 @@ class SetupBase(abc.ABC):
     .. version-added:: 8.0
     .. version-changed:: 8.1
        *dataclass* is used.
+    .. version-changed:: 11.1
+       Use ``sys.executable`` to determine the Python Python interpreter
+       executing this script.
     """
 
     local: bool
@@ -124,15 +131,15 @@ class SetupBase(abc.ABC):
                 return True
 
         if self.upgrade:  # pragma: no cover
-            check_call('python -m pip install --upgrade pip', shell=True)
+            check_call(f'{pip} install --upgrade pip', shell=True)
             for module in ('build', 'twine'):
                 info(f'<<lightyellow>>Install or upgrade {module}')
                 try:
                     import_module(module)
                 except ModuleNotFoundError:
-                    check_call(f'pip install {module}', shell=True)
+                    check_call(f'{pip} install {module}', shell=True)
                 else:
-                    check_call(f'pip install --upgrade {module}', shell=True)
+                    check_call(f'{pip} install --upgrade {module}', shell=True)
         else:
             for module in ('build', 'twine'):
                 try:
@@ -147,6 +154,9 @@ class SetupBase(abc.ABC):
         """Build the packages.
 
         .. version-added:: 9.3
+        .. version-changed:: 11.1
+           Use pure-Python implementation of tokenizer for
+           mwparserfromhell with Windows.
         """
         self.copy_files()
         info('<<lightyellow>>Build package')
@@ -164,9 +174,15 @@ class SetupBase(abc.ABC):
 
         if self.local:
             info('<<lightyellow>>Install locally')
-            check_call(f'pip uninstall {self.package} -y', shell=True)
-            check_call(f'pip install --no-cache-dir --no-index --pre '
-                       f'--find-links=dist {self.package}', shell=True)
+            check_call(f'{pip} uninstall {self.package} -y', shell=True)
+            env = os.environ.copy()
+            if sys.platform.startswith('win32'):
+                # set the WITH_EXTENSION ennvironment variable for mwpfh;
+                # refer the mwpfh documentation
+                env['WITH_EXTENSION'] = '0'
+            check_call(f'{pip} install --no-cache-dir --pre '
+                       f'--find-links=dist {self.package}',
+                       shell=True, env=env)
 
         if self.remote and input_yn(
                 '<<lightblue>>Upload dist to pypi', automatic_quit=False):
@@ -268,20 +284,24 @@ def handle_args() -> tuple[bool, bool, bool, bool, bool]:
     clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
     scripts = 'scripts' in sys.argv
+    msg = ''
 
     if not scripts and remote and 'dev' in __version__:  # pragma: no cover
-        warning('Distribution must not be a developmental release to upload.')
+        msg = 'Distribution must not be a developmental release to upload.'
         remote = False
 
     sys.argv = [sys.argv[0]]
-    return local, remote, clear, upgrade, scripts
+    return local, remote, clear, upgrade, scripts, msg
 
 
 def main() -> None:
     """Script entry point."""
-    *args, scripts = handle_args()
+    *args, scripts, msg = handle_args()
     installer = SetupScripts if scripts else SetupPywikibot
-    return installer(*args).run()
+    done = installer(*args).run()
+    if msg:
+        warning(f'<<lightred>>{msg}<<default>>')
+    return done
 
 
 if __name__ == '__main__':
