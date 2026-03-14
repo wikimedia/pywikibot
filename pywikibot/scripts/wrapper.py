@@ -236,19 +236,24 @@ def check_modules(script: str | None = None) -> bool:
 
     :param script: The script name to be checked for dependencies
     :return: True if all dependencies are installed
-    :raise RuntimeError: wrong Python version found in setup.py
+    :raise RuntimeError: wrong Python version found in setup.py or
+        function is called in site-package environment.
     """
+    if site_package:
+        raise RuntimeError(
+            "check_modules function shouldn't be called from site-package"
+        )
+
     try:
         from packaging.requirements import Requirement
     except ModuleNotFoundError:
         _print_requirements(['packaging'], None, 'missing')
         sys.exit()
 
-    from setup import script_deps
-
     missing_requirements = []
     version_conflicts = []
 
+    from setup import script_deps
     if script:
         dependencies = script_deps.get(Path(script).name, [])
     else:
@@ -293,9 +298,6 @@ def check_modules(script: str | None = None) -> bool:
 
     return not missing_requirements
 
-
-if not check_modules():
-    sys.exit()
 
 filename, script_args, global_args, environ = handle_args(*sys.argv)
 
@@ -558,6 +560,7 @@ def run() -> None:  # pragma: no cover
     """
     global site_package
     site_package = True
+
     if not execute():
         print(__doc__)
 

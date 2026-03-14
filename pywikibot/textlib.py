@@ -28,8 +28,11 @@ from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 try:
     import wikitextparser
-except ImportError:
-    import mwparserfromhell as wikitextparser
+except ModuleNotFoundError:
+    try:
+        import mwparserfromhell as wikitextparser
+    except ModuleNotFoundError as e:
+        wikitextparser = e
 
 
 # cache for replaceExcept to avoid recompile or regexes each call
@@ -2046,15 +2049,18 @@ def extract_templates_and_params(
     To replicate that behaviour, enable both `remove_disabled_parts`
     and `strip` parameters.
 
+    .. version-changed:: 6.1
+       *wikitextparser* package is supported; either *wikitextparser* or
+       *mwparserfromhell* is strictly recommended.
+    .. version-changed:: 11.1
+       Raise ModuleNotFoundError if no wikitext parser is installed.
+
     :param text: The wikitext from which templates are extracted
     :param remove_disabled_parts: If enabled, remove disabled wikitext
         such as comments and pre.
     :param strip: If enabled, strip arguments and values of templates.
     :return: List of template name and params
-
-    .. version-changed:: 6.1
-       *wikitextparser* package is supported; either *wikitextparser* or
-       *mwparserfromhell* is strictly recommended.
+    :raises ModuleNotFoundError: No wikitext parser is installed.
     """
     def explicit(param):
         try:
@@ -2062,6 +2068,9 @@ def extract_templates_and_params(
         except AttributeError:
             attr = not param.positional
         return attr
+
+    if isinstance(wikitextparser, Exception):
+        raise wikitextparser
 
     if remove_disabled_parts:
         text = removeDisabledParts(text)
