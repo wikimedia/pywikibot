@@ -1,20 +1,20 @@
-"""Fix ups for memento-client package version 0.6.1.
-
-.. versionadded:: 7.4
-.. versionchanged:: 10.7
-   Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
-.. seealso:: https://github.com/mementoweb/py-memento-client#readme
-"""
 #
 # (C) Shawn M. Jones, Harihar Shankar, Herbert Van de Sompel.
 #     -- Los Alamos National Laboratory, 2013
 # Parts of MementoClient class codes are
 # licensed under the BSD open source software license.
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Fix ups for memento-client package version 0.6.1.
+
+.. version-added:: 7.4
+.. version-changed:: 10.7
+   Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
+.. seealso:: https://github.com/mementoweb/py-memento-client#readme
+"""
 from __future__ import annotations
 
 from datetime import datetime
@@ -45,9 +45,9 @@ class MementoClient(OldMementoClient):
     It makes it straightforward to access the Web of the past as it is
     to access the current Web.
 
-    .. versionchanged:: 7.4
+    .. version-changed:: 7.4
        `timeout` is used in several methods.
-    .. versionchanged:: 10.7
+    .. version-changed:: 10.7
        Set default timegate to :attr`DEFAULT_TIMEGATE_BASE_URI`
 
     Basic usage:
@@ -278,7 +278,7 @@ class MementoClient(OldMementoClient):
                      timeout: int | None = None) -> requests.Response:
         """Makes HEAD requests.
 
-        .. versionchanged:: 10.0
+        .. version-changed:: 10.0
            The default timout was increased from 9 to 30 seconds.
 
         :param uri: the uri for the request.
@@ -332,7 +332,7 @@ def get_closest_memento_url(url: str,
                             timeout: int | None = None):
     """Get most recent memento for url.
 
-    .. versionadded:: 10.0
+    .. version-added:: 10.0
        The *timeout* parameter.
 
     :param url: The input http url.

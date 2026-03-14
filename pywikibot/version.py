@@ -4,7 +4,6 @@
 # Distributed under the terms of the MIT license.
 #
 """Module to determine the pywikibot version (tag, revision and date)."""
-
 from __future__ import annotations
 
 import datetime
@@ -37,8 +36,8 @@ def _get_program_dir() -> str:
 def get_toolforge_hostname() -> str | None:
     """Get hostname of the current Toolforge host.
 
-    .. versionadded:: 3.0
-    .. deprecated:: 9.0
+    .. version-added:: 3.0
+    .. version-deprecated:: 9.0
 
     :return: The hostname of the currently running host,
              if it is in Wikimedia Toolforge; otherwise return None.
@@ -194,10 +193,10 @@ def getversion_nightly(path: str | Path | None = None):
         - hash (git hash for the current revision)
     :rtype: ``tuple`` of three ``str`` and a ``time.struct_time``
     """
-    file = Path(path or _get_program_dir())
-    if not path:
-        file /= 'pywikibot'  # pragma: no cover
-    file /= 'version'
+    folder = Path(path or _get_program_dir())
+    file = folder / 'version'
+    if not file.exists():
+        file = folder / 'pywikibot' / 'version'
 
     with file.open() as data:
         (tag, rev, date, hsh) = data.read().splitlines()

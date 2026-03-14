@@ -1,9 +1,9 @@
 """Citoid Query interface.
 
-.. versionadded:: 10.6
+.. version-added:: 10.6
 """
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,9 +1,9 @@
-"""SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2025
+# (C) Pywikibot team, 2016-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""SPARQL Query interface."""
 from __future__ import annotations
 
 from textwrap import fill
@@ -29,7 +29,7 @@ class SparqlQuery(WaitingMixin):
 
     This class allows to run SPARQL queries against any SPARQL endpoint.
 
-    .. versionchanged:: 8.4
+    .. version-changed:: 8.4
        inherited from :class:`data.WaitingMixin` which provides a
        :meth:`data.WaitingMixin.wait` method.
     """
@@ -130,10 +130,10 @@ class SparqlQuery(WaitingMixin):
     def query(self, query: str, headers: dict[str, str] | None = None):
         """Run SPARQL query and return parsed JSON result.
 
-        .. versionchanged:: 8.5
+        .. version-changed:: 8.5
            :exc:`exceptions.NoUsernameError` is raised if the response
            looks like the user is not logged in.
-        .. versionchanged:: 9.6
+        .. version-changed:: 9.6
            retry on internal server error (500).
 
         :param query: Query text

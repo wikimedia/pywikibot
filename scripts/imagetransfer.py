@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to copy images to Wikimedia Commons, or to another wiki.
 
 Syntax:
@@ -42,11 +47,6 @@ of the images used on a page reachable via interwiki links.
 
 &params;
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test plural module."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test plural module."""
 from __future__ import annotations
 
 import unittest

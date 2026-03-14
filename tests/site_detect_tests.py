@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test for site detection."""
 from __future__ import annotations
 
 import os
@@ -73,7 +73,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
-        'https://www.arabeyes.org/$1',  # non standard 1.28.0
     )
 
     no_sites = (

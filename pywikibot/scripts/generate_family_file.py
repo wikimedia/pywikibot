@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2010-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script generates a family file from a given URL.
 
 This script must be invoked with the pwb wrapper script/code entry point.
@@ -22,20 +27,15 @@ Example::
 This will create the file mywiki_family.py in families folder of your
 base directory.
 
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    moved to pywikibot.scripts folder; create family files in families
    folder of your base directory instead of pywikibot/families.
-.. versionchanged:: 8.1
+.. version-changed:: 8.1
    [s]trict can be given for <dointerwiki> parameter to ensure that
    sites are from the given domain.
-.. versionchanged:: 8.4
+.. version-changed:: 8.4
    If the url scheme is missing, ``https`` will be used.
 """
-#
-# (C) Pywikibot team, 2010-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re
@@ -171,7 +171,7 @@ class FamilyFileGenerator:
     def getlangs(self, w) -> None:
         """Determine site code of a family.
 
-        .. versionchanged:: 8.1
+        .. version-changed:: 8.1
            with [e]dit the interwiki list can be given delimited by
            space or comma or both. With [s]trict only sites with the
            same domain are collected. A [h]elp answer was added to show

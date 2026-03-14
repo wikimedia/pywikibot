@@ -1,9 +1,9 @@
-"""GeneratorFactory module which handles pagegenerators options."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""GeneratorFactory module which handles pagegenerators options."""
 from __future__ import annotations
 
 import itertools
@@ -132,7 +132,7 @@ class GeneratorFactory:
 
         Otherwise the value is undefined and gives None.
 
-        .. versionadded:: 7.3
+        .. version-added:: 7.3
         """
 
     def _validate_options(self,
@@ -196,6 +196,11 @@ class GeneratorFactory:
                 self.site.namespaces.resolve(self._namespaces))
         return self._namespaces
 
+    @namespaces.deleter
+    def namespaces(self) -> None:
+        """Deleter of namespaces property."""
+        self._namespaces = frozenset()
+
     def getCombinedGenerator(self,  # noqa: N802
                              gen: OPT_GENERATOR_TYPE = None,
                              preload: bool = False) -> OPT_GENERATOR_TYPE:
@@ -203,9 +208,9 @@ class GeneratorFactory:
 
         Only call this after all arguments have been parsed.
 
-        .. versionchanged:: 7.3
+        .. version-changed:: 7.3
            set the instance variable :attr:`is_preloading` to True or False.
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            if ``limit`` option is set and multiple generators are given,
            pages are yieded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
@@ -346,6 +351,11 @@ class GeneratorFactory:
                        gen_func: Callable | None = None) -> Any:
         """Return generator based on Category defined by category and gen_func.
 
+        .. version-changed::11.1
+           *gen_func* is now called with the ``namespaces`` parameter
+           using the value from :attr:`namespaces`, because the namespace
+           option is prioritized in :meth:`handle_args`.
+
         :param category: Category name with start parameter
         :param recurse: If not False or 0, also iterate articles in
             subcategories. If an int, limit recursion to this number of
@@ -359,10 +369,17 @@ class GeneratorFactory:
 
         cat, startfrom = self.getCategory(category)
 
-        return gen_func(cat,
-                        start=startfrom,
-                        recurse=recurse,
-                        content=content)
+        ns = self.namespaces or None
+        # reset namespaces property to avoid filtering by getCombinedGenerator
+        del self.namespaces
+
+        return gen_func(
+            cat,
+            start=startfrom,
+            recurse=recurse,
+            content=content,
+            namespaces=ns
+        )
 
     @staticmethod
     def _parse_log_events(
@@ -373,7 +390,7 @@ class GeneratorFactory:
     ) -> Iterable[pywikibot.page.BasePage] | None:
         """Parse the -logevent argument information.
 
-        .. deprecated:: 9.2
+        .. version-deprecated:: 9.2
            the *start* parameter as total amount of pages.
 
         :param logtype: A valid logtype
@@ -928,7 +945,7 @@ class GeneratorFactory:
     def _handle_redirect(self, value: str) -> Literal[True]:
         """Handle `-redirect` argument.
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
         """
         if not value:
             # True by default
@@ -939,7 +956,7 @@ class GeneratorFactory:
     def _handle_pagepile(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-pagepile` argument.
 
-        .. versionadded:: 9.0
+        .. version-added:: 9.0
         """
         if not value.isnumeric():
             raise ValueError(
@@ -949,8 +966,8 @@ class GeneratorFactory:
     def handle_args(self, args: Iterable[str]) -> list[str]:
         """Handle command line arguments and return the rest as a list.
 
-        .. versionadded:: 6.0
-        .. versionchanged:: 7.3
+        .. version-added:: 6.0
+        .. version-changed:: 7.3
            Prioritize -namespaces options to solve problems with several
            generators like -newpages/-random/-randomredirect/-linter
         """
@@ -969,7 +986,7 @@ class GeneratorFactory:
         can try parsing the argument. Call getCombinedGenerator() after all
         arguments have been parsed to get the final output generator.
 
-        .. versionadded:: 6.0
+        .. version-added:: 6.0
            renamed from ``handleArg``
 
         :param arg: Pywikibot argument consisting of -name:value

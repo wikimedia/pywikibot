@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2005-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot is used for checking external links found at the wiki.
 
 It checks several pages at once, with a limit set by the config variable
@@ -102,11 +107,6 @@ Loads all wiki pages where dead links were found during a prior run:
 
     python pwb.py weblinkchecker -repeat
 """
-#
-# (C) Pywikibot team, 2005-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pickle
@@ -124,6 +124,7 @@ import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 from pywikibot.exceptions import (
+    FatalServerError,
     IsRedirectPageError,
     NoPageError,
     SpamblacklistError,
@@ -248,11 +249,13 @@ class LinkCheckThread(threading.Thread):
         self.page = page
         self.url = url
         self.history = history
+        # use preferred site encodings
+        encodings = ','.join(self.page.site.encodings())
         self.header = {
             'Accept': 'text/xml,application/xml,application/xhtml+xml,'
                       'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
-            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Accept-Charset': f'{encodings};q=0.8,*;q=0.7',
             'Keep-Alive': '30',
             'Connection': 'keep-alive',
         }
@@ -283,25 +286,26 @@ class LinkCheckThread(threading.Thread):
     def run(self) -> None:
         """Run the bot."""
         time.sleep(self.get_delay(self.name))
+
         try:
             header = self.header
             r = comms.http.fetch(
                 self.url, headers=header,
                 use_fake_user_agent=self._use_fake_user_agent)
-        except requests.exceptions.InvalidURL:
-            message = i18n.twtranslate(self.page.site,
-                                       'weblinkchecker-badurl_msg',
-                                       {'URL': self.url})
-        except Exception:
-            pywikibot.info(f'Exception while processing URL {self.url} in '
-                           f'page {self.page}')
-            raise
-
-        if (
-            r.status_code != HTTPStatus.OK
-            or r.status_code in self.http_ignores
-        ):
+            bad = (r.status_code != HTTPStatus.OK
+                   or r.status_code in self.http_ignores)
             message = HTTPStatus(r.status_code).phrase
+        except (requests.exceptions.InvalidURL, FatalServerError):
+            bad = True
+            message = i18n.twtranslate(self.page.site,
+                                       'weblinkchecker-badurl',
+                                       {'URL': self.url})
+        except Exception as e:
+            pywikibot.info(f'Exception while processing URL {self.url} in '
+                           f'page {self.page}:\n{e}')
+            return
+
+        if bad:
             pywikibot.info(f'*{self.page} links to {self.url} - {message}.')
             self.history.set_dead_link(self.url, message, self.page,
                                        config.weblink_dead_days)

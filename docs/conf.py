@@ -1,4 +1,3 @@
-"""Configuration file for Sphinx."""
 #
 # (C) Pywikibot team, 2014-2026
 #
@@ -15,6 +14,7 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+"""Configuration file for Sphinx."""
 from __future__ import annotations
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -47,7 +47,7 @@ import pywikibot  # noqa: E402
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-needs_sphinx = '8.2.3'
+needs_sphinx = '9.1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -469,7 +469,6 @@ numfig = True
 show_authors = True
 todo_include_todos = True
 autodoc_typehints = 'description'
-autodoc_use_legacy_class_based = True  # T413563
 
 # autosectionlabel_prefix_document = True
 suppress_warnings = [
@@ -525,7 +524,7 @@ def linkcode_resolve(domain, info) -> str | None:
 
     ..note: These links point directly to diffusion repository.
     .. seealso:: :phab:`T333762`
-    .. versionadded:: 11.0
+    .. version-added:: 11.0
     """
     if domain != 'py':
         return None
@@ -576,7 +575,7 @@ def linkcode_resolve(domain, info) -> str | None:
 def pywikibot_docstring_fixups(app, what, name, obj, options, lines) -> None:
     """Remove plain 'Initializer.' or 'Allocator.' docstring.
 
-    .. versionchanged:: 8.2
+    .. version-changed:: 8.2
        remove 'Allocator.' docstring too.
     """
     if what not in ('class', 'exception'):

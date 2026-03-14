@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script can be used to delete and undelete pages en masse.
 
 Of course, you will need an admin account on the relevant wiki.
@@ -51,11 +56,6 @@ Delete everything in the category "To delete" without prompting:
 
     python pwb.py delete -cat:"To delete" -always
 """
-#
-# (C) Pywikibot team, 2013-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import collections

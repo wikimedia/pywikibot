@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-r"""Template harvesting script.
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of MIT license.
+#
+"""Template harvesting script.
 
 Usage (see below for explanations and examples):
 
-    python pwb.py harvest_template -transcludes:"..." \
-    [default optional arguments] template_parameter PID \
-    [local optional arguments] \
+    python pwb.py harvest_template -transcludes:"..." \\
+    [default optional arguments] template_parameter PID \\
+    [local optional arguments] \\
     [template_parameter PID [local optional arguments]]
 
-    python pwb.py harvest_template [generators] -template:"..." \
-    [default optional arguments] template_parameter PID \
-    [local optional arguments] \
+    python pwb.py harvest_template [generators] -template:"..." \\
+    [default optional arguments] template_parameter PID \\
+    [local optional arguments] \\
     [template_parameter PID [local optional arguments]]
 
 This will work on all pages that transclude the template in the article
@@ -52,27 +57,27 @@ The following command will try to import existing images from "image"
 parameter of "Infobox person" on English Wikipedia as Wikidata property
 "P18" (image):
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" image P18
 
 The following command will behave the same as the previous example and
 also try to import [[links]] from "birth_place" parameter of the same
 template as Wikidata property "P19" (place of birth):
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" image P18 birth_place P19
 
 The following command will import both "birth_place" and "death_place"
 params with -islink modifier, ie. the bot will try to import values,
 even if it doesn't find a [[link]]:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" -islink birth_place P19 death_place P20
 
 The following command will do the same but only "birth_place" can be
 imported without a link:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" birth_place P19 -islink death_place P20
 
 The following command will import an occupation from "occupation"
@@ -80,7 +85,7 @@ parameter of "Infobox person" on English Wikipedia as Wikidata property
 "P106" (occupation). The page won't be skipped if the item already has
 that property but there is not the new value:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox person" occupation P106 -exists:p
 
 The following command will import band members from the "current_members"
@@ -88,7 +93,7 @@ parameter of "Infobox musical artist" on English Wikipedia as Wikidata
 property "P527" (has part). This will only extract multiple band members
 if each is linked, and will not add duplicate claims for the same member:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:0 \\
     -template:"Infobox musical artist" current_members P527 -exists:p -multi
 
 The following command will import the category's main topic from the
@@ -98,21 +103,16 @@ imported, the inverse claim is imported to the topic item as Wikidata
 property "P910" (topic's main category) unless a claim of that property
 is already there:
 
-    python pwb.py harvest_template -site:wikipedia:en -namespace:14 \
+    python pwb.py harvest_template -site:wikipedia:en -namespace:14 \\
     -template:"Cat main" 1 P301 -inverse:P910 -islink
 
 
 .. note:: This script is a
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
-.. versionadded:: 7.5
+.. version-added:: 7.5
    the -inverse option.
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of MIT license.
-#
 from __future__ import annotations
 
 import re
@@ -168,7 +168,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
 
     """A bot to add Wikidata claims.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        HarvestRobot is a ConfigParserBot
     """
 
@@ -242,7 +242,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                              link_text: str) -> pywikibot.ItemPage | None:
         """Find the ItemPage target for a given link text.
 
-        .. versionchanged:: 7.5
+        .. version-changed:: 7.5
            Only follow the redirect target if redirect page has no
            wikibase item.
         """
@@ -323,7 +323,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     field_item: tuple[str, str]) -> None:
         """Process a single field of template fielddict.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         field, value = field_item
         field = field.strip()
@@ -387,7 +387,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     ) -> Generator[pywikibot.ItemPage]:
         """Handle 'wikibase-item' claim type.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         value = value.replace('{{!}}', '|')
         prop, options = self.fields[field]
@@ -418,7 +418,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
                     *args) -> Generator[WbTime]:
         """Handle 'time' claim type.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         value = value.replace('{{!}}', '|')
         value = value.replace('&nbsp;', ' ')
@@ -472,7 +472,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_string(value: str, *args) -> Generator[str]:
         """Handle 'string' and 'external-id' claim type.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         yield value.strip()
 
@@ -481,7 +481,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     def handle_url(self, value, *args) -> Generator[str]:
         """Handle 'url' claim type.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         for match in self.linkR.finditer(value):
             yield match['url']
@@ -494,7 +494,7 @@ class HarvestRobot(ConfigParserBot, WikidataBot):
     ) -> Generator[pywikibot.FilePage]:
         """Handle 'commonsMedia' claim type.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         repo = site.image_repository()
         image = pywikibot.FilePage(repo, value)

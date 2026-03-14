@@ -1,9 +1,9 @@
-"""Character based helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Character based helper functions (not wiki-dependent)."""
 from __future__ import annotations
 
 import re
@@ -98,7 +98,7 @@ def url2string(title: str,
     For a single *encodings* string this function is equivalent to
     :samp:`urllib.parse.unquote(title, encodings, errors='strict')`
 
-    .. versionchanged:: 8.4
+    .. version-changed:: 8.4
        Ignore *LookupError* and try other encodings.
 
     .. seealso:: :python:`urllib.parse.unquote

@@ -1,9 +1,9 @@
-"""Library module representing MediaWiki sites (wikis)."""
 #
-# (C) Pywikibot team, 2021-2024
+# (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Library module representing MediaWiki sites (wikis)."""
 from __future__ import annotations
 
 

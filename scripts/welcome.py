@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to welcome new users.
 
 This script works out of the box for Wikis that have been defined in the
@@ -170,11 +175,6 @@ using without adding or deleting.
 Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo"
 aren't badwords at all but can be used for some bad-nickname.
 """
-#
-# (C) Pywikibot team, 2006-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import locale
@@ -496,7 +496,7 @@ globalvar = Global()
 def get_welcome_text(site: pywikibot.site.BaseSite, *, sign: str = '') -> str:
     """Return the fully composed welcome text for the given site.
 
-    .. versionchanged:: 11.0
+    .. version-changed:: 11.0
        *sign* parameteer was added, return the fully composed welcome text.
 
     :param site: The target site where the script is running.
@@ -783,7 +783,7 @@ class WelcomeBot(SingleSiteBot):
     def define_sign(self) -> list[str]:
         """Setup signature.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            The unused *force* parameter was removed.
         """
         sign_text = ''
@@ -828,7 +828,7 @@ class WelcomeBot(SingleSiteBot):
     def skip_page(self, user) -> bool:
         """Check whether the user is to be skipped.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            also skip if user is locked globally
         """
         if user.is_blocked() or user.is_locked():

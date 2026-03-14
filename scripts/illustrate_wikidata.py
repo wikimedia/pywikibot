@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of MIT license.
+#
 """Bot to add images to Wikidata items.
 
 The image is extracted from the page_props. For this to be available the
@@ -17,11 +22,6 @@ Usage:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2013-2024
-#
-# Distributed under the terms of MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

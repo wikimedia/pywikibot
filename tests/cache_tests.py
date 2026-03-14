@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""API Request cache tests."""
 from __future__ import annotations
 
 import re

@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """User interfaces module.
 
 The user interface object must define its own `init_handlers()` method
@@ -15,10 +20,3 @@ all of which are documented in the abstract class
 :class:`userinterfaces._interface_base.ABUIC`.
 """
 from __future__ import annotations
-
-
-#
-# (C) Pywikibot team, 2008-2022
-#
-# Distributed under the terms of the MIT license.
-#

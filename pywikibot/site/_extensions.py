@@ -1,9 +1,9 @@
-"""Objects representing API interface to MediaWiki site extensions."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API interface to MediaWiki site extensions."""
 from __future__ import annotations
 
 from collections.abc import Generator, Iterable
@@ -183,7 +183,7 @@ class ProofreadPageMixin:
         Load URLs to images for a given page in the "Page:" namespace.
         No effect for pages in other namespaces.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         .. seealso:: :api:`imageforpage`
         """
@@ -302,7 +302,7 @@ class WikibaseClientMixin:
         .. warning:: The retrieved pages may be connected in meantime.
            To avoid this, use *strict* parameter to check.
 
-        .. versionchanged::
+        .. version-changed::
            The *strict* parameter was added.
 
         :param total: Maximum number of pages to return, or ``None`` for
@@ -431,7 +431,7 @@ class TextExtractsMixin:
 
     """APISite mixin for TextExtracts extension.
 
-    .. versionadded:: 7.1
+    .. version-added:: 7.1
     """
 
     @need_extension('TextExtracts')

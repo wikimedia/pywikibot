@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to upload images to Wikipedia.
 
 The following parameters are supported:
@@ -66,11 +71,6 @@ the wiki.
 The script will ask for the location of an image(s), if not given as a
 parameter, and for a description.
 """
-#
-# (C) Pywikibot team, 2003-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import math

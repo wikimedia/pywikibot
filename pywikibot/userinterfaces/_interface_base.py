@@ -1,12 +1,12 @@
-"""Abstract base user interface module.
-
-.. versionadded:: 6.2
-"""
 #
-# (C) Pywikibot team, 2021
+# (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Abstract base user interface module.
+
+.. version-added:: 6.2
+"""
 from __future__ import annotations
 
 import sys
@@ -21,7 +21,7 @@ class ABUIC(ABC):
     Every user interface should derive from it to ensure that all
     required methods are implemented.
 
-    .. versionadded:: 6.2
+    .. version-added:: 6.2
     """
 
     def argvu(self) -> list[str]:

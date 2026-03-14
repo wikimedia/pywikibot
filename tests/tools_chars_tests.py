@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Test tools.chars package."""
 #
-# (C) Pywikibot team, 2015-2023
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
+"""Test tools.chars package."""
 from __future__ import annotations
 
 import unicodedata

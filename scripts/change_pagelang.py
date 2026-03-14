@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2018-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This script changes the content language of pages.
 
 These command line parameters can be used to specify which pages to work
@@ -20,13 +25,8 @@ Furthermore, the following command line parameters are supported:
 .. note:: This script is a
    :class:`ConfigParserBot<bot.ConfigParserBot>`. All options can be set
    within a settings file which is scripts.ini by default.
-.. versionadded:: 5.1
+.. version-added:: 5.1
 """
-#
-# (C) Pywikibot team, 2018-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot
@@ -43,7 +43,7 @@ class ChangeLangBot(ConfigParserBot, SingleSiteBot):
 
     """Change page language bot.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        ChangeLangBot is a ConfigParserBot
     """
 

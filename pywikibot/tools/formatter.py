@@ -1,9 +1,9 @@
-"""Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module containing various formatting related utilities."""
 from __future__ import annotations
 
 import math
@@ -57,7 +57,7 @@ class SequenceOutputter:
     def output(self) -> None:
         """Output the text of the current sequence.
 
-        .. deprecated:: 9.0
+        .. version-deprecated:: 9.0
            Use :func:`pywikibot.info()<pywikibot.logging.info>` with
            :attr:`out` property.
         """

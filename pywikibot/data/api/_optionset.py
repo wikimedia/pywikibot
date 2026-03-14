@@ -1,9 +1,9 @@
-"""Object representing boolean API option."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Object representing boolean API option."""
 from __future__ import annotations
 
 from collections.abc import MutableMapping
@@ -37,7 +37,7 @@ class OptionSet(MutableMapping):
 
         If a site is given, the module and param must be given too.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            *dict* parameter was renamed to *data*.
 
         :param site: The associated site

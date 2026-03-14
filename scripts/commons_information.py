@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2015-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot adds a language template to the file's description field.
 
 The ``Information`` template is commonly used to provide formatting to
@@ -53,16 +58,11 @@ Example for going through all files:
 
     python pwb.py commons_information -start:File:!
 
-.. versionadded:: 6.0
-.. versionchanged:: 9.2
+.. version-added:: 6.0
+.. version-changed:: 9.2
    accelerate script with preloading pages; use ``commons`` as default
    site; use transcluded pages of ``Information`` template.
 """
-#
-# (C) Pywikibot team, 2015-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from textwrap import fill
@@ -190,7 +190,7 @@ class InformationBot(SingleSiteBot, ExistingPageBot):
         Combine all nodes and replace the last with new created
         Template while removing the remaining from *wikicode*.
 
-        .. versionadded:: 9.2
+        .. version-added:: 9.2
 
         :param wikicode: The Wikicode of the parsed page text.
         :param nodes: wikitext nodes to be processed

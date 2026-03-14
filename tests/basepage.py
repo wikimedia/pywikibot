@@ -1,9 +1,9 @@
-"""BasePage tests subclasses."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""BasePage tests subclasses."""
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -16,7 +16,7 @@ class ABCTestCaseMeta(ABCMeta, type(TestCase)):
 
     """Enable abstract methods in TestCase-based base classes.
 
-    .. versionadded:: 10.3
+    .. version-added:: 10.3
     """
 
 
@@ -38,7 +38,7 @@ class BasePageTestBase(TestCase, metaclass=ABCTestCaseMeta):
     def setup_page(self) -> None:
         """Subclasses must implement this to assign self._page.
 
-        .. versionadded:: 10.3
+        .. version-added:: 10.3
         """
 
 

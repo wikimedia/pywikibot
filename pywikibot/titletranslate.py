@@ -1,9 +1,9 @@
-"""Title translate module."""
 #
-# (C) Pywikibot team, 2003-2025
+# (C) Pywikibot team, 2003-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Title translate module."""
 from __future__ import annotations
 
 import pywikibot
@@ -23,7 +23,7 @@ def translate(
     entries such as "all:" or "xyz:" or "20:" are first built from the
     page title of 'page' and then listed.
 
-    .. versionchanged:: 9.6
+    .. version-changed:: 9.6
        Raise ``RuntimeError`` instead of ``AssertionError`` if neither
        *page* nor *site* parameter is given.
 

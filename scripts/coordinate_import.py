@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-r"""Coordinate importing script.
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of MIT license.
+#
+"""Coordinate importing script.
 
 Usage:
 
-    python pwb.py coordinate_import -site:wikipedia:en \
+    python pwb.py coordinate_import -site:wikipedia:en \\
     -cat:Category:Coordinates_not_on_Wikidata
 
 This will work on all pages in the category "coordinates not on Wikidata"
@@ -16,7 +21,7 @@ is used so that extension has to be setup properly. You can look at the
 
 You can use any typical pagegenerator to provide with a list of pages:
 
-    python pwb.py coordinate_import -site:wikipedia:it -namespace:0 \
+    python pwb.py coordinate_import -site:wikipedia:it -namespace:0 \\
     -transcludes:Infobox_stazione_ferroviaria
 
 You can also run over a set of items on the repo without coordinates and
@@ -25,7 +30,7 @@ explicitly provide the repo as the site using -site argument.
 
 Example:
 
-    python pwb.py coordinate_import -site:wikidata:wikidata -namespace:0 \
+    python pwb.py coordinate_import -site:wikidata:wikidata -namespace:0 \\
     -querypage:Deadendpages
 
 
@@ -41,11 +46,6 @@ The following command line parameters are supported:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of MIT license.
-#
 from __future__ import annotations
 
 import pywikibot
@@ -61,7 +61,7 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
     """A bot to import coordinates to Wikidata.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CoordImportRobot is a ConfigParserBot
     """
 

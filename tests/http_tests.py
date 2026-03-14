@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for http module."""
 #
 # (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for http module."""
 from __future__ import annotations
 
 import re

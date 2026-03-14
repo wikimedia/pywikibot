@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2013-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing various types of Wikibase pages and structures.
 
 This module also includes objects:
@@ -7,11 +12,6 @@ This module also includes objects:
 * Property: a type of semantic data.
 * WikibaseEntity: base interface for Wikibase entities.
 """
-#
-# (C) Pywikibot team, 2013-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import json as jsonlib
@@ -294,7 +294,7 @@ class WikibaseEntity:
 
          .. seealso:: :meth:`WikibasePage.editEntity`
 
-         .. versionchanged:: 8.0.1
+         .. version-changed:: 8.0.1
             Copy snak IDs/hashes (:phab:`T327607`)
 
         :param data: Data to be saved
@@ -367,7 +367,7 @@ class MediaInfo(WikibaseEntity):
 
     """Interface for MediaInfo entities on Commons.
 
-    .. versionadded:: 6.5
+    .. version-added:: 6.5
     """
 
     entity_type = 'mediainfo'
@@ -402,7 +402,7 @@ class MediaInfo(WikibaseEntity):
     def _defined_by(self, singular: bool = False) -> dict:
         """Function to provide the API parameters to identify the entity.
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
 
         :param singular: Whether the parameter names should use the singular
                          form
@@ -447,7 +447,7 @@ class MediaInfo(WikibaseEntity):
            of this entity and their modifying may indirectly cause
            unwanted change to the live content
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            Added *pageid*, *ns*, *title*, *lastrevid*, *modified*, *id*
            values to ``_content`` attribute when it is loaded.
 
@@ -516,7 +516,7 @@ class MediaInfo(WikibaseEntity):
     def title(self) -> str:
         """Return ID as title of the MediaInfo.
 
-        .. versionadded:: 9.4
+        .. version-added:: 9.4
         .. seealso:: :meth:`getID`
 
         :raises NoWikibaseEntityError: If this entity is associated with
@@ -539,7 +539,7 @@ class MediaInfo(WikibaseEntity):
         >>> item = page.data_item()
         >>> item.editLabels({'en': 'Test file.'}) # doctest: +SKIP
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
         """
         data = {'labels': labels}
         self.editEntity(data, **kwargs)
@@ -547,7 +547,7 @@ class MediaInfo(WikibaseEntity):
     def addClaim(self, claim, bot: bool = True, **kwargs) -> None:
         """Add a claim to the MediaInfo.
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
 
         :param claim: The claim to add
         :type claim: pywikibot.page.Claim
@@ -564,7 +564,7 @@ class MediaInfo(WikibaseEntity):
     def removeClaims(self, claims, **kwargs) -> None:
         """Remove the claims from the MediaInfo.
 
-        .. versionadded:: 8.5
+        .. version-added:: 8.5
 
         :param claims: List of claims to be removed
         :type claims: List or pywikibot.Claim
@@ -1160,7 +1160,7 @@ class ItemPage(WikibasePage):
     def getRedirectTarget(self, *, ignore_section: bool = True):
         """Return the redirect target for this page.
 
-        .. versionadded:: 9.3
+        .. version-added:: 9.3
            *ignore_section* parameter
 
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
@@ -1209,7 +1209,7 @@ class ItemPage(WikibasePage):
         If the item doesn't have a link to that site, raise
         NoSiteLinkError.
 
-        .. versionchanged:: 8.1
+        .. version-changed:: 8.1
            raises NoSiteLinkError instead of NoPageError.
 
         :param site: Site to find the linked page of.
@@ -1301,7 +1301,7 @@ class ItemPage(WikibasePage):
         You need to define an extra argument to make this work, like
         :code:`save=True`.
 
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
 
         :param target_page: Target of the redirect, this argument is
@@ -1341,7 +1341,7 @@ class ItemPage(WikibasePage):
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         .. seealso:: :meth:`pywikibot.Page.get_best_claim`
 
@@ -1377,7 +1377,7 @@ class ItemPage(WikibasePage):
     ) -> pywikibot.WbRepresentation | None:
         """Return the best value for this page at a given timestamp.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param prop: Property id, "P###"
         :param timestamp: The timestamp to check the value at
@@ -1506,7 +1506,7 @@ class Property:
     def exists(self) -> bool:
         """Determine if the property exists in the data repository.
 
-        .. versionadded:: 9.4
+        .. version-added:: 9.4
         """
         try:
             self._type = self.repo.get_property_type(self)
@@ -1519,7 +1519,7 @@ class Property:
     def type(self) -> str:
         """Return the type of this property.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            raises :exc:`NoWikibaseEntityError` if property does not
            exist.
 
@@ -1818,7 +1818,7 @@ class Claim(Property):
     def fromJSON(cls, site, data: dict[str, Any]) -> Claim:
         """Create a claim object from JSON returned in the API call.
 
-        .. versionchanged:: 9.4
+        .. version-changed:: 9.4
            print a warning if the Claim.type is not given and missing in
            the wikibase.
 
@@ -2232,7 +2232,7 @@ class Claim(Property):
     def has_better_rank(self, other: Claim | None) -> bool:
         """Check if this claim has a better rank than the other claim.
 
-        .. versionadded:: 10.6
+        .. version-added:: 10.6
 
         :param other: The other claim to compare with.
         :return: True if this claim has a better rank, False otherwise.

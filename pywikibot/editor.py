@@ -1,13 +1,13 @@
-"""Text editor class for your favourite editor.
-
-.. note:: This module uses :mod:`userinterfaces.gui` and has dependencies
-   from other partially external modules.
-"""
 #
 # (C) Pywikibot team, 2004-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Text editor class for your favourite editor.
+
+.. note:: This module uses :mod:`userinterfaces.gui` and has dependencies
+   from other partially external modules.
+"""
 from __future__ import annotations
 
 import os
@@ -39,7 +39,7 @@ class TextEditor:
 
     """Text editor.
 
-    .. versionchanged:: 8.0
+    .. version-changed:: 8.0
        Editor detection functions were moved from :mod:`config`.
     """
 

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
-"""Pre-commit hook to set the leftmost copyright year.
-
-.. versionadded:: 10.3
-"""
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Pre-commit hook to set the leftmost copyright year.
+
+.. version-added:: 10.3
+"""
 from __future__ import annotations
 
 import re
@@ -35,6 +35,11 @@ def get_patched_files():
     )
     captures.append(
         subprocess.check_output(diff_cmd + ['--staged'], encoding='utf-8')
+    )
+    captures.append(
+        subprocess.check_output(
+            diff_cmd + ['HEAD~1', 'HEAD'], encoding='utf-8'
+        )
     )
     captures.append(
         subprocess.check_output(show_cmd + ['HEAD'], encoding='utf-8')

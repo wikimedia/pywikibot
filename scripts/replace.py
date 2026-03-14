@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""This bot will make direct text replacements.
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""This bot will make direct text replacements.
 
 It will retrieve information on which pages might need changes either from
 an XML dump or a text file, or only change a single page.
@@ -108,7 +113,7 @@ Furthermore, the following command line parameters are supported:
     The First argument is the old text to be replaced, the second
     argument is the new text. If the ``-regex`` argument is given, the
     first argument will be regarded as a regular expression, and the
-    second argument might contain expressions like ``\1`` or ``\g<name>``.
+    second argument might contain expressions like ``\1`` or ``\\g<name>``.
     The second parameter can also be specified as empty string, usually
     ``""``. It is possible to introduce more than one pair of
     replacement parameters.
@@ -142,7 +147,7 @@ articles, e.g. Errror -> Error, use this:
 
 If you want to do more than one replacement at a time, use this:
 
-    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
+    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \\
     -namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs,
@@ -160,11 +165,6 @@ talk about HTTP, where the typo has become part of the standard:
 .. Please type "python pwb.py replace -help | more" if you can't read
    the top of the help.
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re
@@ -694,7 +694,7 @@ class ReplaceRobot(SingleSiteBot, ExistingPageBot):
     def treat(self, page) -> None:
         """Work on each page retrieved from generator.
 
-        .. versionchanged:: 10.1
+        .. version-changed:: 10.1
            After the browser call, the script affects the possibly
            changed text.
         """
@@ -813,14 +813,14 @@ EXC_KEYS = {
 }
 """Dictionary to convert exceptions command line options to exceptions keys.
 
-.. versionadded:: 7.0
+.. version-added:: 7.0
 """
 
 
 def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
     """Handle exceptions args to ignore pages which contain certain texts.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     exceptions = {key: [] for key in EXC_KEYS.values()}
     local_args = []
@@ -836,8 +836,8 @@ def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
 def handle_pairsfile(filename: str) -> list[str] | None:
     """Handle -pairsfile argument.
 
-    .. versionadded:: 7.0
-    .. versionchanged:: 9.2
+    .. version-added:: 7.0
+    .. version-changed:: 9.2
        replacement patterns are printed it they are incomplete.
     """
     if not filename:
@@ -865,7 +865,7 @@ def handle_pairsfile(filename: str) -> list[str] | None:
 def handle_manual() -> list[str]:
     """Handle manual input.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     pairs = []
     old = pywikibot.input('Please enter the text that should be replaced:')
@@ -883,7 +883,7 @@ def handle_sql(sql: str,
                exceptions: list[re.Pattern]) -> Generator:
     """Handle default sql query.
 
-    .. versionadded:: 7.0
+    .. version-added:: 7.0
     """
     if not sql:
         where_clause = 'WHERE ({})'.format(' OR '.join(
@@ -915,7 +915,7 @@ def main(*args: str) -> None:
 
     If args is an empty list, sys.argv is used.
 
-    .. versionchanged:: 9.2
+    .. version-changed:: 9.2
        replacement patterns are printed it they are incomplete.
 
     :param args: command line arguments

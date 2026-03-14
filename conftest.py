@@ -1,12 +1,12 @@
-"""Configuration file for pytest.
-
-.. versionadded:: 10.3
-"""
 #
 # (C) Pywikibot team, 2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Configuration file for pytest.
+
+.. version-added:: 10.3
+"""
 from __future__ import annotations
 
 import re
@@ -20,8 +20,20 @@ from pywikibot.tools import SPHINX_RUNNING
 try:
     import pytest
 except ModuleNotFoundError:
-    pytest = None
+    if SPHINX_RUNNING:
 
+        class _DummyPytest:
+
+            def fixture(self, *args, **kwargs):
+
+                def wrapper(func):
+                    return func
+
+                return wrapper
+
+        pytest = _DummyPytest()
+    else:
+        pytest = None
 
 EXCLUDE_PATTERN = re.compile(
     r'(?:'
@@ -75,7 +87,7 @@ def pytest_addoption(parser) -> None:
     If the option is given without parameter, the default value is 0.5
     seconds.
 
-    .. versionadded:: 11.0
+    .. version-added:: 11.0
 
     :param parser: The pytest parser object used to add CLI options.
     :type parser: _pytest.config.argparsing.Parser
@@ -91,13 +103,13 @@ def pytest_addoption(parser) -> None:
     )
 
 
-if pytest or SPHINX_RUNNING:
+if pytest:
 
     @pytest.fixture(autouse=True)
     def pause_between_doctests(request) -> None:
         """Insert a pause after each doctest if enabled.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
 
         :param request: The pytest FixtureRequest object providing test
             context.

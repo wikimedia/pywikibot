@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the ``pywikibot.tools.formatter`` module."""
 #
-# (C) Pywikibot team, 2015-2024
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the ``pywikibot.tools.formatter`` module."""
 from __future__ import annotations
 
 import unittest

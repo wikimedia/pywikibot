@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test Interwiki Graph functionality."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test Interwiki Graph functionality."""
 from __future__ import annotations
 
 import unittest

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""This script transfers pages from a source wiki to a target wiki.
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""This script transfers pages from a source wiki to a target wiki.
 
 It also copies edit history to a subpage.
 
@@ -29,25 +34,20 @@ Examples
 Transfer all pages in category "Query service" from the English Wikipedia to
 the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
 
-    python pwb.py transferbot -site:wikipedia:en -cat:"Query service" \
+    python pwb.py transferbot -site:wikipedia:en -cat:"Query service" \\
     -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
 
 Copy the template "Query service" from the English Wikipedia to the
 Arabic Wiktionary:
 
-    python pwb.py transferbot -site:wikipedia:en -tofamily:wiktionary \
+    python pwb.py transferbot -site:wikipedia:en -tofamily:wiktionary \\
     -tolang:ar -page:"Template:Query service"
 
 Copy 10 wanted templates of German Wikipedia from English Wikipedia to German:
 
-    python pwb.py transferbot -site:wikipedia:en -tolang:de \
+    python pwb.py transferbot -site:wikipedia:en -tolang:de \\
     -wantedtemplates:10 -target
 """
-#
-# (C) Pywikibot team, 2014-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot

@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing a MediaWiki page.
 
 Various Wikibase pages are defined in ``page._wikibase.py``,
@@ -8,11 +13,6 @@ various pages for Proofread Extensions are defined in
    :class:`pywikibot.Page` objects (defined here) represent the page
    itself, including its contents.
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import pywikibot
@@ -133,7 +133,7 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
     ) -> None:
         """Change the page's text to point to the redirect page.
 
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
 
         :param target_page: Target of the redirect, this argument is
@@ -188,7 +188,7 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
         Return the first 'preferred' ranked Claim specified by Wikibase
         property or the first 'normal' one otherwise.
 
-        .. versionadded:: 3.0
+        .. version-added:: 3.0
 
         .. seealso:: :meth:`pywikibot.ItemPage.get_best_claim`
 

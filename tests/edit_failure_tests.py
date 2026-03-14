@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Tests for edit failures.
 
 These tests should never write to the wiki, unless something has broken
 badly.
 """
-#
-# (C) Pywikibot team, 2014-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import unittest

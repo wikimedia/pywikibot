@@ -1,9 +1,9 @@
-"""Decorators for Page objects."""
 #
-# (C) Pywikibot team, 2017-2024
+# (C) Pywikibot team, 2017-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Decorators for Page objects."""
 from __future__ import annotations
 
 import pywikibot

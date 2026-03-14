@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for reflinks script."""
 #
-# (C) Pywikibot team, 2014-2022
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for reflinks script."""
 from __future__ import annotations
 
 import unittest

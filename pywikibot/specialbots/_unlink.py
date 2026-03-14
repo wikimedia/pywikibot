@@ -1,12 +1,12 @@
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Special bot library containing BaseUnlinkBot.
 
 Do not import classes directly from here but from specialbots.
 """
-#
-# (C) Pywikibot team, 2003-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot

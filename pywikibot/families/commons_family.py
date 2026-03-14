@@ -1,6 +1,6 @@
 """Family module for Wikimedia Commons."""
 #
-# (C) Pywikibot team, 2005-2025
+# (C) Pywikibot team, 2005-2026
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ class Family(family.WikimediaFamily, family.DefaultWikibaseFamily):
 
     """Family class for Wikimedia Commons.
 
-    .. versionchanged:: 6.5
+    .. version-changed:: 6.5
        :meth:`family.WikibaseFamily.interface` was changed  to
        :class:`DataSite<pywikibot.site._datasite.DataSite>` to enable
        structured data.

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""This script runs commands on each entry in the API caches.
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""This script runs commands on each entry in the API caches.
 
 Syntax:
 
@@ -62,11 +67,6 @@ Available output commands:
 
     uniquedesc(entry)
 """
-#
-# (C) Pywikibot team, 2014-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime
@@ -116,7 +116,7 @@ class CacheEntry(api.CachedRequest):
     def _get_cache_dir(self) -> Path:
         """Directory of the cached entry.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            return a `pathlib.Path` object.
         """
         return Path(self.directory)
@@ -124,7 +124,7 @@ class CacheEntry(api.CachedRequest):
     def _cachefile_path(self) -> Path:
         """Return cache file path.
 
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            return a `pathlib.Path` object.
         """
         return self._get_cache_dir() / self._create_file_name()
@@ -229,7 +229,7 @@ def process_entries(cache_path, func, use_accesstime: bool | None = None,
     check the filesystem mount options. You may need to remount with
     'strictatime'.
 
-    .. versionchanged:: 9.0
+    .. version-changed:: 9.0
        default cache path to 'apicache' without Python main version.
 
     :param use_accesstime: Whether access times should be used. `None`

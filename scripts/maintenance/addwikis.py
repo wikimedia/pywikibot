@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2024-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script that adds new wikis to the codes set in Wikimedia family files.
 
 Usage:
@@ -14,20 +19,15 @@ Example:
     and ``baz`` to wikisource.
 
 
-.. versionadded:: 9.2
-.. versionchanged:: 10.4
+.. version-added:: 9.2
+.. version-changed:: 10.4
    The options ``-h``, ``-help`` and ``--help`` display the help message.
-.. deprecated:: 10.4
+.. version-deprecated:: 10.4
    The ``help`` option
-.. versionchanged:: 11.0
+.. version-changed:: 11.0
    Multiple families can be given with one run. The difference is shown
    instead of the new list.
 """
-#
-# (C) Pywikibot team, 2024-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re

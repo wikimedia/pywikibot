@@ -1,9 +1,9 @@
-"""Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2025
+# (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module to transliterate text."""
 from __future__ import annotations
 
 from pywikibot.tools import (
@@ -1132,9 +1132,9 @@ class Transliterator:
                       prev: str = '-', succ: str = '-') -> str:
         """Transliterate the character.
 
-        .. versionchanged:: 9.0
+        .. version-changed:: 9.0
            *next* parameter was renamed to *succ*.
-        .. versionchanged:: 10.6
+        .. version-changed:: 10.6
            *char* argument is positional only; *prev* and *succ*
            arguments are keyword only.
 

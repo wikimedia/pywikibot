@@ -1,9 +1,9 @@
-"""Object representing a MediaWiki category page."""
 #
 # (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Object representing a MediaWiki category page."""
 from __future__ import annotations
 
 from collections import defaultdict
@@ -105,7 +105,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            all parameters are keyword arguments only. Additional
            parameters are supported. The order of subcategories are
            yielded was changed. The old order was
@@ -162,7 +162,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            all parameters are keyword arguments only.
 
         :param recurse: If not False or 0, also iterate articles in
@@ -227,7 +227,7 @@ class Category(Page):
            `sys.getrecursionlimit()`, an ``RecursionError`` may be
            raised. Be careful if passing this generator to a collection
            in such case.
-        .. versionchanged:: 8.0
+        .. version-changed:: 8.0
            all parameters are keyword arguments only. Additional
            parameters are supported.
 

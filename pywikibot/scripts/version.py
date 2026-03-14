@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to determine the Pywikibot version (tag, revision and date).
 
 The following option is supported:
@@ -6,11 +11,11 @@ The following option is supported:
 -nouser  do not print usernames; otherwise they are printed for each
          registered family
 
-.. versionchanged:: 7.0
+.. version-changed:: 7.0
    version script was moved to the framework scripts folder.
-.. versionadded:: 9.1.2
+.. version-added:: 9.1.2
    the *-nouser* option was added.
-.. versionchanged:: 10.6
+.. version-changed:: 10.6
    The User-Agent string is now printed for the default site. To print
    it for another site, call the ``pwb`` wrapper with the global option,
    e.g.:
@@ -26,11 +31,6 @@ The following option is supported:
       ``True`` or to a custom UA string, or if
       *fake_user_agent_exceptions* is defined in the :mod:`config` file.
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os
@@ -76,7 +76,7 @@ WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 def main(*args: str) -> None:
     """Print pywikibot version and important settings.
 
-    .. versionchanged:: 9.1.2
+    .. version-changed:: 9.1.2
        usernames are not printed with ``-nouser`` option.
     """
     pywikibot.info('Pywikibot: ' + getversion())

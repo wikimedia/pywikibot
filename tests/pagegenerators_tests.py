@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2025
+# (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
+"""Test pagegenerators module."""
 from __future__ import annotations
 
 import calendar

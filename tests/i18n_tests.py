@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Test i18n module."""
 from __future__ import annotations
 
 import unittest

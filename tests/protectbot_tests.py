@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for scripts/protect.py."""
 #
-# (C) Pywikibot team, 2014-2025
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for scripts/protect.py."""
 from __future__ import annotations
 
 import unittest

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the date module."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the date module."""
 from __future__ import annotations
 
 import unittest

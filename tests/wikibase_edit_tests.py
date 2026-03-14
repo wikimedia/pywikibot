@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2014-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Tests for editing Wikibase items.
 
 Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failure_tests.py
 """
-#
-# (C) Pywikibot team, 2014-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import time

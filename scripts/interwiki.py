@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to check language links for general pages.
 
 Uses existing translations of a page, plus hints from the command line,
@@ -345,15 +350,10 @@ To run the script on all pages on a language, run it with option
 ``-start:!``, and if it takes so long that you have to break it off, use
 ``-continue`` next time.
 
-.. versionchanged:: 10.4
+.. version-changed:: 10.4
    The ``-localonly`` option now restricts page processing to the
    default site only, instead of the origin page.
 """
-#
-# (C) Pywikibot team, 2003-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os
@@ -686,7 +686,7 @@ class Subject(interwiki_graph.Subject):
     def is_not_redirect(page):
         """Check whether *page* is not a redirect page.
 
-        .. versionadded:: 11.0
+        .. version-added:: 11.0
         """
         return page.exists() and not (page.isRedirectPage()
                                       or page.isCategoryRedirect())

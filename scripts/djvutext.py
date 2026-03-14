@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """This bot uploads text from DjVu files onto pages in the "Page" namespace.
 
 .. note:: This script is intended to be used for Wikisource.
@@ -34,11 +39,6 @@ The following options can be set in a settings file (default:
 
 -always     Do not prompt for confirmation before making changes.
 """
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os.path
@@ -57,7 +57,7 @@ class DjVuTextBot(SingleSiteBot):
 
     Works only on sites with Proofread Page extension installed.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CheckerBot is a ConfigParserBot
     """
 

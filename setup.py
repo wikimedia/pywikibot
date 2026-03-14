@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2009-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Installer script for Pywikibot framework.
 
 **How to create a new distribution:**
@@ -19,11 +24,7 @@
 
 .. warning:: do not upload a development release to pypi.
 """
-#
-# (C) Pywikibot team, 2009-2026
-#
-# Distributed under the terms of the MIT license.
-#
+
 from __future__ import annotations
 
 import configparser
@@ -50,11 +51,11 @@ extra_deps = {
         'and python_version == "3.9"',
         'Pillow==11.3.0; platform_python_implementation == "PyPy" '
         'and python_version == "3.10"',
-        'Pillow==12.1.0; platform_python_implementation == "PyPy" '
+        'Pillow>=12.1.1; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
         'Pillow==11.3.0; platform_python_implementation == "CPython" '
         'and python_version == "3.9"',
-        'Pillow>=12.1.0; platform_python_implementation == "CPython" '
+        'Pillow>=12.1.1; platform_python_implementation == "CPython" '
         'and  python_version >= "3.10"',
     ],
     'mwoauth': [
@@ -99,7 +100,7 @@ def read_project() -> str:
     ``configparser`` is used. Therefore the tomlfile must be readable as
     config file until the first comment.
 
-    .. versionadded:: 9.0
+    .. version-added:: 9.0
     """
     if sys.version_info >= (3, 11):
         import tomllib

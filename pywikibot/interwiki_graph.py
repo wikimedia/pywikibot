@@ -1,9 +1,9 @@
-"""Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module with the Graphviz drawing calls."""
 from __future__ import annotations
 
 import itertools
@@ -43,7 +43,7 @@ class GraphSavingThread(threading.Thread):
     def run(self) -> None:
         """Write graphs to the data directory.
 
-        .. versionchanged:: 11.0
+        .. version-changed:: 11.0
            use explicit ``utf-8`` encoding.
         """
         for fmt in config.interwiki_graph_formats:

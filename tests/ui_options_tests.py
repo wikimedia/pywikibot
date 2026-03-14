@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Bot tests for input_choice options."""
 #
-# (C) Pywikibot team, 2015-2022
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Bot tests for input_choice options."""
 from __future__ import annotations
 
 import unittest

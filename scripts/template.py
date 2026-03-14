@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""Very simple script to replace a template with another one.
+#
+# (C) Pywikibot team, 2003-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""Very simple script to replace a template with another one.
 
 It also converts the old MediaWiki boilerplate format to the new format.
 
@@ -80,18 +85,18 @@ summary. It only performs substitutions in main article namespace and
 doesn't prompt to start replacing. Note that -putthrottle: is a global
 Pywikibot parameter:
 
-    python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \
+    python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \\
     -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
 This next example removes the templates {{cfr}}, {{cfru}}, and
 {{cfr-speedy}} from five category pages as given:
 
-    python pwb.py template cfr cfru cfr-speedy -remove -always \
-    -page:"Category:Mountain monuments and memorials" \
-    -page:"Category:Indian family names" \
-    -page:"Category:Tennis tournaments in Belgium" \
-    -page:"Category:Tennis tournaments in Germany" \
-    -page:"Category:Episcopal cathedrals in the United States" \
+    python pwb.py template cfr cfru cfr-speedy -remove -always \\
+    -page:"Category:Mountain monuments and memorials" \\
+    -page:"Category:Indian family names" \\
+    -page:"Category:Tennis tournaments in Belgium" \\
+    -page:"Category:Tennis tournaments in Germany" \\
+    -page:"Category:Episcopal cathedrals in the United States" \\
     -summary:"Removing Cfd templates from category pages that survived."
 
 This next example substitutes templates test1, test2, and space test on
@@ -99,11 +104,6 @@ all user talk pages (namespace #3):
 
     python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 """
-#
-# (C) Pywikibot team, 2003-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re
@@ -164,20 +164,19 @@ class TemplateRobot(ReplaceBot):
         replacements = []
         exceptions = {}
         builder = textlib.MultiTemplateMatchBuilder(self.site)
+        inside_tags_exceptions = ['ref', 'gallery', 'poem', 'pagelist']
         for old, new in self.templates.items():
             template_regex = builder.pattern(old)
 
             if self.opt.subst and self.opt.remove:
                 replacements.append((template_regex,
                                      r'{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
-                                             'pagelist', ]
+                exceptions['inside-tags'] = inside_tags_exceptions
             elif self.opt.subst:
                 replacements.append(
                     (template_regex, r'{{%s:%s\g<parameters>}}' %
                      (self.opt.subst, old)))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
-                                             'pagelist', ]
+                exceptions['inside-tags'] = inside_tags_exceptions
             elif self.opt.remove:
                 separate_line_regex = re.compile(
                     fr'^[*#:]* *{template_regex.pattern} *\n',

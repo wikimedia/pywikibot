@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""Print a list of pages, as defined by page generator parameters.
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""Print a list of pages, as defined by page generator parameters.
 
 Optionally, it also prints page content to STDOUT or save it to a file
 in the current directory.
@@ -100,11 +105,6 @@ page object:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2008-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import os

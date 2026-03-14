@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2007-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """A bot to remove stale protection templates from unprotected pages.
 
 Very often sysops block the pages for a set time but then they forget to
@@ -43,11 +48,6 @@ Examples::
 
     python pwb.py blockpageschecker -show -protectedpages:4
 """
-#
-# (C) Pywikibot team, 2007-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import re
@@ -185,7 +185,7 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     """Bot to remove stale protection templates from unprotected pages.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        CheckerBot is a ConfigParserBot
     """
 

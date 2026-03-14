@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2004-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to resolve double redirects, and to delete broken redirects.
 
 Requires access to MediaWiki's maintenance pages or to a XML dump file.
@@ -21,7 +26,7 @@ where action can be one of these
                deletion if there is no speedy deletion template
                available.
 
-               .. versionchanged:: 10.3
+               .. version-changed:: 10.3
                   only tries to fix if the namspace of the source page
                   is equal to the destination page.
 
@@ -70,11 +75,6 @@ Furthermore the following options are provided:
 
 &params;
 """
-#
-# (C) Pywikibot team, 2004-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import datetime
@@ -238,7 +238,7 @@ class RedirectGenerator(OptionHandler):
     ) -> Generator[tuple[str, int | None, str, str | None]]:
         r"""Return a generator that yields tuples of data about redirect Pages.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            only yield tuple if type of redirect is not 1 (normal redirect)
 
         The description of returned tuple items is as follows:

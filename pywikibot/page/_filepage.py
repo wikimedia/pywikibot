@@ -1,3 +1,8 @@
+#
+# (C) Pywikibot team, 2008-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Objects representing MediaWiki File pages.
 
 This module includes objects:
@@ -5,11 +10,6 @@ This module includes objects:
 * FilePage: A subclass of Page representing a file description page
 * FileInfo: a structure holding imageinfo of latest revision of FilePage
 """
-#
-# (C) Pywikibot team, 2008-2026
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -42,11 +42,11 @@ class FilePage(Page):
                  ignore_extension: bool = False) -> None:
         """Initializer.
 
-        .. versionchanged:: 8.4
+        .. version-changed:: 8.4
            Check for valid extensions.
-        .. versionchanged:: 9.3
+        .. version-changed:: 9.3
            Added the optional *ignore_extension* parameter.
-        .. versionchanged:: 9.6
+        .. version-changed:: 9.6
            Show a warning if *ignore_extension* was set and the
            extension is invalid.
         .. seealso::
@@ -133,7 +133,7 @@ class FilePage(Page):
         This function will load also metadata. It is also used as a
         helper in FileInfo to load metadata lazily.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
 
         :param ts: Timestamp of the Image revision to retrieve
         :return: Instance of FileInfo()
@@ -212,7 +212,7 @@ class FilePage(Page):
     def file_is_shared(self) -> bool:
         """Check if the file is stored on any known shared repository.
 
-        .. versionchanged:: 7.0
+        .. version-changed:: 7.0
            return False if file does not exist on shared image repository
            instead raising NoPageError.
         """
@@ -265,11 +265,11 @@ class FilePage(Page):
         'Pywikibot'
 
         .. seealso:: :meth:`globalusage`
-        .. versionchanged:: 7.2
+        .. version-changed:: 7.2
            all parameters from :meth:`APISite.imageusage()
            <pywikibot.site._generators.GeneratorsMixin.imageusage>`
            are available.
-        .. versionchanged:: 7.4
+        .. version-changed:: 7.4
            renamed from :meth:`usingPages`.
         """
         return self.site.imageusage(self, **kwargs)
@@ -278,7 +278,7 @@ class FilePage(Page):
     def file_is_used(self) -> bool:
         """Check whether the file is used at this site.
 
-        .. versionadded:: 7.1
+        .. version-added:: 7.1
         """
         return bool(list(self.using_pages(total=1)))
 
@@ -360,11 +360,14 @@ class FilePage(Page):
         The suffix has changed and Pywikibot_MW_gear_icon.png was
         downloaded.
 
-        .. versionadded:: 8.2
+        .. version-added:: 8.2
            *url_width*, *url_height* and *url_param* parameters.
-        .. versionchanged:: 8.2
+        .. version-changed:: 8.2
            *filename* argument may be also a path-like object or an
            iterable of path segments.
+        .. version-changed:: 11.1
+           Use a read throttle for download per Wikitech robot policy.
+           Set it to 25 times of :attr:`throttle.Throttle.delay`.
         .. note:: filename suffix is adjusted if target url's suffix is
            different which may be the case if a thumbnail is loaded.
         .. warning:: If a file already exists, it will be overridden
@@ -413,6 +416,12 @@ class FilePage(Page):
         path = path.with_suffix(Path(urlparse(url).path).suffix)
         # adjust user path
         path = path.expanduser()
+        # use read throttle per Wikitech robot policy for download (T418672)
+        # multiply minthrottle by 25 to get an functional delay
+        self.site.throttle.set_delays(delay=25 * self.site.throttle.delay)
+        self.site.throttle()
+        self.site.throttle.set_delays()
+
         req = http.fetch(url, stream=True)
         if req.status_code == HTTPStatus.OK:
             with open(path, 'wb') as f:
@@ -444,7 +453,7 @@ class FilePage(Page):
         the method returns the associated mediainfo entity. Otherwise,
         it falls back to the behavior of :meth:`BasePage.data_item`.
 
-        .. versionadded:: 6.5
+        .. version-added:: 6.5
 
         :rtype: pywikibot.page.WikibaseEntity
         """
@@ -473,10 +482,10 @@ class FileInfo:
 
     .. note:: timestamp will be casted to :func:`pywikibot.Timestamp`.
 
-    .. versionchanged:: 7.7
+    .. version-changed:: 7.7
        raises KeyError instead of AttributeError if FileInfo is used as
        Mapping.
-    .. versionchanged:: 8.6
+    .. version-changed:: 8.6
        Metadata are loaded lazily.
        Added *filepage* parameter.
     """
@@ -490,7 +499,7 @@ class FileInfo:
     def update(self, file_revision) -> None:
         """Update FileInfo with new values.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
         """
         for k, v in file_revision.items():
             if k == 'timestamp':
@@ -517,7 +526,7 @@ class FileInfo:
     def metadata(self):
         """Return metadata.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
         """
         if self._metadata is None:
             self.filepage.get_file_info(self.timestamp)
@@ -527,6 +536,6 @@ class FileInfo:
     def metadata(self, value) -> None:
         """Set metadata.
 
-        .. versionadded:: 8.6
+        .. version-added:: 8.6
         """
         self._metadata = value

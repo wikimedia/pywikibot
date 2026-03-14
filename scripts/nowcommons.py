@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-r"""Script to delete files that are also present on Wikimedia Commons.
+#
+# (C) Pywikibot team, 2006-2026
+#
+# Distributed under the terms of the MIT license.
+#
+"""Script to delete files that are also present on Wikimedia Commons.
 
 Do not run this script on Wikimedia Commons itself. It works based on
 a given array of templates defined below.
@@ -41,11 +46,6 @@ Example
    :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
    can be set within a settings file which is scripts.ini by default.
 """
-#
-# (C) Pywikibot team, 2006-2024
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import sys
@@ -187,7 +187,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
     """Bot to delete migrated files.
 
-    .. versionchanged:: 7.0
+    .. version-changed:: 7.0
        NowCommonsDeleteBot is a ConfigParserBot
     """
 

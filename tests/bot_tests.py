@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Bot tests."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Bot tests."""
 from __future__ import annotations
 
 import sys

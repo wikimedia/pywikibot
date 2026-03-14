@@ -1,9 +1,9 @@
-"""Module containing plural rules of various languages."""
 #
-# (C) Pywikibot team, 2011-2025
+# (C) Pywikibot team, 2011-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Module containing plural rules of various languages."""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -114,6 +114,6 @@ plural_rules.update(
 def plural_rule(lang: str) -> PluralRule:
     """Return the plural rule for a given lang.
 
-    .. versionadded:: 4.3
+    .. version-added:: 4.3
     """
     return plural_rules.get(lang, plural_rules['_default'])

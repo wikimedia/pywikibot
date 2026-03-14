@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# (C) Pywikibot team, 2022-2026
+#
+# Distributed under the terms of the MIT license.
+#
 """Script to create a new distribution.
 
 The following options are supported:
@@ -27,38 +32,34 @@ Usage::
 
     [pwb] make_dist [repo] [options]
 
-.. versionadded:: 7.3
-.. versionchanged:: 7.4
+.. version-added:: 7.3
+.. version-changed:: 7.4
 
    - updates pip, setuptools, wheel and twine packages first
    - installs pre-releases over stable versions
    - also creates built distribution together with source distribution
    - *-upgrade* option was added
 
-.. versionchanged:: 7.5
+.. version-changed:: 7.5
 
    - *clear* option was added
    - *nodist* option was added
 
-.. versionchanged:: 8.1
+.. version-changed:: 8.1
    *nodist* option was removed, *clear* option does not create a
    distribution. *local* and *remote* option clears old distributions
    first.
-.. versionchanged:: 8.2
+.. version-changed:: 8.2
    Build frontend was changed from setuptools to build. ``-upgrade``
    option also installs packages if necessary.
 
-.. versionchanged:: 9.4
+.. version-changed:: 9.4
    The pywikibot-scripts distribution can be created.
 """
-#
-# (C) Pywikibot team, 2022-2025
-#
-# Distributed under the terms of the MIT license.
-#
 from __future__ import annotations
 
 import abc
+import os
 import shutil
 import sys
 from contextlib import suppress
@@ -70,14 +71,20 @@ from subprocess import check_call, run
 from pywikibot import __version__, error, info, input_yn, warning
 
 
+pip = f'{sys.executable} -m pip'
+
+
 @dataclass
 class SetupBase(abc.ABC):
 
     """Setup distribution base class.
 
-    .. versionadded:: 8.0
-    .. versionchanged:: 8.1
+    .. version-added:: 8.0
+    .. version-changed:: 8.1
        *dataclass* is used.
+    .. version-changed:: 11.1
+       Use ``sys.executable`` to determine the Python Python interpreter
+       executing this script.
     """
 
     local: bool
@@ -95,7 +102,7 @@ class SetupBase(abc.ABC):
     def clear_old_dist(self) -> None:  # pragma: no cover
         """Delete old dist folders.
 
-        .. versionadded:: 7.5
+        .. version-added:: 7.5
         """
         info('<<lightyellow>>Removing old dist folders... ', newline=False)
         shutil.rmtree(self.folder / 'build', ignore_errors=True)
@@ -124,15 +131,15 @@ class SetupBase(abc.ABC):
                 return True
 
         if self.upgrade:  # pragma: no cover
-            check_call('python -m pip install --upgrade pip', shell=True)
+            check_call(f'{pip} install --upgrade pip', shell=True)
             for module in ('build', 'twine'):
                 info(f'<<lightyellow>>Install or upgrade {module}')
                 try:
                     import_module(module)
                 except ModuleNotFoundError:
-                    check_call(f'pip install {module}', shell=True)
+                    check_call(f'{pip} install {module}', shell=True)
                 else:
-                    check_call(f'pip install --upgrade {module}', shell=True)
+                    check_call(f'{pip} install --upgrade {module}', shell=True)
         else:
             for module in ('build', 'twine'):
                 try:
@@ -146,7 +153,10 @@ class SetupBase(abc.ABC):
     def build(self) -> bool:  # pragma: no cover
         """Build the packages.
 
-        .. versionadded:: 9.3
+        .. version-added:: 9.3
+        .. version-changed:: 11.1
+           Use pure-Python implementation of tokenizer for
+           mwparserfromhell with Windows.
         """
         self.copy_files()
         info('<<lightyellow>>Build package')
@@ -164,9 +174,15 @@ class SetupBase(abc.ABC):
 
         if self.local:
             info('<<lightyellow>>Install locally')
-            check_call(f'pip uninstall {self.package} -y', shell=True)
-            check_call(f'pip install --no-cache-dir --no-index --pre '
-                       f'--find-links=dist {self.package}', shell=True)
+            check_call(f'{pip} uninstall {self.package} -y', shell=True)
+            env = os.environ.copy()
+            if sys.platform.startswith('win32'):
+                # set the WITH_EXTENSION ennvironment variable for mwpfh;
+                # refer the mwpfh documentation
+                env['WITH_EXTENSION'] = '0'
+            check_call(f'{pip} install --no-cache-dir --pre '
+                       f'--find-links=dist {self.package}',
+                       shell=True, env=env)
 
         if self.remote and input_yn(
                 '<<lightblue>>Upload dist to pypi', automatic_quit=False):
@@ -178,7 +194,7 @@ class SetupPywikibot(SetupBase):
 
     """Setup for Pywikibot distribution.
 
-    .. versionadded:: 8.0
+    .. version-added:: 8.0
     """
 
     build_opt = ''  # defaults to current directory
@@ -221,7 +237,7 @@ class SetupScripts(SetupBase):
 
     """Setup pywikibot-scripts distribution.
 
-    .. versionadded:: 9.4
+    .. version-added:: 9.4
     """
 
     build_opt = '-w'  # only wheel (yet)
@@ -268,20 +284,24 @@ def handle_args() -> tuple[bool, bool, bool, bool, bool]:
     clear = '-clear' in sys.argv
     upgrade = '-upgrade' in sys.argv
     scripts = 'scripts' in sys.argv
+    msg = ''
 
     if not scripts and remote and 'dev' in __version__:  # pragma: no cover
-        warning('Distribution must not be a developmental release to upload.')
+        msg = 'Distribution must not be a developmental release to upload.'
         remote = False
 
     sys.argv = [sys.argv[0]]
-    return local, remote, clear, upgrade, scripts
+    return local, remote, clear, upgrade, scripts, msg
 
 
 def main() -> None:
     """Script entry point."""
-    *args, scripts = handle_args()
+    *args, scripts, msg = handle_args()
     installer = SetupScripts if scripts else SetupPywikibot
-    return installer(*args).run()
+    done = installer(*args).run()
+    if msg:
+        warning(f'<<lightred>>{msg}<<default>>')
+    return done
 
 
 if __name__ == '__main__':

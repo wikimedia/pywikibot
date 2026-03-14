@@ -1,14 +1,14 @@
-"""Objects representing API/Query generators.
-
-.. versionchanged:: 7.6
-   All Objects were changed from Iterable object to a Generator object.
-   They are subclassed from :class:`tools.collections.GeneratorWrapper`
-"""
 #
-# (C) Pywikibot team, 2008-2025
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Objects representing API/Query generators.
+
+.. version-changed:: 7.6
+   All Objects were changed from Iterable object to a Generator object.
+   They are subclassed from :class:`tools.collections.GeneratorWrapper`
+"""
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -53,9 +53,9 @@ class APIGeneratorBase(ABC):
     Subclasses can override :meth:`filter_item` for more complex
     filtering logic.
 
-    .. versionchanged:: 7.6
+    .. version-changed:: 7.6
        Renamed from _RequestWrapper.
-    .. versionchanged:: 10.4
+    .. version-changed:: 10.4
        Introduced :attr:`filter_func` and :meth:`filter_item` for
        instance-level item filtering.
     """
@@ -69,7 +69,7 @@ class APIGeneratorBase(ABC):
         Returns the instance-specific filter if set, otherwise the
         class-level default (None by default).
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :return: Callable that accepts an item and returns True to
             yield, False to skip; or None to disable filtering
@@ -80,7 +80,7 @@ class APIGeneratorBase(ABC):
     def filter_func(self, func: Callable[[Any], bool] | None):
         """Set a filter function to apply to items before yielding.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param func: Callable that accepts an item and returns True to
             yield, False to skip; or None to disable filtering
@@ -93,7 +93,7 @@ class APIGeneratorBase(ABC):
         By default, applies :attr:`filter_func` if set. Returns True if
         no filter is set.
 
-        .. versionadded:: 10.4
+        .. version-added:: 10.4
 
         :param item: The item to check
         :return: True if the item should be yielded, False otherwise
@@ -120,8 +120,8 @@ class APIGeneratorBase(ABC):
     def set_maximum_items(self, value: int | str | None) -> None:
         """Set the maximum number of items to be retrieved from the wiki.
 
-        .. versionadded:: 7.1
-        .. versionchanged:: 7.6
+        .. version-added:: 7.1
+        .. version-changed:: 7.6
            become an abstract method
         """
         raise NotImplementedError
@@ -136,7 +136,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
     automatically. If the limit attribute is set, the iterator will stop
     after iterating that many values.
 
-    .. versionchanged:: 7.6
+    .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
@@ -219,9 +219,9 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         Applies :meth:`filter_item()<APIGeneratorBase.filter_item>` to
         each item before yielding.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            Changed from iterator method to generator property
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Applies `filter_item` for instance-level filtering.
 
         :yield: Items from the MediaWiki API, filtered by `filter_item()`
@@ -275,7 +275,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     list of pages or links. See the API documentation for specific query
     options.
 
-    .. versionchanged:: 7.6
+    .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
     """
 
@@ -481,19 +481,31 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     def support_namespace(self) -> bool:
         """Check if namespace is a supported parameter on this query.
 
-        .. note:: this function will be removed when
-           :meth:`set_namespace` will throw TypeError() instead of just
-           giving a warning. See :phab:`T196619`.
+        .. version-added:: 3.0.20190430
+        .. version-changed:: 11.1
+           Return False if module has no prefix instead raising
+           AttributeError.
 
         :return: True if yes, False otherwise
         """
-        assert self.limited_module  # some modules do not have a prefix
+        if not self.limited_module:
+            return False  # some modules do not have a prefix
+
         return bool(
             self.site._paraminfo.parameter('query+' + self.limited_module,
                                            'namespace'))
 
-    def set_namespace(self, namespaces) -> bool | None:
+    def set_namespace(self, namespaces) -> None:
         """Set a namespace filter on this query.
+
+        .. version-changed:: 3.0.20190430
+           No longer raises TypeError if module does not support a
+           namespace parameter bug gives a FutureWarning. Return False
+           in that case.
+        .. version-changed:: 11.1
+           Again raises TypeError if module does not support a namespace
+           parameter. Check it with :meth:`support_namespace` first.
+           No longer raises AttributeError if module has no prefix.
 
         :param namespaces: namespace identifiers to limit query results
         :type namespaces: iterable of str or Namespace key, or a single
@@ -501,35 +513,21 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             namespace identifiers. An empty iterator clears any
             namespace restriction.
         :raises KeyError: a namespace identifier was not resolved
+        :raises TypeError: module does not support a namespace parameter
+            or a namespace identifier has an inappropriate type such as
+            NoneType or bool, or more than one namespace if the API
+            module does not support multiple namespaces
         """
-        # TODO: T196619
-        # :raises TypeError: module does not support a namespace parameter
-        #    or a namespace identifier has an inappropriate
-        #    type such as NoneType or bool, or more than one namespace
-        #    if the API module does not support multiple namespaces
-        assert self.limited_module  # some modules do not have a prefix
+        if not self.support_namespace():
+            raise TypeError(f'{self.limited_module or self.modules} module'
+                            ' does not support a namespace parameter')
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
-        if not param:
-            pywikibot.warning(f'{self.limited_module} module does not support'
-                              ' a namespace parameter')
-            warn('set_namespace() will be modified to raise TypeError '
-                 'when namespace parameter is not supported. '
-                 'It will be a Breaking Change, please update your code '
-                 'ASAP, due date July, 31st 2019.', FutureWarning, 2)
-
-            # TODO: T196619
-            # raise TypeError('{} module does not support a namespace '
-            #                 'parameter'.format(self.limited_module))
-
-            return False
-
         if isinstance(namespaces, str):
             namespaces = namespaces.split('|')
 
         # Use Namespace id (int) here; Request will cast int to str
-        namespaces = [ns.id for ns in
-                      self.site.namespaces.resolve(namespaces)]
+        namespaces = [ns.id for ns in self.site.namespaces.resolve(namespaces)]
 
         if 'multi' not in param and len(namespaces) != 1:
             if self._check_result_namespace is NotImplemented:
@@ -543,17 +541,15 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         elif self.prefix + 'namespace' in self.request:
             del self.request[self.prefix + 'namespace']
 
-        return None
-
     def continue_update(self) -> None:
         """Update query with continue parameters.
 
-        .. versionadded:: 3.0
-        .. versionchanged:: 4.0
+        .. version-added:: 3.0
+        .. version-changed:: 4.0
            explicit return a bool value to be used in :meth:`generator`
-        .. versionchanged:: 6.0
+        .. version-changed:: 6.0
            always return *False*
-        .. versionchanged:: 8.4
+        .. version-changed:: 8.4
            return *None* instead of *False*.
         """
         for key, value in self.data[self.continue_name].items():
@@ -634,7 +630,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         passes :meth:`filter_item() <APIGeneratorBase.filter_item>` and
         respects namespaces and the generator's limit.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Applies `filter_item()` for instance-level filtering.
 
         :param resultdata: List or iterable of raw API items
@@ -679,9 +675,9 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         Continues response as needed until limit (if any) is reached.
         Each item is already filtered by `_extract_results()`.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            Changed from iterator method to generator property
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Items are filtered via :meth:`filter_item()
            <APIGeneratorBase.filter_item>` inside :meth:`_extract_results`.
 
@@ -771,7 +767,7 @@ class PageGenerator(QueryGenerator):
         Required and optional parameters are as for ``Request``, except
         that ``action=query`` is assumed and generator is required.
 
-        .. versionchanged:: 9.1
+        .. version-changed:: 9.1
            retrieve the same imageinfo properties as in
            :meth:`APISite.loadimageinfo()
            <pywikibot.site._apisite.APISite.loadimageinfo>` with default
@@ -813,11 +809,11 @@ class PageGenerator(QueryGenerator):
         This can be overridden in subclasses to return a different type
         of object.
 
-        .. versionchanged:: 9.5
+        .. version-changed:: 9.5
            No longer raise :exc:`exceptions.UnsupportedPageError` but
            return a generic :class:`pywikibot.Page` object. The exception
            is raised when getting the content for example.
-        .. versionchanged:: 9.6
+        .. version-changed:: 9.6
            Upcast to :class:`page.FilePage` if *pagedata* has
            ``imageinfo`` contents even if the file extension is invalid.
         """
@@ -852,7 +848,7 @@ class PropertyGenerator(QueryGenerator):
     dict for each page queried via a titles= or ids= parameter (which
     must be supplied when instantiating this class).
 
-    .. versionchanged:: 10.4
+    .. version-changed:: 10.4
        Supports instance-level filtering via :attr:`filter_func
        <APIGenerator.filter_func>` / :meth:`filter_item()
        <APIGenerator.filter_item`.
@@ -881,10 +877,10 @@ class PropertyGenerator(QueryGenerator):
     def generator(self):
         """Yield results from the API, including previously retrieved dicts.
 
-        .. versionchanged:: 7.6
+        .. version-changed:: 7.6
            Changed from iterator method to generator property.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Items are filtered via :meth:`filter_item()
            <APIGenerator.filter_item` inside :meth:`_extract_results`.
            Previously retrieved dicts in `_previous_dicts` are also
@@ -915,7 +911,7 @@ class PropertyGenerator(QueryGenerator):
     def _fully_retrieved_data_dicts(self, resultdata):
         """Yield items of self._previous_dicts that are not in resultdata.
 
-        .. versionchanged:: 10.4
+        .. version-changed:: 10.4
            Applies :meth:`filter_item()<APIGenerator.filter_item` to
            previously stored dicts.
 
@@ -1064,7 +1060,7 @@ def _update_categories(page, categories) -> None:
 def _update_langlinks(page, langlinks) -> None:
     """Update page langlinks.
 
-    .. versionadded:: 9.3
+    .. version-added:: 9.3
        only add a language link if it is found in the family file.
 
     :meta public:

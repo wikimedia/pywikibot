@@ -13,7 +13,7 @@ The project started in 2003 and is currently on core version |version|.
 It features full API usage and is up-to-date with new MediaWiki features and
 a Pythonic package layout. But it also works with older installations of
 MediaWiki 1.31 or higher. For older MediaWiki versions you have to use older
-Pywikibot releases; refer :manpage:`Compatibility`.
+Pywikibot releases; refer :ref:`Version compatibility`.
 
 Pywikibot supports Microsoft Windows, macOS and Linux when used with a
 compatible version of Python. It should also work on any other operating

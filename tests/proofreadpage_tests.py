@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2025
+# (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the proofreadpage module."""
 from __future__ import annotations
 
 import difflib
@@ -256,8 +256,9 @@ class TestProofreadPageValidSite(TestCase):
 
     valid_redlink = {
         'title': 'Page:Pywikibot test page 3.jpg',
-        'url_image': ('https://upload.wikimedia.org/wikisource/en/3/37/'
-                      'Pywikibot_test_page_3.jpg'),
+        'url_image':
+            'https://upload.wikimedia.org/wikisource/en/thumb/3/37/'
+            'Pywikibot_test_page_3.jpg/60px-Pywikibot_test_page_3.jpg',
     }
 
     existing_invalid = {
@@ -408,7 +409,10 @@ class TestProofreadPageValidSite(TestCase):
 
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+            ValueError,
+            'imagesforpage is empty|No prp-page-image src found'
+        ):
             page.url_image
 
         page = ProofreadPage(self.site, self.valid_redlink['title'])
