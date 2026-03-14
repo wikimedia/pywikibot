@@ -1,6 +1,7 @@
 Release 11.1
 ============
 
+* Re-enable ``pwb`` site-package code entry point which was broken in Pywikibot 11 (:phab:`T420086`)
 * Add support for kaiwiki (:phab:`T414239`)
 * Add support for urwikisource (:phab:`T415976`)
 * Raise :exc:`NotImplementedError` instead of :exc:`AttributeError` if a
