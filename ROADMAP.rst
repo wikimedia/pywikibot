@@ -1,19 +1,7 @@
-Release 11.1
+Release 11.2
 ============
 
-* Re-enable ``pwb`` site-package code entry point which was broken in Pywikibot 11 (:phab:`T420086`)
-* Add support for kaiwiki (:phab:`T414239`)
-* Add support for urwikisource (:phab:`T415976`)
-* Raise :exc:`NotImplementedError` instead of :exc:`AttributeError` if a
-  :class:`Site<pywikibot.site._basesite.BaseSite>` method cannot be delegated to the corresponding
-  :class:`Family<family.Family>` (:phab:`T417961`)
-* Use read throttle with :meth:`pywikibot.FilePage.download` per Wikitech robot policy for download (:phab:`T418672`)
-* Add *namespaces* parameter to :func:`pagegenerators.SubCategoriesPageGenerator` (:phab:`T417961`)
-* Fix nightly package version detection in :meth:`version.getversion_nightly`
-* Remove warning in :attr:`data.api.QueryGenerator.set_namespace` (:phab:`T196619`, :phab:`T198452`)
-* Prefer Pillow 12.1.1 or above due to security vulnerability (:phab:`T418046`)
-* Updated localization (L10N) files.
-
+* (no changes yet)
 
 Deprecations
 ============
