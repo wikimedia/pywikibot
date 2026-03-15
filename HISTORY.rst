@@ -3,7 +3,7 @@ Release History
 
 11.1.0
 ------
-*15 March 2026*
+*14 March 2026*
 
 * Re-enable ``pwb`` site-package code entry point which was broken in Pywikibot 11 (:phab:`T420086`)
 * Add support for kaiwiki (:phab:`T414239`)
