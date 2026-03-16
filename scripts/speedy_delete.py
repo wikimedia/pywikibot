@@ -453,7 +453,9 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         elif choice == 'd':
             reason = self.get_reason_for_deletion(page)
             pywikibot.info(f'The chosen reason is: <<lightred>>{reason}')
-            page.delete(reason, prompt=False)
+            # don't produce orphaned talk pages
+            deletetalk = not page.isTalkPage() and page.namespace() != 2
+            page.delete(reason, prompt=False, deletetalk=deletetalk)
 
         # skip this page
         else:
@@ -463,9 +465,6 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         """Refresh generator."""
         generator = pagegenerators.CategorizedPageGenerator(
             self.csd_cat, start=self.saved_progress)
-        # wrap another generator around it so that we won't produce orphaned
-        # talk pages.
-        generator = pagegenerators.PageWithTalkPageGenerator(generator)
         self.generator = pagegenerators.PreloadingGenerator(generator,
                                                             groupsize=20)
         self.saved_progress = None
