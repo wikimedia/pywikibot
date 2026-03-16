@@ -447,7 +447,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
         elif choice == 'u':
             pywikibot.info('Updating from CSD category.')
             self.saved_progress = page.title()
-            self.stop()
+            self.generator.close()
 
         # delete the current page
         elif choice == 'd':
