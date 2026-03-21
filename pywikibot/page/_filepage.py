@@ -188,6 +188,9 @@ class FilePage(Page):
            the corresponding thumbnail URL directly. See the additional
            notes at :api:`Imageinfo`.
 
+        .. version-changed:: 11.2
+           Remove UTM tracking parameter.
+
         .. seealso::
 
            * :meth:`APISite.loadimageinfo()
@@ -201,13 +204,13 @@ class FilePage(Page):
         """
         # Plain url is requested.
         if url_width is None and url_height is None and url_param is None:
-            return self.latest_file_info.url
+            return self.latest_file_info.url.split('?', 1)[0]
 
         # Thumburl is requested.
         self.site.loadimageinfo(self, history=not self._file_revisions,
                                 url_width=url_width, url_height=url_height,
                                 url_param=url_param)
-        return self.latest_file_info.thumburl
+        return self.latest_file_info.thumburl.split('?', 1)[0]
 
     def file_is_shared(self) -> bool:
         """Check if the file is stored on any known shared repository.
