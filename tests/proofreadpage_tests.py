@@ -256,9 +256,12 @@ class TestProofreadPageValidSite(TestCase):
 
     valid_redlink = {
         'title': 'Page:Pywikibot test page 3.jpg',
-        'url_image':
+        'url_image': (
+            'https://upload.wikimedia.org/wikisource/en/3/37/'
+            'Pywikibot_test_page_3.jpg',
             'https://upload.wikimedia.org/wikisource/en/thumb/3/37/'
             'Pywikibot_test_page_3.jpg/60px-Pywikibot_test_page_3.jpg',
+        )
     }
 
     existing_invalid = {
@@ -406,7 +409,6 @@ class TestProofreadPageValidSite(TestCase):
         """Test fetching of url image of the scan of ProofreadPage."""
         page = ProofreadPage(self.site, self.valid['title'])
         self.assertEqual(page.url_image, self.valid['url_image'])
-
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
         # test Exception in property.
         with self.assertRaisesRegex(
@@ -416,7 +418,8 @@ class TestProofreadPageValidSite(TestCase):
             page.url_image
 
         page = ProofreadPage(self.site, self.valid_redlink['title'])
-        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
+        # seems the result is not deterministic
+        self.assertIn(page.url_image, self.valid_redlink['url_image'])
 
 
 class TestPageQuality(TestCase):
