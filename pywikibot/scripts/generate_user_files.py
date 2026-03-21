@@ -4,8 +4,11 @@
 #
 # Distributed under the terms of the MIT license.
 #
-"""Script to create user-config.py. Other file names are not supported.
+"""Script to create user-config.py and user-password.cfg if required.
 
+.. version-changed:: 3.0.20190722
+   ``user-fixes.py`` is no longer created. Use the
+   ``user-fixes.py.sample`` file instead.
 .. version-changed:: 7.0
    moved to pywikibot.scripts folder.
 .. version-changed:: 8.0
