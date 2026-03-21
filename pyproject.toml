@@ -165,6 +165,7 @@ disable = [
     "SIG202",
     "SIG203",
     "SIG301",
+    "SIG306",
     "SIG501",
     "SIG503",
     "SIG505",
