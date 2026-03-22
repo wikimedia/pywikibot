@@ -830,11 +830,11 @@ class TestIndexPageMappings(BS4TestCase):
         proofread_page = ProofreadPage(self.site, page_title)
 
         # Check start/end limits.
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, ' are not in valid range '):
             index_page.page_gen(-1, 2)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, ' are not in valid range '):
             index_page.page_gen(1, -1)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, ' are not in valid range '):
             index_page.page_gen(2, 1)
 
         # Check quality filters.
