@@ -1,7 +1,9 @@
 Release 11.2
 ============
 
-* (no changes yet)
+* Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
+  <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
+* Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
 
 Deprecations
 ============

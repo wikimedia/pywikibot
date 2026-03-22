@@ -1,6 +1,16 @@
 Scripts Changelog
 =================
 
+11.2.0
+------
+
+speedy_delete
+^^^^^^^^^^^^^
+
+* Use :python:`generator.close()<reference/expressions.html#generator.close>` instead of ``stop()`` method which was removed in Pywikibot 7 (:phab:`T420169`)
+* Don't add user talk pages to generator, use *deletetalk* option instead (:phab:`T420170`)
+
+
 11.1.0
 ------
 

@@ -253,6 +253,9 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate all pages that link to the given page.
 
+        .. version-changed:: 11.2
+           No longer follow interwiki redirect links.
+
         .. seealso:: :api:`Backlinks`
 
         :param page: The Page to get links to.
