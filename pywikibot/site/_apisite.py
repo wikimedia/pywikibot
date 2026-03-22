@@ -2693,9 +2693,12 @@ class APISite(
 
         if deletetalk:
             if self.mw_version < '1.38wmf24':
-                pywikibot.warning(
-                    f'deletetalk is not available on {self.mw_version}'
-                )
+                if not page.isTalkPage():
+                    talk_page = page.toggleTalkPage()
+                    talk_page.delete(reason=reason, prompt=False)
+                else:
+                    raise ValueError('Cannot use "deletetalk" when deleting '
+                                     'a talk page.')
             else:
                 params['deletetalk'] = deletetalk
 
