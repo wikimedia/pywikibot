@@ -89,6 +89,12 @@
 .. automodule:: families.wikifunctions_family
    :synopsis: Family module for Wikifunctions
 
+:mod:`families.abstract\_family` --- Abstract Wikipedia
+=======================================================
+
+.. automodule:: families.abstract_family
+   :synopsis: Family module for Abstract Wikipedia
+
 :mod:`families.wikihow\_family` --- Wikihow
 ===========================================
 

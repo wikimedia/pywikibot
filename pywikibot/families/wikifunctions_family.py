@@ -1,4 +1,4 @@
-"""Family module for Wikifunction.
+"""Family module for Wikifunctions.
 
 .. version-added:: 8.4
 """
