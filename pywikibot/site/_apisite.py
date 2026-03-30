@@ -2690,17 +2690,15 @@ class APISite(
         else:
             params['pageid'] = int(page)
             title = str(page)
+            if deletetalk and self.mw_version < '1.38':
+                raise TypeError(
+                    "'page' must be a BasePage not a "
+                    f"'{page.__class__.__name__}' when "
+                    'deletetalk=True.'
+                )
 
-        if deletetalk:
-            if self.mw_version < '1.38wmf24':
-                if not page.isTalkPage():
-                    talk_page = page.toggleTalkPage()
-                    talk_page.delete(reason=reason, prompt=False)
-                else:
-                    raise ValueError('Cannot use "deletetalk" when deleting '
-                                     'a talk page.')
-            else:
-                params['deletetalk'] = deletetalk
+        if self.mw_version >= '1.38':
+            params['deletetalk'] = deletetalk
 
         req = self.simple_request(**params)
         self.lock_page(page)
@@ -2728,6 +2726,19 @@ class APISite(
                 page.clear_cache()
         finally:
             self.unlock_page(page)
+
+        if deletetalk and self.mw_version < '1.38':
+            talk_page = page.toggleTalkPage()
+            if page.isTalkPage():
+                pywikibot.warning(
+                    'Cannot delete associated talk page of a talk page.'
+                )
+            elif not talk_page.exists():
+                pywikibot.warning(
+                    'Cannot delete a non-existing associated talk page.'
+                )
+            else:
+                self.delete(talk_page, reason)
 
     @need_right('undelete')
     def undelete(
