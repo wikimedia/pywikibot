@@ -26,7 +26,6 @@ jobs:
         include:
           # Other test are already made on Jenkins
           - python-version: pypy3.11
-          - python-version: '3.14'
           - python-version: 3.15-dev
     steps:
       - name: Checkout Repository
