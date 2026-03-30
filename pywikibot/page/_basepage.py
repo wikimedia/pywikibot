@@ -2049,6 +2049,16 @@ class BasePage(ComparableMixin):
         .. version-changed:: 7.1
            keyword only parameter *deletetalk* was added.
 
+        .. version-changed:: 11.2
+           *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
+
+        .. seealso::
+           - :meth:`undelete`
+           - :meth:`loadDeletedRevisions`
+           - :meth:`markDeletedRevision`
+           - :meth:`site.APISite.delete
+             <pywikibot.site._apisite.APISite.delete>`
+
         :param reason: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
         :param prompt: If true, prompt user for confirmation before deleting.
@@ -2234,6 +2244,7 @@ class BasePage(ComparableMixin):
             page.undelete('This will restore only selected revisions.')
 
         .. seealso::
+           - :meth:`delete`
            - :meth:`loadDeletedRevisions`
            - :meth:`markDeletedRevision`
            - :meth:`site.APISite.undelete

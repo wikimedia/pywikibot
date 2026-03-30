@@ -1,6 +1,9 @@
 Release 11.2
 ============
 
+* Implement *deletetalk* option in :meth:`APISite.delete()<pywikibot.site._apisite.APISite.delete>`
+  for older MediaWiki versions (:phab:`T420636`)
+* Add support for :mod:`abstract_family<families.abstract_family>` (:phab:`T420636`)
 * Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
   <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
 * Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
