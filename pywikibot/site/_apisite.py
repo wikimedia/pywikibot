@@ -1362,9 +1362,9 @@ class APISite(
         >>> site = pywikibot.Site('commons')
         >>> page = site.page_from_repository('Q131303')
         >>> page.title()
-        'Category:Hello World'
+        'Category:Hello World!'
         >>> page
-        Category('Category:Hello World')
+        Category('Category:Hello World!')
 
         It also works for wikibase repositories:
 
