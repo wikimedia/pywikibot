@@ -20,7 +20,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Wait for all workflows to complete excluding this one
-        uses: kachick/wait-other-jobs@v3.8.1
+        uses: kachick/wait-other-jobs@v4
         with:
           skip-same-workflow: true
           skip-list: |
@@ -126,6 +126,6 @@ jobs:
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
