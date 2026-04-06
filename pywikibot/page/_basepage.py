@@ -1635,11 +1635,9 @@ class BasePage(ComparableMixin):
         :return: A generator that yields Link objects.
         """
         if hasattr(self, '_langlinks'):
-            return iter(self.langlinks(include_obsolete=include_obsolete))
-        # FIXME: We might want to fill _langlinks when the Site
-        # method is called. If we do this, we'll have to think
-        # about what will happen if the generator is not completely
-        # iterated upon.
+            return islice(self.langlinks(include_obsolete=include_obsolete),
+                          total)
+
         return self.site.pagelanglinks(self, total=total,
                                        include_obsolete=include_obsolete)
 
