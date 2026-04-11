@@ -1,12 +1,12 @@
-"""Citoid Query interface.
-
-.. version-added:: 10.6
-"""
 #
 # (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Citoid Query interface.
+
+.. version-added:: 10.6
+"""
 from __future__ import annotations
 
 import urllib.parse

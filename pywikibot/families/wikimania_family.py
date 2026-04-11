@@ -1,12 +1,12 @@
-"""Family module for Wikimania wikis.
-
-.. version-added:: 3.0
-"""
 #
 # (C) Pywikibot team, 2017-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikimania wikis.
+
+.. version-added:: 3.0
+"""
 from __future__ import annotations
 
 from pywikibot import family
