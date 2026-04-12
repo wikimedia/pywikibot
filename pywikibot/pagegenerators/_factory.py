@@ -306,7 +306,7 @@ class GeneratorFactory:
                 preloadgen = pywikibot.pagegenerators.DequePreloadingGenerator
             else:
                 preloadgen = pywikibot.pagegenerators.PreloadingGenerator
-            dupfiltergen = preloadgen(dupfiltergen)
+            dupfiltergen = preloadgen(dupfiltergen, quiet=True)
 
         if self.articlefilter_list:
             dupfiltergen = RegexBodyFilterPageGenerator(
