@@ -1,6 +1,6 @@
-*************************
-pytest mypy plugin module
-*************************
+********************
+pytest plugin module
+********************
 
 .. automodule:: conftest
     :members:

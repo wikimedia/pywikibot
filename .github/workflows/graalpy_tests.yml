@@ -44,7 +44,7 @@ jobs:
           pip install packaging
           pip install requests
           pip install wikitextparser
-          pip install pytest
+          pip install pytest >= 9.0.3
           pip install pytest-attrib
           pip install coverage
       - name: Generate user files
