@@ -11,12 +11,9 @@ Useful for editing the contents of an article.
 
 .. caution::
    Pillow may not be installable on GraalPy.
-   PyPy 3.9 needs Pillow 10.4.0, PyPy 3.10 needs Pillow 11.3.0.
-   CPython and other Python versions needs Pillow >= 11.3.0 to use this
-   module.
 
 .. danger::
-   Due to security vulnerability, use Pillow >= 12.1.1.
+   Due to security vulnerability, use Pillow >= 12.2.0.
    Requires PyPy >= 3.11 or CPython >= 3.10.
 
 .. seealso:: :mod:`editor`
@@ -522,9 +519,12 @@ class Tkdialog:
 
         .. version-changed:: 11.1
            PSD files are not allowed for ``Pillow < 12.1.1``.
+        .. version-changed:: 11.2
+           ``Pillow >= 12.2.0`` is required due to security
+           vulnerability.
 
         :raises ImportError: Pillow is not installed
-        :raises ValueError: if a PSD file is passed and Pillow < 12.1.1
+        :raises RuntimeError: Pillow < 12.2.0
         """
         try:
             from PIL import Image, ImageTk, __version__
@@ -533,15 +533,15 @@ class Tkdialog:
                               'Python Imaging Library (PIL).')
             raise
 
-        path = pathlib.Path(photo)
         pil_version = Version(__version__)
-        if pil_version < Version('12.1.1') and path.suffix.lower() == '.psd':
-            raise ValueError(
-                f'PSD files are not allowed with Pillow {pil_version} due to'
-                ' Pillow security advisory. Please update your Pillow and'
-                ' if necessary your Python.'
+        if pil_version < Version('12.2.0'):
+            raise RuntimeError(
+                f'Pillow {pil_version} is not allowed due to Pillow security'
+                ' advisory. Please update your Pillow and if necessary your'
+                ' Python.'
             )
 
+        path = pathlib.Path(photo)
         image = Image.open(path)
         image.thumbnail((width, height))
         return ImageTk.PhotoImage(image)
