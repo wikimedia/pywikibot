@@ -33,12 +33,15 @@ jobs:
             site: false
             family: wpbeta
             code: en
+            experimental: true
           - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
+            experimental: true
           - python-version: '3.10'
             site: wsbeta:en
+            experimental: true
           - python-version: '3.9'
             site: wikidata:test
           - python-version: '3.11'
