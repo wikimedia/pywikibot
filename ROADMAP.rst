@@ -1,9 +1,15 @@
 Release 11.2
 ============
 
+* Require Pillow 12.2.0 or above due to security vulnerability
+* Remove UTM tracking parameters in :attr:`proofreadpage.ProofreadPage.url_image` (:phab:`T419943`)
+* Enable *total* parameter in :meth:`Page.iterlanglinks()<page.BasePage.iterlanglinks>`
+  if links were cached (:phab:`T422390`)
+* Update translations (i18n)
 * Implement *deletetalk* option in :meth:`APISite.delete()<pywikibot.site._apisite.APISite.delete>`
   for older MediaWiki versions (:phab:`T420636`)
-* Add support for :mod:`abstract_family<families.abstract_family>` (:phab:`T420636`)
+* Add support for :mod:`abstract_family<families.abstract_family>`
+  (:phab:`T420636`, :phab:`T422369`)
 * Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
   <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
 * Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
