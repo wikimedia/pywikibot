@@ -193,6 +193,9 @@ def Site(code: str | None = None,  # noqa: N802
        any longer.
     .. version-changed:: 10.3
        accept a trailing slash in *url* after domain.
+    .. version-changed:: 11.2
+       Redirect abstract wikipedia to :mod:`abstract family
+       <families.abstract_family>`
 
     :param code: Site code (override config.mylang); *code* may also be
         a sitename like 'wikipedia:test'
@@ -225,6 +228,11 @@ def Site(code: str | None = None,  # noqa: N802
         if not fam:  # try code as family
             with suppress(exceptions.UnknownFamilyError):
                 fam = Family.load(code)
+
+        # ensure that abstract family is used
+        if (code, fam) == ('abstract', 'wikipedia'):
+            fam = 'abstract'
+
         # Fallback to config defaults
         code = code or _config.mylang
         fam = fam or _config.family

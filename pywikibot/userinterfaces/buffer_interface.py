@@ -1,12 +1,12 @@
-"""Non-interactive interface that stores output.
-
-.. version-added:: 6.4
-"""
 #
 # (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Non-interactive interface that stores output.
+
+.. version-added:: 6.4
+"""
 from __future__ import annotations
 
 import logging

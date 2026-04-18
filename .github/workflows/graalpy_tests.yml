@@ -44,7 +44,7 @@ jobs:
           pip install packaging
           pip install requests
           pip install wikitextparser
-          pip install pytest
+          pip install pytest >= 9.0.3
           pip install pytest-attrib
           pip install coverage
       - name: Generate user files
@@ -71,7 +71,7 @@ jobs:
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure

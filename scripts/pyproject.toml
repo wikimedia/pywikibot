@@ -1,5 +1,5 @@
 [build-system]
-requires = ["packaging", "setuptools", "wheel"]
+requires = ["packaging", "setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
@@ -7,7 +7,7 @@ package-dir = {"pywikibot_scripts" = "scripts"}
 
 [project]
 name = "pywikibot-scripts"
-version = "11.0.0"
+version = "11.2.0"
 
 authors = [
     {name = "xqt", email = "info@gno.de"},
@@ -19,7 +19,7 @@ description = "Pywikibot Scripts Collection"
 readme = "scripts/README.rst"
 requires-python = ">=3.9.0"
 dependencies = [
-    "pywikibot >= 11.1.0",
+    "pywikibot >= 11.2.0",
     "langdetect",
     "mwparserfromhell",
     "pydot",
@@ -32,12 +32,12 @@ keywords = [
     "replace", "redirect", "script", "scripts", "upload",
     "wiki", "wikibase", "wikidata", "wikimedia", "wikipedia",
 ]
-license = {text = "MIT License"}
+license = "MIT"
+license-files = ["LICENSE"]
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Natural Language :: Afrikaans",
     "Natural Language :: Arabic",
     "Natural Language :: Basque",

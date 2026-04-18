@@ -1,12 +1,12 @@
-"""Family module for Foundation wiki.
-
-.. version-added:: 3.0
-"""
 #
 # (C) Pywikibot team, 2019-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Foundation wiki.
+
+.. version-added:: 3.0
+"""
 from __future__ import annotations
 
 from pywikibot import family

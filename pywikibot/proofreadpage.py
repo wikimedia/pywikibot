@@ -881,6 +881,9 @@ class ProofreadPage(pywikibot.Page):
     def url_image(self) -> str:
         """Get the file url of the scan of ProofreadPage.
 
+        .. version-changed:: 11.2
+           Remove UTM tracking parameters.
+
         :return: File url of the scan of ProofreadPage or None. For MW
             version < 1.40:
         :raises Exception: In case of http errors
@@ -890,9 +893,11 @@ class ProofreadPage(pywikibot.Page):
             scan
         """
         if self.site.version() < MediaWikiVersion('1.40'):
-            return self._url_image_lt_140()
+            url = self._url_image_lt_140()
+        else:
+            url = self._url_image_ge_140()
 
-        return self._url_image_ge_140()
+        return url.split('?', 1)[0]
 
     def _ocr_callback(
         self,

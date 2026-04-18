@@ -45,17 +45,11 @@ extra_deps = {
     'memento': ['memento_client==0.6.1'],
     'wikitextparser': ['wikitextparser>=0.56.4'],
     'mysql': ['PyMySQL >= 1.1.2'],
-    # Pillow cannot be installed with GraalPy
+    # Pillow cannot be installed with GraalPy, Python 3.9 or PyPy < 3.11
     'Tkinter': [
-        'Pillow==10.4.0; platform_python_implementation == "PyPy" '
-        'and python_version == "3.9"',
-        'Pillow==11.3.0; platform_python_implementation == "PyPy" '
-        'and python_version == "3.10"',
-        'Pillow>=12.1.1; platform_python_implementation == "PyPy" '
+        'Pillow>=12.2.0; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
-        'Pillow==11.3.0; platform_python_implementation == "CPython" '
-        'and python_version == "3.9"',
-        'Pillow>=12.1.1; platform_python_implementation == "CPython" '
+        'Pillow>=12.2.0; platform_python_implementation == "CPython" '
         'and  python_version >= "3.10"',
     ],
     'mwoauth': [

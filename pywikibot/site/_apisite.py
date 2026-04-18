@@ -1362,9 +1362,9 @@ class APISite(
         >>> site = pywikibot.Site('commons')
         >>> page = site.page_from_repository('Q131303')
         >>> page.title()
-        'Category:Hello World'
+        'Category:Hello World!'
         >>> page
-        Category('Category:Hello World')
+        Category('Category:Hello World!')
 
         It also works for wikibase repositories:
 
@@ -2644,8 +2644,6 @@ class APISite(
 
         Requires appropriate privileges.
 
-        .. seealso:: :api:`Delete`
-
         Page to be deleted can be given either as Page object or as pageid.
         To delete a specific version of an image the oldimage identifier
         must be provided.
@@ -2662,13 +2660,27 @@ class APISite(
         .. version-changed:: 8.1
            raises :exc:`exceptions.NoPageError` if page does not exist.
 
+        .. version-changed:: 11.2
+           *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
+
+        .. seealso::
+           - :api:`Delete`
+           - :meth:`undelete`
+           - :meth:`page.BasePage.delete`
+
         :param page: Page to be deleted or its pageid.
         :param reason: Deletion reason.
         :param deletetalk: Also delete the talk page, if it exists.
         :param oldimage: Oldimage id of the file version to be deleted.
             If a BasePage object is given with page parameter, it has to
             be a FilePage.
-        :raises TypeError, ValueError: page has wrong type/value.
+        :raises TypeError: *oldimage* option is given but page object is
+            neither a page id nor a :class:`pywikibot.FilePage`.
+        :raises NoPageError: the *page* does not exists.
+        :raises Error: Any of the following conditions occurred:
+            noapiwrite, writeapidenied, permissiondenied, cantdelete,
+            nodeleteablefile.
+        :raises APIError: Any other API error occurred.
         """
         if oldimage and isinstance(page, pywikibot.page.BasePage) \
            and not isinstance(page, pywikibot.FilePage):
@@ -2690,14 +2702,15 @@ class APISite(
         else:
             params['pageid'] = int(page)
             title = str(page)
-
-        if deletetalk:
-            if self.mw_version < '1.38wmf24':
-                pywikibot.warning(
-                    f'deletetalk is not available on {self.mw_version}'
+            if deletetalk and self.mw_version < '1.38':
+                raise TypeError(
+                    "'page' must be a BasePage not a "
+                    f"'{page.__class__.__name__}' when "
+                    'deletetalk=True.'
                 )
-            else:
-                params['deletetalk'] = deletetalk
+
+        if self.mw_version >= '1.38':
+            params['deletetalk'] = deletetalk
 
         req = self.simple_request(**params)
         self.lock_page(page)
@@ -2726,6 +2739,19 @@ class APISite(
         finally:
             self.unlock_page(page)
 
+        if deletetalk and self.mw_version < '1.38':
+            talk_page = page.toggleTalkPage()
+            if page.isTalkPage():
+                pywikibot.warning(
+                    'Cannot delete associated talk page of a talk page.'
+                )
+            elif not talk_page.exists():
+                pywikibot.warning(
+                    'Cannot delete a non-existing associated talk page.'
+                )
+            else:
+                self.delete(talk_page, reason)
+
     @need_right('undelete')
     def undelete(
         self,
@@ -2737,14 +2763,17 @@ class APISite(
     ) -> None:
         """Undelete page from the wiki. Requires appropriate privilege level.
 
-        .. seealso:: :api:`Undelete`
-
         .. version-added:: 6.1
            renamed from `undelete_page`
 
         .. version-changed:: 6.1
            `fileids` parameter was added,
            keyword argument required for `revisions`.
+
+        .. seealso::
+           - :api:`Undelete`
+           - :meth:`delete`
+           - :meth:`page.BasePage.undelete`
 
         :param page: Page to be deleted.
         :param reason: Undeletion reason.

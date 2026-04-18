@@ -30,9 +30,11 @@ The entire suite of tests may be run in the following ways from the root directo
 
 **pytest**
 
+.. note:: Python 3.10 or higher is required to run pytest.
+
 ::
 
-    pip install "pytest != 9.0.0"
+    pip install "pytest >= 9.0.3"
     pytest
 
 **tox**

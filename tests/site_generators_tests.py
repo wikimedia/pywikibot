@@ -208,8 +208,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_pagelanglinks(self) -> None:
         """Test Site.pagelanglinks."""
-        for ll in self.site.pagelanglinks(self.mainpage):
-            self.assertIsInstance(ll, pywikibot.Link)
+        with suppress_warnings(WARN_SITE_CODE, category=UserWarning):
+            for ll in self.site.pagelanglinks(self.mainpage):
+                self.assertIsInstance(ll, pywikibot.Link)
 
     def test_page_extlinks(self) -> None:
         """Test Site.extlinks."""

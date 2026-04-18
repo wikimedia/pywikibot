@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9']
+        python-version: ['3.10']
         site: ['wikipedia:test']
         attr: [write and not rights, write and rights, rights and not write]
     steps:
@@ -65,7 +65,7 @@ jobs:
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure

@@ -20,7 +20,7 @@ jobs:
     continue-on-error: true
     steps:
       - name: Wait for all workflows to complete excluding this one
-        uses: kachick/wait-other-jobs@v3.8.1
+        uses: kachick/wait-other-jobs@v4
         with:
           skip-same-workflow: true
           skip-list: |
@@ -50,13 +50,16 @@ jobs:
             family: wpbeta
             code: en
             os: ubuntu-22.04
+            experimental: true
           - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
             os: ubuntu-22.04
+            experimental: true
           - python-version: '3.10'
             site: wsbeta:en
+            experimental: true
           - python-version: '3.9'
             site: wikidata:test
             os: ubuntu-22.04
@@ -126,6 +129,6 @@ jobs:
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

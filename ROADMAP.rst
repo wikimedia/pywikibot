@@ -1,19 +1,18 @@
-Release 11.1
+Release 11.2
 ============
 
-* Re-enable ``pwb`` site-package code entry point which was broken in Pywikibot 11 (:phab:`T420086`)
-* Add support for kaiwiki (:phab:`T414239`)
-* Add support for urwikisource (:phab:`T415976`)
-* Raise :exc:`NotImplementedError` instead of :exc:`AttributeError` if a
-  :class:`Site<pywikibot.site._basesite.BaseSite>` method cannot be delegated to the corresponding
-  :class:`Family<family.Family>` (:phab:`T417961`)
-* Use read throttle with :meth:`pywikibot.FilePage.download` per Wikitech robot policy for download (:phab:`T418672`)
-* Add *namespaces* parameter to :func:`pagegenerators.SubCategoriesPageGenerator` (:phab:`T417961`)
-* Fix nightly package version detection in :meth:`version.getversion_nightly`
-* Remove warning in :attr:`data.api.QueryGenerator.set_namespace` (:phab:`T196619`, :phab:`T198452`)
-* Prefer Pillow 12.1.1 or above due to security vulnerability (:phab:`T418046`)
-* Updated localization (L10N) files.
-
+* Require Pillow 12.2.0 or above due to security vulnerability
+* Remove UTM tracking parameters in :attr:`proofreadpage.ProofreadPage.url_image` (:phab:`T419943`)
+* Enable *total* parameter in :meth:`Page.iterlanglinks()<page.BasePage.iterlanglinks>`
+  if links were cached (:phab:`T422390`)
+* Update translations (i18n)
+* Implement *deletetalk* option in :meth:`APISite.delete()<pywikibot.site._apisite.APISite.delete>`
+  for older MediaWiki versions (:phab:`T420636`)
+* Add support for :mod:`abstract_family<families.abstract_family>`
+  (:phab:`T420636`, :phab:`T422369`)
+* Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
+  <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
+* Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
 
 Deprecations
 ============

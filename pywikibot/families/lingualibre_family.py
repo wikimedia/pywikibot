@@ -1,12 +1,12 @@
-"""Family module for Lingua Libre.
-
-.. version-added:: 6.5
-"""
 #
 # (C) Pywikibot team, 2021-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Lingua Libre.
+
+.. version-added:: 6.5
+"""
 from __future__ import annotations
 
 from pywikibot import family

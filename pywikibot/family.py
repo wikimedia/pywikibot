@@ -893,6 +893,7 @@ class WikimediaFamily(Family):
         'mediawiki',
         'wikidata',
         'wikifunctions',
+        'abstract',
     ]
 
     content_families = set(
