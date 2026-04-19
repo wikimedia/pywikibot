@@ -14,7 +14,7 @@ Deprecated items may still work in the current release but are no longer recomme
 Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
-removed in in the third subsequent major release, remaining available for the two releases in between.
+removed in the third subsequent major release, remaining available for the two releases in between.
 
 
 Pending removal in Pywikibot 12
@@ -57,7 +57,7 @@ Pending removal in Pywikibot 12
 Pending removal in Pywikibot 13
 -------------------------------
 
-* 10.6.0: The old ``(type, value, traceback)`` signature in
+* 10.7.0: The old ``(type, value, traceback)`` signature in
   :meth:`tools.collections.GeneratorWrapper.throw` will be removed in Pywikibot 13, or earlier if it
   is dropped from a future Python release. (:phab:`T340641`)
 * 10.6.0: :meth:`Family.isPublic()<family.Family.isPublic>` will be removed (:phab:`T407049`)
@@ -104,5 +104,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.0.0: The User-Agent variable *script_product* is deprecated; use *script* instead.
+  The User-Agent variable *version* is deprecated; use *revision* instead.
+  The User-Agent variables *lang*, *code* and *family* are deprecated; use *site* instead.
+* 11.0.0: Positional argument for *block* parameter is deprecated; use a keyword argument instead.
 * 11.0.0: Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
   Positional parameters for *by_letter* and *replace_invisible* are deprecated.
