@@ -1341,7 +1341,7 @@ class TestPageFromWikibase(DefaultSiteTestCase):
         'en-wp': {
             'family': 'wikipedia',
             'code': 'en',
-            'result': '"Hello, World!" program',
+            'result': 'Hello, world',
         },
     }
 
