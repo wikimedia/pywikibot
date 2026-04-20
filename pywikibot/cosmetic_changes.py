@@ -557,8 +557,13 @@ class CosmeticChangesToolkit:
         # unmodified, or returns a replacement.
         def handleOneLink(match: re.Match[str]) -> str:
             # Convert URL-encoded characters to str
-            titleWithSection = url2string(match['titleWithSection'],
-                                          encodings=self.site.encodings())
+            try:
+                titleWithSection = url2string(match['titleWithSection'],
+                                              encodings=self.site.encodings())
+            except UnicodeDecodeError:
+                # Ignore broken links
+                return match.group()
+
             label = match['label']
             trailingChars = match['linktrail']
             newline = match['newline'] or ''
