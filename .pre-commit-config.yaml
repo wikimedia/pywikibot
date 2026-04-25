@@ -63,7 +63,7 @@ repos:
         language: python
         require_serial: true
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.11
+    rev: v0.15.12
     hooks:
       - id: ruff-check
         alias: ruff
@@ -87,7 +87,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.1
+    rev: 9.0.0a3
     hooks:
       - id: isort
         name: isort
@@ -115,7 +115,7 @@ repos:
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.1
+    rev: v1.20.2
     hooks:
       - id: mypy
         args:
