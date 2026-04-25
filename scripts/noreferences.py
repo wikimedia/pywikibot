@@ -668,7 +668,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         # Set the edit summary key for this case
         self.summary_key = 'noreferences-add-tag'
         for section in i18n.translate(self.site, referencesSections) or []:
-            sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *\r?\n')
+            sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *(?=\r?\n|$)')
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
@@ -684,10 +684,11 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
                             flags=re.DOTALL)
                         return (
-                            oldText[:match.end() - 1]
+                            oldText[:match.end()]
                             + templates_or_comments.sub(
                                 fr'\1\n{self.referencesText}\n',
-                                oldText[match.end() - 1:])
+                                oldText[match.end():]
+                            )
                         )
                 else:
                     break
