@@ -465,7 +465,7 @@ class TestDryPageGenerator(TestCase):
         """Test PageGenerator set_namespace."""
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                 self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
+                    self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
                 self.gen.set_namespace(namespace)
 
 
@@ -622,7 +622,7 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
                                      parameters={'titles': 'test'})
         for namespace in (0, 1, None):
             with self.subTest(namespace=namespace), \
-                    self.assertRaises(TypeError):
+                    self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
                 self.gen.set_namespace(namespace)
 
     def test_namespace_param_is_not_settable(self) -> None:
