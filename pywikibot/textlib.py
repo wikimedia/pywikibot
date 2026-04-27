@@ -2261,7 +2261,7 @@ class TimeStripper:
 
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')
-        timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
+        timeznR = r'\((?P<tzinfo>[^(){}\[\]:;#\t\n\r\f\v+-]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)(?:{})?'.format('\ub144')
         # if months have 'digits' as names, they need to be
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
