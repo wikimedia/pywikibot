@@ -214,6 +214,11 @@ class GeneratorFactory:
            if ``limit`` option is set and multiple generators are given,
            pages are yieded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
+        .. version-changed:: 11.3
+           If *preload* optiom is set, the preloading generators
+           :func:`pagegenerators.PreloadingGenerator` or
+           :func:`pagegenerators.DequePreloadingGenerator` are called
+           with the *quiet* option.
 
         :param gen: Another generator to be combined with
         :param preload: Preload pages using PreloadingGenerator

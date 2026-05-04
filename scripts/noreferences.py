@@ -678,7 +678,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                                        f'commented out, skipping.')
                         index = match.end()
                     else:
-                        pywikibot.info(f'Adding references tag to existing'
+                        pywikibot.info(f'Adding references tag to existing '
                                        f'{section} section...\n')
                         templates_or_comments = re.compile(
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',

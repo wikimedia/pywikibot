@@ -1,7 +1,15 @@
 Release 11.3
 ============
 
-* (no changes yet)
+* Add Devanagari numerals for ne-wiki to :attr:`NON_ASCII_DIGITS
+  <userinterfaces.transliteration.NON_ASCII_DIGITS>` and fix :class:`textlib.TimeStripper`
+  regex for :attr:`textlib.TimeStripperPatterns.timezone` (:phab:`T424467`)
+* Ignore ``UnicodeDecodeError`` in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks`
+  and skip the link in such case (:phab:`T423062`)
+* Update translations (i18n)
+* If *preload* optiom is set in :meth:`pagegenerators.GeneratorFactory.getCombinedGenerator`,
+  the preloading generators :func:`pagegenerators.PreloadingGenerator` or
+  :func:`pagegenerators.DequePreloadingGenerator` are called with the *quiet* option.
 
 
 Deprecations

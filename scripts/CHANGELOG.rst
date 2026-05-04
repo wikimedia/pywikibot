@@ -1,6 +1,20 @@
 Scripts Changelog
 =================
 
+11.3.0
+------
+
+noreferences
+^^^^^^^^^^^^
+
+* No longer skip references headers without trailing newline (:phab:`T424283`)
+
+parser_function_count
+^^^^^^^^^^^^^^^^^^^^^
+
+* Load all pages with content flag  (:phab:`T423836`)
+
+
 11.2.0
 ------
 

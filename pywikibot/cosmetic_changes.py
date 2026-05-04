@@ -7,7 +7,7 @@
 
 The changes are not supposed to change the look of the rendered wiki page.
 
-If you wish to run this as an stand-alone script, use::
+If you wish to run this as a stand-alone script, use::
 
     scripts/cosmetic_changes.py
 
@@ -15,10 +15,10 @@ For regular use, it is recommended to put this line into your user config::
 
     cosmetic_changes = True
 
-You may enable cosmetic changes for additional languages by adding the
-dictionary cosmetic_changes_enable to your user-config.py. It should contain
-a tuple of languages for each site where you wish to enable in addition to
-your own langlanguage if cosmetic_changes_mylang_only is True (see below).
+You may enable cosmetic changes for additional site codes by adding the
+dictionary ``cosmetic_changes_enable`` to your user-config.py. It should
+contain a tuple of codes for each site where you wish to enable in addition to
+your own site code if ``cosmetic_changes_mylang_only`` is True (see below).
 Please set your dictionary by adding such lines to your user config::
 
     cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
@@ -30,8 +30,8 @@ There is another config variable: You can set::
 if you're running a bot on multiple sites and want to do cosmetic changes on
 all of them, but be careful if you do.
 
-You may disable cosmetic changes by adding the all unwanted languages to
-the `dictionary cosmetic_changes_disable` in your user config file
+You may disable cosmetic changes by adding all unwanted languages to
+the dictionary ``cosmetic_changes_disable`` in your user config file
 (`user-config.py`). It should contain a tuple of languages for each site
 where you wish to disable cosmetic changes. You may use it with
 `cosmetic_changes_mylang_only` is False, but you can also disable your
@@ -41,8 +41,8 @@ lines to your user config file::
 
     cosmetic_changes_disable['wikipedia'] = ('de', 'en', 'fr')
 
-You may disable cosmetic changes for a given script by appending the all
-unwanted scripts to the list cosmetic_changes_deny_script in your
+You may disable cosmetic changes for a given script by appending all
+unwanted scripts to the list ``cosmetic_changes_deny_script`` in your
 user-config.py. By default it contains cosmetic_changes.py itself and touch.py.
 This overrides all other enabling settings for cosmetic changes. Please modify
 the given list by adding such lines to your user-config.py::
@@ -549,6 +549,9 @@ class CosmeticChangesToolkit:
         .. version-changed:: 8.4
            Convert URL-encoded characters if a link is an interwiki link
            or different from main namespace.
+        .. version-changed:: 11.3
+           UnicodeDecodeError is now ignored when encoding a links, and
+           link cleanup is skipped in such case.
 
         :param text: String to perform the clean-up on
         :return: Text with tidied wikilinks
