@@ -36,7 +36,7 @@ class TestTitleTranslate(TestCase):
         """Test translate method."""
         site = self.get_site(key)
         result = translate(page=self.get_mainpage(site), auto=False,
-                           hints=['5:', 'nl,en,zh'], site=site)
+                           hints=['5:', 'nl,en,th'], site=site)
         self.assertLength(result, 6)
         result = translate(page=self.get_mainpage(site))
         self.assertIsEmpty(result)
