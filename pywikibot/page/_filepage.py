@@ -503,10 +503,15 @@ class FileInfo:
         """Update FileInfo with new values.
 
         .. version-added:: 8.6
+        .. version-changed:: 11.3
+           Tracking utm_* parameters are stripped from the url attribute.
         """
         for k, v in file_revision.items():
             if k == 'timestamp':
                 v = pywikibot.Timestamp.fromISOformat(v)
+            elif k == 'url':
+                # remove tracking parameters
+                v = v.split('?', 1)[0]
             setattr(self, k, v)
 
     def __getitem__(self, key):
