@@ -1079,7 +1079,7 @@ class CosmeticChangesToolkit:
         https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
         if (self.site.sitename != 'commons:commons'
-                or self.namespace == Namespace.FILE):
+                or self.namespace != Namespace.FILE):
             return text
 
         # section headers to {{int:}} versions
