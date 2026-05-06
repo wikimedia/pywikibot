@@ -692,7 +692,7 @@ class CosmeticChangesToolkit:
         """Replace HTML entities with string."""
         ignore = [
             38,     # Ampersand (&amp;)
-            39,     # Single quotation mark (&quot;) per T26093
+            39,     # Single quotation mark (&apos;) per T26093
             60,     # Less than (&lt;)
             62,     # Greater than (&gt;)
             91,     # Opening square bracket ([)

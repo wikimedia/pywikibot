@@ -313,7 +313,7 @@ class FilePage(Page):
                raise an UploadError exception if the static boolean is
                False.
         :type ignore_warnings: bool or callable or iterable of str
-        :keyword chunk_size: The chunk size in bytesfor chunked
+        :keyword chunk_size: The chunk size in bytes for chunked
             uploading (see :api:`Upload#Chunked_uploading`). It will
             only upload in chunks, if the chunk size is positive but
             lower than the file size.

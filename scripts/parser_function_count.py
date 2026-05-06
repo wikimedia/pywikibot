@@ -57,13 +57,6 @@ from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 
-# TODO:
-# * Using xml and xmlstart
-# * Using categories
-# * Error handling for uploading (anyway, that's the last action, it's only
-#   for the beauty of the program, does not effect anything).
-
-
 class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
     """Bot class used for obtaining Parser function Count."""
