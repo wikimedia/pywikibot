@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
-# nds_nl code alias requires "_"n
+# nds_nl code alias requires "_"
 # dash must be the last char to be reused as regex
 CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
 
@@ -87,7 +87,7 @@ class Family:
         else:
             raise RuntimeError(fill(
                 f'__post_init__() method of {cls.__module__}.{cls.__name__}'
-                ' class or its superclass must be a classmethod. Please  check'
+                ' class or its superclass must be a classmethod. Please check'
                 ' your family file.', width=66))
 
         return cls.instance
@@ -193,11 +193,9 @@ class Family:
     """
 
     interwiki_forward: str | None = None
-    """Some families, e.
-
-    g. commons and meta, are not multilingual and forward interlanguage
-    links to another family (wikipedia). These families can set this
-    variable to the name of the target family.
+    """Some families, e.g. commons and meta, are not multilingual and
+    forward interlanguage links to another family (wikipedia). These
+    families can set this variable to the name of the target family.
     """
 
     #: Some languages belong to a group where the possibility is high
@@ -919,37 +917,41 @@ class WikimediaFamily(Family):
     # Known Wikimedia site codes
     known_codes = [
         'aa', 'ab', 'ace', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'ami', 'an',
-        'ang', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj', 'av', 'avk',
-        'awa', 'ay', 'az', 'azb', 'ba', 'ban', 'bar', 'bat-smg', 'bcl', 'be',
-        'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'blk', 'bm', 'bn', 'bo', 'bpy',
-        'br', 'bs', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch',
-        'cho', 'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'cs', 'csb', 'cu', 'cv',
-        'cy', 'da', 'dag', 'de', 'din', 'diq', 'dk', 'dsb', 'dty', 'dv', 'dz',
-        'ee', 'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'ext', 'fa', 'ff',
-        'fi', 'fiu-vro', 'fj', 'fo', 'fr', 'frp', 'frr', 'fur', 'fy', 'ga',
+        'ang', 'ann', 'anp', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj',
+        'av', 'avk', 'awa', 'ay', 'az', 'azb', 'ba', 'ban', 'bar', 'bat-smg',
+        'bbc', 'bcl', 'bdr', 'be', 'be-tarask', 'bew', 'bg', 'bh', 'bi', 'bjn',
+        'blk', 'bm', 'bn', 'bo', 'bpy', 'br', 'bs', 'btm', 'bug', 'bxr', 'ca',
+        'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'cho', 'chr', 'chy', 'ckb', 'co',
+        'cr', 'crh', 'cs', 'csb', 'cu', 'cv', 'cy', 'da', 'dag', 'de', 'dga',
+        'din', 'diq', 'dk', 'dsb', 'dtp', 'dty', 'dv', 'dz', 'ee', 'el', 'eml',
+        'en', 'eo', 'es', 'et', 'eu', 'ext', 'fa', 'fat', 'ff', 'fi',
+        'fiu-vro', 'fj', 'fo', 'fon', 'fr', 'frp', 'frr', 'fur', 'fy', 'ga',
         'gag', 'gan', 'gcr', 'gd', 'gl', 'glk', 'gn', 'gom', 'gor', 'got',
-        'gu', 'guw', 'gv', 'ha', 'hak', 'haw', 'he', 'hi', 'hif', 'ho', 'hr',
-        'hsb', 'ht', 'hu', 'hy', 'hyw', 'hz', 'ia', 'id', 'ie', 'ig', 'ii',
-        'ik', 'ilo', 'inh', 'io', 'is', 'it', 'iu', 'ja', 'jam', 'jbo', 'jv',
-        'ka', 'kaa', 'kab', 'kbd', 'kbp', 'kcg', 'kg', 'ki', 'kj', 'kk', 'kl',
-        'km', 'kn', 'ko', 'koi', 'kr', 'krc', 'ks', 'ksh', 'ku', 'kv', 'kw',
+        'gpe', 'gu', 'guc', 'gur', 'guw', 'gv', 'ha', 'hak', 'haw', 'he', 'hi',
+        'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hy', 'hyw', 'hz', 'ia', 'iba',
+        'id', 'ie', 'ig', 'igl', 'ii', 'ik', 'ilo', 'inh', 'io', 'is', 'it',
+        'iu', 'ja', 'jam', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kai', 'kaj',
+        'kbd', 'kbp', 'kcg', 'kg', 'kge', 'ki', 'kj', 'kk', 'kl', 'km', 'kn',
+        'knc', 'ko', 'koi', 'kr', 'krc', 'ks', 'ksh', 'ku', 'kus', 'kv', 'kw',
         'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lfn', 'lg', 'li', 'lij', 'lld',
         'lmo', 'ln', 'lo', 'lrc', 'lt', 'ltg', 'lv', 'mad', 'mai', 'map-bms',
         'mdf', 'mg', 'mh', 'mhr', 'mi', 'min', 'mk', 'ml', 'mn', 'mni', 'mnw',
-        'mo', 'mr', 'mrj', 'ms', 'mt', 'mus', 'mwl', 'my', 'myv', 'mzn', 'na',
-        'nah', 'nan', 'nap', 'nb', 'nds', 'nds-nl', 'ne', 'new', 'ng', 'nia',
-        'nl', 'nn', 'no', 'nov', 'nqo', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo',
-        'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pcd', 'pcm', 'pdc',
-        'pfl', 'pi', 'pih', 'pl', 'pms', 'pnb', 'pnt', 'ps', 'pt', 'pwn', 'qu',
-        'rm', 'rmy', 'rn', 'ro', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
-        'sa', 'sah', 'sat', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'shi',
-        'shn', 'si', 'simple', 'sk', 'skr', 'sl', 'sm', 'smn', 'sn', 'so',
-        'sq', 'sr', 'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'szy',
-        'ta', 'tay', 'tcy', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
-        'to', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm',
-        'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls', 'vo', 'wa',
-        'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh',
-        'zh-classical', 'zh-cn', 'zh-min-nan', 'zh-tw', 'zh-yue', 'zu',
+        'mo', 'mos', 'mr', 'mrj', 'ms', 'mt', 'mus', 'mwl', 'my', 'myv', 'mzn',
+        'na', 'nah', 'nan', 'nap', 'nb', 'nds', 'nds-nl', 'ne', 'new', 'ng',
+        'nia', 'nl', 'nn', 'no', 'nov', 'nqo', 'nr', 'nrm', 'nso', 'nup', 'nv',
+        'ny', 'oc', 'olo', 'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pcd',
+        'pcm', 'pdc', 'pfl', 'pi', 'pih', 'pl', 'pms', 'pnb', 'pnt', 'ppl',
+        'ps', 'pt', 'pwn', 'qu', 'rki', 'rm', 'rmy', 'rn', 'ro', 'roa-rup',
+        'roa-tara', 'rsk', 'ru', 'rue', 'rw', 'sa', 'sah', 'sat', 'sc', 'scn',
+        'sco', 'sd', 'se', 'sg', 'sh', 'shi', 'shn', 'shy', 'si', 'simple',
+        'sk', 'skr', 'sl', 'sm', 'smn', 'sn', 'so', 'sq', 'sr', 'srn', 'ss',
+        'st', 'stq', 'su', 'sv', 'sw', 'syl', 'szl', 'szy', 'ta', 'tay', 'tcy',
+        'tdd', 'te', 'tet', 'tg', 'th', 'ti', 'tig', 'tk', 'tl', 'tly', 'tn',
+        'to', 'tok', 'tpi', 'tr', 'trv', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv',
+        'udm', 'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls', 'vo',
+        'wa', 'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'yue', 'za',
+        'zea', 'zgh', 'zh', 'zh-classical', 'zh-cn', 'zh-min-nan', 'zh-tw',
+        'zh-yue', 'zu',
     ]
 
     # Code mappings which are only an alias, and there is no 'old' wiki.

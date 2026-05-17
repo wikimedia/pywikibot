@@ -656,7 +656,7 @@ class GeneratorsMixin:
             member_type = {member_type}
 
         if member_type and sortby == 'timestamp':
-            # Covert namespaces to a known type
+            # Convert namespaces to a known type
             namespaces = set(self.namespaces.resolve(namespaces or []))
 
             if 'page' in member_type:
@@ -950,12 +950,20 @@ class GeneratorsMixin:
         reverse: bool = False,
         total: int | None = None,
         content: bool = False,
+        until: str = '',
     ) -> Iterable[pywikibot.Page]:
         """Iterate pages in a single namespace.
 
         .. seealso:: :api:`Allpages`
 
-        :param start: Start at this title (page need not exist).
+        .. version-changed:: 10.4
+           All parameters except of *start* are keyword-only. Enable
+           *maxsize* filtering even if misermode is enabled.
+        .. version-changed:: 11.3
+           The *until* parameter was added.
+
+        :param start: Title to start enumerating from (the page does not
+            need to exist). Can be used with *until* to define a range.
         :param prefix: Only yield pages starting with this string.
         :param namespace: Iterate pages from this (single) namespace.
         :param filterredir: If True, only yield redirects; if False (and
@@ -975,6 +983,10 @@ class GeneratorsMixin:
             order (default: iterate in forward order).
         :param content: If True, load the current content of each
             iterated page (default False).
+        :param until: Optional page title to stop enumerating at; only
+            meaningful when used together with *start*. The given
+            argument must be lexically higher than the *start* argument
+            if *reverse* is False; otherwise it must be lower.
         :raises KeyError: The namespace identifier was not resolved
         :raises TypeError: The namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one
@@ -993,6 +1005,8 @@ class GeneratorsMixin:
                                 namespaces=namespace,
                                 gapfrom=start, total=total,
                                 g_content=content or misermode)
+        if until:
+            apgen.request['gapto'] = until
         if prefix:
             apgen.request['gapprefix'] = prefix
         if filterredir is not None:
@@ -1324,7 +1338,7 @@ class GeneratorsMixin:
                                namespaces=namespaces,
                                total=total, g_content=content, **iuargs)
 
-    def logevents(  # docsig: disable=SIG305
+    def logevents(
         self,
         logtype: str | None = None,
         user: str | None = None,
@@ -1714,7 +1728,7 @@ class GeneratorsMixin:
                                        or self.has_right('undelete'))):
             raise UserRightsError(err + 'deleted content.')
 
-    def deletedrevs(  # docsig: disable=SIG305
+    def deletedrevs(
         self,
         titles: str
         | pywikibot.Page

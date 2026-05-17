@@ -7,7 +7,7 @@
    .. admonition:: Imports from :mod:`bot` module
       :class: tip
 
-      The following classes and functions are inported from :mod:`bot` module
+      The following classes and functions are imported from :mod:`bot` module
       but can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Bot<bot.Bot>`
@@ -23,7 +23,7 @@
    .. admonition:: Imports from :mod:`i18n` module
       :class: tip
 
-      The following function is inported from :mod:`i18n` module but can also be
+      The following function is imported from :mod:`i18n` module but can also be
       used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.translate()<i18n.translate>`
@@ -31,7 +31,7 @@
    .. admonition:: Imports from :mod:`logging` module
       :class: tip
 
-      The following functions are inported from :mod:`logging` module but can
+      The following functions are imported from :mod:`logging` module but can
       also be used as :mod:`pywikibot` members:
 
       - :func:`pywikibot.critical()<logging.critical>`
@@ -47,7 +47,7 @@
    .. admonition:: Imports from :mod:`page` module
       :class: tip
 
-      The following classes and function are inported from :mod:`page` module
+      The following classes and function are imported from :mod:`page` module
       but can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Category<page.Category>`
@@ -67,7 +67,7 @@
    .. admonition:: Imports from :mod:`time<pywikibot.time>` module
       :class: tip
 
-      The following class is inported from :mod:`time<pywikibot.time>` module
+      The following class is imported from :mod:`time<pywikibot.time>` module
       but can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Timestamp<time.Timestamp>`

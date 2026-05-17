@@ -192,14 +192,6 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
                 'roughtranslation': 'mactra',
             },
         },
-        'wikinews': {
-            'en': {
-                '_default': '[[WN:CSD]]',
-            },
-            'zh': {
-                '_default': '[[WN:CSD]]',
-            },
-        },
     }
 
     #: Default reason for deleting a talk page.
@@ -218,10 +210,6 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
             'pt': 'Página de discussão órfã',
             'zh': '[[WP:CSD#O1|CSD O1 O2 O6]] 沒有在使用的討論頁',
         },
-        'wikinews': {
-            'en': 'Orphaned talk page',
-            'zh': '[[WN:CSD#O1|CSD O1 O2 O6]] 沒有在使用的討論頁',
-        }
     }
 
     #: A list of often-used reasons for deletion. Shortcuts are keys, and

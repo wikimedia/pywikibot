@@ -286,6 +286,21 @@ class TestSiteGenerators(DefaultSiteTestCase):
             if self.validate_page(page):
                 self.assertFalse(page.isRedirectPage())
 
+    def test_allpages_until(self) -> None:
+        """Test the site.allpages() method with until option."""
+        start, until = 'Python', 'Pywiki'
+        fwd = list(self.site.allpages(start=start, until=until))
+        for page in fwd:
+            if self.validate_page(page):
+                self.assertLessEqual(page.title(), until)
+
+        rev = list(self.site.allpages(start=until, until=start, reverse=True))
+        for page in rev:
+            if self.validate_page(page):
+                self.assertLessEqual(page.title(), until)
+
+        self.assertLength(fwd, rev)
+
     def test_allpages_langlinks_enabled(self) -> None:
         """Test allpages with langlinks enabled."""
         mysite = self.get_site()
@@ -1087,6 +1102,10 @@ class SearchTestCase(DefaultSiteTestCase):
             if e.code == 'gsrsearch-text-disabled':
                 self.skipTest(
                     'gsrsearch is disabled on site {mysite}:\n{e!r}')
+            if (e.code == 'cirrussearch-backend-error'
+                    and mysite.family.name == 'wpbeta'):  # T426529
+                self.skipTest(
+                    f'cirrussearch-backend-error on site {mysite}:\n{e!r}')
             raise
 
     def test_search_where_title(self) -> None:
@@ -1101,9 +1120,16 @@ class SearchTestCase(DefaultSiteTestCase):
             gsrwhat=['title'],
         )
         self.assertEqual(search_gen.request._params, expected_params)
-        for hit in search_gen:
-            self.assertIsInstance(hit, pywikibot.Page)
-            self.assertEqual(hit.namespace(), 0)
+        try:
+            for hit in search_gen:
+                self.assertIsInstance(hit, pywikibot.Page)
+                self.assertEqual(hit.namespace(), 0)
+        except APIError as e:  # pragma: no cover
+            if (e.code == 'cirrussearch-backend-error'
+                    and self.site.family.name == 'wpbeta'):  # T426529
+                self.skipTest(
+                    f'cirrussearch-backend-error on site {self.site}:\n{e!r}')
+            raise
 
 
 class TestUserContribsAsUser(DefaultSiteTestCase):
@@ -1784,7 +1810,7 @@ class TestBacklinks(TestCase):
         self.assertLength(self.nofollow, 1)
 
     def test_backlinks_redirects_status(self) -> None:
-        """Test backlinks redirects statur."""
+        """Test backlinks redirects status."""
         for page in self.backlinks:
             self.assertTrue(page.isRedirectPage())
         for page in self.references:

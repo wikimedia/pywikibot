@@ -286,11 +286,6 @@ WELCOME = {
         'es': '{{subst:bienivenido usuario}} %s',
         'ml': '{{subst:സ്വാഗതം}}',
     },
-    'wikinews': {
-        'fa': '{{خوشامد۲|%s}}',
-        'it': '{{subst:benvenuto}}',
-        'zh': '{{subst:welcome}} %s',
-    },
     'wikiquote': {
         'ml': '{{subst:സ്വാഗതം}}',
     },
@@ -514,18 +509,17 @@ def get_welcome_text(site: pywikibot.site.BaseSite, *, sign: str = '') -> str:
                        f'{welcome}WELCOME dict.')
 
     if globalvar.random_sign:
-        if site.family.name != 'wikinews':
-            if not sign:
-                raise ValueError(
-                    'sign parameter must be provided when random_sign is '
-                    'enabled'
-                )
-            welcome_text = welcome_text % sign
+        if not sign:
+            raise ValueError(
+                'sign parameter must be provided when random_sign is '
+                'enabled'
+            )
+        welcome_text = welcome_text % sign
 
         if site.sitename != 'wiktionary:it':
             welcome_text += TIMESELECTED
 
-    elif site.sitename != 'wikinews:it':
+    else:
         welcome_text = welcome_text % globalvar.default_sign
 
     final_text = i18n.translate(site, FINAL_NEW_TEXT_ADDITIONS)

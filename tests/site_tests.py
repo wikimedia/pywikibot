@@ -63,7 +63,7 @@ class TestSiteObject(DefaultSiteTestCase):
         test_dict = {
             'alswiki': 'wikipedia:als',  # see T345036
             'commonswiki': 'commons:commons',
-            'dewikinews': 'wikinews:de',
+            'dewikinews': 'wikinews:de',  # note: this wiki is closed
             'enwiki': 'wikipedia:en',
             'eswikisource': 'wikisource:es',
             'metawiki': 'meta:meta',
@@ -1341,7 +1341,7 @@ class TestPageFromWikibase(DefaultSiteTestCase):
         'en-wp': {
             'family': 'wikipedia',
             'code': 'en',
-            'result': '"Hello, World!" program',
+            'result': 'Hello, world',
         },
     }
 

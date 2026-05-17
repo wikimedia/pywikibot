@@ -24,18 +24,19 @@ class TestObsoleteSite(DefaultSiteTestCase):
 
     def test_locked_site(self) -> None:
         """Test Wikimedia closed/locked site."""
-        with suppress_warnings('Interwiki removal mh is in wikipedia codes'):
-            site = pywikibot.Site('mh', 'wikipedia')
-        self.assertIsInstance(site, pywikibot.site.ClosedSite)
-        self.assertEqual(site.code, 'mh')
-        self.assertIsInstance(site.obsolete, bool)
-        self.assertTrue(site.obsolete)
-        self.assertEqual(site.hostname(), 'mh.wikipedia.org')
-        r = http.fetch('http://mh.wikipedia.org/w/api.php',
-                       default_error_handling=False)
-        self.assertEqual(r.status_code, HTTPStatus.OK.value)
-        self.assertEqual(site.siteinfo['lang'], 'mh')
-        self.assertTrue(site.is_uploaddisabled())
+        for code, family in [('mh', 'wikipedia'), ('en', 'wikinews')]:
+            with self.subTest(site=f'{family}:{code}'):
+                site = pywikibot.Site(code, family)
+                self.assertIsInstance(site, pywikibot.site.ClosedSite)
+                self.assertEqual(site.code, code)
+                self.assertIsInstance(site.obsolete, bool)
+                self.assertTrue(site.obsolete)
+                self.assertEqual(site.hostname(), f'{code}.{family}.org')
+                r = http.fetch(f'http://{code}.{family}.org/w/api.php',
+                               default_error_handling=False)
+                self.assertEqual(r.status_code, HTTPStatus.OK.value)
+                self.assertEqual(site.siteinfo['lang'], code)
+                self.assertTrue(site.is_uploaddisabled())
 
     def test_removed_site(self) -> None:
         """Test Wikimedia offline site."""

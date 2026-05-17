@@ -172,7 +172,6 @@ class TestTimestamp(TestCase):
         t2 = Timestamp.fromISOformat(ts1, sep=sep)
         ts2 = t2.isoformat(sep=sep)
         self.assertEqual(t1, t2)
-        self.assertEqual(t1, t2)
         self.assertEqual(ts1, ts2)
         date, sep, time = ts1.partition(sep)
         time = time.rstrip('Z')
@@ -232,11 +231,12 @@ class TestTimestamp(TestCase):
 
         for mw_ts, ts in tests[1:-1]:
             with self.subTest(timestamp=mw_ts), self.assertRaisesRegex(
-                    ValueError, f'time data {mw_ts!r} does not match MW'):
+                ValueError,
+                    f'time data {mw_ts!r} does not match MW format'):
                 Timestamp.fromtimestampformat(mw_ts, strict=True)
 
     def test_add_timedelta(self) -> None:
-        """Test addin a timedelta to a Timestamp."""
+        """Test adding a timedelta to a Timestamp."""
         t1 = Timestamp.nowutc()
         t2 = t1 + timedelta(days=1)
         if t1.month != t2.month:

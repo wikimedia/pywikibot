@@ -279,7 +279,7 @@ class MementoClient(OldMementoClient):
         """Makes HEAD requests.
 
         .. version-changed:: 10.0
-           The default timout was increased from 9 to 30 seconds.
+           The default timeout was increased from 9 to 30 seconds.
 
         :param uri: the uri for the request.
         :param accept_datetime: the accept-datetime in the http format.

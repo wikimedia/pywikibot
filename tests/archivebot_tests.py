@@ -121,7 +121,9 @@ class TestArchiveBot(TestCase):
     sites = {code: {'family': 'wikipedia', 'code': code} for code in THREADS}
 
     cached = True
-    expected_failures = ['ar', 'scn', 'th']
+    expected_failures = ['scn', 'th']
+    # FIXME: see TestArchiveBotAfterDateUpdate()
+    # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
 
     def test_archivebot(self, code=None) -> None:
         """Test archivebot for one site."""
@@ -152,20 +154,6 @@ class TestArchiveBot(TestCase):
                 self.assertEqual(thread.code, talk.timestripper.site.code)
                 self.assertIsInstance(thread.content, str)
                 self.assertIsInstance(thread.timestamp, datetime)
-
-    # FIXME: see TestArchiveBotAfterDateUpdate()
-    # 'ar': Uses Arabic acronym for TZ
-    # 'eo': changed month name setting in wiki from Sep to sep
-    #       Localisation updates from https://translatewiki.net.
-    #       Change-Id: I3d9b14ae3a5d77fea9694ef113b0180e5677c39e
-    #       ref: mediawiki languages/i18n/eo.json
-    #       for new entries it should work
-    # 'pdc': changed month name setting in wiki over time (?)
-    #   in old posts in talk page, February is "Feb.", site message gives
-    #   <message name="feb" xml:space="preserve">Han.</message>.
-    #   for new entries it should work
-    # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
-    # 'uz': changed month name for October (T370501)
 
 
 class TestArchiveBotAfterDateUpdate(TestCase):

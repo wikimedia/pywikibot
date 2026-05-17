@@ -902,7 +902,7 @@ class GoogleSearchPageGenerator(GeneratorWrapper):
        subclassed from :class:`tools.collections.GeneratorWrapper`
     .. version-changed:: 10.1
        ``googlesearch-python`` package is needed instead of ``google``,
-       see :phab:`T387618` for further informations. The *total*
+       see :phab:`T387618` for further information. The *total*
        parameter was added. The *query* parameter is positional only.
        All other parameters are keyword only.
     """

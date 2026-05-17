@@ -1,9 +1,9 @@
-"""Family module for OpenStreetMap wiki."""
 #
-# (C) Pywikibot team, 2009-2023
+# (C) Pywikibot team, 2009-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for OpenStreetMap wiki."""
 from __future__ import annotations
 
 from pywikibot import family

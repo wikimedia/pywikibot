@@ -13,6 +13,9 @@ This script is for updating ``_first_upper_exception_dict``.
    tested completely.
 
 .. version-added:: 8.4
+.. version-changed:: 11.3
+   wikinews is no longer supported by this script because all wikinews
+   sites are closed.
 """
 from __future__ import annotations
 
@@ -33,7 +36,6 @@ FILEPATH = '/data/firstup_excepts.json'
 # supported families by this script
 families_list = [
     'wikibooks',
-    'wikinews',
     'wikipedia',
     'wikiquote',
     'wikisource',

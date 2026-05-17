@@ -1,9 +1,9 @@
-"""Family module for Wikivoyage."""
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikivoyage."""
 from __future__ import annotations
 
 # The new Wikivoyage family that is hosted at Wikimedia

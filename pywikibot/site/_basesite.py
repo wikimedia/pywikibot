@@ -37,7 +37,7 @@ class BaseSite(ComparableMixin):
 
     .. hint::
        :class:`BaseSite` delegates undefined method calls to the
-       corresponing :class:`family.Family` object by its
+       corresponding :class:`family.Family` object by its
        :meth:`__getattr__` method. The working method is described below.
 
        Only public Family instance methods are delegated. A method is

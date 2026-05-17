@@ -11,7 +11,7 @@ interwiki.
 
 Use the following command line parameters to specify what to add:
 
--text        [str] Text to append. "\n" are interpreted as newlines.
+-text        [str] Text to append. ``\\n`` are interpreted as newlines.
 
 -textfile    [str] Path to a file with text to append
 
@@ -132,7 +132,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
             self.generator = pagegenerators.PageWithTalkPageGenerator(
                 self.generator, return_talk_only=True)
 
-    def skip_page(self, page):
+    def skip_page(self, page: pywikibot.Page) -> bool:
         """Skip if -exceptUrl matches or page does not exists."""
         if page.exists():
             if self.opt.createonly:

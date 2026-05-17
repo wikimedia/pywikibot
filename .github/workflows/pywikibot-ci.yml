@@ -24,7 +24,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [pypy3.9, pypy3.10, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version:
+          - pypy3.9
+          - pypy3.10
+          - pypy3.11
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
         site: ['wikipedia:en', 'wikisource:zh']
         include:
           - python-version: '3.9'
@@ -33,15 +42,12 @@ jobs:
             site: false
             family: wpbeta
             code: en
-            experimental: true
           - python-version: '3.9'
             site: false
             family: wpbeta
             code: zh
-            experimental: true
           - python-version: '3.10'
-            site: wsbeta:en
-            experimental: true
+            site: wikisource:beta
           - python-version: '3.9'
             site: wikidata:test
           - python-version: '3.11'
@@ -81,9 +87,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip --version
-          if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
           pip install wikitextparser
+          pip install requests[socks]
       - name: Install DjVuLibre
         if: runner.os == 'Linux'
         run: |
@@ -94,13 +101,40 @@ jobs:
       - name: Install setuptools
         if: ${{ (matrix.python-version >= '3.12') || (matrix.os == 'macOS-latest') }}
         run: pip install setuptools
+      - name: Configure and start WMCS SOCKS tunnel
+        env:
+          USER: ${{ secrets.WMCS_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.WMCS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -lf ~/.ssh/id_ed25519
+          ssh-keyscan bastion.wmcloud.org >> ~/.ssh/known_hosts
+          ssh \
+            -o StrictHostKeyChecking=accept-new \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o ConnectTimeout=10 \
+            -f -N \
+            -D 127.0.0.1:1080 \
+            -i ~/.ssh/id_ed25519 \
+            "$USER@bastion.wmcloud.org"
+          echo "Socket connection:"
+          ss -lntp | grep 1080 || true
+          echo "Local IP:"
+          curl -s https://api.ipify.org
+          echo "Proxy IP:"
+          curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
       - name: Generate family files
+        env:
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           if  [ ${{matrix.family || 0}} == wpbeta ]; then
             python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
-          fi
-          if [ ${{matrix.site || 0}} == 'wsbeta:en' ]; then
-            python pwb.py generate_family_file http://en.wikisource.beta.wmcloud.org/ wsbeta n
           fi
       - name: Generate user files
         run: |
@@ -130,6 +164,10 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
           # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
           PYTHON_GIL: ${{ endsWith(matrix.python-version, 't') && '0' || '1' }}
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           python pwb.py version
           if [ "${{ matrix.site }}" != "wikisource:zh" ] ||
@@ -149,7 +187,5 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure
         if: steps.ci_test.outcome == 'failure'
-        run: |
-          # Print public IP of runner
-          curl -s https://api.ipify.org
+        run: |-
           exit 1

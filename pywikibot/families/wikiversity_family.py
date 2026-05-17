@@ -1,9 +1,9 @@
-"""Family module for Wikiversity."""
 #
-# (C) Pywikibot team, 2007-2025
+# (C) Pywikibot team, 2007-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikiversity."""
 from __future__ import annotations
 
 from pywikibot import family

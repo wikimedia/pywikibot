@@ -1,7 +1,5 @@
 ---
-default_install_hook_types:
-  - commit-msg
-  - pre-commit
+default_install_hook_types: [commit-msg, pre-commit]
 
 repos:
   - repo: meta
@@ -16,8 +14,7 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
-        args:
-          - --maxkb=200
+        args: [--maxkb=200]
       - id: check-ast
       - id: check-builtin-literals
       - id: check-case-conflict
@@ -62,19 +59,21 @@ repos:
         files: .+\.py$
         language: python
         require_serial: true
+  - repo: https://github.com/lyz-code/yamlfix/
+    rev: 1.19.1
+    hooks:
+      - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.9
+    rev: v0.15.13
     hooks:
       - id: ruff-check
         alias: ruff
-        args:
-          - --fix
+        args: [--fix]
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
       - id: pyupgrade
-        args:
-          - --py39-plus
+        args: [--py39-plus]
   - repo: https://github.com/PyCQA/autoflake
     rev: v2.3.3
     hooks:
@@ -87,18 +86,17 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.1
+    rev: 9.0.0a3
     hooks:
       - id: isort
         name: isort
-        args:
-          - -a from __future__ import annotations
-        exclude: ^pwb\.py$
+        args: [-a from __future__ import annotations]
+        exclude: ^(pwb|pywikibot/families/__init__)\.py$
       - id: isort
         name: isort (skip future annotations)
-        files: ^pwb\.py$
+        files: ^(pwb|pywikibot/families/__init__)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.82.0
+    rev: v0.85.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
@@ -109,24 +107,22 @@ repos:
         args:
           - --doctests
           - --config=tox.ini
+        # Due to incompatibilities between packages the order matters.
         additional_dependencies:
-          # Due to incompatibilities between packages the order matters.
           - flake8-bugbear>=25.11.29
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.0
+    rev: v2.1.0
     hooks:
       - id: mypy
-        args:
-          - --config-file=pyproject.toml
-          - --follow-imports=silent
+        args: [--config-file=pyproject.toml, --follow-imports=silent]
         additional_dependencies:
           - types-PyMySQL
           - types-requests
         # Test for files which already passed in past.
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
-        files: |
+        files: |-
           (?x)^pywikibot/(
             (__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|exceptions|fixes|logging|plural|time|titletranslate)|
             (comms|data|families|specialbots)/__init__|

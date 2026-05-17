@@ -65,7 +65,7 @@ class WikiBlameMixin:
 
         .. version-deprecated:: 9.3
            use :meth:`authorship` instead.
-        .. seealso:: :meth:`authorship` for further informations
+        .. seealso:: :meth:`authorship` for further information
 
         :return: Percentage of edits for each username
 

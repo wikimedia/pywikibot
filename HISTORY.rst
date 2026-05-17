@@ -1,6 +1,24 @@
 Release History
 ===============
 
+11.2.0
+------
+*18 April 2026*
+
+* Require Pillow 12.2.0 or above due to security vulnerability
+* Remove UTM tracking parameters in :attr:`proofreadpage.ProofreadPage.url_image` (:phab:`T419943`)
+* Enable *total* parameter in :meth:`Page.iterlanglinks()<page.BasePage.iterlanglinks>`
+  if links were cached (:phab:`T422390`)
+* Update translations (i18n)
+* Implement *deletetalk* option in :meth:`APISite.delete()<pywikibot.site._apisite.APISite.delete>`
+  for older MediaWiki versions (:phab:`T420636`)
+* Add support for :mod:`abstract_family<families.abstract_family>`
+  (:phab:`T420636`, :phab:`T422369`)
+* Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
+  <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
+* Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
+
+
 11.1.0
 ------
 *14 March 2026*
@@ -380,7 +398,8 @@ Release History
   <page._toolforge.WikiBlameMixin.authorship>` (:phab:`T392345`)
 * Correct :class:`comms.eventstreams.EventStreams` kwarg name
   from *last_event_id* to *latest_event_id* (:phab:`T394570`)
-* Retieve charset from accept-charset header entry in :func:`comms.http._decide_encoding` (:phab:`T392345`)
+* Retrieve charset from accept-charset header entry in :func:`comms.http._decide_encoding`
+  (:phab:`T392345`)
 * Skip :meth:`CosmeticChangesToolkit.removeEmptySections()
   <cosmetic_changes.CosmeticChangesToolkit.removeEmptySections>` if section length is too less  (:phab:`T391776`)
 * Add support for nupwiki (:phab:`T390713`)
@@ -415,7 +434,8 @@ Release History
 
 **Bugfixes**
 
-* Allow url without api path, requests path or script path in :func:`pywikibot.Site` constuctor  (:phab:`T386665`).
+* Allow url without api path, requests path or script path in :func:`pywikibot.Site` constructor
+  (:phab:`T386665`).
 * Appended <<default>> color tag before the last linefeed in
   :class:`UI<userinterfaces.terminal_interface_base.UI>` (:phab:`T382884`).
 * Remove unintentional *args* parameter in :class:`tools.threading.ThreadList` (:phab:`T382787`).
@@ -554,7 +574,8 @@ Release History
 
 * Ignore :exc:`ValueError` during upcast of :class:`FilePage<pywikibot.page.FilePage>` due to invalid file extension
   (:phab:`T367777`, :phab:`T376452`)
-* Provide an entry point to connect foreign scripts with pwb wapper (:phab:`T139143`, :phab:`T139144`)
+* Provide an entry point to connect foreign scripts with pwb wrapper
+  (:phab:`T139143`, :phab:`T139144`)
 * Show a warning message for a deleted or unknown :class:`Claim<pywikibot.Claim>` type (:phab:`T374676`)
 * ``preload_sites`` maintenance script was removed (:phab:`T348925`)
 * Add :meth:`User.renamed_target()<pywikibot.User.renamed_target>` method
@@ -1230,7 +1251,7 @@ Release History
 * A new and easier color format was implemented; colors can be used like:
     ``'this is a <<green>>colored<<default>> text'``
 * Unused and unsupported `xmlreader.XmlParserThread` was removed
-* Use upercased IP user titles (:phab:`T306291`)
+* Use uppercased IP user titles (:phab:`T306291`)
 * Use pathlib to extract filename and file_package in pwb.py
 * Fix isbn messages in fixes.py (:phab:`T306166`)
 * Fix Page.revisions() with starttime (:phab:`T109181`)
@@ -1522,7 +1543,7 @@ Release History
 **Improvements and Bugfixes**
 
 * Use different logfiles for multiple processes of the same script (:phab:`T56685`)
-* throttle.pip will be reused as soon as possibile
+* throttle.pip will be reused as soon as possible
 * terminal_interface_base.TerminalHandler is subclassed from logging.StreamHandler
 * Fix iterating of SizedKeyCollection (:phab:`T282865`)
 * An abstract base user interface module was added
@@ -1669,7 +1690,7 @@ Release History
 * Add support for trwikivoyage (:phab:`T271263`)
 * UI.input_list_choice() has been improved (:phab:`T272237`)
 * Global handleArgs() function was removed in favour of handle_args
-* Deprecated originPage and foundIn property has been removed in interwiki_graph.py
+* Deprecated ``originPage`` and ``foundIn`` property has been removed in interwiki_graph.py
 * ParamInfo modules, prefixes, query_modules_with_limits properties and module_attribute_map() method was removed
 * Allow querying alldeletedrevisions with APISite.alldeletedrevisions() and User.deleted_contributions()
 * data attribute of http.fetch() response is deprecated (:phab:`T265206`)
@@ -2043,7 +2064,7 @@ Release History
 * compat module is deprecated for 5 years and will be removed in next release (:phab:`T183085`)
 * ipaddress module is required for Python 2 (:phab:`T243171`)
 * tools.ip will be dropped in favour of tools.is_IP (:phab:`T243171`)
-* tools.ip_regexp is deprecatd for 5 years and will be removed in next release
+* tools.ip_regexp is deprecated for 5 years and will be removed in next release
 * backports.py will be removed in next release (:phab:`T244664`)
 * stdnum package is required for ISBN scripts and cosmetic_changes (:phab:`T132919`, :phab:`T144288`, :phab:`T241141`)
 * preload urllib.quote() with Python 2 (:phab:`T243710`, :phab:`T222623`)

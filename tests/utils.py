@@ -403,9 +403,8 @@ class DrySite(pywikibot.site.APISite):
             fam_name = self.family.name
 
         # Only let through valid entries
-        if fam_name not in ('commons', 'wikibooks', 'wikidata', 'wikinews',
-                            'wikipedia', 'wikiquote', 'wikisource',
-                            'wikivoyage'):
+        if fam_name not in ('commons', 'wikibooks', 'wikidata', 'wikipedia',
+                            'wikiquote', 'wikisource', 'wikivoyage'):
             code, fam = None, None
 
         if code or fam:

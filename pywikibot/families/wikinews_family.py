@@ -1,9 +1,14 @@
-"""Family module for Wikinews."""
 #
-# (C) Pywikibot team, 2005-2025
+# (C) Pywikibot team, 2005-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikinews.
+
+.. version-changed:: 11.3
+   All Wikinews sites were marked as closed and are listed in
+   :attr:`Family.closed_wikis`. Refer :phab:`T421796`.
+"""
 from __future__ import annotations
 
 from pywikibot import family
@@ -18,14 +23,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/closed.dblist
-        'bg', 'hu', 'sd', 'th', 'tr',
+        'ar', 'bs', 'bg', 'ca', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi',
+        'fr', 'guw', 'he', 'hu', 'it', 'ja', 'ko', 'li', 'nl', 'no', 'pl',
+        'pt', 'ro', 'ru', 'sd', 'shn', 'sq', 'sr', 'sv', 'ta', 'th', 'tr',
+        'uk', 'zh',
     ]
 
-    codes = {
-        'ar', 'bs', 'ca', 'cs', 'de', 'el', 'en', 'eo', 'es', 'fa', 'fi', 'fr',
-        'guw', 'he', 'it', 'ja', 'ko', 'li', 'nl', 'no', 'pl', 'pt', 'ro',
-        'ru', 'shn', 'sq', 'sr', 'sv', 'ta', 'uk', 'zh',
-    }
+    codes = set()
 
     category_redirect_templates = {
         '_default': (),
@@ -49,7 +53,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     # Subpages for documentation.
-    # TODO: List is incomplete, to be completed for missing languages.
     doc_subpages = {
         '_default': (('/doc', ),
                      ['en']

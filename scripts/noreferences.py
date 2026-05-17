@@ -259,7 +259,7 @@ PLACE_AFTER_SECTIONS: dict[str, list[str]]
 """References sections can also be placed after a given section. This
 dictionary defines these sections, sorted by priority. For example, on Simple
 wiki, the script would place the "References" section after the "Notes"
-section, if that existed. The PLACE_AFTER_SECTIONS is priorized over the
+section, if that existed. The PLACE_AFTER_SECTIONS is prioritized over the
 placing of the "placeBeforeSections" sections.
 
 .. attention:: not implemented yet.
@@ -668,7 +668,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         # Set the edit summary key for this case
         self.summary_key = 'noreferences-add-tag'
         for section in i18n.translate(self.site, referencesSections) or []:
-            sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *\r?\n')
+            sectionR = re.compile(fr'\r?\n=+ *{section} *=+ *(?=\r?\n|$)')
             index = 0
             while index < len(oldText):
                 match = sectionR.search(oldText, index)
@@ -678,16 +678,17 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                                        f'commented out, skipping.')
                         index = match.end()
                     else:
-                        pywikibot.info(f'Adding references tag to existing'
+                        pywikibot.info(f'Adding references tag to existing '
                                        f'{section} section...\n')
                         templates_or_comments = re.compile(
                             r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
                             flags=re.DOTALL)
                         return (
-                            oldText[:match.end() - 1]
+                            oldText[:match.end()]
                             + templates_or_comments.sub(
                                 fr'\1\n{self.referencesText}\n',
-                                oldText[match.end() - 1:])
+                                oldText[match.end():]
+                            )
                         )
                 else:
                     break

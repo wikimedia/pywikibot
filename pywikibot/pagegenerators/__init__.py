@@ -15,6 +15,9 @@ titles to standard output.
 These parameters are supported to specify which pages titles to be used:
 
 &params;
+
+.. version-changed:: 11.3
+   The :kbd:`-until` option was added.
 """
 from __future__ import annotations
 
@@ -313,7 +316,12 @@ GENERATOR OPTIONS
                     "-start:Template:!" will make the bot work on all pages
                     in the template namespace.
 
-                    default value is start:!
+                    Default value is start:!
+
+-until              Specifies the page title at which the robot should
+                    stop alphabetically through all pages on the home wiki.
+
+                    Can only be used together with -start.
 
 -prefixindex        Work on pages commencing with a common prefix.
 

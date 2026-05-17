@@ -225,24 +225,25 @@ def roundrobin_generators(*iterables) -> Generator[Any]:
 def filter_unique(iterable, container=None, key=None, add=None):
     """Yield unique items from an iterable, omitting duplicates.
 
-    By default, to provide uniqueness, it puts the generated items into a
-    set created as a local variable. It only yields items which are not
-    already present in the local set.
+    By default, to provide uniqueness, it puts the generated items into
+    a set created as a local variable. It only yields items which are
+    not already present in the local set.
 
-    For large collections, this is not memory efficient, as a strong reference
-    to every item is kept in a local set which cannot be cleared.
+    For large collections, this is not memory efficient, as a strong
+    reference to every item is kept in a local set which cannot be
+    cleared.
 
-    Also, the local set can't be re-used when chaining unique operations on
-    multiple generators.
+    Also, the local set can't be reused when chaining unique operations
+    on multiple generators.
 
-    To avoid these issues, it is advisable for the caller to provide their own
-    container and set the key parameter to be the function
+    To avoid these issues, it is advisable for the caller to provide
+    their own container and set the key parameter to be the function
     :py:obj:`hash`, or use a :py:obj:`weakref` as the key.
 
     The container can be any object that supports __contains__.
-    If the container is a set or dict, the method add or __setitem__ will be
-    used automatically. Any other method may be provided explicitly using the
-    add parameter.
+    If the container is a set or dict, the method add or __setitem__
+    will be used automatically. Any other method may be provided
+    explicitly using the add parameter.
 
     Beware that key=id is only useful for cases where id() is not unique.
 

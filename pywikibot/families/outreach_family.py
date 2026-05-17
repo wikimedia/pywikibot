@@ -1,9 +1,9 @@
-"""Family module for Wikimedia outreach wiki."""
 #
-# (C) Pywikibot team, 2014-2023
+# (C) Pywikibot team, 2014-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikimedia outreach wiki."""
 from __future__ import annotations
 
 from pywikibot import family

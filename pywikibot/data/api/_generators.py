@@ -47,8 +47,8 @@ class APIGeneratorBase(ABC):
     Handles request cleaning and filtering. Each instance can have an
     optional filter function applied to items before yielding. Set this
     via the :attr:`filter_func` property, which should be a callable
-    accepting a single item and returning True to yield it, alse to skip
-    it. If :attr:`filter_func` is None, no filtering is applied.
+    accepting a single item and returning True to yield it, False to
+    skip it. If :attr:`filter_func` is None, no filtering is applied.
 
     Subclasses can override :meth:`filter_item` for more complex
     filtering logic.
@@ -158,7 +158,7 @@ class APIGenerator(APIGeneratorBase, GeneratorWrapper):
         :param limit_name: Name of the limit API parameter.
         :param data_name: Name of the data in API response.
         :keyword dict parameters: All parameters passed to request class
-            usally :class:`api.Request<data.api.Request>` or
+            usually :class:`api.Request<data.api.Request>` or
             :class:`api.CachedRequest<data.api.CachedRequest>`. See these
             classes for further parameter descriptions. The *parameters*
             keys can also given here as keyword parameters but this is

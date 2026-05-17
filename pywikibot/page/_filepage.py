@@ -313,7 +313,7 @@ class FilePage(Page):
                raise an UploadError exception if the static boolean is
                False.
         :type ignore_warnings: bool or callable or iterable of str
-        :keyword chunk_size: The chunk size in bytesfor chunked
+        :keyword chunk_size: The chunk size in bytes for chunked
             uploading (see :api:`Upload#Chunked_uploading`). It will
             only upload in chunks, if the chunk size is positive but
             lower than the file size.
@@ -503,10 +503,15 @@ class FileInfo:
         """Update FileInfo with new values.
 
         .. version-added:: 8.6
+        .. version-changed:: 11.3
+           Tracking utm_* parameters are stripped from the url attribute.
         """
         for k, v in file_revision.items():
             if k == 'timestamp':
                 v = pywikibot.Timestamp.fromISOformat(v)
+            elif k == 'url':
+                # remove tracking parameters
+                v = v.split('?', 1)[0]
             setattr(self, k, v)
 
     def __getitem__(self, key):

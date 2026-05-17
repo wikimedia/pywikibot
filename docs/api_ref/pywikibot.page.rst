@@ -8,7 +8,7 @@
    .. admonition:: Imports in :mod:`pywikibot` module
       :class: note
 
-      The following classes and function are inported in :mod:`pywikibot` module
+      The following classes and function are imported in :mod:`pywikibot` module
       and can also be used as :mod:`pywikibot` members:
 
       - :class:`pywikibot.Category<page.Category>`

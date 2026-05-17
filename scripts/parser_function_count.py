@@ -57,16 +57,9 @@ from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 
-# TODO:
-# * Using xml and xmlstart
-# * Using categories
-# * Error handling for uploading (anyway, that's the last action, it's only
-#   for the beauty of the program, does not effect anything).
-
-
 class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
-    """Bot class used for obtaining Parser function Count."""
+    """Bot class used for obtaining parser function count."""
 
     use_redirects = False
 
@@ -116,8 +109,8 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
     @property
     def generator(self):
         """Generator."""
-        gen = self.site.allpages(start=self.opt.start,
-                                 namespace=10, filterredir=False)
+        gen = self.site.allpages(start=self.opt.start, namespace=10,
+                                 filterredir=False, content=True)
         if self.site.doc_subpage:
             gen = pagegenerators.RegexFilterPageGenerator(
                 gen, self.site.doc_subpage, quantifier='none')
@@ -125,8 +118,7 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
     def setup(self) -> None:
         """Setup magic words, regex and result counter."""
-        pywikibot.info('Hold on, this will need some time. '
-                       'You will be notified by 50 templates.')
+        pywikibot.info('Hold on, this will need some time.')
         magicwords = []
         for magic_word in self.site.siteinfo['magicwords']:
             magicwords += magic_word['aliases']
@@ -135,17 +127,14 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
     def treat(self, page) -> None:
         """Process a single template."""
-        title = page.title()
-        if (self.counter['read'] + 1) % 50 == 0:
+        if self.counter['read'] % 100 == 0:
             # Don't let the poor user panic in front of a black screen.
-            pywikibot.info('{}th template is being processed: {}'
-                           .format(self.counter['read'] + 1, title))
+            pywikibot.info('.', newline=False)
 
-        text = page.text
-        functions = self.regex.findall(text)
+        functions = self.regex.findall(page.text)
         if functions and (self.opt.atleast is None
                           or self.opt.atleast <= len(functions)):
-            self.results[title] = len(functions)
+            self.results[page.title()] = len(functions)
 
         if self.opt.nosort and self.opt.first \
            and len(self.results) >= self.opt.first:
@@ -155,8 +144,9 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
         """Final processing."""
         resultlist = '\n'.join(
             f'# [[{result[0]}]] ({result[1]})'
-
-            for result in self.results.most_common(self.opt.first))
+            for result in self.results.most_common(self.opt.first)
+        )
+        pywikibot.info()
         pywikibot.info(resultlist)
         pywikibot.info(f'{len(self.results)} templates were found.')
 

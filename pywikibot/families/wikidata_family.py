@@ -1,9 +1,9 @@
-"""Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2025
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikidata."""
 from __future__ import annotations
 
 from pywikibot import config, family

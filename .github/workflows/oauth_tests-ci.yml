@@ -22,7 +22,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [pypy3.9, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', 3.15-dev]
+        python-version:
+          - pypy3.9
+          - pypy3.11
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - 3.15-dev
         family: [wikipedia]
         code: [test]
         domain: [test.wikipedia.org]
@@ -31,12 +40,10 @@ jobs:
             family: wpbeta
             code: en
             domain: en.wikipedia.beta.wmcloud.org
-            experimental: true
           - python-version: '3.9'
             family: wpbeta
             code: zh
             domain: zh.wikipedia.beta.wmcloud.org
-            experimental: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
@@ -73,25 +80,76 @@ jobs:
           pip install mwoauth
           pip install packaging
           pip install requests
+          pip install requests[socks]
+      - name: Configure and start WMCS SOCKS tunnel
+        env:
+          USER: ${{ secrets.WMCS_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.WMCS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -lf ~/.ssh/id_ed25519
+          ssh-keyscan bastion.wmcloud.org >> ~/.ssh/known_hosts
+          ssh \
+            -o StrictHostKeyChecking=accept-new \
+            -o ExitOnForwardFailure=yes \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o ConnectTimeout=10 \
+            -f -N \
+            -D 127.0.0.1:1080 \
+            -i ~/.ssh/id_ed25519 \
+            "$USER@bastion.wmcloud.org"
+          echo "Socket connection:"
+          ss -lntp | grep 1080 || true
+          echo "Local IP:"
+          curl -s https://api.ipify.org
+          echo "Proxy IP:"
+          curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
       - name: Generate family files
         if: ${{ matrix.family == 'wpbeta' }}
+        env:
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
       - name: Generate user files
         run: |
-          python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -code:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+          python -Werror::UserWarning -m pwb generate_user_files  \
+            -family:${{matrix.family}} \
+            -code:${{matrix.code}} \
+            -user:${{ env.PYWIKIBOT_USERNAME }} \
+            -v \
+            -debug;
+          echo "::add-mask::$CK"
+          echo "::add-mask::$CS"
+          echo "::add-mask::$AK"
+          echo "::add-mask::$AS"
           echo "usernames['commons']['beta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
-          echo "authenticate['${{ matrix.domain }}'] = ('${{ steps.split.outputs._0 }}', '${{ steps.split.outputs._1 }}', '${{ steps.split.outputs._2 }}', '${{ steps.split.outputs._3 }}')" >> user-config.py
+          echo "authenticate['${{ matrix.domain }}'] = ('$CK', '$CS', '$AK', '$AS')" >> user-config.py
           echo "noisysleep = float('inf')" >> user-config.py
           echo "maximum_GET_length = 5000" >> user-config.py
           echo "console_encoding = 'utf8'" >> user-config.py
+        env:
+          CK: ${{ steps.split.outputs._0 }}
+          CS: ${{ steps.split.outputs._1 }}
+          AK: ${{ steps.split.outputs._2 }}
+          AS: ${{ steps.split.outputs._3 }}
       - name: Oauth tests with unittest
+        id: ci_test
+        continue-on-error: true
         timeout-minutes: 8
         env:
           PYWIKIBOT_TEST_WRITE: 1
           PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}
           PYWIKIBOT_TEST_MODULES: edit_failure,file,oauth,superset
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           python pwb.py version
           coverage run -m unittest -vv
@@ -103,3 +161,7 @@ jobs:
         uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      - name: Check on failure
+        if: steps.ci_test.outcome == 'failure'
+        run: |-
+          exit 1

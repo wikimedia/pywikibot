@@ -1156,8 +1156,8 @@ class BasePage(ComparableMixin):
 
         The framework enforces this restriction by default. It is
         possible to override this by setting ignore_bot_templates=True
-        in user cnfig file (user-config.py), or using
-        page.put(force=True).
+        in user config file (user-config.py), or using
+        :code:`page.put(force=True)`.
         """
         if not hasattr(self, '_bot_may_edit'):
             self._bot_may_edit = self._check_bot_may_edit()

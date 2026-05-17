@@ -25,11 +25,6 @@ class TestBaseSiteProperties(TestCase):
     """Test properties for BaseSite."""
 
     sites = {
-        'enwikinews': {
-            'family': 'wikinews',
-            'code': 'en',
-            'result': ('/doc',),
-        },
         'enwikibooks': {
             'family': 'wikibooks',
             'code': 'en',

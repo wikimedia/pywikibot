@@ -27,7 +27,7 @@ where action can be one of these
                available.
 
                .. version-changed:: 10.3
-                  only tries to fix if the namspace of the source page
+                  Only tries to fix if the namespace of the source page
                   is equal to the destination page.
 
 :both:         Both of the above. Retrieves redirect pages from live wiki,

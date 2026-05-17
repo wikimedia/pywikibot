@@ -32,11 +32,8 @@ coverage:
 component_management:
   individual_components:
     - component_id: Framework
-      paths:
-        - pywikibot/**
+      paths: [pywikibot/**]
     - component_id: Tests
-      paths:
-        - tests/**
+      paths: [tests/**]
     - component_id: Scripts
-      paths:
-        - scripts/**
+      paths: [scripts/**]

@@ -490,7 +490,7 @@ def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
     """
     _compPattern, strPattern, decoders = escapePattern2(pattern)
     # Encode an integer value into a textual form.
-    # This will be called from outside as well as recursivelly to verify
+    # This will be called from outside as well as recursively to verify
     # parsed value
     if filter_func and not filter_func(value):
         raise ValueError(f'value {value} is not allowed')

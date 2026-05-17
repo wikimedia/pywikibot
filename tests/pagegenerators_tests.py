@@ -962,6 +962,18 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertEqual(page.namespace(), 0)
 
+    def test_allpages_until(self) -> None:
+        """Test allpages generator."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handle_arg('-start:Python'))
+        self.assertTrue(gf.handle_arg('-until:Pywikibot'))
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 0)
+            self.assertLessEqual(page.title(), 'Pywikibot')
+
     def test_allpages_ns(self) -> None:
         """Test allpages generator with namespace argument."""
         gf = pagegenerators.GeneratorFactory()
@@ -1115,7 +1127,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_recentchanges_default(self) -> None:
         """Test recentchanges generator with default namespace setting."""
-        if self.site.family.name in ('wpbeta', 'wsbeta'):
+        if (self.site.family.name == 'wpbeta'
+                or self.site.sitename == 'wikisource:beta'):
             self.skipTest(
                 f'Skipping {self.site} due to too many autoblocked users')
         gf = pagegenerators.GeneratorFactory(site=self.site)
@@ -1448,7 +1461,7 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
     def test_wanted_files(self) -> None:
         """Test wantedfiles generator."""
         if self.site.sitename == 'wowwiki:uk':
-            self.skipTest(f'skipping {self.site} due to T362384)')
+            self.skipTest(f'Skipping {self.site} due to T362384)')
         self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
@@ -1645,11 +1658,18 @@ class EnWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
         )
 
 
+@require_modules('requests_sse')
 class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
-    @require_modules('requests_sse')
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Skip wikisource:beta site due to T426540."""
+        super().setUpClass()
+        if cls.site.sitename == 'wikisource:beta':
+            cls.skipTest(cls, f'Skip {cls.site} site due to T426540')
+
     def test_RC_pagegenerator_result(self) -> None:
         """Test RC pagegenerator."""
         lgr = logging.getLogger('requests_sse.client')

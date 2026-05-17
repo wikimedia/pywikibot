@@ -25,7 +25,7 @@ def main() -> None:
     max_len_bc_color = len(max(bg_colors, key=len))
 
     for bg_col in bg_colors:
-        # Three lines per each backgoung color.
+        # Three lines per each background color.
         for fg_col_group in batched(fg_colors, n_fg_colors // 4 + 1):
             line = ''
             for fg_col in fg_col_group:

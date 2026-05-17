@@ -21,10 +21,6 @@ class TestInterwikiMap(TestCase):
     """Test interwiki map and methods."""
 
     sites = {
-        'enwikinews': {
-            'family': 'wikinews',
-            'code': 'en',
-        },
         'enwikibooks': {
             'family': 'wikibooks',
             'code': 'en',

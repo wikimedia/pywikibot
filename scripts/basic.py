@@ -35,7 +35,7 @@ that settings file below the [basic] section like:
 .. code:: ini
 
     [basic] ; inline comments starts with colon
-    # This is a commend line. Assignments may be done with '=' or ':'
+    # This is a comment line. Assignments may be done with '=' or ':'
     text: A text with line break and
         continuing on next line to be put
     replace: yes ; yes/no, on/off, true/false and 1/0 is also valid

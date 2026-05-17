@@ -9,7 +9,7 @@ User preferences are loaded from a python file called `user-config.py`,
 which may be located in directory specified by the environment variable
 `PYWIKIBOT_DIR`, or the same directory as `pwb.py`, or in a directory
 within the users home. See :py:obj:`get_base_dir` for more information.
-The different file name can specified with global `-config` option.
+A different file name can be specified with the global `-config` option.
 
 If user config file cannot be found in any of those locations, this
 module will fail to load unless the environment variable
@@ -139,7 +139,7 @@ user_agent_format = ('{username}/{script} ({script_comments}) {pwb} '
                      '({revision}) {python} {http_backend}')
 
 # User agent description
-# This is a free-form string that can be user to describe specific bot/tool,
+# This is a free-form string that can be used to describe specific bot/tool,
 # provide contact information, etc.
 user_agent_description: str | None = None
 # Fake user agent.
@@ -408,7 +408,7 @@ for arg in sys.argv[1:]:
         info('The base directory is ' + base_dir)
         info('The user config file is ' + user_config_file)
         break
-family_files = {}
+family_files: dict[str, str] = {}
 
 
 def register_families_folder(folder_path: str,
@@ -800,9 +800,9 @@ cosmetic_changes = False
 # foreign wiki, set cosmetic_changes_mylang_only to False, but be careful!
 cosmetic_changes_mylang_only = True
 
-# The dictionary cosmetic_changes_enable should contain a tuple of languages
-# for each site where you wish to enable in addition to your own langlanguage
-# (if cosmetic_changes_mylang_only is set)
+# The dictionary cosmetic_changes_enable should contain a tuple of site codes
+# for each site where you wish to enable in addition to your own mylang code
+# if cosmetic_changes_mylang_only is set.
 # Please set your dictionary by adding such lines to your user config file:
 # cosmetic_changes_enable['wikipedia'] = ('de', 'en', 'fr')
 cosmetic_changes_enable: dict[str, tuple[str, ...]] = {}
@@ -827,7 +827,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
 # ############# REPLICATION BOT SETTINGS ################
 # You can add replicate_replace to your user config file.
 #
-# Use has the following format:
+# Use the following format:
 #
 # replicate_replace = {
 #            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}

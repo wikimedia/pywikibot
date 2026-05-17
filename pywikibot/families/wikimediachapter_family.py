@@ -1,9 +1,9 @@
-"""Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 #
-# (C) Pywikibot team, 2012-2024
+# (C) Pywikibot team, 2012-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 from __future__ import annotations
 
 from pywikibot import family

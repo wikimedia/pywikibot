@@ -32,9 +32,18 @@ class TestFamily(TestCase):
                 f = Family.load(name)
                 self.assertIsInstance(f.langs, dict)
                 self.assertTrue(f.langs)
-                self.assertTrue(f.codes)
-                self.assertTrue(iter(f.codes))
-                self.assertIsInstance(next(iter(f.codes)), str)
+
+                if name == 'wikinews':
+                    self.assertFalse(f.codes)
+                    self.assertTrue(f.closed_wikis)
+                    self.assertTrue(iter(f.closed_wikis))
+                    self.assertIsInstance(next(iter(f.closed_wikis)), str)
+                    self.assertIsInstance(f.closed_wikis, list)
+                else:
+                    self.assertTrue(f.codes)
+                    self.assertTrue(iter(f.codes))
+                    self.assertIsInstance(next(iter(f.codes)), str)
+
                 self.assertTrue(f.domains)
                 self.assertTrue(iter(f.domains))
                 for domain in f.domains:

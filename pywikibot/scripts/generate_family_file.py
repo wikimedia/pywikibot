@@ -18,7 +18,7 @@ omitted if there is no successor parameter. The parameters are::
     <url>:         an url from where the family settings are loaded
     <name>:        the family name without "_family.py" tail.
     <dointerwiki>: predefined answer (y|s|n) to add multiple site codes
-    <verify>:      disable certificate validaton `(y|n)
+    <verify>:      disable certificate validation `(y|n)
 
 Example::
 
@@ -74,7 +74,7 @@ class FamilyFileGenerator:
             sites), `N` or `n` for no and `E` or `e` if you want to edit
             the collection of sites.
         :param verify: If a certificate verification fails, you may pass
-            `Y` or `y` to disable certificate validaton `N` or `n` to
+            `Y` or `y` to disable certificate validation `N` or `n` to
             keep it enabled.
         """
         from pywikibot.scripts import _import_with_no_user_config

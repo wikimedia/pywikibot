@@ -1,18 +1,25 @@
-Release 11.2
+Release 11.3
 ============
 
-* Require Pillow 12.2.0 or above due to security vulnerability
-* Remove UTM tracking parameters in :attr:`proofreadpage.ProofreadPage.url_image` (:phab:`T419943`)
-* Enable *total* parameter in :meth:`Page.iterlanglinks()<page.BasePage.iterlanglinks>`
-  if links were cached (:phab:`T422390`)
+* Add *until* parameter to :meth:`Site.allpages()
+  <pywikibot.site._generators.GeneratorsMixin.allpages>` and add ``-until`` option to
+  :ref:`Generator Options` as a stop title for enumeration (:phab:`T425882`)
+* Update :attr:`family.WikimediaFamily.known_codes` (:phab:`T426319`)
+* Move all :mod:`families.wikinews_family` site codes to :attr:`Family.closed_wikis
+  <families.wikinews_family.Family.closed_wikis>` (:phab:`T425953`, :phab:`T426022`)
+* Enable :meth:`CosmeticChangesToolkit.commonsfiledesc()
+  <cosmetic_changes.CosmeticChangesToolkit.commonsfiledesc>` for FILE namespace on
+  on all commons wikis (:phab:`T425306`, :phab:`T425349`)
+* Add Devanagari numerals for ne-wiki to :attr:`NON_ASCII_DIGITS
+  <userinterfaces.transliteration.NON_ASCII_DIGITS>` and fix :class:`textlib.TimeStripper`
+  regex for :attr:`textlib.TimeStripperPatterns.timezone` (:phab:`T424467`)
+* Ignore ``UnicodeDecodeError`` in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks`
+  and skip the link in such case (:phab:`T423062`)
 * Update translations (i18n)
-* Implement *deletetalk* option in :meth:`APISite.delete()<pywikibot.site._apisite.APISite.delete>`
-  for older MediaWiki versions (:phab:`T420636`)
-* Add support for :mod:`abstract_family<families.abstract_family>`
-  (:phab:`T420636`, :phab:`T422369`)
-* Do not follow interwiki redirects in :meth:`APISite.pagebacklinks()
-  <pywikibot.site._generators.GeneratorsMixin.pagebacklinks>` (:phab:`T121833`)
-* Remove UTM tracking parameter in :meth:`pywikibot.FilePage.get_file_url` (:phab:`T420827`)
+* If *preload* option is set in :meth:`pagegenerators.GeneratorFactory.getCombinedGenerator`,
+  the preloading generators :func:`pagegenerators.PreloadingGenerator` or
+  :func:`pagegenerators.DequePreloadingGenerator` are called with the *quiet* option.
+
 
 Deprecations
 ============
@@ -24,7 +31,7 @@ Deprecated items may still work in the current release but are no longer recomme
 Users should update their code according to the recommended alternatives.
 
 Pywikibot follows a clear deprecation policy: features are typically deprecated in one release and
-removed in in the third subsequent major release, remaining available for the two releases in between.
+removed in the third subsequent major release, remaining available for the two releases in between.
 
 
 Pending removal in Pywikibot 12
@@ -56,8 +63,8 @@ Pending removal in Pywikibot 12
   <pywikibot.site._apisite.APISite.namespace>` was renamed to ``all_ns``
 * 9.0.0: ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``
 * 9.0.0: ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
-* 9.0.0: :func:`pywikibot.version.get_toolforge_hostname` is deprecated with no replacement
-* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmpDump` is deprecated, use ``revisions`` instead
+* 9.0.0: :func:`version.get_toolforge_hostname` is deprecated with no replacement
+* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
   (:phab:`T340804`)
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 * 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of the
@@ -67,7 +74,7 @@ Pending removal in Pywikibot 12
 Pending removal in Pywikibot 13
 -------------------------------
 
-* 10.6.0: The old ``(type, value, traceback)`` signature in
+* 10.7.0: The old ``(type, value, traceback)`` signature in
   :meth:`tools.collections.GeneratorWrapper.throw` will be removed in Pywikibot 13, or earlier if it
   is dropped from a future Python release. (:phab:`T340641`)
 * 10.6.0: :meth:`Family.isPublic()<family.Family.isPublic>` will be removed (:phab:`T407049`)
@@ -114,5 +121,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.0.0: The User-Agent variable *script_product* is deprecated; use *script* instead.
+  The User-Agent variable *version* is deprecated; use *revision* instead.
+  The User-Agent variables *lang*, *code* and *family* are deprecated; use *site* instead.
+* 11.0.0: Positional argument for *block* parameter is deprecated; use a keyword argument instead.
 * 11.0.0: Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
   Positional parameters for *by_letter* and *replace_invisible* are deprecated.

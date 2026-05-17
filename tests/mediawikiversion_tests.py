@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2022
+# (C) Pywikibot team, 2008-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Tests for the tools.MediaWikiVersion class."""
 from __future__ import annotations
 
 import unittest

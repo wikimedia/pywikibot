@@ -1,6 +1,30 @@
 Scripts Changelog
 =================
 
+11.3.0
+------
+
+addwikis
+^^^^^^^^
+
+* Update :attr:`family.WikimediaFamily.known_codes` together with wiki updates (:phab:`T426319`)
+
+interwiki
+^^^^^^^^^
+
+* Ignore site codes of ``-neverlink`` option instead of deleting them (:phab:`T410104`)
+
+noreferences
+^^^^^^^^^^^^
+
+* No longer skip references headers without trailing newline (:phab:`T424283`)
+
+parser_function_count
+^^^^^^^^^^^^^^^^^^^^^
+
+* Load all pages with content flag (:phab:`T423836`)
+
+
 11.2.0
 ------
 
@@ -488,7 +512,7 @@ clean_sandbox
 ^^^^^^^^^^^^^
 
 * L10N updates
-* A `-textfile` option was addet to fetch the text from a file
+* A `-textfile` option was added to fetch the text from a file
 
 create_isbn_edition
 ^^^^^^^^^^^^^^^^^^^
@@ -868,7 +892,7 @@ solve_disambiguation
 touch
 ^^^^^
 
-\*Do not pass OtherPageSaveRelatedError silently
+* Do not pass OtherPageSaveRelatedError silently
 
 unusedfiles
 ^^^^^^^^^^^
@@ -915,8 +939,7 @@ reflinks
 general
 ^^^^^^^
 
-*  show a warning if pywikibot.__version_\_ is behind
-   scripts.__version_\_
+*  show a warning if ``pywikibot.__version__`` is behind ``scripts.__version__``
 
 addtext
 ^^^^^^^

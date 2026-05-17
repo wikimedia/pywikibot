@@ -97,7 +97,7 @@ class GeneratorFactory:
         :param positional_arg_name: Generator to use for positional
             args, which do not begin with a hyphen
         :param enabled_options: Only enable options given by this
-            Iterable. This is priorized over disabled_options
+            Iterable. This is prioritized over disabled_options
         :param disabled_options: Disable these given options and let
             them be handled by scripts options handler
         """
@@ -119,7 +119,7 @@ class GeneratorFactory:
         self._sparql: str | None = None
         self.nopreload = False
         self._validate_options(enabled_options, disabled_options)
-
+        self._allpages_args = None
         self.is_preloading: bool | None = None
         """Return whether Page objects are preloaded. You may use this
         instance variable after :meth:`getCombinedGenerator` is called
@@ -214,6 +214,11 @@ class GeneratorFactory:
            if ``limit`` option is set and multiple generators are given,
            pages are yieded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
+        .. version-changed:: 11.3
+           If *preload* optiom is set, the preloading generators
+           :func:`pagegenerators.PreloadingGenerator` or
+           :func:`pagegenerators.DequePreloadingGenerator` are called
+           with the *quiet* option.
 
         :param gen: Another generator to be combined with
         :param preload: Preload pages using PreloadingGenerator
@@ -221,6 +226,10 @@ class GeneratorFactory:
         """
         if gen:
             self.gens.insert(0, gen)
+
+        # Handle allpages where args are given by -start and -until
+        if self._allpages_args is not None and 'start' in self._allpages_args:
+            self.gens.append(self.site.allpages(**self._allpages_args))
 
         for i, gen_item in enumerate(self.gens):
             if self.namespaces:
@@ -306,7 +315,7 @@ class GeneratorFactory:
                 preloadgen = pywikibot.pagegenerators.DequePreloadingGenerator
             else:
                 preloadgen = pywikibot.pagegenerators.PreloadingGenerator
-            dupfiltergen = preloadgen(dupfiltergen)
+            dupfiltergen = preloadgen(dupfiltergen, quiet=True)
 
         if self.articlefilter_list:
             dupfiltergen = RegexBodyFilterPageGenerator(
@@ -761,14 +770,27 @@ class GeneratorFactory:
                                              source=self.site))
         return page.getReferences(only_template_inclusion=True)
 
-    def _handle_start(self, value: str) -> HANDLER_GEN_TYPE:
+    def _handle_start(self, value: str) -> Literal[True]:
         """Handle `-start` argument."""
         if not value:
             value = '!'
         firstpagelink = pywikibot.Link(value, self.site)
-        return self.site.allpages(
-            start=firstpagelink.title, namespace=firstpagelink.namespace,
-            filterredir=False)
+        self._allpages_args = self._allpages_args or {}
+        self._allpages_args.update(
+            start=firstpagelink.title,
+            namespace=firstpagelink.namespace,
+            filterredir=False,
+        )
+        return True
+
+    def _handle_until(self, value: str) -> Literal[True]:
+        """Handle `-until` argument."""
+        if not value:
+            value = '!'
+        lastpagelink = pywikibot.Link(value, self.site)
+        self._allpages_args = self._allpages_args or {}
+        self._allpages_args.update(until=lastpagelink.title)
+        return True
 
     def _handle_prefixindex(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-prefixindex` argument."""

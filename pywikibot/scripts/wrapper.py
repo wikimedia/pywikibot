@@ -68,7 +68,7 @@ def check_pwb_versions(package: str) -> None:
     """Validate package version and scripts version.
 
     Rules:
-        - Pywikibot version must not be older than scrips version
+        - Pywikibot version must not be older than scripts version
         - Scripts version must not be older than previous Pywikibot version
           due to deprecation policy
     """
