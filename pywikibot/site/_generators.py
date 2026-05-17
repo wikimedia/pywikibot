@@ -952,7 +952,9 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate pages in a single namespace.
 
-        .. seealso:: :api:`Allpages`
+        .. seealso::
+           - :api:`Allpages`
+           - :func:`pagegenerators.AllpagesPageGenerator`
 
         .. version-changed:: 10.4
            All parameters except of *start* are keyword-only. Enable
