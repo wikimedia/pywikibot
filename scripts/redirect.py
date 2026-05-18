@@ -82,6 +82,7 @@ from __future__ import annotations
 import datetime
 from collections.abc import Generator
 from contextlib import suppress
+from itertools import islice
 from textwrap import fill
 from typing import Any
 
@@ -209,18 +210,18 @@ class RedirectGenerator(OptionHandler):
 
     def get_redirect_pages_via_api(self) -> Generator[pywikibot.Page]:
         """Yield Pages that are redirects."""
-        for ns in self.opt.namespaces:
-            gen = self.site.allpages(start=self.opt.start,
-                                     namespace=ns,
-                                     filterredir=True)
-            if self.opt.limit:
-                gen.set_maximum_items(self.opt.limit)
-            for p in gen:
-                done = (self.opt.until
-                        and p.title(with_ns=False) >= self.opt.until)
-                if done:
-                    return
-                yield p
+        pages = (
+            page
+            for ns in self.opt.namespaces
+            for page in self.site.allpages(
+                start=self.opt.start,
+                until=self.opt.until,
+                namespace=ns,
+                filterredir=True,
+                total=self.opt.limit
+            )
+        )
+        yield from islice(pages, self.opt.limit)
 
     def _next_redirect_group(self) -> Generator[list[pywikibot.Page]]:
         """Generator that yields batches of redirects as a list."""
@@ -505,7 +506,7 @@ class RedirectRobot(ExistingPageBot):
                 return
 
             if redir_page.namespace() != movedTarget.namespace():
-                pywikibot.info(f'Namespace of {redir_page} is different'
+                pywikibot.info(f'Namespace of {redir_page} is different '
                                f'from target page {movedTarget}')
             elif redir_page == movedTarget:
                 pywikibot.info('Redirect to target page forms a redirect loop')
@@ -576,7 +577,7 @@ class RedirectRobot(ExistingPageBot):
                 return False  # do nothing
 
             pywikibot.info(
-                f'Skipping: Redirect target {new_redir} is not a  redirect.')
+                f'Skipping: Redirect target {new_redir} is not a redirect.')
 
         elif isinstance(error, SectionError):
             pywikibot.warning(
@@ -601,7 +602,7 @@ class RedirectRobot(ExistingPageBot):
             pywikibot.info('Skipping due to server error: No textarea found')
 
         else:
-            # all uncatched exceptions
+            # all uncaught exceptions
             # Note: elif statements are necessary above because all Errors
             # above derive from Exception class
             raise error
@@ -768,7 +769,7 @@ def main(*args: str) -> None:
         gen = RedirectGenerator(action, **gen_options)
 
     if gen_factory.gens \
-       or action != 'both' and source not in ('-fullscan', '-xml'):
+       or action != 'both' and next(iter(source)) not in ('-fullscan', '-xml'):
         gen = gen_factory.getCombinedGenerator(gen=gen)
 
     bot = RedirectRobot(action, generator=gen, **options)
