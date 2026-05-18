@@ -33,9 +33,7 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if typing.TYPE_CHECKING:
-    from data.api import ParamInfo, Request
-
-    from pywikibot.site._apisite import _RequestWrapperT
+    from pywikibot.data.api import ParamInfo, Request
     from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
     from pywikibot.site._tokenwallet import TokenWallet
     from pywikibot.tools import MediaWikiVersion
@@ -46,7 +44,7 @@ class GeneratorsMixin:
     """API generators mixin to MediaWiki site."""
 
     if typing.TYPE_CHECKING:
-        _generator: Callable[..., _RequestWrapperT]
+        _generator: Callable[..., pywikibot.site._apisite._RequestWrapperT]
         _paraminfo: ParamInfo
         _request: Callable[..., Request]
         assert_valid_iter_params: Callable[..., None]
@@ -67,7 +65,7 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page]:
         """Return a page generator from pageids.
 
-        Pages are iterated in the same order than in the underlying
+        Pages are iterated in the same order as in the underlying
         pageids.
 
         Pageids are filtered and only one page is returned in case of
@@ -131,7 +129,7 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page]:
         """Return a generator to a list of preloaded pages.
 
-        Pages are iterated in the same order than in the underlying
+        Pages are iterated in the same order as in the underlying
         pagelist. In case of duplicates in a groupsize batch, return the
         first entry.
 
