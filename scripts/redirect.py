@@ -54,9 +54,11 @@ and arguments can be:
                (see progress). Otherwise, ignored.
 
 -start:title   The starting page title in each namespace. Page need not exist.
+               Can only be used with ``both`` action.
 
 -until:title   The possible last page title in each namespace. Page needs not
-               exist.
+               exist. Can only be used with ``both`` action and together with
+               ``-start`` option.
 
 -limit:n       The maximum count of redirects to work upon. If omitted, there
                is no limit.
