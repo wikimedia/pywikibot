@@ -2367,7 +2367,6 @@ class GeneratorsMixin:
         :param propname: Must be a valid property.
         :param total: Number of pages to return
         :return: Return a generator of Page objects
-        :rtype: iterator
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(
