@@ -359,7 +359,7 @@ class GeneratorsMixin:
         total: int | None = None,
         content: bool = False
     ) -> Iterable[pywikibot.Page]:
-        """Iterale all redirects to the given page.
+        """Iterate all redirects to the given page.
 
         .. seealso:: :api:`Redirects`
 
@@ -481,7 +481,7 @@ class GeneratorsMixin:
         :param with_sort_key: If True, include the sort key in each
             Category
         :param content: If True, load the current content of each
-            iterated page default False); note that this means the
+            iterated page (default False); note that this means the
             contents of the category description page, not the pages
             contained in the category
         """
