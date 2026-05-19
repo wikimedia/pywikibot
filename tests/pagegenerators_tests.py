@@ -1662,13 +1662,6 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        """Skip wikisource:beta site due to T426540."""
-        super().setUpClass()
-        if cls.site.sitename == 'wikisource:beta':
-            cls.skipTest(cls, f'Skip {cls.site} site due to T426540')
-
     def test_RC_pagegenerator_result(self) -> None:
         """Test RC pagegenerator."""
         site = self.get_site()

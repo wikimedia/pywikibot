@@ -1521,15 +1521,20 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        """Set up test class."""
+        """Set up test class.
+
+        .. version-changed:: 11.4
+           Override the default site for all test sites.
+        """
         if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
             raise unittest.SkipTest(
                 'PYWIKIBOT_TEST_NO_RC is set; RecentChanges tests disabled.')
 
         super().setUpClass()
 
-        if cls.get_site().code in ('test', 'test2'):
-            cls.override_default_site(pywikibot.Site('en', 'wikipedia'))
+        site = cls.get_site()
+        if site.code in site.family.test_codes:
+            cls.override_default_site(pywikibot.Site('wikipedia:en'))
 
 
 class DeprecationTestCase(TestCase):
