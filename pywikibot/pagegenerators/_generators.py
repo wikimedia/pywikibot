@@ -282,7 +282,7 @@ def UnconnectedPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all unconnected pages to a Wikibase repository.
 
-    .. version-changed::
+    .. version-changed:: 10.4.0
        The *strict* parameter was added.
 
     :param site: Site for generator results.
