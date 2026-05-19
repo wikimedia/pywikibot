@@ -496,7 +496,7 @@ def PagesFromPageidGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Return a page generator from pageids.
 
-    Pages are iterated in the same order than in the underlying pageids.
+    Pages are iterated in the same order as in the underlying pageids.
     Pageids are filtered and only one page is returned in case of
     duplicate pageid.
 
