@@ -770,8 +770,8 @@ def main(*args: str) -> None:
             gen_options['namespaces'] = gen_factory.namespaces
         gen = RedirectGenerator(action, **gen_options)
 
-    if gen_factory.gens \
-       or action != 'both' and next(iter(source)) not in ('-fullscan', '-xml'):
+    if gen_factory.gens or action != 'both' \
+       and next(iter(source), None) not in ('-fullscan', '-xml'):
         gen = gen_factory.getCombinedGenerator(gen=gen)
 
     bot = RedirectRobot(action, generator=gen, **options)
