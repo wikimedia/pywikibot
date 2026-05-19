@@ -419,7 +419,7 @@ class UrlShortenerMixin:
         Note that on Wikimedia wikis only metawiki supports this action,
         and this wiki can process links to all WM domains.
 
-        :param url: The link to reduce, with propotol prefix.
+        :param url: The link to reduce, with protocol prefix.
         :return: The reduced link, without protocol prefix.
         """
         req = self.simple_request(action='shortenurl', url=url)
