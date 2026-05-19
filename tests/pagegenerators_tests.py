@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import calendar
 import datetime
-import logging
 import sys
 import unittest
 from contextlib import suppress
@@ -1672,12 +1671,6 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     def test_RC_pagegenerator_result(self) -> None:
         """Test RC pagegenerator."""
-        lgr = logging.getLogger('requests_sse.client')
-        lgr.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        lgr.addHandler(ch)
-
         site = self.get_site()
         pagegenerator = pagegenerators.LiveRCPageGenerator(site,
                                                            total=self.length)
