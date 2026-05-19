@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Unit tests for citoid script."""
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Unit tests for citoid script."""
 from __future__ import annotations
 
 import datetime
