@@ -42,6 +42,17 @@ class TestAddingReferences(TestCase):
         expected = page.text + '\n<references />\n'
         self.assertEqual(new_text, expected)
 
+    def test_add_under_comments(self) -> None:
+        """Test adding references section under comments in section."""
+        page = pywikibot.Page(self.site, 'foo')
+        bot = NoReferencesBot()
+        bot.site = self.site
+        page.text = '\n== Reference ==\n<!-- comment -->\nSome text'
+        new_text = bot.addReferences(page.text)
+        expected = ('\n== Reference ==\n<!-- comment -->\n<references />\n'
+                    '\nSome text')
+        self.assertEqual(new_text, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
