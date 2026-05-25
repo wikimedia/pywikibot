@@ -44,7 +44,7 @@ class BaseSiteProtocol(Protocol):
         ...
 
     @property
-    def namespaces(self, **kwargs) -> NamespacesDict:
+    def namespaces(self) -> NamespacesDict:
         ...
 
     def simple_request(self, **kwargs) -> api.Request:
