@@ -42,7 +42,7 @@ class TestPagesTagParser(TestCase):
         self.assertEqual(attr.attr, 'to')
         self.assertEqual(attr.value, 3)
 
-    def test_tag_attr_srt_int(self) -> None:
+    def test_tag_attr_str_int(self) -> None:
         """Test TagAttr for str values that can be converted to int."""
         attr = TagAttr('to', '3')
         self.assertEqual(repr(attr), "TagAttr('to', '3')")
@@ -994,7 +994,7 @@ class TestIndexPageHasValidContent(BS4TestCase):
         self.index.text = self.other_template
         self.assertFalse(self.index.has_valid_content())
 
-    def test_has_valid_content_missnamed_template(self) -> None:
+    def test_has_valid_content_misnamed_template(self) -> None:
         """Test nested templates is valid."""
         self.index.text = '{{%s_bar|foo=bar}}' % IndexPage.INDEX_TEMPLATE
         self.assertFalse(self.index.has_valid_content())
