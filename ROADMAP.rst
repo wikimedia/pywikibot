@@ -1,7 +1,9 @@
 Release 11.4
 ============
 
-* *(no changes yet)*
+* Add *until* and *reverse* options to :func:`pagegenerators.AllpagesPageGenerator`
+  (:phab:`T66531`, :phab:`T426542`)
+* Support attributes in with multiple words with :class:`proofreadpage.TagAttr` (:phab:`T383506`)
 
 
 Deprecations
