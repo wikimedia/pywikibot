@@ -335,50 +335,44 @@ class LinterMixin:
     @need_extension('Linter')
     def linter_pages(
         self: BaseSiteProtocol,
-        lint_categories=None,
+        lint_categories: Iterable[str] | str = None,
         total: int | None = None,
         namespaces=None,
-        pageids: str | int | None = None,
+        pageids: Iterable[str | int] | str | int | None = None,
         lint_from: str | int | None = None
     ) -> Iterable[pywikibot.Page]:
         """Return a generator to pages containing linter errors.
 
-        :param lint_categories: Categories of lint errors
-        :type lint_categories: An iterable that returns values (str), or
-            a pipe-separated string of values.
-        :param total: If not None, yielding this many items in total
-        :param namespaces: Only iterate pages in these namespaces
+        .. seealso:: https://www.mediawiki.org/wiki/Extension:Linter
+
+        :param lint_categories: Categories of lint errors. Must be an
+            iterable of lint categories, or a pipe-separated string of
+            lint categories.
+        :param total: If not None, yield this many items in total.
+        :param namespaces: Only iterate pages in these namespaces.
         :type namespaces: Iterable of str or Namespace key, or a single
             instance of those types. May be a '|' separated list of
             namespace identifiers.
         :param pageids: Only include lint errors from the specified
-            pageids
-        :type pageids: An iterable that returns pageids, or a comma- or
-             pipe-separated string of pageids (e.g. '945097,1483753,
-             956608' or '945097|483753|956608')
+            pageids. Must be given as an iterable of page ids, or a
+            pipe-separated string of page ids
+            (e.g. '945097|483753|956608').
         :param lint_from: Lint ID to start querying from
         :return: Pages with Linter errors.
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',
-                                total=total,  # Will set lntlimit
-                                namespaces=namespaces)
+                                total=total, namespaces=namespaces,
+                                lntfrom=lint_from)
 
         if lint_categories:
             if isinstance(lint_categories, str):
-                lint_categories = lint_categories.split('|')
-                lint_categories = [p.strip() for p in lint_categories]
-            query.request['lntcategories'] = '|'.join(lint_categories)
+                lint_categories = lint_categories.replace(' ', '')
+            query.request['lntcategories'] = lint_categories
 
         if pageids:
             if isinstance(pageids, str):
-                pageids = pageids.split('|')
-                pageids = [p.strip() for p in pageids]
-            # Validate pageids.
-            pageids = (str(int(p)) for p in pageids if int(p) > 0)
-            query.request['lntpageid'] = '|'.join(pageids)
-
-        if lint_from:
-            query.request['lntfrom'] = int(lint_from)
+                pageids = pageids.replace(' ', '')
+            query.request['lntpageid'] = pageids
 
         for pageitem in query:
             page = pywikibot.Page(self, pageitem['title'])
