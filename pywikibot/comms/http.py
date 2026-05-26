@@ -70,7 +70,7 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
 
     .. version-added:: 8.0
     .. version-changed:: 10.2
-       use `threading.Lock` in :meth:`load` and :meth`save` to be thread
+       use `threading.Lock` in :meth:`load` and :meth:`save` to be thread
        safe.
     """
 
