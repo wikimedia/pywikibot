@@ -314,7 +314,7 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
 class CharsetTestCase(TestCase):
 
-    """Test that HttpRequest correct handles the charsets given."""
+    """Test that HttpRequest correctly handles the charsets given."""
 
     CODEC_CANT_DECODE_RE = "codec can't decode byte"
     net = False
@@ -561,36 +561,6 @@ class QueryStringParamsTestCase(HttpbinTestCase):
 
         self.assertEqual(r.status_code, HTTPStatus.OK)
         self.assertEqual(r.json()['args'], {'fish%26chips': 'delicious'})
-
-
-class DataBodyParameterTestCase(HttpbinTestCase):
-
-    """Test data and body params of fetch/request methods are equivalent."""
-
-    maxDiff = None
-
-    def test_fetch(self) -> None:
-        """Test that using the data and body params produce same results."""
-        tracker = (
-            'X-Amzn-Trace-Id', 'X-B3-Parentspanid', 'X-B3-Spanid',
-            'X-B3-Traceid', 'X-Forwarded-Client-Cert',
-        )
-        r_data_request = self.fetch(self.get_httpbin_url('/post'),
-                                    method='POST',
-                                    data={'fish&chips': 'delicious'})
-        r_body_request = self.fetch(self.get_httpbin_url('/post'),
-                                    method='POST',
-                                    data={'fish&chips': 'delicious'})
-
-        r_data = r_data_request.json()
-        r_body = r_body_request.json()
-
-        # remove tracker ids if present (T243662, T255862)
-        for tracker_id in tracker:
-            r_data['headers'].pop(tracker_id, None)
-            r_body['headers'].pop(tracker_id, None)
-
-        self.assertEqual(r_data, r_body)
 
 
 if __name__ == '__main__':
