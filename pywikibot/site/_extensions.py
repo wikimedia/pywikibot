@@ -335,7 +335,7 @@ class LinterMixin:
     @need_extension('Linter')
     def linter_pages(
         self: BaseSiteProtocol,
-        lint_categories: Iterable[str] | str = None,
+        lint_categories: Iterable[str] | str | None = None,
         total: int | None = None,
         namespaces=None,
         pageids: Iterable[str | int] | str | int | None = None,
