@@ -148,6 +148,18 @@ jobs:
         run: |
           python pwb.py version
           coverage run -m unittest -vv tests/site_login_logout_tests.py
+      - name: Close WMCS SOCKS tunnel
+        if: always()
+        shell: bash
+        run: |-
+          if [ -f ssh.pid ]; then
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
+          fi
       - name: Show coverage statistics
         run: |
           coverage combine || true

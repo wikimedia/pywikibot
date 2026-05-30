@@ -159,6 +159,18 @@ jobs:
           else
             coverage run -m pytest
           fi
+      - name: Close WMCS SOCKS tunnel
+        if: always()
+        shell: bash
+        run: |-
+          if [ -f ssh.pid ]; then
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
+          fi
       - name: Show coverage statistics
         run: |
           coverage combine || true

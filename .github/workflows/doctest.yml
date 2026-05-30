@@ -84,9 +84,15 @@ jobs:
           coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py" --doctest-wait
       - name: Close WMCS SOCKS tunnel
         if: always()
+        shell: bash
         run: |-
           if [ -f ssh.pid ]; then
-            kill "$(cat ssh.pid)" || true
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
           fi
       - name: Show coverage statistics
         run: |
