@@ -103,30 +103,10 @@ jobs:
           pip install requests
           pip install requests[socks]
       - name: Configure and start WMCS SOCKS tunnel
-        env:
-          USER: ${{ secrets.WMCS_USER }}
-        run: |
-          mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.WMCS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keygen -lf ~/.ssh/id_ed25519
-          ssh-keyscan bastion.wmcloud.org >> ~/.ssh/known_hosts
-          ssh \
-            -o StrictHostKeyChecking=accept-new \
-            -o ExitOnForwardFailure=yes \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o ConnectTimeout=10 \
-            -f -N \
-            -D 127.0.0.1:1080 \
-            -i ~/.ssh/id_ed25519 \
-            "$USER@bastion.wmcloud.org"
-          echo "Socket connection:"
-          echo "Local IP:"
-          curl -s https://api.ipify.org
-          echo
-          echo "Proxy IP:"
-          curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
+        uses: ./.github/actions/wmcs-socks
+        with:
+          ssh_user: ${{ secrets.WMCS_USER }}
+          ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate family files
         env:
           HTTP_PROXY: socks5h://127.0.0.1:1080
