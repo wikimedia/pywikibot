@@ -122,9 +122,9 @@ jobs:
             -i ~/.ssh/id_ed25519 \
             "$USER@bastion.wmcloud.org"
           echo "Socket connection:"
-          ss -lntp | grep 1080 || true
           echo "Local IP:"
           curl -s https://api.ipify.org
+          echo
           echo "Proxy IP:"
           curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
       - name: Generate family files
