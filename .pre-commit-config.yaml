@@ -64,7 +64,7 @@ repos:
     hooks:
       - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.15
+    rev: v0.15.13
     hooks:
       - id: ruff-check
         alias: ruff
@@ -96,7 +96,7 @@ repos:
         name: isort (skip future annotations)
         files: ^(pwb|pywikibot/families/__init__)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.86.0
+    rev: v0.85.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
