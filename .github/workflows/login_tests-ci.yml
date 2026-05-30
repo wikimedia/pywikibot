@@ -8,6 +8,9 @@ on:
     branches: [master]
     types: [completed]
 
+permissions:
+  contents: read
+
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_TEST_LOGOUT: 1

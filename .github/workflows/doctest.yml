@@ -10,14 +10,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
 jobs:
   build:
-    permissions:
-      contents: read
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     timeout-minutes: 10
     strategy:

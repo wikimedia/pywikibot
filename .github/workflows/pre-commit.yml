@@ -9,15 +9,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_NO_USER_CONFIG: 2
 
 jobs:
   pre-commit:
-    timeout-minutes: 10
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
