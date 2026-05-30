@@ -1,0 +1,57 @@
+---
+name: WMCS SOCKS Tunnel
+description: Configure and start WMCS SOCKS proxy tunnel
+
+inputs:
+  ssh_user:
+    description: SSH user for bastion
+    required: true
+  ssh_key:
+    description: Private SSH key
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup SSH directory
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p ~/.ssh
+    - name: Install SSH key
+      shell: bash
+      run: |
+        set -euo pipefail
+        printf "%s" "${{ inputs.ssh_key }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+    - name: Add known hosts
+      shell: bash
+      run: |
+        set -euo pipefail
+        ssh-keyscan bastion.wmcloud.org >> ~/.ssh/known_hosts
+    - name: Start SOCKS tunnel
+      shell: bash
+      run: |
+        set -euo pipefail
+        ssh \
+          -o StrictHostKeyChecking=accept-new \
+          -o ExitOnForwardFailure=yes \
+          -o ServerAliveInterval=30 \
+          -o ServerAliveCountMax=3 \
+          -o ConnectTimeout=10 \
+          -N \
+          -D 127.0.0.1:1080 \
+          -i ~/.ssh/id_ed25519 \
+          "${{ inputs.ssh_user }}@bastion.wmcloud.org" &
+        echo $! > ssh.pid
+        echo "SSH tunnel started with PID $(cat ssh.pid)"
+    - name: Show proxy connection
+      shell: bash
+      run: |-
+        set -euo pipefail
+        echo "Local IP:"
+        curl -s https://api.ipify.org
+        echo
+        echo "Proxy IP:"
+        curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
+        echo
