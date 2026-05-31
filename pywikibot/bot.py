@@ -1008,7 +1008,7 @@ class _OptionDict(dict[str, Any]):
         super().__init__(options)
 
     def __missing__(self, key: str) -> None:
-        raise Error(f"'{key}' is not a valid option for {self._classname}.")
+        raise Error(f'{key!r} is not a valid option for {self._classname}.')
 
     def __getattr__(self, name: str) -> Any:
         """Get item from dict."""
@@ -1092,7 +1092,7 @@ class OptionHandler:
         self.opt.update((opt, options[opt])
                         for opt in received_options & valid_options)
         for opt in received_options - valid_options:
-            _warning(f'{opt} is not a valid option. It was ignored.')
+            _warning(f'{opt!r} is not a valid option. It was ignored.')
 
 
 class BaseBot(OptionHandler):
@@ -1813,7 +1813,7 @@ class ConfigParserBot(BaseBot):
                     method = getattr(conf, 'get' + value_type, default)
                 options[option] = method(section, option)
             for opt in set(conf.options(section)) - set(options):
-                _warning(f'"{opt}" is not a valid option. It was ignored.')
+                _warning(f'{opt!r} is not a valid option. It was ignored.')
             options.update(kwargs)
         else:
             options = kwargs
