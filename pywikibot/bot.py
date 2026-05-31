@@ -1171,11 +1171,12 @@ class BaseBot(OptionHandler):
             method
         """
         if 'generator' in kwargs:
+            gen = kwargs.pop('generator')
             if hasattr(self, 'generator'):
                 warnings.warn(f'{type(self).__name__} has a generator'
                               ' already. Ignoring argument.', stacklevel=2)
             else:
-                self.generator: Iterable = kwargs.pop('generator')
+                self.generator: Iterable = gen
 
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
