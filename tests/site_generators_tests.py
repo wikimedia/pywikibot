@@ -1227,13 +1227,13 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         mysite = self.get_site()
         start = '2008-10-08T03:05:07Z'
         for contrib in mysite.usercontribs(
-                userprefix='Brion',
+                userprefix='Brooke',
                 start=pywikibot.Timestamp.fromISOformat(start),
                 total=5, reverse=True):
             self.assertGreaterEqual(contrib['timestamp'], start)
 
         for contrib in mysite.usercontribs(
-                userprefix='Brion',
+                userprefix='Brooke',
                 end=pywikibot.Timestamp.fromISOformat('2008-10-09T04:06:08Z'),
                 total=5, reverse=True):
             self.assertLessEqual(contrib['timestamp'], '2008-10-09T04:06:08Z')
@@ -1527,7 +1527,7 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
 class TestUserList(DefaultSiteTestCase):
 
-    """Test usernames Jimbo Wales, Brion VIBBER and Tim Starling."""
+    """Test usernames Jimbo Wales, Brooke Vibber and Tim Starling."""
 
     cached = True
 
