@@ -1204,7 +1204,7 @@ class BaseBot(OptionHandler):
         To check for an empty generator you may use::
 
             if self.generator_completed and not self.counter['read']:
-                print('generator was emtpty')
+                print('generator was empty')
 
         .. note:: An empty generator returns True.
         .. version-added:: 3.0
@@ -1518,7 +1518,7 @@ class BaseBot(OptionHandler):
                if not hasattr(self, 'generator'):
                    raise NotImplementedError('"generator" not set.')
 
-               if self.generator is None;
+               if self.generator is None:
                    print('No generator was defined')
 
                try:
