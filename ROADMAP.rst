@@ -31,12 +31,6 @@ removed in the third subsequent major release, remaining available for the two r
 Pending removal in Pywikibot 12
 -------------------------------
 
-* 9.6.0: :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` will be removed in
-  favour of :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`
-* 9.5.0: :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>` will be removed
-  in favour of :meth:`DataSite.get_property_type()<pywikibot.site._datasite.DataSite.get_property_type>`
-* 9.3.0: :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` are deprecated in favour of
-  ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property
 * 9.3.0: *botflag* parameter of :meth:`Page.save()<page.BasePage.save>`, :meth:`Page.put()
   <page.BasePage.put>`, :meth:`Page.touch()<page.BasePage.touch>` and
   :meth:`Page.set_redirect_target()<page.Page.set_redirect_target>` was renamed to *bot*

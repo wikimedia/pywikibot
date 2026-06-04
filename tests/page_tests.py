@@ -598,14 +598,6 @@ class TestPageObject(DefaultSiteTestCase):
         # we only check that the returned objects are of correct type.
         self.assertIsInstance(mainpage.get(), str)
         self.assertIsInstance(mainpage.latest_revision_id, int)
-
-        with suppress_warnings(
-            r'pywikibot\.page\._basepage.BasePage\.\w+ is deprecated since '
-            r'release 9\.3\.0; use latest_revision\..+ instead\.',
-                FutureWarning):
-            self.assertIsInstance(mainpage.userName(), str)
-            self.assertIsInstance(mainpage.isIpEdit(), bool)
-
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)

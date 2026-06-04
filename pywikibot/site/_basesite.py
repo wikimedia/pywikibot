@@ -25,7 +25,6 @@ from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     ComparableMixin,
     cached,
-    deprecated,
     first_upper,
     normalize_username,
 )
@@ -255,15 +254,6 @@ class BaseSite(ComparableMixin):
     def __hash__(self):
         """Return hash value of instance."""
         return hash(repr(self))
-
-    @deprecated('codes', since='9.6')
-    def languages(self) -> list[str]:
-        """Return list of all valid site codes for this site's Family.
-
-        .. version-deprecated:: 9.6
-           Use :meth:`codes` instead.
-        """
-        return sorted(self.codes)
 
     @property
     def codes(self) -> set[str]:

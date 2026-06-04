@@ -954,26 +954,6 @@ class BasePage(ComparableMixin):
                 includecomments=includecomments)
         return self._expanded_text
 
-    @deprecated('latest_revision.user', since='9.3.0')
-    def userName(self) -> str:
-        """Return name or IP address of last user to edit page.
-
-        .. version-deprecated:: 9.3
-           Use :attr:`latest_revision.user<latest_revision>`
-           instead.
-        """
-        return self.latest_revision.user  # type: ignore[attr-defined]
-
-    @deprecated('latest_revision.anon', since='9.3.0')
-    def isIpEdit(self) -> bool:
-        """Return True if last editor was unregistered.
-
-        .. version-deprecated:: 9.3
-           Use :attr:`latest_revision.anon<latest_revision>`
-           instead.
-        """
-        return self.latest_revision.anon  # type: ignore[attr-defined]
-
     @cached
     def lastNonBotUser(self) -> str | None:
         """Return name or IP address of last human/non-bot user to edit page.
