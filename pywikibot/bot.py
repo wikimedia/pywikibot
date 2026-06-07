@@ -425,7 +425,7 @@ def init_handlers() -> None:
             # keep config.logfilename unchanged
             logfile = config.datafilepath('logs', config.logfilename)
         else:
-            # add PID to logfle name
+            # add PID to logfile name
             logfile = config.datafilepath('logs',
                                           f'{module_name}-{pid}bot.log')
 
@@ -1480,7 +1480,7 @@ class BaseBot(OptionHandler):
     def setup(self) -> None:
         """Some initial setup before :meth:`run` operation starts.
 
-        This can be used for reading huge parts from life wiki or file
+        This can be used for reading huge parts from live wiki or file
         operation which is more than just initialize the instance.
         Invoked by :meth:`run` before running through :attr:`generator`
         loop.
