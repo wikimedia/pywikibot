@@ -806,7 +806,7 @@ def prepareRegexForMySQL(pattern: str) -> str:
 
 EXC_KEYS = {
     '-excepttitle': 'title',
-    '-requiretitle:': 'require-title',
+    '-requiretitle': 'require-title',
     '-excepttext': 'text-contains',
     '-exceptinside': 'inside',
     '-exceptinsidetag': 'inside-tags'
