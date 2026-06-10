@@ -284,7 +284,7 @@ class ReplacementBase:
 
 class Replacement(ReplacementBase):
 
-    """A single replacement with it's own data."""
+    """A single replacement with its own data."""
 
     def __init__(self, old, new, use_regex=None, exceptions=None,
                  case_insensitive=None, edit_summary=None,

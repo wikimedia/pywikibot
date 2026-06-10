@@ -166,7 +166,7 @@ class APISite(
         guaranteed to equal ``site`` (i.e. the parameter passed to this
         function).
 
-        :param site: The targeted site, which might be it's own.
+        :param site: The targeted site, which might be its own.
         :raises KeyError: If there is no interwiki prefix for that site.
         """
         assert site is not None, 'Site must not be None'
@@ -929,7 +929,7 @@ class APISite(
         :param is_ts: When comparing timestamps (with is_ts=True) the
             start is usually greater than end. Comparing titles this is
             vice versa.
-        :raises AssertionError: Start/end values are not comparabel
+        :raises AssertionError: Start/end values are not comparable
             types or are in the wrong order
         """
         if not (isinstance(end, type(start)) or isinstance(start, type(end))):
@@ -1195,11 +1195,10 @@ class APISite(
 
         for nsdata in self.siteinfo.get('namespaces', cache=False).values():
             ns = nsdata.pop('id')
+            custom_name = nsdata.pop('name')
             if ns == 0:
-                custom_name = canonical_name = nsdata.pop('name')
-                custom_name = canonical_name
+                canonical_name = custom_name
             else:
-                custom_name = nsdata.pop('name')
                 canonical_name = nsdata.pop('canonical')
 
             default_case = Namespace.default_case(ns)
@@ -1385,7 +1384,7 @@ class APISite(
            site.
         .. version-changed:: 11.0
            No longer raise UnknownExtensionError if site is not
-           connected to a wikibase but retern None instead.
+           connected to a wikibase but return None instead.
 
         :param item: Id number of item, "Q###",
         :return: Page, or Category object given by Wikibase item number
@@ -1859,7 +1858,7 @@ class APISite(
         return category._catinfo
 
     def isBot(self, username: str) -> bool:  # noqa: N802
-        """Return True is username is a bot user."""
+        """Return True if username is a bot user."""
         return username in (userdata['name'] for userdata in self.botusers())
 
     @property

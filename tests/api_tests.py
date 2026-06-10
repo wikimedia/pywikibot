@@ -756,8 +756,7 @@ class TestLazyLoginBase(TestCase):
     """Test that it tries to login when read API access is denied.
 
     Because there is no such family configured it creates an AutoFamily
-    and BaseSite on it's own. It's testing against
-    steward.wikimedia.org.
+    and BaseSite on its own. It's testing against steward.wikimedia.org.
 
     These tests are split into two subclasses as only the first failed
     login behaves as expected. All subsequent logins will raise an

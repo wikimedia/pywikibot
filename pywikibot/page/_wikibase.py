@@ -1896,7 +1896,7 @@ class Claim(Property):
         """Create a Claim for a qualifier from JSON.
 
         Qualifier objects are represented a bit differently like
-        references, but I'm not sure if this even requires it's own
+        references, but I'm not sure if this even requires its own
         function.
 
         :rtype: pywikibot.page.Claim
