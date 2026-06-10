@@ -36,6 +36,8 @@ utility methods to build paths relative to base_dir:
 .. version-changed:: 8.0
    Editor settings has been revised. *editor* variable is None by
    default. Editor detection functions were moved to :mod:`editor`.
+.. version-added:: 11.4
+   The 7-zip executable variable *cmd_7zip* was added.
 """
 from __future__ import annotations
 
@@ -866,6 +868,14 @@ max_queue_size = 64
 # Version 4 is only available for Python 3.4+
 # Version 5 was added with Python 3.8. It is the default since Pywikibot 11.
 pickle_protocol = 5
+
+# 7-zip executable setting
+# The default for 7-zip executable is '7za' but my also be '7Z'. If The
+# executable is not included in the local PATH environment variable the
+# relative or absolute path can also be given with this cmd line setting
+# like:
+# cmd_7zip = r'C:\Program Files\7-Zip\7z.exe'
+cmd_7zip = '7za'
 
 # ============================
 # End of configuration section
