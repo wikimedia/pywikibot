@@ -631,7 +631,7 @@ class APISite(
         >>> info['groups']
         ['*']
         >>> info['rights']  # doctest: +ELLIPSIS
-        ['createaccount', 'read', 'edit', 'createpage', 'createtalk', ...]
+        ['createaccount', 'autocreateaccount', 'read', 'edit', ...]
         >>> info['messages']
         False
         >>> del site.userinfo  # delete userinfo cache
