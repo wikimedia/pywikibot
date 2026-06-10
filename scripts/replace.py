@@ -838,7 +838,7 @@ def handle_pairsfile(filename: str) -> list[str] | None:
 
     .. version-added:: 7.0
     .. version-changed:: 9.2
-       replacement patterns are printed it they are incomplete.
+       replacement patterns are printed if they are incomplete.
     """
     if not filename:
         filename = pywikibot.input(
@@ -916,7 +916,7 @@ def main(*args: str) -> None:
     If args is an empty list, sys.argv is used.
 
     .. version-changed:: 9.2
-       replacement patterns are printed it they are incomplete.
+       replacement patterns are printed if they are incomplete.
 
     :param args: command line arguments
     """
