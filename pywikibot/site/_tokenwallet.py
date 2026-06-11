@@ -21,6 +21,11 @@ class TokenWallet(Container):
     You should not use this container class directly; use
     :attr:`APISite.tokens<pywikibot.site._apisite.APISite.tokens>`
     instead which gives access to the site's TokenWallet instance.
+
+    .. version-changed:: 11.0
+       Support of legacy API tokens was dropped.
+    .. version-changed:: 11.4
+       Reload a single token if missing.
     """
 
     def __init__(self, site: APISite) -> None:
@@ -32,11 +37,7 @@ class TokenWallet(Container):
         self._last_token_key: str | None = None
 
     def __getitem__(self, key: str) -> str:
-        """Get token value for the given key.
-
-        .. version-changed:: 11.0
-           Support of legacy API tokens was dropped.
-        """
+        """Get token value for the given key."""
         if self.site.user() is None and key != 'login':
             self.site.login()
 
@@ -46,6 +47,9 @@ class TokenWallet(Container):
 
         if not self._tokens:
             self._tokens = self.site.get_tokens([])
+
+        if key not in self._tokens:
+            self._tokens.update(self.site.get_tokens([key]))
 
         try:
             token = self._tokens[key]
