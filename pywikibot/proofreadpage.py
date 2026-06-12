@@ -176,7 +176,7 @@ class TagAttrDesc:
     Implements a data descriptor for attributes of <pages /> tags
     (used in :class:`PagesTagParser`). Provides controlled access
     to a single attribute value via a WeakKeyDictionary to store
-    per-instance da
+    per-instance data.
 
     .. version-added:: 8.0
     .. version-changed:: 11.0
