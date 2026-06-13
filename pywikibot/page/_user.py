@@ -6,7 +6,7 @@
 """Object representing a Wiki user."""
 from __future__ import annotations
 
-from collections.abc import Generator
+from collections.abc import Generator, Iterable
 from typing import Any
 
 import pywikibot
@@ -30,13 +30,27 @@ class User(Page):
 
     """A class that represents a Wiki user.
 
-    This class also represents the Wiki page User:<username>
+    This class also represents the Wiki page ``User:<username>``
+
+    A user object represents a user account, which may be:
+
+    - named (regular) account (see: :meth:`is_named`)
+    - temporary account (see: :meth:`is_temporary`)
+    - anonymous IP user (see: :meth:`isAnonymous`)
+    - CIDR range (see: :meth:`is_CIDR`)
+
+    .. note:: This class inherits from :class:`Page`. Therefore,
+       :meth:`exists()<BasePage.exists>` determines whether the wiki
+       page exists, not whether the user account exists. Use
+       :meth:`is_named`, :meth:`is_temporary` :meth:`isAnonymous`,
+       :meth:`is_CIDR` or :meth:`isRegistered` to determine the account
+       type.
     """
 
     def __init__(self, source, title: str = '') -> None:
         """Initializer for a User object.
 
-        All parameters are the same as for Page() Initializer.
+        All parameters are the same as for ``Page()`` Initializer.
         """
         self._isAutoblock = True
         if title.startswith('#'):
@@ -68,15 +82,22 @@ class User(Page):
     def isRegistered(self, force: bool = False) -> bool:  # noqa: N802
         """Determine if the user is registered on the site.
 
-        It is possible to have a page named User:xyz and not have
-        a corresponding user with username xyz.
+        It is possible to have a page named ``User:xyz`` and not have a
+        corresponding user with username xyz.
 
-        The page does not need to exist for this method to return
-        True.
+        This method checks whether the username corresponds to a valid
+        named or temporary account. The user page does not need to exist
+        for this method to return True. Use :meth:`exists()
+        <BasePage.exists>` to check whether the user page exists.
 
-        .. seealso:: :meth:`isAnonymous`
+        .. seealso::
+           - :meth:`isAnonymous`
+           - :meth:`is_temporary`
+           - :meth:`is_named`
 
         :param force: If True, forces reloading the data from API
+        :return: True if the user is either a named (regular) user or a
+            temporary account.
         """
         # T135828: the registration timestamp may be None but the key exists
         return (not self.isAnonymous()
@@ -87,6 +108,8 @@ class User(Page):
 
         .. seealso::
            - :meth:`isRegistered`
+           - :meth:`is_temporary`
+           - :meth:`is_named`
            - :meth:`is_CIDR`
            - :func:`tools.is_ip_address`
         """
@@ -103,20 +126,79 @@ class User(Page):
         """
         return is_ip_network(self.username)
 
-    def getprops(self, force: bool = False) -> dict[str, Any]:
-        """Return a properties about the user.
+    def is_named(self, *, force: bool = False) -> bool:
+        """Determine if the user is a regular named account.
 
-        .. version-changed:: 9.0
-           detect range blocks
+        A named account is neither an IP nor a temporary account.
+
+        .. version-added:: 11.4
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`isAnonymous`
+           - :meth:`is_temporary`
 
         :param force: If True, forces reloading the data from API
         """
-        if force and hasattr(self, '_userprops'):
+        return self.isRegistered(force) and not self.is_temporary()
+
+    def is_temporary(self) -> bool:
+        """Determine if the user is a temporary account.
+
+        .. version-added:: 11.4
+        .. seealso::
+           - :meth:`isRegistered`
+           - :meth:`isAnonymous`
+           - :meth:`is_named`
+           - :meth:`temp_expired`
+        """
+        return 'temp' in self.groups()
+
+    def temp_expired(self, force: bool = False) -> bool | None:
+        """Indicates whether the temporary account has expired or not.
+
+        If account isn't temporary, None is returned.
+
+        .. version-added:: 11.4
+        .. seealso:: :meth:`is_temporary`
+
+        :param force: If True, forces reloading the data from API
+        """
+        if not self.is_temporary():
+            return None
+
+        return 'tempexpired' in self.getprops(force, ['tempexpired'])
+
+    def getprops(
+        self,
+        force: bool = False,
+        extra_props: Iterable[str] = ()
+    ) -> dict[str, Any]:
+        """Return user properties.
+
+        .. version-changed:: 9.0
+           detect range blocks
+        .. versionchanged:: 11.4
+           Added the *extra_props* parameter.
+
+        :param force: If True, forces reloading the data from API
+        :param extra_props: Additional user properties to request.
+        """
+        if not hasattr(self, '_additional_props'):
+            self._additional_props: set[str] = set()
+
+        new_props = False
+        if extra_props:
+            missing = set(extra_props) - self._additional_props
+            new_props = bool(missing)
+            self._additional_props.update(missing)
+
+        if (force or new_props) and hasattr(self, '_userprops'):
             self._userprops: dict[str, Any]
             del self._userprops
 
         if not hasattr(self, '_userprops'):
-            self._userprops = next(self.site.users([self.username]))
+            self._userprops = next(
+                self.site.users([self.username], self._additional_props))
             if self.isAnonymous() or self.is_CIDR():
                 r = next(self.site.blocks(iprange=self.username, total=1),
                          None)
@@ -504,8 +586,9 @@ class User(Page):
 
         :param total: Limit result to this number of pages
         """
-        if not self.isRegistered():
+        if not self.is_named():
             return
+
         for item in self.logevents(logtype='upload', total=total):
             yield (item.page(),
                    str(item.timestamp()),
