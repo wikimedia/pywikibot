@@ -1,6 +1,15 @@
 Release 11.4
 ============
 
+* Reload a single token if missing in the
+  :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` container
+  (:phab:`T343187`, :phab:`T428817`)
+* Cache page quality and existence for :class:`proofreadpage.IndexPage` and improve performance
+  of :meth:`page_gen()<proofreadpage.IndexPage.page_gen>` (:phab:`T409023`)
+* Prevent ignored generator option from leaking into kwargs of :class:`bot.BaseBot`
+  initializer (:phab:`T427740`)
+* Update translations (i18n)
+* Update :mod:`families.vikidia_family` file
 * Add *until* and *reverse* options to :func:`pagegenerators.AllpagesPageGenerator`
   (:phab:`T66531`, :phab:`T426542`)
 * Support attributes in with multiple words with :class:`proofreadpage.TagAttr` (:phab:`T383506`)
