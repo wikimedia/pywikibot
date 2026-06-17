@@ -1115,7 +1115,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.quux(force=True), 'quux')
         self.assertEqual(self.foo.read, 2)
 
-    def test_cached_with_argse(self) -> None:
+    def test_cached_with_args(self) -> None:
         """Test method with args."""
         self.assertEqual(self.foo.method_with_args(force=False),
                          'method_with_args')
