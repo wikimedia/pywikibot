@@ -303,7 +303,7 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertEqual(it[-1], '…')
 
     def test_show_custom_marker(self) -> None:
-        """Test correct marker is shown with kwargs.."""
+        """Test correct marker is shown with kwargs."""
         stop = 2
         it = list(islice_with_ellipsis(self.it, stop, marker='new'))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
@@ -661,7 +661,7 @@ class TestFileModeChecker(TestCase):
 
 
 def hash_func(digest):
-    """Function who gives a hashlib function."""
+    """Return a hash object for the given *digest* algorithm."""
     return hashlib.new(digest)
 
 
