@@ -331,7 +331,7 @@ def stopme() -> None:
     Can be called manually if desired but usually it is not necessary.
     Does not clean :func:`async_manager`. This should be run when a bot
     does not interact with the Wiki, or when it has stopped doing so.
-    After a bot has run ``stopme()`` it will not slow down other bots
+    After a bot has run ``stopme()`` it will not slow down other bot
     instances any more.
 
     ``stopme()`` is called with :func:`sleep` function during long
