@@ -1531,7 +1531,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-searchitem:en:abc')
-        gf.handle_arg('-limit:5')
+        gf.handle_arg('-limit:7')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         result = {page.title() for page in gen}
