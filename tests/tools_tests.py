@@ -145,10 +145,10 @@ class OpenArchiveTestCase(TestCase):
         self.assertIsNone(zf._process)
         self.assertEqual(repr(zf), 'tools.SevenZipFile[closed]')
         with self.assertRaisesRegex(ValueError,
-                                    r'I/O operation on closed file\.'):
+                                    r'I/O operation on closed file'):
             zf.read(100)
         with self.assertRaisesRegex(ValueError,
-                                    r'I/O operation on closed file\.'):
+                                    r'I/O operation on closed file'):
             zf.rewind()
         zf.close()  # test that nothing happens here
 
