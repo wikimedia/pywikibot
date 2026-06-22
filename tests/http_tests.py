@@ -227,29 +227,18 @@ class DefaultUserAgentTestCase(TestCase):
 
     net = False
 
-    def setUp(self) -> None:
-        """Set up unit test."""
-        super().setUp()
-        self.orig_format = config.user_agent_format
-        config.user_agent_format = ('{script_product} ({script_comments}) '
-                                    '{pwb} ({revision}) {http_backend} '
-                                    '{python}')
-
-    def tearDown(self) -> None:
-        """Tear down unit test."""
-        super().tearDown()
-        config.user_agent_format = self.orig_format
-
     def test_default_user_agent(self) -> None:
         """Config defined format string test."""
-        self.assertStartsWith(http.user_agent(), pywikibot.calledModuleName())
-        self.assertIn('Pywikibot/' + pywikibot.__version__, http.user_agent())
-        self.assertNotIn('  ', http.user_agent())
-        self.assertNotIn('()', http.user_agent())
-        self.assertNotIn('(;', http.user_agent())
-        self.assertNotIn(';)', http.user_agent())
-        self.assertIn('requests/', http.user_agent())
-        self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
+        ua = http.user_agent()
+        ua = ua.split('/', 1)[1]  # remove username part
+        self.assertStartsWith(ua, pywikibot.calledModuleName())
+        self.assertIn('Pywikibot/' + pywikibot.__version__, ua)
+        self.assertNotIn('  ', ua)
+        self.assertNotIn('()', ua)
+        self.assertNotIn('(;', ua)
+        self.assertNotIn(';)', ua)
+        self.assertIn('requests/', ua)
+        self.assertIn('Python/' + str(PYTHON_VERSION[0]), ua)
 
 
 @require_modules('fake_useragent')
