@@ -75,10 +75,14 @@ class TestSiteObject(DefaultSiteTestCase):
             'ukwikivoyage': 'wikivoyage:uk',
             'wikidatawiki': 'wikidata:wikidata',
         }
-        if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
-            site = self.site
-        else:
-            site = None
+
+        site = (
+            self.site
+            if isinstance(self.site.family, pywikibot.family.WikimediaFamily)
+            and self.site.code != 'beta'  # exclude Beta Cluster sites
+            else None
+        )
+
         for dbname, sitename in test_dict.items():
             with self.subTest(dbname=dbname):
                 self.assertIs(
