@@ -1,6 +1,11 @@
 Release 11.4
 ============
 
+* Add support for temporary accounts (:phab:`T418983`)
+* Add support for magwiki (:phab:`T428281`)
+* Introduce :class:`tools.SevenZipFile` class for :func:`tools.open_archive` to
+  ensure proper cleanup when closing the stream and to support rewinding the 7zip
+  archive stream. (:phab:`T428322`)
 * Reload a single token if missing in the
   :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` container
   (:phab:`T343187`, :phab:`T428817`)
