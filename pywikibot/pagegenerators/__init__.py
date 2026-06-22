@@ -478,9 +478,11 @@ FILTER OPTIONS
                     pages in total. If used with multiple generators,
                     pages are yielded in a roundrobin way.
 
--namespaces         Filter the page generator to only yield pages in the
--namespace          specified namespaces. Separate multiple namespace
--ns                 numbers or names with commas.
+-namespaces         Aliases :kbd:`-namespace` and :kbd:`-ns`.
+
+                    Filter the page generator to only yield pages in the
+                    specified namespaces. Separate multiple namespace
+                    numbers or names with commas.
 
                     Examples::
 
@@ -493,6 +495,11 @@ FILTER OPTIONS
 
                     -ns:not:2,3
                     -ns:not:Help,File
+
+                    .. versionchanged:: 11.5
+                       When using the leading ``not`` directive, the special
+                       namespaces ``-1`` and ``-2`` are not included. To
+                       add them, specify them explicitly, e.g. ``-ns:-1``.
 
                     If used with -newpages/-random/-randomredirect/-linter
                     generators, -namespace/ns must be provided before

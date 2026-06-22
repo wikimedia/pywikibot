@@ -755,6 +755,9 @@ class DryFactoryGeneratorTest(TestCase):
         ns = set(range(16))
         ns.remove(2)
         self.assertTrue(ns.issubset(gf.namespaces))
+        self.assertNotIn(2, gf.namespaces)
+        self.assertNotIn(-1, gf.namespaces)
+        self.assertNotIn(-2, gf.namespaces)
 
     def test_two_excluded_namespaces(self) -> None:
         """Test two excluded namespaces."""
@@ -765,6 +768,10 @@ class DryFactoryGeneratorTest(TestCase):
         ns.remove(2)
         ns.remove(1)
         self.assertTrue(ns.issubset(gf.namespaces))
+        self.assertNotIn(2, gf.namespaces)
+        self.assertNotIn(1, gf.namespaces)
+        self.assertNotIn(-1, gf.namespaces)
+        self.assertNotIn(-2, gf.namespaces)
 
     def test_two_excluded_named_namespaces(self) -> None:
         """Test two excluded named namespaces."""

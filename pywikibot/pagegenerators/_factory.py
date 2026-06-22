@@ -654,7 +654,14 @@ class GeneratorFactory:
         return TextIOPageGenerator(value, site=self.site)
 
     def _handle_namespaces(self, value: str) -> Literal[True]:
-        """Handle `-namespaces` argument."""
+        """Handle `-namespaces` argument.
+
+        .. version-changed:: 11.5
+           If preleading ``not:`` directive is given, special namespaces
+           ``-1`` and ``-2`` are not included.
+
+        :meta public:
+        """
         if isinstance(self._namespaces, frozenset):
             raise RuntimeError('-namespace/ns option must be provided before '
                                '-newpages/-random/-randomredirect/-linter')
@@ -665,9 +672,10 @@ class GeneratorFactory:
             value = value.removeprefix(not_key)
             resolve = self.site.namespaces.resolve
             not_ns = set(resolve(value.split(',')))
+            special_ns = set(resolve([-1, -2]))
             if not self._namespaces:
                 self._namespaces = list(
-                    set(self.site.namespaces.values()) - not_ns)
+                    set(self.site.namespaces.values()) - not_ns - special_ns)
             else:
                 self._namespaces = list(
                     set(resolve(self._namespaces)) - not_ns)
