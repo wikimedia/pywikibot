@@ -144,6 +144,7 @@ exclude_also = [
     "if (0|False):",
     "if .+PYWIKIBOT_TEST_\\w+.+:",
     "if (typing\\.)?TYPE_CHECKING:",
+    "if SPHINX_RUNNING:",
     "if __debug__:",
     "if __name__ == .__main__.:",
     "if self\\.mw_version < .+:",
