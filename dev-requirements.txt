@@ -1,12 +1,12 @@
 # This is a requirements file for development dependencies.
 #
 # Python 3.10 is required for pytest and pre-commit
-pytest >= 9.0.3; python_version > "3.9"
+pytest >= 9.1.1; python_version > "3.9"
 pytest-attrib >= 0.1.3
 pytest-xvfb>=3.1.1
 
 pre-commit >= 4.6.0; python_version > "3.9"
-coverage>=7.14.0; python_version > "3.9"
+coverage>=7.14.3; python_version > "3.9"
 coverage==7.10.7; python_version == "3.9"
 # required for coverage (T380697)
 tomli>=2.4.1; python_version < "3.11"

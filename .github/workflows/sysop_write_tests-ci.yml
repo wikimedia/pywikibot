@@ -30,7 +30,7 @@ jobs:
         attr: [write and not rights, write and rights, rights and not write]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: true
           persist-credentials: false
@@ -69,7 +69,7 @@ jobs:
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure

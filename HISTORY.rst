@@ -1,6 +1,29 @@
 Release History
 ===============
 
+11.4.0
+------
+*23 June 2026*
+
+* Add support for temporary accounts (:phab:`T418983`)
+* Add support for magwiki (:phab:`T428281`)
+* Introduce :class:`tools.SevenZipFile` class for :func:`tools.open_archive` to
+  ensure proper cleanup when closing the stream and to support rewinding the 7zip
+  archive stream. (:phab:`T428322`)
+* Reload a single token if missing in the
+  :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` container
+  (:phab:`T343187`, :phab:`T428817`)
+* Cache page quality and existence for :class:`proofreadpage.IndexPage` and improve performance
+  of :meth:`page_gen()<proofreadpage.IndexPage.page_gen>` (:phab:`T409023`)
+* Prevent ignored generator option from leaking into kwargs of :class:`bot.BaseBot`
+  initializer (:phab:`T427740`)
+* Update translations (i18n)
+* Update :mod:`families.vikidia_family` file
+* Add *until* and *reverse* options to :func:`pagegenerators.AllpagesPageGenerator`
+  (:phab:`T66531`, :phab:`T426542`)
+* Support attributes with multiple words with :class:`proofreadpage.TagAttr` (:phab:`T383506`)
+
+
 11.3.0
 ------
 *17 May 2026*
