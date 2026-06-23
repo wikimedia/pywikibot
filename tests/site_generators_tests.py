@@ -24,7 +24,7 @@ from pywikibot.exceptions import (
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
-from tests.utils import skipping
+from tests.utils import expected_failure_if, skipping
 
 
 global_expected_params = {
@@ -688,6 +688,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('registration', botuser)
             self.assertIn('bot', botuser['groups'])
 
+    @expected_failure_if(pywikibot.config.family == 'wowwiki')  # T429874
     def test_allusers(self) -> None:
         """Test the site.allusers() method."""
         mysite = self.get_site()
