@@ -9,9 +9,11 @@ from __future__ import annotations
 import abc
 import hashlib
 import importlib.metadata
+import io
 import ipaddress
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -19,7 +21,7 @@ from collections.abc import Callable
 from contextlib import suppress
 from functools import total_ordering, wraps
 from types import TracebackType
-from typing import Any
+from typing import IO, Any, Literal
 from warnings import catch_warnings, showwarning, warn
 
 import packaging.version
@@ -81,6 +83,7 @@ __all__ = (
     'strtobool',
     'normalize_username',
     'MediaWikiVersion',
+    'SevenZipFile',
     'open_archive',
     'merge_unique_dicts',
     'file_mode_checker',
@@ -540,7 +543,194 @@ class MediaWikiVersion:
         return self._dev_version < other._dev_version
 
 
-def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
+class SevenZipFile(io.RawIOBase):
+
+    """Read-only file-like wrapper around a 7za/7z subprocess.
+
+    This wrapper waits for the 7-Zip process to terminate when closing.
+    It inherits from RawIOBase and implements its low-level access
+    design. It also provides an interface similar to :class:`io.FileIO`.
+
+    This class is used by :func:`open_archive` but can also be used
+    standalone to open 7zip archives:
+
+    >>> zf = SevenZipFile('tests/data/xml/article-pyrus.xml.7z')
+    ... # doctest: +SKIP
+    >>> content = zf.readline()  # doctest: +SKIP
+    >>> content[:43]  # doctest: +SKIP
+    b'<mediawiki xmlns="https://www.mediawiki.org'
+    >>> zf.read(43)  # doctest: +SKIP
+    b'<mediawiki xmlns="https://www.mediawiki.org'
+    >>> zf.write(b'')  # doctest: +SKIP
+    Traceback (most recent call last):
+    ...
+    io.UnsupportedOperation: File or stream is not writable.
+    >>> zf.close()  # doctest: +SKIP
+    >>> zf.readlines()  # doctest: +SKIP
+    Traceback (most recent call last):
+    ...
+    ValueError: I/O operation on closed file.
+
+    You can use this class as context manager too:
+
+    .. code::
+
+       with SevenZipFile('tests/data/xml/article-pyrus.xml.7z') as zf:
+           content = zf.readall()
+
+    This is equal to:
+
+    .. code::
+
+       with open_archive('tests/data/xml/article-pyrus.xml.7z') as zf:
+           content = zf.readall()
+
+    but it works for 7z-files only.
+
+    The 7-Zip executable is taken from :attr:`pywikibot.config.cmd_7zip`,
+    which defaults to ``'7za'``. If the executable is not available via
+    the local ``PATH`` environment variable, a relative or absolute path
+    may be given there.
+
+    .. version-added:: 11.4
+    """
+
+    def __init__(self, name: str, /) -> None:
+        """Initializer."""
+        self._name = name
+        self._process = None
+        self._stream = None
+        self._open_process()
+
+    def __repr__(self) -> str:
+        """Representation string."""
+        module_name = type(self).__module__.removeprefix('pywikibot.')
+        class_name = f'{module_name}.{type(self).__qualname__}'
+        if self.closed:
+            return f'{class_name}[closed]'
+        return f'{class_name}({self.name!r})'
+
+    @property
+    def name(self) -> str:
+        """The file name passed to initializer."""
+        return self._name
+
+    @property
+    def mode(self) -> str:
+        """The file mode, always 'rb'."""
+        return 'rb'
+
+    def readable(self) -> Literal[True]:
+        """Return True if the stream can be read from."""
+        return True
+
+    def readinto(self, b) -> int | None:
+        """Read bytes into a pre-allocated bytes-like object *b*.
+
+        Returns an int representing the number of bytes read (0 for EOF),
+        or None if the object is set not to block and has no data to
+        read. This is the :class:`io.RawIOBase` implementation of the
+        abstract method.
+
+        :param b: Writable buffer to fill with data.
+        :return: Number of bytes read, 0 for end of file, or None if the
+            object is in non-blocking mode and no data is available.
+        :raises ValueError: I/O operation on closed file.
+        """
+        self._checkClosed()
+        self._checkReadable()
+        return self._stream.readinto(b)
+
+    def write(self, b) -> int:
+        """Write the given buffer *b* to the IO stream.
+
+        Returns the number of bytes written, which may be less than the
+        length of *b* in bytes. This is the :class:`io.RawIOBase`
+        implementation of the abstract method.
+
+        :param b: Bytes to write.
+        :raises ValueError: I/O operation on closed file.
+        :raises io.UnsupportedOperation: The stream is not writable.
+        """
+        self._checkClosed()
+        self._checkWritable()
+
+    def close(self) -> None:
+        """Close the file-like wrapper.
+
+        A closed IO object cannot be used for further I/O operations.
+        :meth:`close` may be called more than once without error.
+        """
+        if self.closed:
+            return
+
+        self._close_process()
+        super().close()
+
+    def _open_process(self) -> None:
+        """Start the 7-Zip process and initialize the stream.
+
+        :raises FileNotFoundError: The archive file or the 7-Zip executable
+            was not found.
+        :raises OSError: 7-Zip returned an error while opening the archive.
+        """
+        if not os.path.exists(self.name):
+            raise FileNotFoundError(f'Compressed file {self.name!r} not found')
+
+        cmd = shutil.which(pywikibot.config.cmd_7zip)
+        if cmd is None:
+            raise FileNotFoundError(
+                '7-Zip executable not found (not installed or not in PATH)')
+
+        self._process = subprocess.Popen(
+            [cmd, 'e', '-bd', '-so', self.name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=65535
+        )
+
+        stderr = self._process.stderr.read()
+        self._process.stderr.close()
+
+        if stderr:
+            self._close_process()
+            raise OSError(
+                f'Unexpected STDERR output from {cmd}:\n{stderr}')
+
+        self._stream = self._process.stdout
+
+    def _close_process(self) -> None:
+        """Close the stream and wait for the 7-Zip process to terminate."""
+        if self._stream is not None:
+            self._stream.close()
+
+        if self._process is not None:
+            self._process.wait()
+
+        self._stream = None
+        self._process = None
+
+    def rewind(self) -> None:
+        """Rewind the stream to the beginning.
+
+        This method closes the current stream, waits for the associated
+        7-Zip process to terminate and starts a new process to read the
+        archive again from the beginning.
+
+        :raises ValueError: I/O operation on closed file.
+        :raises FileNotFoundError: The archive file or the 7-Zip executable
+            was not found.
+        :raises OSError: 7-Zip returned an error while reopening the archive.
+        """
+        self._checkClosed()
+        self._close_process()
+        self._open_process()
+
+
+@deprecated_signature(since='11.4.0')
+def open_archive(filename: str, /,
+                 mode: str = 'rb', *,
+                 use_extension: bool = True) -> IO[bytes]:
     """Open a file and uncompress it if needed.
 
     This function supports bzip2, gzip, 7zip, lzma, and xz as
@@ -553,6 +743,9 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     ending.
 
     .. version-added:: 3.0
+    .. version-changed:: 11.4
+       *filename* parameter is positional only, *use_extension* is
+       keyword only. Uses :class:`SevenZipFile` to open 7zip-files.
 
     :param filename: The filename.
     :param mode: The mode in which the file should be opened. It may
@@ -570,11 +763,11 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
         is 7z. It is also raised by bz2 when its content is invalid.
         gzip does not immediately raise that error but only on reading
         it.
+    :raises NotImplementedError: When trying to write a 7z file.
     :raises lzma.LZMAError: When error occurs during compression or
         decompression or when initializing the state with lzma or xz.
     :return: A file-like object returning the uncompressed data in
         binary mode.
-    :rtype: file-like object
     """
     # extension_map maps magic_number to extension.
     # Unfortunately, legacy LZMA container has no magic number
@@ -616,23 +809,7 @@ def open_archive(filename: str, mode: str = 'rb', use_extension: bool = True):
     elif extension == '7z':
         if mode != 'rb':
             raise NotImplementedError('It is not possible to write a 7z file.')
-
-        try:
-            process = subprocess.Popen(['7za', 'e', '-bd', '-so', filename],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE,
-                                       bufsize=65535)
-        except OSError:
-            raise ValueError(
-                f'7za is not installed or cannot uncompress "{filename}"')
-
-        stderr = process.stderr.read()
-        process.stderr.close()
-        if stderr != b'':
-            process.stdout.close()
-            raise OSError(
-                f'Unexpected STDERR output from 7za {stderr}')
-        binary = process.stdout
+        binary = SevenZipFile(filename)
 
     elif extension in ('lzma', 'xz'):
         lzma_fmts = {'lzma': lzma.FORMAT_ALONE, 'xz': lzma.FORMAT_XZ}

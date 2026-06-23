@@ -48,12 +48,17 @@ def AllpagesPageGenerator(
     total: int | None = None,
     content: bool = False,
     *,
+    until: str = '',
     filterredir: bool | None = None,
+    reverse: bool = False
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all titles in a single namespace.
 
     .. version-deprecated:: 10.0
        The *includeredirects* parameter; use *filterredir* instead.
+    .. version-changed:: 11.4
+       The *until* and *reverse* parameters were added.
+
     .. seealso:: :meth:`APISite.allpages()
        <pywikibot.site._generators.GeneratorsMixin.allpages>`
 
@@ -68,8 +73,14 @@ def AllpagesPageGenerator(
     :param total: Maximum number of pages to retrieve in total
     :param content: If True, load current version of each page (default
         False)
+    :param until: Optional page title to stop enumerating at; only
+        meaningful when used together with *start*. The given argument
+        must be lexically higher than the *start* argument if *reverse*
+        is False; otherwise it must be lower.
     :param filterredir: If True, only yield redirects; if False (and
         not None), only yield non-redirects (default: yield both).
+    :param reverse: If True, iterate in reverse Unicode lexicographic
+        order (default: iterate in forward order).
     :return: A generator that yields Page objects
     :raises ValueError: *filterredir* as well as *includeredirects*
         parameters were given. Use *filterredir* only.
@@ -96,8 +107,9 @@ def AllpagesPageGenerator(
             since='10.0.0'
         )
 
-    return site.allpages(start=start, namespace=namespace,
-                         filterredir=filterredir, total=total, content=content)
+    return site.allpages(start=start, until=until, namespace=namespace,
+                         reverse=reverse, filterredir=filterredir, total=total,
+                         content=content)
 
 
 def PrefixingPageGenerator(
@@ -282,7 +294,7 @@ def UnconnectedPageGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Iterate Page objects for all unconnected pages to a Wikibase repository.
 
-    .. version-changed::
+    .. version-changed:: 10.4.0
        The *strict* parameter was added.
 
     :param site: Site for generator results.
@@ -496,7 +508,7 @@ def PagesFromPageidGenerator(
 ) -> Iterable[pywikibot.page.Page]:
     """Return a page generator from pageids.
 
-    Pages are iterated in the same order than in the underlying pageids.
+    Pages are iterated in the same order as in the underlying pageids.
     Pageids are filtered and only one page is returned in case of
     duplicate pageid.
 

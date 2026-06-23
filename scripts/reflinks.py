@@ -192,9 +192,9 @@ badtitles = {
 # Regex that match bare references
 linksInRef = re.compile(
     # bracketed URLs
-    r'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>(?:http|https)://(?:'
+    r'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>https?://(?:'
     # unbracketed with()
-    r'^\[\]\s<>"]+\([^\[\]\s<>"]+[^\[\]\s\.:;\\,<>\?"]+|'
+    r'[^\[\]\s<>"]+\([^\[\]\s<>"]+[^\[\]\s\.:;\\,<>\?"]+|'
     # unbracketed without ()
     r'[^\[\]\s<>"]+[^\[\]\s\)\.:;\\,<>\?"]+|[^\[\]\s<>"]+))'
     r'[!?,\s]*\]?\s*</ref>')

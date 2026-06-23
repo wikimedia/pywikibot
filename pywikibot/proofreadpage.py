@@ -141,6 +141,11 @@ class TagAttr:
             if (value.startswith('"') != value.endswith('"')
                     or value.startswith("'") != value.endswith("'")):
                 raise ValueError(f'{value=!s} has wrong quotes.')
+
+            # Add quotes if value contains spaces and is not already quoted
+            if ' ' in value and not value.startswith(('"', "'")):
+                self._orig_value = json.dumps(value, ensure_ascii=False)
+
             value = value.strip('"\'')
             value = int(value) if value.isdigit() else value
 
@@ -171,7 +176,7 @@ class TagAttrDesc:
     Implements a data descriptor for attributes of <pages /> tags
     (used in :class:`PagesTagParser`). Provides controlled access
     to a single attribute value via a WeakKeyDictionary to store
-    per-instance da
+    per-instance data.
 
     .. version-added:: 8.0
     .. version-changed:: 11.0
@@ -325,7 +330,7 @@ class PagesTagParser(collections.abc.Container):
             attr, _, value = attribute.partition('=')
             if attr == 'from':
                 attr = 'f' + attr
-            setattr(self, attr, value)
+            setattr(self, attr, value.strip())
 
     @classmethod
     def get_descriptors(cls):
@@ -1177,7 +1182,13 @@ class IndexPage(pywikibot.Page):
         assert 'purged' in rawdata['purge'][0], error_message
 
     def _get_page_mappings(self) -> None:
-        """Associate label and number for each page linked to the index."""
+        """Associate label and number for each page linked to the index.
+
+        .. version-changed:: 11.4
+           Added internal caching of page quality levels (``_qls``)
+           and existence flags (``_existences``) for each page linked
+           to the index.
+        """
         # Clean cache, if any.
         self._page_from_numbers = {}
         self._numbers_from_page: dict[pywikibot.page.Page, int] = {}
@@ -1185,6 +1196,8 @@ class IndexPage(pywikibot.Page):
         self._pages_from_label: dict[str, set[pywikibot.Page]] = {}
         self._labels_from_page_number: dict[int, str] = {}
         self._labels_from_page: dict[pywikibot.page.Page, str] = {}
+        self._qls: dict[int, str] = {}
+        self._existences: dict[int, bool] = {}
         self._soup = _bs4_soup(self.get_parsed_page(True))
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
@@ -1224,7 +1237,8 @@ class IndexPage(pywikibot.Page):
             class_ = a_tag.get('class')
             href = a_tag.get('href')
 
-            if 'new' in class_:
+            new = 'new' in class_
+            if new:
                 title = self._parse_redlink(href)  # non-existing page
                 if title is None:  # title not conforming to required format
                     continue
@@ -1262,6 +1276,15 @@ class IndexPage(pywikibot.Page):
                 label, set()).add(page_cnt)
             self._pages_from_label.setdefault(label, set()).add(page)
 
+            # Existences and QLs
+            self._existences[page_cnt] = not new
+            if new:
+                self._qls[page_cnt] = ProofreadPage.NOT_PROOFREAD
+            else:
+                for clss in class_:
+                    if m := re.search(r'quality(\d)', clss):
+                        self._qls[page_cnt] = int(m[1])
+
         # Sanity check: all links to Page: ns must have been considered.
         assert (set(self._labels_from_page)
                 == set(self._all_page_links.values()))
@@ -1278,6 +1301,7 @@ class IndexPage(pywikibot.Page):
         """
         return len(self._page_from_numbers)
 
+    @check_if_cached
     @remove_last_args(['content'])  # since 9.0.0
     def page_gen(
         self, start: int = 1,
@@ -1291,11 +1315,14 @@ class IndexPage(pywikibot.Page):
 
         .. version-changed:: 9.0
            The *content* parameter was removed
+        .. version-changed:: 11.4
+           Use cached quality levels and page existence information to
+           reduce additional API requests and improve performance.
 
         :param start: First page, defaults to 1
         :param end: Num_pages if end is None
-        :param filter_ql: Filters quality levels
-                          If None: all but 'Without Text'.
+        :param filter_ql: Filters quality levels. If None: all but
+            'Without Text'.
         :param only_existing: Yields only existing pages.
         """
         if end is None:
@@ -1307,17 +1334,24 @@ class IndexPage(pywikibot.Page):
 
         # All but 'Without Text'
         if filter_ql is None:
-            filter_ql = list(self.site.proofread_levels)
+            filter_ql = set(self.site.proofread_levels)
             filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
+        else:
+            filter_ql = set(filter_ql)
 
-        gen = (self.get_page(i) for i in range(start, end + 1))
+        gen = self.site.preloadpages(
+            self.get_page(i) for i in range(start, end + 1))
 
-        gen = self.site.preloadpages(gen)
         # Filter by QL.
-        gen = (p for p in gen if p.ql in filter_ql)
+        gen = (
+            p for p in gen
+            if (number := self._numbers_from_page.get(p)) in self._qls
+            and self._qls[number] in filter_ql
+        )
         # Yield only existing.
         if only_existing:
-            gen = (p for p in gen if p.exists())
+            gen = (p for p in gen
+                   if self._existences.get(self._numbers_from_page[p]))
 
         return gen
 

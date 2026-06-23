@@ -19,7 +19,7 @@ description = "Pywikibot Scripts Collection"
 readme = "scripts/README.rst"
 requires-python = ">=3.9.0"
 dependencies = [
-    "pywikibot >= 11.3.0",
+    "pywikibot >= 11.4.0",
     "langdetect",
     "mwparserfromhell",
     "pydot",

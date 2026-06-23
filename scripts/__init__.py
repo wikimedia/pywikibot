@@ -34,7 +34,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
-__version__ = '11.3.0'
+__version__ = '11.4.0'
 
 #: defines the entry point for pywikibot-scripts package
 base_dir = Path(__file__).parent

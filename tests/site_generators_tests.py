@@ -24,7 +24,7 @@ from pywikibot.exceptions import (
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
 from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
-from tests.utils import skipping
+from tests.utils import expected_failure_if, skipping
 
 
 global_expected_params = {
@@ -688,6 +688,7 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
             self.assertIn('registration', botuser)
             self.assertIn('bot', botuser['groups'])
 
+    @expected_failure_if(pywikibot.config.family == 'wowwiki')  # T429874
     def test_allusers(self) -> None:
         """Test the site.allusers() method."""
         mysite = self.get_site()
@@ -1227,13 +1228,13 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         mysite = self.get_site()
         start = '2008-10-08T03:05:07Z'
         for contrib in mysite.usercontribs(
-                userprefix='Brion',
+                userprefix='Brooke',
                 start=pywikibot.Timestamp.fromISOformat(start),
                 total=5, reverse=True):
             self.assertGreaterEqual(contrib['timestamp'], start)
 
         for contrib in mysite.usercontribs(
-                userprefix='Brion',
+                userprefix='Brooke',
                 end=pywikibot.Timestamp.fromISOformat('2008-10-09T04:06:08Z'),
                 total=5, reverse=True):
             self.assertLessEqual(contrib['timestamp'], '2008-10-09T04:06:08Z')
@@ -1527,7 +1528,7 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
 
 class TestUserList(DefaultSiteTestCase):
 
-    """Test usernames Jimbo Wales, Brion VIBBER and Tim Starling."""
+    """Test usernames Jimbo Wales, Brooke Vibber and Tim Starling."""
 
     cached = True
 

@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
@@ -35,6 +38,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: true
+          persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
@@ -54,31 +58,10 @@ jobs:
           pip install wikitextparser
           pip install requests[socks]
       - name: Configure and start WMCS SOCKS tunnel
-        shell: bash
-        env:
-          USER: ${{ secrets.WMCS_USER }}
-        run: |
-          mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.WMCS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keygen -lf ~/.ssh/id_ed25519
-          ssh-keyscan bastion.wmcloud.org >> ~/.ssh/known_hosts
-          ssh \
-            -o StrictHostKeyChecking=accept-new \
-            -o ExitOnForwardFailure=yes \
-            -o ServerAliveInterval=30 \
-            -o ServerAliveCountMax=3 \
-            -o ConnectTimeout=10 \
-            -f -N \
-            -D 127.0.0.1:1080 \
-            -i ~/.ssh/id_ed25519 \
-            "$USER@bastion.wmcloud.org"
-          echo "Socket connection:"
-          ss -lntp | grep 1080 || true
-          echo "Local IP:"
-          curl -s https://api.ipify.org
-          echo "Proxy IP:"
-          curl --proxy socks5h://127.0.0.1:1080 -s https://api.ipify.org
+        uses: ./.github/actions/wmcs-socks
+        with:
+          ssh_user: ${{ secrets.WMCS_USER }}
+          ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
@@ -99,6 +82,18 @@ jobs:
           python pwb.py version
           pytest --version
           coverage run -m pytest pywikibot --doctest-modules --ignore-glob="*gui.py" --ignore-glob="*memento.py" --doctest-wait
+      - name: Close WMCS SOCKS tunnel
+        if: always()
+        shell: bash
+        run: |-
+          if [ -f ssh.pid ]; then
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
+          fi
       - name: Show coverage statistics
         run: |
           coverage combine || true

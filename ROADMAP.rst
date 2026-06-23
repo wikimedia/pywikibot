@@ -1,24 +1,23 @@
-Release 11.3
+Release 11.4
 ============
 
-* Add *until* parameter to :meth:`Site.allpages()
-  <pywikibot.site._generators.GeneratorsMixin.allpages>` and add ``-until`` option to
-  :ref:`Generator Options` as a stop title for enumeration (:phab:`T425882`)
-* Update :attr:`family.WikimediaFamily.known_codes` (:phab:`T426319`)
-* Move all :mod:`families.wikinews_family` site codes to :attr:`Family.closed_wikis
-  <families.wikinews_family.Family.closed_wikis>` (:phab:`T425953`, :phab:`T426022`)
-* Enable :meth:`CosmeticChangesToolkit.commonsfiledesc()
-  <cosmetic_changes.CosmeticChangesToolkit.commonsfiledesc>` for FILE namespace on
-  on all commons wikis (:phab:`T425306`, :phab:`T425349`)
-* Add Devanagari numerals for ne-wiki to :attr:`NON_ASCII_DIGITS
-  <userinterfaces.transliteration.NON_ASCII_DIGITS>` and fix :class:`textlib.TimeStripper`
-  regex for :attr:`textlib.TimeStripperPatterns.timezone` (:phab:`T424467`)
-* Ignore ``UnicodeDecodeError`` in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks`
-  and skip the link in such case (:phab:`T423062`)
+* Add support for temporary accounts (:phab:`T418983`)
+* Add support for magwiki (:phab:`T428281`)
+* Introduce :class:`tools.SevenZipFile` class for :func:`tools.open_archive` to
+  ensure proper cleanup when closing the stream and to support rewinding the 7zip
+  archive stream. (:phab:`T428322`)
+* Reload a single token if missing in the
+  :class:`TokenWallet<pywikibot.site._tokenwallet.TokenWallet>` container
+  (:phab:`T343187`, :phab:`T428817`)
+* Cache page quality and existence for :class:`proofreadpage.IndexPage` and improve performance
+  of :meth:`page_gen()<proofreadpage.IndexPage.page_gen>` (:phab:`T409023`)
+* Prevent ignored generator option from leaking into kwargs of :class:`bot.BaseBot`
+  initializer (:phab:`T427740`)
 * Update translations (i18n)
-* If *preload* option is set in :meth:`pagegenerators.GeneratorFactory.getCombinedGenerator`,
-  the preloading generators :func:`pagegenerators.PreloadingGenerator` or
-  :func:`pagegenerators.DequePreloadingGenerator` are called with the *quiet* option.
+* Update :mod:`families.vikidia_family` file
+* Add *until* and *reverse* options to :func:`pagegenerators.AllpagesPageGenerator`
+  (:phab:`T66531`, :phab:`T426542`)
+* Support attributes with multiple words with :class:`proofreadpage.TagAttr` (:phab:`T383506`)
 
 
 Deprecations

@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+11.4.0
+------
+
+reflinks
+^^^^^^^^
+
+* Fix unbalanced bracket in linksInRef (:phab:`T426607`)
+
 11.3.0
 ------
 

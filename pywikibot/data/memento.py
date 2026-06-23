@@ -48,7 +48,7 @@ class MementoClient(OldMementoClient):
     .. version-changed:: 7.4
        `timeout` is used in several methods.
     .. version-changed:: 10.7
-       Set default timegate to :attr`DEFAULT_TIMEGATE_BASE_URI`
+       Set default timegate to :attr:`DEFAULT_TIMEGATE_BASE_URI`
 
     Basic usage:
 

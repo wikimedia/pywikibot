@@ -33,6 +33,8 @@ class TestUserClass(TestCase):
         self.assertEqual(user.gender(), 'unknown')
         self.assertFalse(user.is_thankable)
         self.assertIn(prop, user.getprops())
+        self.assertFalse(user.is_temporary())
+        self.assertFalse(user.is_named(), f'{user} is a named user')
 
     def test_anonymous_user(self) -> None:
         """Test registered user."""
@@ -52,19 +54,24 @@ class TestUserClass(TestCase):
         self._tests_unregistered_user(user)
         self.assertFalse(user.isAnonymous())
 
-    def test_registered_user(self) -> None:
+    def _test_registered_user(self, user) -> None:
         """Test registered user."""
-        user = User(self.site, 'Xqt')
         self.assertEqual(user.title(with_ns=False), user.username)
         self.assertTrue(user.isRegistered())
         self.assertFalse(user.isAnonymous())
+        self.assertEqual(user.gender(), 'unknown')
+        self.assertIn('userid', user.getprops())
+
+    def test_registered_user(self) -> None:
+        """Test registered user."""
+        user = User(self.site, 'Xqt')
+        self._test_registered_user(user)
+        self.assertTrue(user.is_named())
         self.assertIsInstance(user.registration(), pywikibot.Timestamp)
         self.assertGreater(user.editCount(), 0)
         self.assertFalse(user.is_blocked())
         self.assertFalse(user.is_locked())
         self.assertTrue(user.isEmailable())
-        self.assertEqual(user.gender(), 'unknown')
-        self.assertIn('userid', user.getprops())
         self.assertEqual(user.getprops()['userid'], 287832)
         self.assertEqual(user.pageid, 6927779)
         self.assertEqual(user.getUserPage(),
@@ -93,8 +100,8 @@ class TestUserClass(TestCase):
     def test_registered_user_without_timestamp(self) -> None:
         """Test registered user when registration timestamp is None."""
         user = User(self.site, 'Ulfb')
-        self.assertTrue(user.isRegistered())
-        self.assertFalse(user.isAnonymous())
+        self._test_registered_user(user)
+        self.assertTrue(user.is_named())
         self.assertIsNone(user.registration())
         self.assertIsNone(user.getprops()['registration'])
         self.assertGreater(user.editCount(), 0)
@@ -102,11 +109,24 @@ class TestUserClass(TestCase):
         self.assertIn('userid', user.getprops())
         self.assertTrue(user.is_thankable)
 
+    def test_temporary_user(self) -> None:
+        """Test registered user."""
+        user = User(self.site, '~2026-99999-1')
+        self._test_registered_user(user)
+        self.assertTrue(user.is_temporary())
+        self.assertFalse(user.is_named())
+        self.assertIn('temp', user.groups())
+        self.assertTrue(user.temp_expired())
+        self.assertFalse(user.isEmailable())
+        self.assertIsInstance(user.registration(), pywikibot.Timestamp)
+
     def test_female_user(self) -> None:
         """Test female user."""
         user = User(self.site, 'Catrin')
         self.assertTrue(user.isRegistered())
         self.assertFalse(user.isAnonymous())
+        self.assertTrue(user.is_named())
+        self.assertFalse(user.is_temporary())
         self.assertGreater(user.editCount(), 0)
         self.assertEqual(user.gender(), 'female')
         self.assertIn('userid', user.getprops())
@@ -128,6 +148,8 @@ class TestUserClass(TestCase):
         self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
+        self.assertFalse(user.is_named())
+        self.assertFalse(user.is_temporary())
         self.assertIsNone(user.registration())
         self.assertFalse(user.isEmailable())
         self.assertIn('invalid', user.getprops())

@@ -33,9 +33,7 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if typing.TYPE_CHECKING:
-    from data.api import ParamInfo, Request
-
-    from pywikibot.site._apisite import _RequestWrapperT
+    from pywikibot.data.api import ParamInfo, Request
     from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
     from pywikibot.site._tokenwallet import TokenWallet
     from pywikibot.tools import MediaWikiVersion
@@ -46,7 +44,7 @@ class GeneratorsMixin:
     """API generators mixin to MediaWiki site."""
 
     if typing.TYPE_CHECKING:
-        _generator: Callable[..., _RequestWrapperT]
+        _generator: Callable[..., pywikibot.site._apisite._RequestWrapperT]
         _paraminfo: ParamInfo
         _request: Callable[..., Request]
         assert_valid_iter_params: Callable[..., None]
@@ -67,7 +65,7 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page]:
         """Return a page generator from pageids.
 
-        Pages are iterated in the same order than in the underlying
+        Pages are iterated in the same order as in the underlying
         pageids.
 
         Pageids are filtered and only one page is returned in case of
@@ -131,7 +129,7 @@ class GeneratorsMixin:
     ) -> Generator[pywikibot.Page]:
         """Return a generator to a list of preloaded pages.
 
-        Pages are iterated in the same order than in the underlying
+        Pages are iterated in the same order as in the underlying
         pagelist. In case of duplicates in a groupsize batch, return the
         first entry.
 
@@ -359,7 +357,7 @@ class GeneratorsMixin:
         total: int | None = None,
         content: bool = False
     ) -> Iterable[pywikibot.Page]:
-        """Iterale all redirects to the given page.
+        """Iterate all redirects to the given page.
 
         .. seealso:: :api:`Redirects`
 
@@ -481,7 +479,7 @@ class GeneratorsMixin:
         :param with_sort_key: If True, include the sort key in each
             Category
         :param content: If True, load the current content of each
-            iterated page default False); note that this means the
+            iterated page (default False); note that this means the
             contents of the category description page, not the pages
             contained in the category
         """
@@ -954,7 +952,9 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Iterate pages in a single namespace.
 
-        .. seealso:: :api:`Allpages`
+        .. seealso::
+           - :api:`Allpages`
+           - :func:`pagegenerators.AllpagesPageGenerator`
 
         .. version-changed:: 10.4
            All parameters except of *start* are keyword-only. Enable
@@ -1086,34 +1086,69 @@ class GeneratorsMixin:
 
         yield from self._bots.values()
 
+    @deprecated_signature(since='11.4.0')
     def allusers(
         self,
-        start: str = '!',
+        *,
+        start: str = '',
         prefix: str = '',
         group: str | None = None,
         total: int | None = None,
-    ) -> Iterable[dict[str, str | list[str]]]:
+        end: str = '',
+        withedits: bool = False,
+        active_only: bool = False,
+        named_only: bool = False,
+        temp_only: bool = False,
+        reverse: bool = False,
+    ) -> Iterable[dict[str, str | int | list[str]]]:
         """Iterate registered users, ordered by username.
 
-        Iterated values are dicts containing 'name', 'editcount',
-        'registration', and (sometimes) 'groups' keys. 'groups' will be
-        present only if the user is a member of at least 1 group, and
-        will be a list of str; all the other values are str and should
-        always be present.
+        Iterated values are dicts containing ``'name'``, ``'editcount'``,
+        ``'registration'``, and (sometimes) ``'groups'`` and
+        ``'recentactions'`` keys. ``'groups'`` will be present only if
+        the user is a member of at least 1 group, and will be a list of
+        strings; ``'recentactions'`` will be given if *active_only*
+        parameter is set and will contain an integer representing recent
+        activity. All the other values are strings and should always be
+        present.
+
+        .. version-changed:: 11.4
+           All parameters are keyword-only. The *end*, *withedits*,
+           *active_only*, *named_only*, *temp_only* and *reverse*
+           parameters were added.
 
         .. seealso:: :api:`Allusers`
 
-        :param start: Start at this username (name need not exist)
-        :param prefix: Only iterate usernames starting with this substring
-        :param group: Only iterate users that are members of this group
+        :param start: Start at this username (name need not exist).
+        :param prefix: Only iterate usernames starting with this substring.
+        :param group: Only iterate users that are members of this group.
+        :param total: Maximum number of pages to retrieve in total.
+        :param end: The username to stop enumerating at (name need not exist).
+        :param withedits: Only list users who have made edits.
+        :param active_only: Only list users active in the last 30 days.
+        :param named_only: Only list users of named accounts.
+        :param temp_only: Only list users of temporary accounts.
+        :param reverse: If True, iterate in reverse lexicographic order
         """
+        if start and end:
+            self.assert_valid_iter_params(
+                'allusers', start, end, reverse, is_ts=False)
         augen = self._generator(api.ListGenerator, type_arg='allusers',
+                                aufrom=start or None,
+                                auto=end or None,
+                                auprefix=prefix or None,
                                 auprop='editcount|groups|registration',
-                                aufrom=start, total=total)
-        if prefix:
-            augen.request['auprefix'] = prefix
+                                auwitheditsonly=withedits,
+                                auactiveusers=active_only,
+                                auexcludenamed=temp_only,
+                                auexcludetemp=named_only,
+                                total=total)
         if group:
             augen.request['augroup'] = group
+
+        if reverse:
+            augen.request['audir'] = 'descending'
+
         return augen
 
     def allimages(
@@ -1865,15 +1900,33 @@ class GeneratorsMixin:
     def users(
         self,
         usernames: Iterable[str],
+        extra_props: Iterable[str] = (),
     ) -> Iterable[dict[str, Any]]:
         """Iterate info about a list of users by name or IP.
 
+        By default, the following user properties are requested:
+        ``blockinfo``, ``gender``, ``groups``, ``editcount``,
+        ``registration``, ``rights``, ``emailable``, and ``tempexpired``.
+        Additional properties may be specified with *extra_props* and are
+        appended to the default properties.
+
+        .. versionchanged:: 11.4
+           Added the *extra_props* parameter.
         .. seealso:: :api:`Users`
 
         :param usernames: A list of user names
+        :param extra_props: Additional user properties to request.
         """
-        usprop = ['blockinfo', 'gender', 'groups', 'editcount', 'registration',
-                  'rights', 'emailable']
+        usprop = [
+            'blockinfo',
+            'groups',
+            'rights',
+            'editcount',
+            'registration',
+            'emailable',
+            'gender',
+        ]
+        usprop.extend(extra_props)
         return api.ListGenerator(
             'users', site=self,
             parameters={'ususers': usernames, 'usprop': usprop}
@@ -2369,7 +2422,6 @@ class GeneratorsMixin:
         :param propname: Must be a valid property.
         :param total: Number of pages to return
         :return: Return a generator of Page objects
-        :rtype: iterator
         """
         if propname not in self.get_property_names():
             raise NotImplementedError(

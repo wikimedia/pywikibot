@@ -284,7 +284,7 @@ class ReplacementBase:
 
 class Replacement(ReplacementBase):
 
-    """A single replacement with it's own data."""
+    """A single replacement with its own data."""
 
     def __init__(self, old, new, use_regex=None, exceptions=None,
                  case_insensitive=None, edit_summary=None,
@@ -806,7 +806,7 @@ def prepareRegexForMySQL(pattern: str) -> str:
 
 EXC_KEYS = {
     '-excepttitle': 'title',
-    '-requiretitle:': 'require-title',
+    '-requiretitle': 'require-title',
     '-excepttext': 'text-contains',
     '-exceptinside': 'inside',
     '-exceptinsidetag': 'inside-tags'
@@ -838,7 +838,7 @@ def handle_pairsfile(filename: str) -> list[str] | None:
 
     .. version-added:: 7.0
     .. version-changed:: 9.2
-       replacement patterns are printed it they are incomplete.
+       replacement patterns are printed if they are incomplete.
     """
     if not filename:
         filename = pywikibot.input(
@@ -916,7 +916,7 @@ def main(*args: str) -> None:
     If args is an empty list, sys.argv is used.
 
     .. version-changed:: 9.2
-       replacement patterns are printed it they are incomplete.
+       replacement patterns are printed if they are incomplete.
 
     :param args: command line arguments
     """

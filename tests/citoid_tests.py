@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Unit tests for citoid script."""
 #
-# (C) Pywikibot team, 2025
+# (C) Pywikibot team, 2025-2026
 #
 # Distributed under the terms of the MIT license.
 #
+"""Unit tests for citoid script."""
 from __future__ import annotations
 
 import datetime
@@ -45,8 +45,11 @@ class TestCitoid(TestCase):
 
     def test_citoid_no_config(self):
         """Test citoid script with no citoid endpoint configured."""
-        client = citoid.CitoidClient(pywikibot.Site('pl', 'wikiquote'))
-        with self.assertRaises(ApiNotAvailableError):
+        client = citoid.CitoidClient(pywikibot.Site('wikiquote:pl'))
+        with self.assertRaisesRegex(
+            ApiNotAvailableError,
+            'Citoid endpoint not configured for wikiquote'
+        ):
             client.get_citation(
                 'mediawiki',
                 'https://ro.wikipedia.org/wiki/România'
@@ -55,7 +58,7 @@ class TestCitoid(TestCase):
     def test_citoid_no_valid_format(self):
         """Test citoid script with invalid format provided."""
         client = citoid.CitoidClient(self.site)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, 'Invalid format mediawiki2'):
             client.get_citation(
                 'mediawiki2',
                 'https://ro.wikipedia.org/wiki/România'

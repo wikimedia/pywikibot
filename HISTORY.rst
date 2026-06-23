@@ -1,6 +1,30 @@
 Release History
 ===============
 
+11.3.0
+------
+*17 May 2026*
+
+* Add *until* parameter to :meth:`Site.allpages()
+  <pywikibot.site._generators.GeneratorsMixin.allpages>` and add ``-until`` option to
+  :ref:`Generator Options` as a stop title for enumeration (:phab:`T425882`)
+* Update :attr:`family.WikimediaFamily.known_codes` (:phab:`T426319`)
+* Move all :mod:`families.wikinews_family` site codes to :attr:`Family.closed_wikis
+  <families.wikinews_family.Family.closed_wikis>` (:phab:`T425953`, :phab:`T426022`)
+* Enable :meth:`CosmeticChangesToolkit.commonsfiledesc()
+  <cosmetic_changes.CosmeticChangesToolkit.commonsfiledesc>` for FILE namespace on
+  on all commons wikis (:phab:`T425306`, :phab:`T425349`)
+* Add Devanagari numerals for ne-wiki to :attr:`NON_ASCII_DIGITS
+  <userinterfaces.transliteration.NON_ASCII_DIGITS>` and fix :class:`textlib.TimeStripper`
+  regex for :attr:`textlib.TimeStripperPatterns.timezone` (:phab:`T424467`)
+* Ignore ``UnicodeDecodeError`` in :meth:`cosmetic_changes.CosmeticChangesToolkit.cleanUpLinks`
+  and skip the link in such case (:phab:`T423062`)
+* Update translations (i18n)
+* If *preload* option is set in :meth:`pagegenerators.GeneratorFactory.getCombinedGenerator`,
+  the preloading generators :func:`pagegenerators.PreloadingGenerator` or
+  :func:`pagegenerators.DequePreloadingGenerator` are called with the *quiet* option.
+
+
 11.2.0
 ------
 *18 April 2026*

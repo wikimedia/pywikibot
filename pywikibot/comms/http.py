@@ -70,7 +70,7 @@ class PywikibotCookieJar(cookiejar.LWPCookieJar):
 
     .. version-added:: 8.0
     .. version-changed:: 10.2
-       use `threading.Lock` in :meth:`load` and :meth`save` to be thread
+       use `threading.Lock` in :meth:`load` and :meth:`save` to be thread
        safe.
     """
 
@@ -304,8 +304,10 @@ def request(site: pywikibot.site.BaseSite,
     The optional uri is a relative uri from site base uri including the
     document root '/'.
 
+    .. version-changed:: 7.0
+       The *body* parameter was removed; use *data* instead.
     .. version-changed:: 8.2
-       a *protocol* parameter can be given which is passed to the
+       A *protocol* parameter can be given which is passed to the
        :meth:`family.Family.base_url` method.
 
     :param site: The Site to connect to
@@ -415,6 +417,9 @@ def fetch(uri: str,
           use_fake_user_agent: bool | str = False,
           **kwargs) -> requests.Response:
     """HTTP request.
+
+    .. version-changed:: 7.0
+        The *body* parameter was removed; use *data* instead.
 
     See :py:obj:`requests.Session.request` for parameters.
 

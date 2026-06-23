@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import calendar
 import datetime
-import logging
 import sys
 import unittest
 from contextlib import suppress
@@ -1532,7 +1531,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-searchitem:en:abc')
-        gf.handle_arg('-limit:5')
+        gf.handle_arg('-limit:7')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         result = {page.title() for page in gen}
@@ -1663,21 +1662,8 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        """Skip wikisource:beta site due to T426540."""
-        super().setUpClass()
-        if cls.site.sitename == 'wikisource:beta':
-            cls.skipTest(cls, f'Skip {cls.site} site due to T426540')
-
     def test_RC_pagegenerator_result(self) -> None:
         """Test RC pagegenerator."""
-        lgr = logging.getLogger('requests_sse.client')
-        lgr.setLevel(logging.DEBUG)
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        lgr.addHandler(ch)
-
         site = self.get_site()
         pagegenerator = pagegenerators.LiveRCPageGenerator(site,
                                                            total=self.length)

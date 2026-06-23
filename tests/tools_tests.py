@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import decimal
 import hashlib
+import io
 import os
-import subprocess
 import tempfile
 import unittest
 from collections import Counter, OrderedDict
@@ -20,6 +20,7 @@ from unittest import mock
 
 from pywikibot import config, tools
 from pywikibot.tools import (
+    SevenZipFile,
     cached,
     classproperty,
     has_module,
@@ -83,17 +84,73 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file + '.gz'), self.original_content)
 
     def test_open_archive_7z(self) -> None:
-        """Test open_archive with 7za if installed."""
-        with skipping(OSError, msg='7za not installed'):
-            subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
-
-        self.assertEqual(
-            self._get_content(self.base_file + '.7z'), self.original_content)
+        """Test open_archive with 7z if installed."""
+        with skipping(FileNotFoundError):
+            self.assertEqual(
+                self._get_content(self.base_file + '.7z'),
+                self.original_content
+            )
         with self.assertRaisesRegex(
                 OSError,
-                'Unexpected STDERR output from 7za '):
-            self._get_content(self.base_file + '_invalid.7z',
-                              use_extension=True)
+                'Unexpected STDERR output from .*7z'):
+            self._get_content(self.base_file + '_invalid.7z')
+
+    def test_7_zip_file(self) -> None:
+        """Test SevenZipFile class."""
+        filename = self.base_file + '.7z'
+        with skipping(FileNotFoundError), tools.open_archive(filename) as zf:
+            self.assertIsInstance(zf, SevenZipFile)
+            self.assertIsSubclass(type(zf), io.RawIOBase)
+            self.assertEqual(zf.name, filename)
+            self.assertEqual(zf.mode, 'rb')
+            self.assertFalse(zf.closed)
+            self.assertTrue(zf.readable())
+            self.assertEqual(repr(zf), f'tools.SevenZipFile({filename!r})')
+
+            for method_name in ('isatty', 'seekable', 'writable'):
+                with self.subTest(method=method_name):
+                    method = getattr(zf, method_name)
+                    self.assertFalse(method())
+
+            for method_name in ('fileno', 'tell', 'truncate'):
+                with (
+                    self.subTest(method=method_name),
+                    self.assertRaises(io.UnsupportedOperation)
+                ):
+                    method = getattr(zf, method_name)
+                    method()
+
+            with self.assertRaises(io.UnsupportedOperation):
+                zf.seek(0)
+
+            with self.assertRaises(io.UnsupportedOperation):
+                zf.write(b'RawIOBase.write method is not implemented')
+            with self.assertRaises(io.UnsupportedOperation):
+                zf.writelines([b'foo\n', b'bar\n'])
+
+            self.assertEqual(zf.read(100), self.original_content[:100])
+            zf.rewind()
+            buffer = zf.read(-1)
+            zf.rewind()
+            self.assertEqual(buffer, zf.readall())
+            zf.rewind()
+
+            lines = self.original_content.splitlines(keepends=True)
+            self.assertEqual(zf.readline(), lines[0])
+            zf.rewind()
+            self.assertEqual(zf.readlines(), lines)
+
+        self.assertTrue(zf.closed)
+        self.assertIsNone(zf._stream)
+        self.assertIsNone(zf._process)
+        self.assertEqual(repr(zf), 'tools.SevenZipFile[closed]')
+        with self.assertRaisesRegex(ValueError,
+                                    r'I/O operation on closed file'):
+            zf.read(100)
+        with self.assertRaisesRegex(ValueError,
+                                    r'I/O operation on closed file'):
+            zf.rewind()
+        zf.close()  # test that nothing happens here
 
     def test_open_archive_lzma(self) -> None:
         """Test open_archive with lzma compressor in the standard library."""
@@ -153,7 +210,7 @@ class OpenArchiveWriteTestCase(TestCase):
                 ValueError,
                 'Magic number detection only when reading'):
             tools.open_archive('/dev/null',  # writing without extension
-                               'wb', False)
+                               'wb', use_extension=False)
 
     def test_binary_mode(self) -> None:
         """Test that it uses binary mode."""
@@ -246,7 +303,7 @@ class TestIsSliceWithEllipsis(TestCase):
         self.assertEqual(it[-1], '…')
 
     def test_show_custom_marker(self) -> None:
-        """Test correct marker is shown with kwargs.."""
+        """Test correct marker is shown with kwargs."""
         stop = 2
         it = list(islice_with_ellipsis(self.it, stop, marker='new'))
         self.assertLength(it, stop + 1)  # +1 to consider marker.
@@ -604,7 +661,7 @@ class TestFileModeChecker(TestCase):
 
 
 def hash_func(digest):
-    """Function who gives a hashlib function."""
+    """Return a hash object for the given *digest* algorithm."""
     return hashlib.new(digest)
 
 
@@ -1058,7 +1115,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.quux(force=True), 'quux')
         self.assertEqual(self.foo.read, 2)
 
-    def test_cached_with_argse(self) -> None:
+    def test_cached_with_args(self) -> None:
         """Test method with args."""
         self.assertEqual(self.foo.method_with_args(force=False),
                          'method_with_args')
