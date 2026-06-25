@@ -177,7 +177,7 @@ class User(Page):
 
         .. version-changed:: 9.0
            detect range blocks
-        .. versionchanged:: 11.4
+        .. version-changed:: 11.4
            Added the *extra_props* parameter.
 
         :param force: If True, forces reloading the data from API

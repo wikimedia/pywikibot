@@ -1910,7 +1910,7 @@ class GeneratorsMixin:
         Additional properties may be specified with *extra_props* and are
         appended to the default properties.
 
-        .. versionchanged:: 11.4
+        .. version-changed:: 11.4
            Added the *extra_props* parameter.
         .. seealso:: :api:`Users`
 

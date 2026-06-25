@@ -3,7 +3,7 @@
 # (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
-"""Test tools package alone which don't fit into other tests."""
+"""Test tools package alone which doesn't fit into other tests."""
 from __future__ import annotations
 
 import decimal
@@ -20,6 +20,7 @@ from unittest import mock
 
 from pywikibot import config, tools
 from pywikibot.tools import (
+    PYTHON_VERSION,
     SevenZipFile,
     cached,
     classproperty,
@@ -43,7 +44,7 @@ class OpenArchiveTestCase(TestCase):
 
     """Unit test class for tools.
 
-    The tests for open_archive requires that article-pyrus.xml* contain
+    The tests for open_archive require that article-pyrus.xml* contain
     all the same content after extraction. The content itself is not
     important. The file article-pyrus.xml_invalid.7z is not a valid 7z
     file and open_archive will fail extracting it using 7za.
@@ -71,7 +72,7 @@ class OpenArchiveTestCase(TestCase):
             self._get_content(self.base_file), self.original_content)
 
     def test_open_archive_bz2(self) -> None:
-        """Test open_archive with bz2 compressor in the standard library."""
+        """Test open_archive with bz2 compression in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.bz2'), self.original_content)
         self.assertEqual(
@@ -79,7 +80,7 @@ class OpenArchiveTestCase(TestCase):
             self.original_content)
 
     def test_open_archive_gz(self) -> None:
-        """Test open_archive with gz compressor in the standard library."""
+        """Test open_archive with gz compression in the standard library."""
         self.assertEqual(
             self._get_content(self.base_file + '.gz'), self.original_content)
 
@@ -285,7 +286,7 @@ class MergeUniqueDicts(TestCase):
             tools.merge_unique_dicts(self.dct1, **self.dct1)
 
 
-class TestIsSliceWithEllipsis(TestCase):
+class TestIsliceWithEllipsis(TestCase):
 
     """Test islice_with_ellipsis."""
 
@@ -618,7 +619,7 @@ class TestFilterUnique(TestCase):
 
 class TestFileModeChecker(TestCase):
 
-    """Test parsing password files."""
+    """Tests for tools.file_mode_checker."""
 
     net = False
 
@@ -667,7 +668,7 @@ def hash_func(digest):
 
 class TestFileShaCalculator(TestCase):
 
-    r"""Test calculator of sha of a file.
+    r"""Test calculator of SHA of a file.
 
     There are two possible hash values for each test. The second one is
     for files with Windows line endings (\r\n).
@@ -684,7 +685,7 @@ class TestFileShaCalculator(TestCase):
     }
 
     def test_md5_complete_calculation(self) -> None:
-        """Test md5 of complete file."""
+        """Test MD5 of complete file."""
         for test, sha in self.md5_tests.items():
             with self.subTest(test=test):
                 res = tools.compute_file_hash(self.filename, sha=sha)
@@ -694,7 +695,7 @@ class TestFileShaCalculator(TestCase):
                 ))
 
     def test_md5_partial_calculation(self) -> None:
-        """Test md5 of partial file (1024 bytes)."""
+        """Test MD5 of partial file (1024 bytes)."""
         for test, sha in self.md5_tests.items():
             with self.subTest(test=test):
                 res = tools.compute_file_hash(self.filename, sha=sha,
@@ -705,7 +706,7 @@ class TestFileShaCalculator(TestCase):
                 ))
 
     def test_sha1_complete_calculation(self) -> None:
-        """Test sha1 of complete file."""
+        """Test SHA1 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha1')
         self.assertIn(res, (
             '1c12696e1119493a625aa818a35c41916ce32d0c',
@@ -713,7 +714,7 @@ class TestFileShaCalculator(TestCase):
         ))
 
     def test_sha1_partial_calculation(self) -> None:
-        """Test sha1 of partial file (1024 bytes)."""
+        """Test SHA1 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha1',
                                       bytes_to_read=1024)
         self.assertIn(res, (
@@ -722,7 +723,7 @@ class TestFileShaCalculator(TestCase):
         ))
 
     def test_sha224_complete_calculation(self) -> None:
-        """Test sha224 of complete file."""
+        """Test SHA224 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha224')
         self.assertIn(res, (
             '3d350d9d9eca074bd299cb5ffe1b325a9f589b2bcd7ba1c033ab4d33',
@@ -730,7 +731,7 @@ class TestFileShaCalculator(TestCase):
         ))
 
     def test_sha224_partial_calculation(self) -> None:
-        """Test sha224 of partial file (1024 bytes)."""
+        """Test SHA224 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha224',
                                       bytes_to_read=1024)
         self.assertIn(res, (
@@ -841,7 +842,6 @@ class TestIsIpAddress(TestCase):
         valid_addresses = (
             '0.0.0.0',
             '1.2.3.4',
-            '1.2.3.4',
             '192.168.0.1',
             '255.255.255.255',
         )
@@ -858,13 +858,21 @@ class TestIsIpAddress(TestCase):
             '0.0.0',
             '1.2.3.256',
             '1.2.3.-1',
+            '1.2.3.4.5',
             '0.0.0.a',
             'a.b.c.d',
+            '192.168.0.1\n',
+            '256.0.0.1',
         )
 
         for address in invalid_addresses:
             with self.subTest(ip_address=address):
                 self.assertFalse(is_ip_address(address))
+
+        address = '01.02.03.04'
+        with self.subTest(ip_address=address):
+            self.assertEqual(is_ip_address(address),
+                             PYTHON_VERSION < (3, 9, 5))
 
     def test_valid_ipv6_addresses(self) -> None:
         """Check with valid IPv6 addresses."""
@@ -872,6 +880,7 @@ class TestIsIpAddress(TestCase):
             'fe80:0000:0000:0000:0202:b3ff:fe1e:8329',
             'fe80:0:0:0:202:b3ff:fe1e:8329',
             'fe80::202:b3ff:fe1e:8329',
+            'fe80::',
             '::ffff:5.9.158.75',
             '::',
         )
@@ -887,7 +896,9 @@ class TestIsIpAddress(TestCase):
             '',
             ':',
             ':::',
+            '::ffff:999.999.999.999',
             '2001:db8::aaaa::1',
+            '2001:db8::1::1',
             'fe80:0000:0000:0000:0202:b3ff:fe1e: 8329',
             'fe80:0000:0000:0000:0202:b3ff:fe1e:829g',
         )
@@ -1083,7 +1094,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.read, 1)
         self.assertHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check cached value
-        self.assertEqual(self.foo.read, 1)  # bar() was called only once
+        self.assertEqual(self.foo.read, 1)  # foo() was called only once
         del self.foo._foo
         self.assertNotHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check computed value

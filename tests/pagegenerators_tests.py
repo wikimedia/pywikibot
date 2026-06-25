@@ -755,6 +755,9 @@ class DryFactoryGeneratorTest(TestCase):
         ns = set(range(16))
         ns.remove(2)
         self.assertTrue(ns.issubset(gf.namespaces))
+        self.assertNotIn(2, gf.namespaces)
+        self.assertNotIn(-1, gf.namespaces)
+        self.assertNotIn(-2, gf.namespaces)
 
     def test_two_excluded_namespaces(self) -> None:
         """Test two excluded namespaces."""
@@ -765,6 +768,10 @@ class DryFactoryGeneratorTest(TestCase):
         ns.remove(2)
         ns.remove(1)
         self.assertTrue(ns.issubset(gf.namespaces))
+        self.assertNotIn(2, gf.namespaces)
+        self.assertNotIn(1, gf.namespaces)
+        self.assertNotIn(-1, gf.namespaces)
+        self.assertNotIn(-2, gf.namespaces)
 
     def test_two_excluded_named_namespaces(self) -> None:
         """Test two excluded named namespaces."""
@@ -952,9 +959,12 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test allpages generator."""
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handle_arg('-start:!'))
+        self.assertIsNotEmpty(gf.gens)
+        self.assertIsNone(gf.gens[0])
         gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
+        self.assertIsNotNone(gf.gens[0])
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
@@ -1460,7 +1470,8 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
     def test_wanted_files(self) -> None:
         """Test wantedfiles generator."""
         if self.site.sitename == 'wowwiki:uk':
-            self.skipTest(f'Skipping {self.site} due to T362384)')
+            self.skipTest(f'Skipping {self.site} due to T362384')
+
         self.gf.handle_arg('-wantedfiles:5')
         for page in self._generator_with_tests():
             self.assertIsInstance(page, pywikibot.Page)
