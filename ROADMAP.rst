@@ -1,10 +1,7 @@
-Release 11.4.1
-==============
+Release 11.5
+============
 
-* Ensure :attr:`pagegenerators.GeneratorFactory.gens` is not empty if a generator is specified with
-  :ref:`Generator Options`. (:phab:`T430093`)
-* Remove special namespaces -1 and -2 if ``not:`` directive is used with ``-namespaces``
-  :ref:`Generator Options`. (:phab:`T429803`)
+* (no changes yet)
 
 
 Deprecations
