@@ -20,6 +20,7 @@ from unittest import mock
 
 from pywikibot import config, tools
 from pywikibot.tools import (
+    PYTHON_VERSION,
     SevenZipFile,
     cached,
     classproperty,
@@ -855,7 +856,6 @@ class TestIsIpAddress(TestCase):
             None,
             '',
             '0.0.0',
-            '01.02.03.04',
             '1.2.3.256',
             '1.2.3.-1',
             '1.2.3.4.5',
@@ -868,6 +868,11 @@ class TestIsIpAddress(TestCase):
         for address in invalid_addresses:
             with self.subTest(ip_address=address):
                 self.assertFalse(is_ip_address(address))
+
+        address = '01.02.03.04'
+        with self.subTest(ip_address=address):
+            self.assertEqual(is_ip_address(address),
+                             PYTHON_VERSION < (3, 9, 5))
 
     def test_valid_ipv6_addresses(self) -> None:
         """Check with valid IPv6 addresses."""
