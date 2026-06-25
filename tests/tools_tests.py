@@ -3,7 +3,7 @@
 # (C) Pywikibot team, 2015-2026
 #
 # Distributed under the terms of the MIT license.
-"""Test tools package alone which don't fit into other tests."""
+"""Test tools package alone which doesn't fit into other tests."""
 from __future__ import annotations
 
 import decimal
@@ -1094,7 +1094,7 @@ class TestTinyCache(TestCase):
         self.assertEqual(self.foo.read, 1)
         self.assertHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check cached value
-        self.assertEqual(self.foo.read, 1)  # bar() was called only once
+        self.assertEqual(self.foo.read, 1)  # foo() was called only once
         del self.foo._foo
         self.assertNotHasAttr(self.foo, '_foo')
         self.assertEqual(self.foo.foo(), 'foo')  # check computed value
