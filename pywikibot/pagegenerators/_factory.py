@@ -101,6 +101,7 @@ class GeneratorFactory:
         :param disabled_options: Disable these given options and let
             them be handled by scripts options handler
         """
+        #: List of generators provided by :meth:`getCombinedGenerator`.
         self.gens: list[Iterable[pywikibot.page.BasePage]] = []
         self._namespaces: list[str] | frozenset[Namespace] = []
         self.limit: int | None = None
@@ -206,6 +207,9 @@ class GeneratorFactory:
                              preload: bool = False) -> OPT_GENERATOR_TYPE:
         """Return the combination of all accumulated generators.
 
+        Most generators are selected by :ref:`Generator Options` and
+        stored in :attr:`gens` list.
+
         Only call this after all arguments have been parsed.
 
         .. version-changed:: 7.3
@@ -215,10 +219,12 @@ class GeneratorFactory:
            pages are yieded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
         .. version-changed:: 11.3
-           If *preload* optiom is set, the preloading generators
+           If *preload* option is set, the preloading generators
            :func:`pagegenerators.PreloadingGenerator` or
            :func:`pagegenerators.DequePreloadingGenerator` are called
            with the *quiet* option.
+           The generator specified by ``-start`` and ``-until`` is
+           evaluated lazily by this method.
 
         :param gen: Another generator to be combined with
         :param preload: Preload pages using PreloadingGenerator
@@ -228,8 +234,12 @@ class GeneratorFactory:
             self.gens.insert(0, gen)
 
         # Handle allpages where args are given by -start and -until
-        if self._allpages_args is not None and 'start' in self._allpages_args:
-            self.gens.append(self.site.allpages(**self._allpages_args))
+        if self._allpages_args is not None:
+            apgen = self.site.allpages(**self._allpages_args)
+            if self.gens[0] is None:
+                self.gens[0] = apgen
+            else:
+                self.gens.append(apgen)
 
         for i, gen_item in enumerate(self.gens):
             if self.namespaces:
@@ -782,13 +792,21 @@ class GeneratorFactory:
         """Handle `-start` argument."""
         if not value:
             value = '!'
+
         firstpagelink = pywikibot.Link(value, self.site)
         self._allpages_args = self._allpages_args or {}
         self._allpages_args.update(
             start=firstpagelink.title,
-            namespace=firstpagelink.namespace,
             filterredir=False,
         )
+        self._allpages_args.setdefault('namespace', firstpagelink.namespace)
+
+        if not self.gens:
+            # Placeholder to indicate that a generator was specified.
+            # The actual generator will be inserted later by
+            # getCombinedGenerator().
+            self.gens.append(None)
+
         return True
 
     def _handle_until(self, value: str) -> Literal[True]:
@@ -797,7 +815,16 @@ class GeneratorFactory:
             value = '!'
         lastpagelink = pywikibot.Link(value, self.site)
         self._allpages_args = self._allpages_args or {}
-        self._allpages_args.update(until=lastpagelink.title)
+        self._allpages_args.update(
+            until=lastpagelink.title,
+            filterredir=False,
+        )
+        self._allpages_args.setdefault('namespace', lastpagelink.namespace)
+
+        if not self.gens:
+            # See comment in _handle_start.
+            self.gens.append(None)
+
         return True
 
     def _handle_prefixindex(self, value: str) -> HANDLER_GEN_TYPE:
@@ -1018,6 +1045,15 @@ class GeneratorFactory:
 
         .. version-added:: 6.0
            renamed from ``handleArg``
+        .. version-changed:: 11.3
+           The ``-start`` parameter no longer appends a generator to
+           :attr:`gens`. The generator is added lazily in
+           :meth:`getCombinedGenerator`
+        .. version-changed:: 11.4.1
+           The ``-start`` or ``-until`` parameters appends a placeholder
+           to :attr:`gens`, which indicates that a generator was
+           specified.
+
 
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory

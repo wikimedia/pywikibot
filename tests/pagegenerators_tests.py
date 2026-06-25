@@ -959,9 +959,12 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test allpages generator."""
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handle_arg('-start:!'))
+        self.assertIsNotEmpty(gf.gens)
+        self.assertIsNone(gf.gens[0])
         gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
+        self.assertIsNotNone(gf.gens[0])
         pages = set(gen)
         self.assertLessEqual(len(pages), 10)
         for page in pages:
