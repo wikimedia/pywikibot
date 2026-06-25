@@ -1731,11 +1731,7 @@ class HttpbinTestCase(TestCase):
     Test cases, which use httpbin, need to inherit this class.
     """
 
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-    }
+    hostname = 'httpbin.org'
 
     def get_httpbin_url(self, path=''):
         """Return url of httpbin."""

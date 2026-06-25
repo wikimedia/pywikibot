@@ -35,11 +35,7 @@ class HttpTestCase(TestCase):
 
     """Tests for http module."""
 
-    sites = {
-        'www-wp': {
-            'hostname': 'www.wikipedia.org',
-        },
-    }
+    net = True
 
     def test_fetch(self) -> None:
         """Test http.fetch using http://www.wikipedia.org/."""
@@ -130,18 +126,6 @@ class TestHttpStatus(HttpbinTestCase):
 
     """Test HTTP status code handling and errors."""
 
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-        'enwp': {
-            'hostname': 'en.wikipedia.org',
-        },
-        'wikia': {
-            'hostname': 'en.wikia.com',
-        },
-    }
-
     def test_http_504(self) -> None:
         """Test that a HTTP 504 raises the correct exception."""
         with self.assertRaisesRegex(
@@ -171,13 +155,20 @@ class TestHttpStatus(HttpbinTestCase):
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch('http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status_code, HTTPStatus.OK.value)
-        self.assertIsNotNone(r.history)
+        self.assertIsNotEmpty(r.history)
+        self.assertEqual(r.history[0].status_code,
+                         HTTPStatus.MOVED_PERMANENTLY.value)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
-        r = http.fetch('http://en.wikia.com')
+        r = http.fetch(
+            self.get_httpbin_url('/redirect-to?url=https://www.wikidata.org'))
+        self.assertIsNotEmpty(r.history)
+        self.assertEqual(r.history[0].status_code, HTTPStatus.FOUND.value)
+        self.assertEqual(r.history[-1].status_code,
+                         HTTPStatus.MOVED_PERMANENTLY.value)
         self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertEqual(r.url,
-                         'https://community.fandom.com/wiki/Community_Central')
+                         'https://www.wikidata.org/wiki/Wikidata:Main_Page')
 
 
 class UserAgentTestCase(DeprecationTestCase):
