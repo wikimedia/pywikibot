@@ -1,7 +1,11 @@
-Release 11.5
-============
+Release 11.4.1
+==============
 
-* (no changes yet)
+* Ensure :attr:`pagegenerators.GeneratorFactory.gens` is not empty if a generator is specified with
+  :ref:`Generator Options`. (:phab:`T430093`)
+* Remove special namespaces -1 and -2 if ``not:`` directive is used with ``-namespaces``
+  :ref:`Generator Options`. (:phab:`T429803`)
+
 
 Deprecations
 ============
@@ -103,9 +107,15 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.4.0: The signature of :meth:`APISite.allusers()
+  <pywikibot.site._generators.GeneratorsMixin.allusers>` was changed;
+  all parameters are keyword-only.
+* 11.4.0: The signature of :func:`tools.open_archive` was changed. *filename* parameter is
+  positional only, *use_extension* is keyword only.
 * 11.0.0: The User-Agent variable *script_product* is deprecated; use *script* instead.
   The User-Agent variable *version* is deprecated; use *revision* instead.
   The User-Agent variables *lang*, *code* and *family* are deprecated; use *site* instead.
-* 11.0.0: Positional argument for *block* parameter is deprecated; use a keyword argument instead.
+* 11.0.0: Positional argument for *block* parameter of :func:`pywikibot.async_manager` is
+  deprecated; use a keyword argument instead.
 * 11.0.0: Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
   Positional parameters for *by_letter* and *replace_invisible* are deprecated.

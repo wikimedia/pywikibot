@@ -664,14 +664,7 @@ class GeneratorFactory:
         return TextIOPageGenerator(value, site=self.site)
 
     def _handle_namespaces(self, value: str) -> Literal[True]:
-        """Handle `-namespaces` argument.
-
-        .. version-changed:: 11.5
-           If preleading ``not:`` directive is given, special namespaces
-           ``-1`` and ``-2`` are not included.
-
-        :meta public:
-        """
+        """Handle `-namespaces` argument."""
         if isinstance(self._namespaces, frozenset):
             raise RuntimeError('-namespace/ns option must be provided before '
                                '-newpages/-random/-randomredirect/-linter')
@@ -1050,6 +1043,8 @@ class GeneratorFactory:
            :attr:`gens`. The generator is added lazily in
            :meth:`getCombinedGenerator`
         .. version-changed:: 11.4.1
+           If preleading ``not:`` directive is given, special namespaces
+           ``-1`` and ``-2`` are not included.
            The ``-start`` or ``-until`` parameters appends a placeholder
            to :attr:`gens`, which indicates that a generator was
            specified.

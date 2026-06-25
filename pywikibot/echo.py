@@ -38,7 +38,7 @@ class Notification:
     def __post_init__(self) -> None:
         """Initialize attributes for an empty Notification object.
 
-        .. versionadded: 10.3
+        .. version-added: 10.3
         """
         self.event_id: int | None = None
         self.type = None

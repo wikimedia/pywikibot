@@ -496,7 +496,7 @@ FILTER OPTIONS
                     -ns:not:2,3
                     -ns:not:Help,File
 
-                    .. versionchanged:: 11.5
+                    .. version-changed:: 11.4.1
                        When using the leading ``not`` directive, the special
                        namespaces ``-1`` and ``-2`` are not included. To
                        add them, specify them explicitly, e.g. ``-ns:-1``.
