@@ -1,8 +1,7 @@
-Release 11.4.2
-==============
+Release 11.5
+============
 
-* Add support for isvwiki. (:phab:`T429937`)
-* Remove obsolete WMF_CACERT legacy check in :mod:`pywikibot.scripts.version`. (:phab:`T430266`)
+* (no changes yet)
 
 
 Deprecations
