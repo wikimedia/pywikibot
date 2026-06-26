@@ -198,14 +198,16 @@ def main(*args: str) -> None:
         elif option in protection_types and value:
             protections[option] = value
         else:
+            # specify generator
             if not gen_factory.handle_arg(arg):
                 raise ValueError(f'Unknown parameter "{arg}"')
+
+            generator_type = option
             if value:
                 message_properties.update({'cat': value, 'page': value})
-            if 'summary' not in options:
-                generator_type = option
 
-    if generator_type in default_summaries:
+    # get default summary message
+    if 'summary' not in options and generator_type in default_summaries:
         message_type = default_summaries[generator_type]
         if message_type == 'simple' or message_properties:
             if default_level == 'all':
