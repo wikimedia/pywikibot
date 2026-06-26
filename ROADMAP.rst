@@ -1,10 +1,8 @@
-Release 11.4.1
+Release 11.4.2
 ==============
 
-* Ensure :attr:`pagegenerators.GeneratorFactory.gens` is not empty if a generator is specified with
-  :ref:`Generator Options`. (:phab:`T430093`)
-* Remove special namespaces -1 and -2 if ``not:`` directive is used with ``-namespaces``
-  :ref:`Generator Options`. (:phab:`T429803`)
+* Add support for isvwiki. (:phab:`T429937`)
+* Remove obsolete WMF_CACERT legacy check in :mod:`pywikibot.scripts.version`. (:phab:`T430266`)
 
 
 Deprecations

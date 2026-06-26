@@ -1,6 +1,16 @@
 Release History
 ===============
 
+11.4.1
+------
+*25 June 2026*
+
+* Ensure :attr:`pagegenerators.GeneratorFactory.gens` is not empty if a generator is specified with
+  :ref:`Generator Options`. (:phab:`T430093`)
+* Remove special namespaces -1 and -2 if ``not:`` directive is used with ``-namespaces``
+  :ref:`Generator Options`. (:phab:`T429803`)
+
+
 11.4.0
 ------
 *23 June 2026*

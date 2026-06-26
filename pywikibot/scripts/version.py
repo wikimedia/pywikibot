@@ -70,9 +70,6 @@ except ImportError:
     requests = DummyModule()
 
 
-WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
-
-
 def main(*args: str) -> None:
     """Print pywikibot version and important settings.
 
@@ -86,7 +83,6 @@ def main(*args: str) -> None:
     pywikibot.info('wikitextparser version: ' + wikitextparser.__version__)
     pywikibot.info('requests version: ' + requests.__version__)
 
-    has_wikimedia_cert = False
     if (not hasattr(requests, 'certs')
             or not hasattr(requests.certs, 'where')
             or not callable(requests.certs.where)):
@@ -99,14 +95,6 @@ def main(*args: str) -> None:
             pywikibot.info(f'  cacerts: {cert.name} (missing)')
         else:
             pywikibot.info(f'  cacerts: {cert}')
-            text = cert.read_text(encoding='utf-8')
-            if WMF_CACERT in text:
-                has_wikimedia_cert = True
-            pywikibot.info('    certificate test: {}'
-                           .format('ok' if has_wikimedia_cert else 'not ok'))
-
-    if not has_wikimedia_cert:
-        pywikibot.info('  Please reinstall requests!')
 
     pywikibot.info('Python: ' + sys.version)
     pywikibot.info('User-Agent: ' + user_agent(pywikibot.Site()))
