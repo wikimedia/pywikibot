@@ -134,7 +134,6 @@ class TestHttpStatus(HttpbinTestCase):
                 r' timed out'):
             http.fetch(self.get_httpbin_url('/status/504'))
 
-    @unittest.expectedFailure  # T430263
     def test_server_not_found(self) -> None:
         """Test server not found exception."""
         with self.assertRaisesRegex(
