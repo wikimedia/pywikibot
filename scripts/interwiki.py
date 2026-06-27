@@ -343,6 +343,8 @@ To run the script on all pages on a language, run it with option
 .. version-changed:: 11.3
    The ``-new`` option was removed in favour of pagegenerators
    ``-newpages``.
+.. version-changed:: 11.5
+   Wildcards (``'*'``) in :mod:`config.usernames<config>` are now respected.
 """
 from __future__ import annotations
 
@@ -1489,8 +1491,9 @@ class Subject(interwiki_graph.Subject):
                or (not frgnSiteDone and site != lclSite and site in new):
                 if site == lclSite:
                     lclSiteDone = True   # even if we fail the update
-                if (site.family.name in config.usernames
-                        and site.code in config.usernames[site.family.name]):
+
+                codes = config.usernames.get(site.family.name, {})
+                if codes and site.code in codes or '*' in codes:
                     try:
                         if self.replaceLinks(new[site], new):
                             updated.append(site)
@@ -1536,9 +1539,9 @@ class Subject(interwiki_graph.Subject):
                 )
                 continue
 
-            # Check if a username is configured for this site
+            # Check if a username or wildcard is configured for this site
             codes = config.usernames.get(site.family.name, [])
-            if site.code not in codes:
+            if site.code not in codes and '*' not in codes:
                 pywikibot.warning(
                     f'username for {site} is not given in your user-config.py'
                 )
