@@ -520,10 +520,9 @@ class InterwikiBotConfig:
         elif arg == 'hintfile':
             hintfilename = value or pywikibot.input(
                 'Please enter the hint filename:')
-            # hint or title ends either before | or before ]]
-            R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
             txt = Path(hintfilename).read_text(config.textfile_encoding)
-            self.hints += R.findall(txt)
+            self.hints.extend(m['title']
+                              for m in pywikibot.link_regex.finditer(txt))
         elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True

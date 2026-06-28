@@ -33,6 +33,17 @@ class TestIwConfig(PatchingTestCase):
         site = DrySite(code, fam, None)
         return site
 
+    def test_hint_options(self):
+        """Test -hint and -hintfile options."""
+        iwc = interwiki.InterwikiBotConfig()
+        self.assertIsInstance(iwc.hints, list)
+        self.assertIsEmpty(iwc.hints)
+        iwc.readOptions('-hintfile:tests/data/pagelist-brackets.txt')
+        self.assertLength(iwc.hints, 5)
+        for option in '-hint:foo -hint:bar -hint:baz'.split():
+            iwc.readOptions(option)
+        self.assertLength(iwc.hints, 8)
+
     def test_ignore_option(self):
         """Test -ignore and -ignorefile options."""
         iwc = interwiki.InterwikiBotConfig()
