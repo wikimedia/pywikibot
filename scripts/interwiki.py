@@ -1218,8 +1218,8 @@ class Subject(interwiki_graph.Subject):
                         f.write(
                             f' [{config.interwiki_graph_url}{filename} graph]')
                     f.write('\n')
-            # FIXME: What errors are we catching here?
-            except Exception:
+            # Catch file operation failures while writing autonomous dump.
+            except OSError:
                 pywikibot.info(
                     'File autonomous_problems.dat open or corrupted! '
                     'Try again with -restore.')
