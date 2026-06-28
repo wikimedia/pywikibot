@@ -520,7 +520,7 @@ class InterwikiBotConfig:
         elif arg == 'hintfile':
             hintfilename = value or pywikibot.input(
                 'Please enter the hint filename:')
-            txt = Path(hintfilename).read_text(config.textfile_encoding)
+            txt = Path(hintfilename).read_text('utf-8')
             self.hints.extend(m['title']
                               for m in pywikibot.link_regex.finditer(txt))
         elif arg == 'untranslatedonly':

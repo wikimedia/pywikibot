@@ -106,6 +106,7 @@ _deprecated_variables = {
     'absolute_import': '10.0.0 ',
     'division': '10.0.0',
     'unicode_literals': '10.0.0',
+    'textfile_encoding': '11.5.0',
 }
 
 # ############# ACCOUNT SETTINGS ##############
@@ -496,12 +497,6 @@ console_encoding = getattr(sys.stdout, 'encoding', None)
 # After emitting the warning, this last option will be set.
 
 transliteration_target: str | None = None
-
-# The encoding in which textfiles are stored, which contain lists of page
-# titles. The most used is 'utf-8'; 'utf-8-sig' recognizes BOM.
-# For a complete list please see:
-# https://docs.python.org/3/library/codecs.html#standard-encodings
-textfile_encoding = 'utf-8'
 
 # currently terminal and buffer are the only supported userinterfaces
 userinterface = 'terminal'

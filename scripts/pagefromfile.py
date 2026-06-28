@@ -242,7 +242,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         pywikibot.info(f"\n\nReading '{self.filename}'...")
         filepath = Path(self.filename)
         try:
-            text = filepath.read_text(encoding=config.textfile_encoding)
+            text = filepath.read_text(encoding='utf-8')
         except OSError as e:
             pywikibot.error(e)
             return

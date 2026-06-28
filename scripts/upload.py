@@ -191,7 +191,7 @@ def main(*args: str) -> None:
             return
 
         description = filepath.read_text(
-            encoding=pywikibot.config.textfile_encoding).replace('\r\n', '\n')
+            encoding='utf-8').replace('\r\n', '\n')
 
     while not ('://' in url or os.path.exists(url)):
         if not url:

@@ -65,7 +65,7 @@ These parameters are supported to specify which pages titles to print:
 
 -encode     [str] File encoding can be specified with ``-encode:name``
             (name must be a valid python encoding: utf-8, etc.). If not
-            specified, it defaults to :code:`config.textfile_encoding`.
+            specified, it defaults to ``utf-8``.
 
 -put:       [str] Save the list to the defined page of the wiki. By
             default it does not overwrite an existing page.
@@ -188,7 +188,7 @@ class ListPagesBot(AutomaticTWSummaryBot, SingleSiteBot):
         'always': True,
         'save': None,
         'tofile': None,
-        'encode': config.textfile_encoding,
+        'encode': 'utf-8',
         'format': '1',
         'notitle': False,
         'outputlang': None,

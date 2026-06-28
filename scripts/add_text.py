@@ -74,7 +74,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 import pywikibot
-from pywikibot import config, pagegenerators, textlib
+from pywikibot import pagegenerators, textlib
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
 
 
@@ -123,7 +123,7 @@ class AddTextBot(AutomaticTWSummaryBot, ExistingPageBot):
         """Read text to be added from file."""
         if self.opt.textfile:
             pth = Path(self.opt.textfile)
-            self.opt.text = pth.read_text(encoding=config.textfile_encoding)
+            self.opt.text = pth.read_text(encoding='utf-8')
         else:
             # Translating the \\n into binary \n if given from command line
             self.opt.text = self.opt.text.replace('\\n', '\n')

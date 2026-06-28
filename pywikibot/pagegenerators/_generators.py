@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 from requests.exceptions import ReadTimeout
 
 import pywikibot
-from pywikibot import config, date, xmlreader
+from pywikibot import date, xmlreader
 from pywikibot.backports import batched
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, ServerError
@@ -477,7 +477,7 @@ def TextIOPageGenerator(source: str | None = None,
         site = pywikibot.Site()
     # If source cannot be parsed as an HTTP URL, treat as local file
     if not urlparse(source).netloc:
-        with open(source, encoding=config.textfile_encoding) as local_file:
+        with open(source, encoding='utf-8') as local_file:
             yield from _yield_titles(local_file, site)
     # Else, fetch page (page should return text in same format as that expected
     # in filename, i.e. pages separated by newlines or pages enclosed in double
