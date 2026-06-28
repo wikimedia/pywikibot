@@ -789,9 +789,6 @@ socket_timeout = (6.05, 45)
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
 # whitespace or positioning of category links.
-
-# This is an experimental feature; handle with care and consider re-checking
-# each bot edit if enabling this!
 cosmetic_changes = False
 
 # If cosmetic changes are switched on, and you also have several accounts at
