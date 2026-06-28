@@ -100,7 +100,7 @@ These arguments control miscellaneous bot behaviour:
                    saving the pages was successful.
 
 -summary:       [str] Set an additional action summary message for the
-                edit. This could be used for further explainings of the
+                edit. This could be used for further explanations of the
                 bot action. This will only be used in non-autonomous
                 mode.
 
@@ -257,7 +257,7 @@ links:
                 interactively, via the -askhint command line option, are
                 only effective once they have been entered, thus
                 interwiki links on the starting page are followed
-                regardess of hints given when prompted.
+                regardless of hints given when prompted.
 
                 .. caution:: Should be used with care!
 
