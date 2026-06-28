@@ -555,7 +555,7 @@ class InterwikiBotConfig:
                             for p in value.split(',')]
         elif arg == 'ignorefile':
             ignore_page_gen = pagegenerators.TextIOPageGenerator(value)
-            self.ignore.update(ignore_page_gen)
+            self.ignore.extend(ignore_page_gen)
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':

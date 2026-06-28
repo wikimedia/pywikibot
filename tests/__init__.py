@@ -154,6 +154,7 @@ script_test_modules = {
     'generate_family_file',
     'generate_user_files',
     'harvest_template',
+    'interwikibot',
     'interwikidata',
     'make_dist',
     'noreferences',
