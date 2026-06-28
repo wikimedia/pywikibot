@@ -2264,7 +2264,7 @@ class InterwikiDumps(OptionHandler):
 
     def get_files(self):
         """Get dump files from directory."""
-        pattern = r'(?P<file>(?P<fam>[a-z]+)-(?P<code>[a-z]+)\.txt)'
+        pattern = r'(?P<file>(?P<fam>[a-z]+)-(?P<code>[a-z-]+)\.txt)'
         for filename in os.listdir(self.path):
             found = re.fullmatch(pattern, filename)
             if found:
