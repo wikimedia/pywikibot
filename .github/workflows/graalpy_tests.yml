@@ -54,6 +54,9 @@ jobs:
           # Workaround for known GraalPy compatibility issues (SSL + charset detection)
           pip install "charset_normalizer<=3.4.5"
           pip install "urllib3<2.7"
+      - name: Install setuptools
+        if: matrix.python-version == 'graalpy-25.0'
+        run: pip install setuptools
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
