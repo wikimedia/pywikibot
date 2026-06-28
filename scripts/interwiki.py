@@ -680,10 +680,14 @@ class Subject(interwiki_graph.Subject):
         self.site = pywikibot.Site()
 
     @staticmethod
-    def is_not_redirect(page):
-        """Check whether *page* is not a redirect page.
+    def is_not_redirect(page: pywikibot.Page) -> bool:
+        """Check whether *page* is neither a redirect nor a category redirect.
 
         .. version-added:: 11.0
+
+        :param page: The page to check.
+        :return: ``True`` if the page exists and is not a redirect,
+            otherwise ``False``.
         """
         return page.exists() and not (page.isRedirectPage()
                                       or page.isCategoryRedirect())
