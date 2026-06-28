@@ -867,7 +867,7 @@ max_queue_size = 64
 pickle_protocol = 5
 
 # 7-zip executable setting
-# The default for 7-zip executable is '7za' but my also be '7Z'. If The
+# The default for 7-zip executable is '7za' but may also be '7Z'. If the
 # executable is not included in the local PATH environment variable the
 # relative or absolute path can also be given with this cmd line setting
 # like:
