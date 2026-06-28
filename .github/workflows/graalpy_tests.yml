@@ -51,10 +51,9 @@ jobs:
           pip install "pytest >= 9.0.3"
           pip install pytest-attrib
           pip install coverage
-      - name: Install urllib3 compatibility package
-        if: matrix.python-version == 'graalpy-24.1'
-        run: |
-          pip install "urllib3<2"
+          # Workaround for known GraalPy compatibility issues (SSL + charset detection)
+          pip install "charset_normalizer<=3.4.5"
+          pip install "urllib3<2.7"
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
