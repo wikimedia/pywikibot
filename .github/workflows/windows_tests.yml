@@ -54,6 +54,11 @@ jobs:
           pip install -r dev-requirements.txt
           pip install -r requirements.txt
           pip install wikitextparser
+      - name: Configure and start WMCS SOCKS tunnel
+        uses: ./.github/actions/wmcs-socks
+        with:
+          ssh_user: ${{ secrets.WMCS_USER }}
+          ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
@@ -63,10 +68,10 @@ jobs:
           echo "usernames['commons']['commons'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['meta']['meta'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "noisysleep = float('inf')" >> user-config.py
+          echo "minthrottle = 0.2" >> user-config.py
           echo "maximum_GET_length = 5000" >> user-config.py
           echo "transliteration_target = None"  >> user-config.py
           echo "console_encoding = 'utf8'" >> user-config.py
-          echo "minthrottle = 0.5" >> user-config.py
           echo "import os" >> user-config.py
           echo "password_file = os.path.expanduser('passwordfile')" >> user-config.py
           echo "('${{ env.PYWIKIBOT_USERNAME }}', '${{ secrets.PYWIKIBOT_USERPWD }}')" > passwordfile
@@ -75,9 +80,25 @@ jobs:
         continue-on-error: true
         env:
           PYTHONIOENCODING: utf-8
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           python pwb.py version
           coverage run -m unittest discover -vv -p \"*_tests.py\";
+      - name: Close WMCS SOCKS tunnel
+        if: always()
+        shell: bash
+        run: |-
+          if [ -f ssh.pid ]; then
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
+          fi
       - name: Show coverage statistics
         run: |
           coverage combine || true
