@@ -54,6 +54,7 @@ jobs:
           pip install -r dev-requirements.txt
           pip install -r requirements.txt
           pip install wikitextparser
+          pip install requests[socks]
       - name: Configure and start WMCS SOCKS tunnel
         uses: ./.github/actions/wmcs-socks
         with:
