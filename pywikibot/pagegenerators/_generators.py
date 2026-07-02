@@ -1376,7 +1376,7 @@ class PetScanPageGenerator(GeneratorWrapper):
 
     """Queries PetScan to generate pages.
 
-    .. seealso:: https://petscan.wmflabs.org/
+    .. seealso:: https://petscan.wmcloud.org/
     .. version-added:: 3.0
     .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
