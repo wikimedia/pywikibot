@@ -1453,7 +1453,7 @@ class PetScanPageGenerator(GeneratorWrapper):
         :raises ServerError: Either ReadTimeout or server status error
         :raises APIError: Error response from petscan
         """
-        url = 'https://petscan.wmflabs.org'
+        url = 'https://petscan.wmcloud.org'
 
         try:
             req = http.fetch(url, params=self.opts)
