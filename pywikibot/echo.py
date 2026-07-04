@@ -99,4 +99,4 @@ class Notification:
         if self.event_id is None:
             return False
 
-        return self.site.notifications_mark_read(**{'list': self.event_id})
+        return self.site.notifications_mark_read(list=self.event_id)
