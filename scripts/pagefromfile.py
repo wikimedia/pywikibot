@@ -259,7 +259,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 break
 
             except NoTitleError as err:
-                pywikibot.info('\n{err} - skipping a page.')
+                pywikibot.info(f'\n{err} - skipping a page.')
                 text = text[err.offset:]
             else:
                 page = pywikibot.Page(self.site, title)
