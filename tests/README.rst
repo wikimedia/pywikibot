@@ -284,7 +284,7 @@ the class attribute 'sites' may include a hostname.
 
     sites = {
         'wdq':
-            'hostname': 'wdq.wmflabs.org',
+            'hostname': 'query.wikidata.org',
         }
     }
 
