@@ -187,7 +187,7 @@ def main(*args: str) -> None:
 
         filepath = Path(description_file)
         if not filepath.is_file() or filepath.is_symlink():
-            pywikibot.Error('Invalid filename given with -descfile')
+            pywikibot.error('Invalid filename given with -descfile')
             return
 
         description = filepath.read_text(
