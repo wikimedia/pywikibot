@@ -137,16 +137,6 @@ class Family:
     """A dict of tuples for different sites with names of archive templates
     that indicate an edit of non-archive bots should be avoided."""
 
-    #: A set of projects that share cross-project sessions.
-    cross_projects: set[str] = set()
-
-    #: A list with the name for cross-project cookies, default for
-    #: wikimedia centralAuth extensions.
-    cross_projects_cookies = ['centralauth_Session',
-                              'centralauth_Token',
-                              'centralauth_User']
-    cross_projects_cookie_username = 'centralauth_User'
-
     #: A list with the name in the cross-language flag permissions.
     cross_allowed: list[str] = []
 
@@ -329,6 +319,38 @@ class Family:
            <pywikibot.site._apisite.APISite.has_extension>` instead
         """
         return []
+
+    @classproperty
+    @deprecated(since='11.5.0')
+    def cross_projects(cls) -> set[str]:
+        """A set of projects that share cross-project sessions.
+
+        .. version-deprecated:: 11.5
+           This attribute was never used.
+        """
+        return set()
+
+    @classproperty
+    @deprecated(since='11.5.0')
+    def cross_projects_cookies(cls) -> list[str]:
+        """A list with the name for cross-project cookies.
+
+        Default for wikimedia centralAuth extensions.
+
+        .. version-deprecated:: 11.5
+           This attribute was never used.
+        """
+        return ['centralauth_Session', 'centralauth_Token', 'centralauth_User']
+
+    @classproperty
+    @deprecated(since='11.5.0')
+    def cross_projects_cookie_username(cls) -> str:
+        """The cross-project cookies username.
+
+        .. version-deprecated:: 11.5
+           This attribute was never used.
+        """
+        return 'centralauth_User'
 
     @staticmethod
     def load(fam: str | None = None):
@@ -912,14 +934,6 @@ class WikimediaFamily(Family):
         + wikimedia_org_other_families
     )
 
-    # CentralAuth cross available projects.
-    cross_projects = set(
-        multi_language_content_families
-        + wikimedia_org_content_families
-        + wikimedia_org_meta_families
-        + other_content_families
-    )
-
     # Known Wikimedia site codes
     known_codes = [
         'aa', 'ab', 'ace', 'ady', 'af', 'ak', 'als', 'alt', 'am', 'ami', 'an',
@@ -1001,6 +1015,21 @@ class WikimediaFamily(Family):
     # UrlShortener extension is only usable on metawiki, and this wiki can
     # process links to all WM domains.
     shared_urlshortner_wiki = ('meta', 'meta')
+
+    @classproperty
+    @deprecated(since='11.5.0')
+    def cross_projects(cls) -> set[str]:
+        """A set of projects that share cross-project sessions.
+
+        .. version-deprecated:: 11.5
+           This attribute was never used.
+        """
+        return set(
+            cls.multi_language_content_families
+            + cls.wikimedia_org_content_families
+            + cls.wikimedia_org_meta_families
+            + cls.other_content_families
+        )
 
     @classproperty
     def domain(cls):
