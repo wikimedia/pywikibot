@@ -811,17 +811,17 @@ class TestRollbackPage(PatchingTestCase):
         return None
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         """Use sandbox page for tests."""
         super().setUpClass()
         cls.page = pywikibot.Page(cls.site, 'Sandbox')
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Patch has_right method."""
         super().setUp()
         self.patch(self.site, 'has_right', lambda right: True)
 
-    def test_missing_rights(self):
+    def test_missing_rights(self) -> None:
         """Test missing rollback right."""
         self.patch(self.site, 'has_right', lambda right: False)
         with self.assertRaisesRegex(
@@ -831,7 +831,7 @@ class TestRollbackPage(PatchingTestCase):
         ):
             self.site.rollbackpage(self.page, pageid=4711)
 
-    def test_exceptions(self):
+    def test_exceptions(self) -> None:
         """Test rollback exceptions."""
         with self.assertRaisesRegex(
             ValueError,
@@ -849,7 +849,7 @@ class TestRollbackPage(PatchingTestCase):
                 NoPageError, r"Page -1 \(pageid\) doesn't exist\."):
             self.site.rollbackpage(pageid=-1)
 
-    def test_rollback_simulation(self):
+    def test_rollback_simulation(self) -> None:
         """Test rollback in simulate mode."""
         result = self.site.rollbackpage(self.page)
         self.assertIsInstance(result, dict)

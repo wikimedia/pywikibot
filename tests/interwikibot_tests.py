@@ -33,7 +33,7 @@ class TestIwConfig(PatchingTestCase):
         site = DrySite(code, fam, None)
         return site
 
-    def test_hint_options(self):
+    def test_hint_options(self) -> None:
         """Test -hint and -hintfile options."""
         iwc = interwiki.InterwikiBotConfig()
         self.assertIsInstance(iwc.hints, list)
@@ -44,7 +44,7 @@ class TestIwConfig(PatchingTestCase):
             iwc.readOptions(option)
         self.assertLength(iwc.hints, 8)
 
-    def test_ignore_option(self):
+    def test_ignore_option(self) -> None:
         """Test -ignore and -ignorefile options."""
         iwc = interwiki.InterwikiBotConfig()
         self.assertIsInstance(iwc.ignore, list)
@@ -54,7 +54,7 @@ class TestIwConfig(PatchingTestCase):
         iwc.readOptions('-ignore:Foo,Bar,Baz')
         self.assertLength(iwc.ignore, 8)
 
-    def test_skipfile_option(self):
+    def test_skipfile_option(self) -> None:
         """Test -skipfile options."""
         iwc = interwiki.InterwikiBotConfig()
         self.assertIsInstance(iwc.skip, set)
