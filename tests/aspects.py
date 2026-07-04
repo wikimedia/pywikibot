@@ -865,9 +865,11 @@ class MetaTestCaseClass(type):
 
             return wrapped_method
 
-        tests = [attr_name
-                 for attr_name in dct
-                 if attr_name.startswith('test')]
+        tests = [
+            attr_name
+            for attr_name, attr in dct.items()
+            if attr_name.startswith('test') and callable(attr)
+        ]
 
         base_tests = []
         if not tests:
