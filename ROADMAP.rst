@@ -1,7 +1,10 @@
 Release 11.5
 ============
 
-* (no changes yet)
+* Drop :mod:`config` ``textfile_encoding`` variable and use 'utf-8' directly instead (:phab:`T430454`)
+* Use pyclean package with :mod:`make_dist` script.
+* Fix redirected link for :class:`pagegenerators.PetScanPageGenerator`
+* Update translations (i18n)
 
 
 Deprecations
@@ -104,6 +107,8 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.5.0: :mod:`config` ``textfile_encoding`` variable will be removed; use 'utf-8' directly instead
+  (:phab:`T430454`)
 * 11.4.0: The signature of :meth:`APISite.allusers()
   <pywikibot.site._generators.GeneratorsMixin.allusers>` was changed;
   all parameters are keyword-only.

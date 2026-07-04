@@ -1,6 +1,23 @@
 Scripts Changelog
 =================
 
+11.5.0
+------
+
+interwiki
+^^^^^^^^^
+
+* Fix pattern for getting dump files (:phab:`T430451`)
+* Use :attr:`pywikibot.link_regex` pattern for ``-hintfile`` option
+* Re-enable ``-ignorefile`` option (:phab:`T430444`)
+* Implement ``-onlylink`` whitelist option and unify link preservation logic (:phab:`T430408`)
+* Respect usernames wildcards
+
+protect
+^^^^^^^
+
+* Ensure -summary option overrides default summary setting
+
 11.4.0
 ------
 
