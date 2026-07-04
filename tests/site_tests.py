@@ -1162,6 +1162,7 @@ class TestSubdomainFamilySite(TestCase):
             pywikibot.Site('ceb', 'wowwiki')
 
 
+@unittest.skip('Skipping TimeoutError due to T431173')
 class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
 
     """Test site without other production sites in its family."""

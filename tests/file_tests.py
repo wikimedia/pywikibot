@@ -462,6 +462,7 @@ class TestFilePageDataItem(TestCase):
             item.statements, pywikibot.page._collections.ClaimCollection)
 
 
+@unittest.skip('Skipping TimeoutError due to T431173')
 class TestMediaInfoEditing(TestCase):
 
     """Test writing structured data of FilePage."""
