@@ -213,7 +213,7 @@ def main(*args: str) -> None:
         if url is None:
             missing.append('filename')
             additional = error + ' '
-        if description is None:
+        if not description:
             missing.append('description')
         if aborts is not True and ignorewarn is not True:
             additional += ('Either -ignorewarn or -abortonwarn must be '
