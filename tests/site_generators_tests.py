@@ -1102,7 +1102,7 @@ class SearchTestCase(DefaultSiteTestCase):
                     f'gsrsearch returned timeout on site {mysite}:\n{e!r}')
             if e.code == 'gsrsearch-text-disabled':
                 self.skipTest(
-                    'gsrsearch is disabled on site {mysite}:\n{e!r}')
+                    f'gsrsearch is disabled on site {mysite}:\n{e!r}')
             if (e.code == 'cirrussearch-backend-error'
                     and mysite.family.name == 'wpbeta'):  # T426529
                 self.skipTest(

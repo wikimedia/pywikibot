@@ -49,7 +49,7 @@ class WikiBlameMixin:
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
 
-    @deprecated('authorsship', since='9.3.0')
+    @deprecated('authorship', since='9.3.0')
     @deprecated_args(onlynew=None)  # since 9.2.0
     def main_authors(self) -> collections.Counter[str, int]:
         """Retrieve the 5 topmost main authors of an article.
@@ -158,7 +158,7 @@ class WikiBlameMixin:
             chars changes.
         :param min_pct: Only return authors with more than *min_pct*
             percentage edits.
-        :param max_pct_sum: Only return authors until the prcentage sum
+        :param max_pct_sum: Only return authors until the percentage sum
             reached *max_pct_sum*.
         :return: Character count and percentage of edits for each
             username.
