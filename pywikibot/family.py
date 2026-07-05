@@ -700,19 +700,25 @@ class Family:
         """
         return True
 
+    @deprecated(since='11.5.0')
     def post_get_convert(self, site, getText):
         """Do a conversion on the retrieved text from the Wiki.
 
         For example a :wiki:`X-conversion in Esperanto
         <Esperanto_orthography#X-system>`.
+
+        .. version-deprecated:: 11.5
         """
         return getText
 
+    @deprecated(since='11.5.0')
     def pre_put_convert(self, site, putText):
         """Do a conversion on the text to insert on the Wiki.
 
         For example a :wiki:`X-conversion in Esperanto
         <Esperanto_orthography#X-system>`.
+
+        .. version-deprecated:: 11.5
         """
         return putText
 
