@@ -15,11 +15,11 @@ import pywikibot
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
+    ApiTimeoutError,
     Error,
     HiddenKeyError,
     InvalidTitleError,
     NoPageError,
-    TimeoutError,
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
@@ -65,7 +65,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.pagereferences."""
         # pagereferences includes both backlinks and embeddedin
         backlinks = set(self.site.pagebacklinks(self.mainpage, namespaces=[0]))
-        with skipping(TimeoutError):
+        with skipping(ApiTimeoutError):
             embedded = set(self.site.page_embeddedin(self.mainpage,
                                                      namespaces=[0]))
         refs = set(self.site.pagereferences(self.mainpage, namespaces=[0]))
@@ -105,7 +105,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_embeddedin(self) -> None:
         """Test Site.page_embeddedin."""
-        with skipping(TimeoutError):
+        with skipping(ApiTimeoutError):
             embedded_ns_0 = set(self.site.page_embeddedin(
                 self.mainpage, namespaces=[0]))
             embedded_ns_0_2 = set(self.site.page_embeddedin(

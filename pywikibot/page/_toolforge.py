@@ -72,7 +72,7 @@ class WikiBlameMixin:
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
         :raise NoPageError: The page does not exist.
-        :raise TimeoutError: WikiHistory timeout
+        :raise ApiTimeoutError: WikiHistory timeout
         """
         return collections.Counter(
             {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
@@ -166,7 +166,7 @@ class WikiBlameMixin:
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
         :raise NoPageError: The page does not exist.
-        :raise TimeoutError: WikiHistory timeout
+        :raise ApiTimeoutError: WikiHistory timeout
         """
         if n and n > 5:
             warn('Only the first 5 authors can be given.', stacklevel=2)
@@ -190,7 +190,7 @@ class WikiBlameMixin:
 
             pywikibot.sleep(pywikibot.config.retry_wait)
         else:
-            raise pywikibot.exceptions.TimeoutError('WikiHistory Timeout')
+            raise pywikibot.exceptions.ApiTimeoutError('WikiHistory Timeout')
 
         length = len(self.text)
         result: list[list[str]] = []

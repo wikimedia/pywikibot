@@ -81,6 +81,7 @@ library_test_modules = {
     'echo',
     'edit',
     'edit_failure',
+    'exceptions',
     'eventstreams',
     'family',
     'file',
