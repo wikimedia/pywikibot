@@ -294,7 +294,9 @@ def main(*args: str) -> None:
             if not value.strip():
                 options['notitle'] = True
             options['format'] = value
-        elif option in ('-encode', '-outputlang', '-save', '-summary', '-tofile'):
+        elif option in (
+            '-encode', '-outputlang', '-save', '-summary', '-tofile',
+        ):
             options[opt] = value
         elif option == '-put':
             page_target = value
