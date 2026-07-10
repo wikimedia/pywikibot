@@ -25,7 +25,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     removed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
-        'als', 'tokipona',
+        # wqwikiquote does not exist but is listed at
+        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        'als', 'tokipona', 'wq',
     ]
 
     codes = {
