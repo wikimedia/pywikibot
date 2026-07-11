@@ -11,12 +11,29 @@ interwiki
 * Use :attr:`pywikibot.link_regex` pattern for ``-hintfile`` option
 * Re-enable ``-ignorefile`` option (:phab:`T430444`)
 * Implement ``-onlylink`` whitelist option and unify link preservation logic (:phab:`T430408`)
-* Respect usernames wildcards
+* Respect username wildcards
+
+listpages
+^^^^^^^^^
+
+* Enable ``-tofile`` argument (:phab:`T366033`, :phab:`T431418`)
+
+pagefromfile
+^^^^^^^^^^^^
+
+* Fix missing ``f`` prefix in ``NoTitleError`` message
 
 protect
 ^^^^^^^
 
-* Ensure -summary option overrides default summary setting
+* Ensure ``-summary`` option overrides the default summary
+
+upload
+^^^^^^
+
+* Fix comparison of description variable that cannot be ``None``
+* Fix error logging function name
+
 
 11.4.0
 ------

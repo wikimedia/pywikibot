@@ -1,7 +1,13 @@
 Release 11.5
 ============
 
-* Rename :exc:`exceptions.TimeoutError` exception to :class:`exceptions.ApiTimeoutError` to avoid collision with Python's built-in exception (:phab:`T431174`)
+* Dreprecate ``cross_projects`` :mod:`family.Family` settings (:phab:`T431178`)
+* Deprecate :func:`family.Family.post_get_convert` and
+  :func:`family.Family.pre_put_convert` functions (:phab:`T431188`)
+* Update :mod:`families.wikiquote_family`
+* Add support for minwikiquote (:phab:`T429945`)
+* Rename ``exceptions.TimeoutError`` exception to :exc:`exceptions.ApiTimeoutError` to avoid
+  collision with Python's built-in exception (:phab:`T431174`)
 * Drop :mod:`config` ``textfile_encoding`` variable and use 'utf-8' directly instead (:phab:`T430454`)
 * Use pyclean package with :mod:`make_dist` script.
 * Fix redirected link for :class:`pagegenerators.PetScanPageGenerator`
@@ -108,7 +114,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
-* 11.5.0: :exc:`exceptions.TimeoutError` is deprecated in favour of :class:`exceptions.ApiTimeoutError`
+* 11.5.0: :func:`family.Family.post_get_convert` and :func:`family.Family.pre_put_convert` functions
+  are deprecated and will be removed (:phab:`T431188`)
+* 11.5.0: ``exceptions.TimeoutError`` is deprecated in favour of :exc:`exceptions.ApiTimeoutError`
 * 11.5.0: :mod:`config` ``textfile_encoding`` variable will be removed; use 'utf-8' directly instead
   (:phab:`T430454`)
 * 11.4.0: The signature of :meth:`APISite.allusers()
