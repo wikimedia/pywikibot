@@ -769,7 +769,7 @@ class RequireLoginMixin(TestCaseBase):
            The `skip_if_login_fails` parameter.
 
         :param skip_if_login_fails: called with setUp(); if True, skip
-            the current current test.
+            the current test.
         """
         for site in self.sites.values():
             site = site['site']
@@ -926,7 +926,7 @@ class MetaTestCaseClass(type):
             for hostname in hostnames:
                 if hostname in dct['sites']:  # pragma: no cover
                     raise AttributeError(f'hostname {hostname!r} already found'
-                                         f"in dict['sites']:\n{dict['sites']}")
+                                         f"in dct['sites']:\n{dct['sites']}")
                 dct['sites'][hostname] = {'hostname': hostname}
 
         if dct.get('dry') is True:
@@ -1457,7 +1457,7 @@ class DefaultWikidataClientTestCase(DefaultWikibaseClientTestCase):
 
         if str(cls.get_repo()) != 'wikidata:wikidata':
             raise unittest.SkipTest(f'{cls.__name__}: {cls.get_site()} is not'
-                                    'connected to Wikidata.')
+                                    ' connected to Wikidata.')
 
 
 class PwbTestCase(TestCase):
@@ -1475,7 +1475,7 @@ class PwbTestCase(TestCase):
     unlikely scenario that the test case uses pwb in a way that doesn't
     use a site.
 
-    If a test class is marked as :code:`site = False , the metaclass
+    If a test class is marked as :code:`site = False`, the metaclass
     will also check that the ``net`` flag is explicitly set.
     """
 
