@@ -77,6 +77,20 @@ class BasePage(ComparableMixin):
         '_timestamp',
     )
 
+    if TYPE_CHECKING:
+        _catinfo: dict[str, int]
+        _contentmodel: str
+        _imageforpage: dict[str, Any]
+        _isredir: bool
+        _lintinfo: dict[str, Any]
+        _pageid: int
+        _pageimage: pywikibot.FilePage
+        _preloadedtext: str
+        _protection: list[str]
+        _revid: int
+        _text: str
+        _timestamp: str
+
     def __init__(self, source, title: str = '', ns: int = 0) -> None:
         """Instantiate a Page object.
 
