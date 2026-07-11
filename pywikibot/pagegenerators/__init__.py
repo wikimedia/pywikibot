@@ -620,7 +620,7 @@ def RepeatingGenerator(
     sleep_duration: int = 60,
     total: int | None = None,
     **kwargs: Any,
-) -> Generator[pywikibot.page.Page]:
+) -> Generator[pywikibot.page.BasePage]:
     """Yield items in live time.
 
     The provided generator must support parameter 'start', 'end',

@@ -1,6 +1,23 @@
 Release History
 ===============
 
+11.5.0
+------
+*11 July 2026*
+
+* Dreprecate ``cross_projects`` :mod:`family.Family` settings (:phab:`T431178`)
+* Deprecate :func:`family.Family.post_get_convert` and
+  :func:`family.Family.pre_put_convert` functions (:phab:`T431188`)
+* Update :mod:`families.wikiquote_family`
+* Add support for minwikiquote (:phab:`T429945`)
+* Rename ``exceptions.TimeoutError`` exception to :exc:`exceptions.ApiTimeoutError` to avoid
+  collision with Python's built-in exception (:phab:`T431174`)
+* Drop :mod:`config` ``textfile_encoding`` variable and use 'utf-8' directly instead (:phab:`T430454`)
+* Use pyclean package with :mod:`make_dist` script.
+* Fix redirected link for :class:`pagegenerators.PetScanPageGenerator`
+* Update translations (i18n)
+
+
 11.4.2
 ------
 *26 June 2026*
