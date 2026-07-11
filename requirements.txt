@@ -21,6 +21,9 @@
 mwparserfromhell>=0.7.2
 packaging>=25.0
 requests>=2.32.3
+# Workaround for known GraalPy compatibility issues (SSL + charset detection)
+charset-normalizer<=3.4.5 ; platform_python_implementation == "GraalVM"
+urllib3<2.7 ; platform_python_implementation == "GraalVM"
 
 # MediaWiki markup parser
 # mwparserfromhell is mandatory but wikitextparser can be used instead

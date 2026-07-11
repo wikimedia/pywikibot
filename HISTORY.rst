@@ -1,6 +1,14 @@
 Release History
 ===============
 
+11.4.2
+------
+*26 June 2026*
+
+* Add support for isvwiki. (:phab:`T429937`)
+* Remove obsolete WMF_CACERT legacy check in :mod:`pywikibot.scripts.version`. (:phab:`T430266`)
+
+
 11.4.1
 ------
 *25 June 2026*

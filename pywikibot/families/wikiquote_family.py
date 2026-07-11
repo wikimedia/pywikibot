@@ -25,7 +25,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     removed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=dblists/deleted.dblist
-        'als', 'tokipona',
+        # wqwikiquote does not exist but is listed at
+        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        'als', 'tokipona', 'wq',
     ]
 
     codes = {
@@ -33,9 +35,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa',
         'fi', 'fr', 'gl', 'gor', 'gu', 'guw', 'he', 'hi', 'hr', 'hu', 'hy',
         'id', 'ig', 'is', 'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
-        'lt', 'ml', 'mr', 'ms', 'nl', 'nn', 'no', 'pcm', 'pl', 'pt', 'ro',
-        'ru', 'sa', 'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te',
-        'th', 'tl', 'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
+        'lt', 'min', 'ml', 'mr', 'ms', 'nl', 'nn', 'no', 'pcm', 'pl', 'pt',
+        'ro', 'ru', 'sa', 'sah', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta',
+        'te', 'th', 'tl', 'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
     }
 
     category_redirect_templates = {

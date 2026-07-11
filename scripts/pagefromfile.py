@@ -242,7 +242,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
         pywikibot.info(f"\n\nReading '{self.filename}'...")
         filepath = Path(self.filename)
         try:
-            text = filepath.read_text(encoding=config.textfile_encoding)
+            text = filepath.read_text(encoding='utf-8')
         except OSError as e:
             pywikibot.error(e)
             return
@@ -259,7 +259,7 @@ class PageFromFileReader(OptionHandler, GeneratorWrapper):
                 break
 
             except NoTitleError as err:
-                pywikibot.info('\n{err} - skipping a page.')
+                pywikibot.info(f'\n{err} - skipping a page.')
                 text = text[err.offset:]
             else:
                 page = pywikibot.Page(self.site, title)

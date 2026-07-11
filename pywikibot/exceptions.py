@@ -54,7 +54,7 @@ the framework::
           +-- SiteDefinitionError
           |    +-- UnknownFamilyError
           |    +-- UnknownSiteError
-          +-- TimeoutError
+          +-- ApiTimeoutError
           |    +-- MaxlagTimeoutError
           +-- TranslationError
           +-- UserRightsError
@@ -143,7 +143,7 @@ WikiBaseError: any issue specific to Wikibase.
   - CoordinateGlobeUnknownError: globe is not implemented yet.
   - EntityTypeUnknownError: entity type is not available on the site.
 
-TimeoutError: request failed with a timeout
+ApiTimeoutError: request failed with a timeout
 
   - MaxlagTimeoutError: request failed with a maxlag timeout
 
@@ -182,7 +182,10 @@ import re
 from typing import Any
 
 import pywikibot
-from pywikibot.tools._deprecate import _NotImplementedWarning
+from pywikibot.tools._deprecate import (
+    ModuleDeprecationWrapper,
+    _NotImplementedWarning,
+)
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -720,12 +723,12 @@ class EntityTypeUnknownError(WikiBaseError):
     """The requested entity type is not recognised on this site."""
 
 
-class TimeoutError(Error):
+class ApiTimeoutError(Error):
 
     """Request failed with a timeout error."""
 
 
-class MaxlagTimeoutError(TimeoutError):
+class MaxlagTimeoutError(ApiTimeoutError):
 
     """Request failed with a maxlag timeout error."""
 
@@ -733,3 +736,11 @@ class MaxlagTimeoutError(TimeoutError):
 class ApiNotAvailableError(Error):
 
     """API is not available, e.g. due to a network error or configuration."""
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper.add_deprecated_attr(
+    'TimeoutError',
+    replacement=ApiTimeoutError,
+    since='11.5.0',
+)

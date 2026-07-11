@@ -49,7 +49,7 @@ class WikiBlameMixin:
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
 
-    @deprecated('authorsship', since='9.3.0')
+    @deprecated('authorship', since='9.3.0')
     @deprecated_args(onlynew=None)  # since 9.2.0
     def main_authors(self) -> collections.Counter[str, int]:
         """Retrieve the 5 topmost main authors of an article.
@@ -72,7 +72,7 @@ class WikiBlameMixin:
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
         :raise NoPageError: The page does not exist.
-        :raise TimeoutError: WikiHistory timeout
+        :raise ApiTimeoutError: WikiHistory timeout
         """
         return collections.Counter(
             {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
@@ -158,7 +158,7 @@ class WikiBlameMixin:
             chars changes.
         :param min_pct: Only return authors with more than *min_pct*
             percentage edits.
-        :param max_pct_sum: Only return authors until the prcentage sum
+        :param max_pct_sum: Only return authors until the percentage sum
             reached *max_pct_sum*.
         :return: Character count and percentage of edits for each
             username.
@@ -166,7 +166,7 @@ class WikiBlameMixin:
         :raise NotImplementedError: unsupported site or unsupported
             namespace.
         :raise NoPageError: The page does not exist.
-        :raise TimeoutError: WikiHistory timeout
+        :raise ApiTimeoutError: WikiHistory timeout
         """
         if n and n > 5:
             warn('Only the first 5 authors can be given.', stacklevel=2)
@@ -190,7 +190,7 @@ class WikiBlameMixin:
 
             pywikibot.sleep(pywikibot.config.retry_wait)
         else:
-            raise pywikibot.exceptions.TimeoutError('WikiHistory Timeout')
+            raise pywikibot.exceptions.ApiTimeoutError('WikiHistory Timeout')
 
         length = len(self.text)
         result: list[list[str]] = []

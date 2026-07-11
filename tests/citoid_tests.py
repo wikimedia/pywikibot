@@ -24,7 +24,7 @@ class TestCitoid(TestCase):
     code = 'test'
     login = False
 
-    def test_citoid_positive(self):
+    def test_citoid_positive(self) -> None:
         """Test citoid script."""
         client = citoid.CitoidClient(self.site)
         resp = client.get_citation(
@@ -43,7 +43,7 @@ class TestCitoid(TestCase):
             datetime.datetime.now().strftime('%Y-%m-%d')
         )
 
-    def test_citoid_no_config(self):
+    def test_citoid_no_config(self) -> None:
         """Test citoid script with no citoid endpoint configured."""
         client = citoid.CitoidClient(pywikibot.Site('wikiquote:pl'))
         with self.assertRaisesRegex(
@@ -55,7 +55,7 @@ class TestCitoid(TestCase):
                 'https://ro.wikipedia.org/wiki/România'
             )
 
-    def test_citoid_no_valid_format(self):
+    def test_citoid_no_valid_format(self) -> None:
         """Test citoid script with invalid format provided."""
         client = citoid.CitoidClient(self.site)
         with self.assertRaisesRegex(ValueError, 'Invalid format mediawiki2'):

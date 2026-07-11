@@ -187,11 +187,11 @@ def main(*args: str) -> None:
 
         filepath = Path(description_file)
         if not filepath.is_file() or filepath.is_symlink():
-            pywikibot.Error('Invalid filename given with -descfile')
+            pywikibot.error('Invalid filename given with -descfile')
             return
 
         description = filepath.read_text(
-            encoding=pywikibot.config.textfile_encoding).replace('\r\n', '\n')
+            encoding='utf-8').replace('\r\n', '\n')
 
     while not ('://' in url or os.path.exists(url)):
         if not url:
@@ -213,7 +213,7 @@ def main(*args: str) -> None:
         if url is None:
             missing.append('filename')
             additional = error + ' '
-        if description is None:
+        if not description:
             missing.append('description')
         if aborts is not True and ignorewarn is not True:
             additional += ('Either -ignorewarn or -abortonwarn must be '

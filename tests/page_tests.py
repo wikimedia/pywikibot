@@ -19,13 +19,13 @@ import pywikibot.page
 from pywikibot import config
 from pywikibot.exceptions import (
     APIError,
+    ApiTimeoutError,
     Error,
     InvalidTitleError,
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
     SectionError,
-    TimeoutError,
     UnknownExtensionError,
 )
 from pywikibot.tools import suppress_warnings
@@ -523,7 +523,7 @@ class TestPageObject(DefaultSiteTestCase):
         for p in mainpage.backlinks(follow_redirects=False, total=10):
             self.assertIsInstance(p, pywikibot.Page)
 
-        with skipping(TimeoutError):
+        with skipping(ApiTimeoutError):
             for p in mainpage.embeddedin(total=10):
                 self.assertIsInstance(p, pywikibot.Page)
 

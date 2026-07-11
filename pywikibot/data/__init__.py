@@ -44,7 +44,7 @@ class WaitingMixin:
             self.current_retries += 1
 
         if self.current_retries > self.max_retries:
-            raise pywikibot.exceptions.TimeoutError(
+            raise pywikibot.exceptions.ApiTimeoutError(
                 'Maximum retries attempted without success.')
 
         # double the next wait, but do not exceed config.retry_max seconds

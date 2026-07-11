@@ -106,6 +106,7 @@ _deprecated_variables = {
     'absolute_import': '10.0.0 ',
     'division': '10.0.0',
     'unicode_literals': '10.0.0',
+    'textfile_encoding': '11.5.0',
 }
 
 # ############# ACCOUNT SETTINGS ##############
@@ -497,12 +498,6 @@ console_encoding = getattr(sys.stdout, 'encoding', None)
 
 transliteration_target: str | None = None
 
-# The encoding in which textfiles are stored, which contain lists of page
-# titles. The most used is 'utf-8'; 'utf-8-sig' recognizes BOM.
-# For a complete list please see:
-# https://docs.python.org/3/library/codecs.html#standard-encodings
-textfile_encoding = 'utf-8'
-
 # currently terminal and buffer are the only supported userinterfaces
 userinterface = 'terminal'
 
@@ -789,9 +784,6 @@ socket_timeout = (6.05, 45)
 # ############# COSMETIC CHANGES SETTINGS ##############
 # The bot can make some additional changes to each page it edits, e.g. fix
 # whitespace or positioning of category links.
-
-# This is an experimental feature; handle with care and consider re-checking
-# each bot edit if enabling this!
 cosmetic_changes = False
 
 # If cosmetic changes are switched on, and you also have several accounts at
@@ -870,7 +862,7 @@ max_queue_size = 64
 pickle_protocol = 5
 
 # 7-zip executable setting
-# The default for 7-zip executable is '7za' but my also be '7Z'. If The
+# The default for 7-zip executable is '7za' but may also be '7Z'. If the
 # executable is not included in the local PATH environment variable the
 # relative or absolute path can also be given with this cmd line setting
 # like:

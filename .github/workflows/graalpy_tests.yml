@@ -51,6 +51,12 @@ jobs:
           pip install "pytest >= 9.0.3"
           pip install pytest-attrib
           pip install coverage
+          # Workaround for known GraalPy compatibility issues (SSL + charset detection)
+          pip install "charset_normalizer<=3.4.5"
+          pip install "urllib3<2.7"
+      - name: Install setuptools
+        if: matrix.python-version == 'graalpy-25.0'
+        run: pip install setuptools
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
@@ -59,6 +65,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 25
         env:
+          PYTHONWARNINGS: ignore:urllib3 v2 only supports OpenSSL
           PYTHONIOENCODING: utf-8
           PYWIKIBOT_TEST_NO_RC: 1
         run: |

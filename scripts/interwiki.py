@@ -100,7 +100,7 @@ These arguments control miscellaneous bot behaviour:
                    saving the pages was successful.
 
 -summary:       [str] Set an additional action summary message for the
-                edit. This could be used for further explainings of the
+                edit. This could be used for further explanations of the
                 bot action. This will only be used in non-autonomous
                 mode.
 
@@ -239,6 +239,13 @@ links:
                 treating them as correct. You can also specify a list of
                 site codes, separated by commas.
 
+-onlylink:      Used as ``-onlylink:xx`` where xx is a site code, restrict
+                processing to only the specified site code(s). All other
+                interwiki links are ignored and not modified. You can specify
+                a list of site codes, separated by commas.
+
+                .. version-added:: 11.5
+
 -ignore:        Used as -ignore:xx:aaa where xx is a language code, and
                 aaa is a page title to be ignored.
 
@@ -257,7 +264,7 @@ links:
                 interactively, via the -askhint command line option, are
                 only effective once they have been entered, thus
                 interwiki links on the starting page are followed
-                regardess of hints given when prompted.
+                regardless of hints given when prompted.
 
                 .. caution:: Should be used with care!
 
@@ -343,6 +350,8 @@ To run the script on all pages on a language, run it with option
 .. version-changed:: 11.3
    The ``-new`` option was removed in favour of pagegenerators
    ``-newpages``.
+.. version-changed:: 11.5
+   Wildcards (``'*'``) in :mod:`config.usernames<config>` are now respected.
 """
 from __future__ import annotations
 
@@ -464,6 +473,7 @@ class InterwikiBotConfig:
     minsubjects = config.interwiki_min_subjects
     needlimit = 0
     neverlink = []
+    onlylink = []
     nobackonly = False
     parenthesesonly = False
     quiet = False
@@ -510,10 +520,9 @@ class InterwikiBotConfig:
         elif arg == 'hintfile':
             hintfilename = value or pywikibot.input(
                 'Please enter the hint filename:')
-            # hint or title ends either before | or before ]]
-            R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
-            txt = Path(hintfilename).read_text(config.textfile_encoding)
-            self.hints += R.findall(txt)
+            txt = Path(hintfilename).read_text('utf-8')
+            self.hints.extend(m['title']
+                              for m in pywikibot.link_regex.finditer(txt))
         elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True
@@ -538,12 +547,14 @@ class InterwikiBotConfig:
             self.skip.update(skip_page_gen)
         elif arg == 'neverlink':
             self.neverlink += value.split(',')
+        elif arg == 'onlylink':
+            self.onlylink += value.split(',')
         elif arg == 'ignore':
             self.ignore += [pywikibot.Page(pywikibot.Site(), p)
                             for p in value.split(',')]
         elif arg == 'ignorefile':
             ignore_page_gen = pagegenerators.TextIOPageGenerator(value)
-            self.ignore.update(ignore_page_gen)
+            self.ignore.extend(ignore_page_gen)
         elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
         elif arg == 'graph':
@@ -678,10 +689,14 @@ class Subject(interwiki_graph.Subject):
         self.site = pywikibot.Site()
 
     @staticmethod
-    def is_not_redirect(page):
-        """Check whether *page* is not a redirect page.
+    def is_not_redirect(page: pywikibot.Page) -> bool:
+        """Check whether *page* is neither a redirect nor a category redirect.
 
         .. version-added:: 11.0
+
+        :param page: The page to check.
+        :return: ``True`` if the page exists and is not a redirect,
+            otherwise ``False``.
         """
         return page.exists() and not (page.isRedirectPage()
                                       or page.isCategoryRedirect())
@@ -1003,8 +1018,14 @@ class Subject(interwiki_graph.Subject):
 
     def isIgnored(self, page) -> bool:
         """Return True if pages is to be ignored."""
-        if page.site.code in self.conf.neverlink:
+        code = page.site.code
+
+        if code in self.conf.neverlink:
             pywikibot.info(f'Skipping link {page} to an ignored language')
+            return True
+
+        if self.conf.onlylink and code not in self.conf.onlylink:
+            pywikibot.info(f'Skipping link {page} to a non-selected language')
             return True
 
         if page in self.conf.ignore:
@@ -1212,8 +1233,8 @@ class Subject(interwiki_graph.Subject):
                         f.write(
                             f' [{config.interwiki_graph_url}{filename} graph]')
                     f.write('\n')
-            # FIXME: What errors are we catching here?
-            except Exception:
+            # Catch file operation failures while writing autonomous dump.
+            except OSError:
                 pywikibot.info(
                     'File autonomous_problems.dat open or corrupted! '
                     'Try again with -restore.')
@@ -1223,10 +1244,16 @@ class Subject(interwiki_graph.Subject):
         for link in iw:
             linkedPage = pywikibot.Page(link)
 
-            if linkedPage.site.code in self.conf.neverlink:
-                pywikibot.info(f'NOTE: {self.origin}: {page} has interwiki '
-                               f'link to {linkedPage} in neverlink site code,'
-                               ' preserving without following')
+            code = linkedPage.site.code
+            msg = (f'NOTE: {self.origin}: {page} has interwiki link to '
+                   f'{linkedPage} {{}}; preserving without following')
+
+            if code in self.conf.neverlink:
+                pywikibot.info(msg.format('in neverlink site codes'))
+                continue
+
+            if self.conf.onlylink and code not in self.conf.onlylink:
+                pywikibot.info(msg.format('outside the selected site codes'))
                 continue
 
             if self.conf.hintsareright and linkedPage.site in self.hintedsites:
@@ -1489,8 +1516,9 @@ class Subject(interwiki_graph.Subject):
                or (not frgnSiteDone and site != lclSite and site in new):
                 if site == lclSite:
                     lclSiteDone = True   # even if we fail the update
-                if (site.family.name in config.usernames
-                        and site.code in config.usernames[site.family.name]):
+
+                codes = config.usernames.get(site.family.name, {})
+                if codes and site.code in codes or '*' in codes:
                     try:
                         if self.replaceLinks(new[site], new):
                             updated.append(site)
@@ -1536,9 +1564,9 @@ class Subject(interwiki_graph.Subject):
                 )
                 continue
 
-            # Check if a username is configured for this site
+            # Check if a username or wildcard is configured for this site
             codes = config.usernames.get(site.family.name, [])
-            if site.code not in codes:
+            if site.code not in codes and '*' not in codes:
                 pywikibot.warning(
                     f'username for {site} is not given in your user-config.py'
                 )
@@ -1639,12 +1667,19 @@ class Subject(interwiki_graph.Subject):
         # Put interwiki links into a map
         old = {p.site: p for p in interwikis}
 
-        # Preserve existing interwiki links to neverlink site codes
+        # Preserve interwiki links to neverlink or outside onlylink codes
         for site, oldpage in old.items():
-            if site.code in self.conf.neverlink and site not in new:
+            if site in new:
+                continue
+
+            never = site.code in self.conf.neverlink
+            only = self.conf.onlylink and site.code not in self.conf.onlylink
+
+            if never or only:
+                reason = 'in neverlink' if never else 'outside onlylink'
                 new[site] = oldpage
                 pywikibot.info(f'Preserving link to {oldpage} '
-                               f'(site code {site.code} is in neverlink list)')
+                               f'(site code {site.code} is {reason} list)')
 
         # Check what needs to get done
         mods, mcomment, adding, removing, modifying = compareLanguages(
@@ -2229,7 +2264,7 @@ class InterwikiDumps(OptionHandler):
 
     def get_files(self):
         """Get dump files from directory."""
-        pattern = r'(?P<file>(?P<fam>[a-z]+)-(?P<code>[a-z]+)\.txt)'
+        pattern = r'(?P<file>(?P<fam>[a-z]+)-(?P<code>[a-z-]+)\.txt)'
         for filename in os.listdir(self.path):
             found = re.fullmatch(pattern, filename)
             if found:

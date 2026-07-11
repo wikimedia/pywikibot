@@ -77,7 +77,7 @@ class APIGeneratorBase(ABC):
         return getattr(self, '_filter_func', type(self)._filter_func)
 
     @filter_func.setter
-    def filter_func(self, func: Callable[[Any], bool] | None):
+    def filter_func(self, func: Callable[[Any], bool] | None) -> None:
         """Set a filter function to apply to items before yielding.
 
         .. version-added:: 10.4

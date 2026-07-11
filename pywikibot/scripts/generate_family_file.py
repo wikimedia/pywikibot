@@ -98,7 +98,7 @@ class FamilyFileGenerator:
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
     @staticmethod
-    def show(*args, **kwargs):
+    def show(*args, **kwargs) -> None:
         """Wrapper around print to be mocked in tests."""
         print(*args, **kwargs)  # pragma: no cover
 

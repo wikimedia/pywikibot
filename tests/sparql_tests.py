@@ -21,7 +21,7 @@ from tests.utils import skipping
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
-SQL_RESPONSE_CONTAINER = """
+SPARQL_RESPONSE_CONTAINER = """
 {
   "head" : {
     "vars" : [ "cat", "d", "catLabel" ]
@@ -108,8 +108,8 @@ class TestSparql(WikidataTestCase):
     def testQuerySelect(self, mock_method) -> None:
         """Test SELECT query."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
-        with skipping(pywikibot.exceptions.TimeoutError):
+            SPARQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
+        with skipping(pywikibot.exceptions.ApiTimeoutError):
             q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -130,8 +130,8 @@ class TestSparql(WikidataTestCase):
     def testQuerySelectFull(self, mock_method) -> None:
         """Test SELECT query with full data."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
-        with skipping(pywikibot.exceptions.TimeoutError):
+            SPARQL_RESPONSE_CONTAINER % f'{ITEM_Q498787}, {ITEM_Q677525}')
+        with skipping(pywikibot.exceptions.ApiTimeoutError):
             q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -159,10 +159,10 @@ class TestSparql(WikidataTestCase):
     def testGetItems(self, mock_method) -> None:
         """Test item list retrieval via SPARQL."""
         mock_method.return_value = Container(
-            SQL_RESPONSE_CONTAINER % (f'{ITEM_Q498787}, {ITEM_Q677525}, '
-                                      f'{ITEM_Q677525}')
+            SPARQL_RESPONSE_CONTAINER % (f'{ITEM_Q498787}, {ITEM_Q677525}, '
+                                         f'{ITEM_Q677525}')
         )
-        with skipping(pywikibot.exceptions.TimeoutError):
+        with skipping(pywikibot.exceptions.ApiTimeoutError):
             q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
         self.assertEqual(res, {'Q498787', 'Q677525'})
@@ -174,7 +174,7 @@ class TestSparql(WikidataTestCase):
     def testQueryAsk(self, mock_method) -> None:
         """Test ASK query."""
         mock_method.return_value = Container(RESPONSE_TRUE)
-        with skipping(pywikibot.exceptions.TimeoutError):
+        with skipping(pywikibot.exceptions.ApiTimeoutError):
             q = sparql.SparqlQuery()
 
         res = q.ask('ASK { ?x ?y ?z }')
