@@ -731,10 +731,14 @@ def redirect_func(target, *,
         target_module = target.__module__
     if target_module and target_module[-1] != '.':
         target_module += '.'
+
     if source_module == '.':
         source_module = target_module
     elif source_module and source_module[-1] != '.':
         source_module += '.'
+    elif PYTHON_VERSION >= (3, 12):
+        source_module = sys._getframemodulename(  # type: ignore[attr-defined]
+            1) + '.'
     else:
         source_module = sys._getframe(1).f_globals['__name__'] + '.'
     if class_name:
