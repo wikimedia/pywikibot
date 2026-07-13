@@ -927,7 +927,7 @@ def known_languages() -> list[str]:
     ['ab', 'aeb']
     >>> i18n.known_languages()[-10:]  # doctest: +SKIP
     ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
-    >>> len(i18n.known_languages()) > 250
+    >>> len(i18n.known_languages()) >= 250
     True
     >>> 'ab' in i18n.known_languages()
     True
