@@ -38,7 +38,7 @@ except ModuleNotFoundError:
 EXCLUDE_PATTERN = re.compile(
     r'(?:'
     r'(__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|'
-    r'exceptions|fixes|logging|plural|time|titletranslate)|'
+    r'exceptions|fixes|logging|login|plural|time|titletranslate)|'
     r'(comms|data|families|specialbots)/__init__|'
     r'comms/eventstreams|'
     r'data/(api/(__init__|_generators|_optionset)|citoid|memento|wikistats)|'

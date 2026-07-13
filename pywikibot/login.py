@@ -14,7 +14,7 @@ from ast import literal_eval
 from enum import IntEnum
 from pathlib import Path
 from textwrap import fill
-from typing import Any
+from typing import Any, cast
 from warnings import warn
 
 import pywikibot
@@ -98,7 +98,8 @@ class LoginManager:
         :raises pywikibot.exceptions.NoUsernameError: No username is
             configured for the requested site.
         """
-        site = self.site = site or pywikibot.Site()
+        site = cast(pywikibot.site.APISite, site or pywikibot.Site())
+
         if not user:
             config_names = config.usernames
 
@@ -114,8 +115,11 @@ class LoginManager:
                     f"usernames['{site.family.name}']['{site.code}'] ="
                     " 'myUsername'"
                 )
+
         self.password = password
         self.login_name = self.username = user
+        self.site = site
+
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
@@ -371,6 +375,8 @@ class ClientLoginManager(LoginManager):
        - https://www.mediawiki.org/wiki/Extension:EmailAuth
     """
 
+    _waituntil: datetime.datetime
+
     # API login parameters mapping
     mapping = {
         'user': ('lgname', 'username'),
@@ -387,18 +393,14 @@ class ClientLoginManager(LoginManager):
         """Get API keyword from mapping."""
         return self.mapping[key][self.action != 'login']
 
-    def _login_parameters(self, *, botpassword: bool = False
-                          ) -> dict[str, str]:
+    def _login_parameters(self, user: str, password: str) -> dict[str, str]:
         """Return login parameters."""
-        if botpassword:
-            self.action = 'login'
-        else:
-            self.action = 'clientlogin'
-
+        botpassword = '@' in user or '@' in password
+        self.action = 'login' if botpassword else 'clientlogin'
         # prepare default login parameters
         parameters = {'action': self.action,
-                      self.keyword('user'): self.login_name,
-                      self.keyword('password'): self.password}
+                      self.keyword('user'): user,
+                      self.keyword('password'): password}
 
         if self.action == 'login':
             parameters['lgtoken'] = self.site.tokens['login']
@@ -424,9 +426,12 @@ class ClientLoginManager(LoginManager):
            2FA login was implemented.
         .. version-changed:: 10.2
            Secondary authentication via email was implemented.
+        .. version-changed:: 11.6
+           Raise RuntimeError if login name  or password were not set.
 
         :raises RuntimeError: Unexpected API login response key or
-            unexpected API login requests response
+            unexpected API login requests response, or login name  or
+            password were not set.
         :raises APIError: API login error
         """
         if hasattr(self, '_waituntil') \
@@ -438,12 +443,14 @@ class ClientLoginManager(LoginManager):
 
         self.site._loginstatus = LoginStatus.IN_PROGRESS
 
+        if self.login_name is None or self.password is None:
+            raise RuntimeError("'login_name' or 'password' were not set")
+
         # Bot passwords username contains @,
         # otherwise @ is not allowed in usernames.
         # @ in bot password is deprecated,
         # but we don't want to break bots using it.
-        parameters = self._login_parameters(
-            botpassword='@' in self.login_name or '@' in self.password)
+        parameters = self._login_parameters(self.login_name, self.password)
 
         # base login request
         login_request = self.site._request(use_get=False,
