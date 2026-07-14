@@ -20,9 +20,11 @@ from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import Any, NoReturn
 from urllib.parse import unquote, urlencode
 from warnings import warn
+
+import requests
 
 import pywikibot
 from pywikibot import config
@@ -41,9 +43,6 @@ from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import deprecated
 
-
-if TYPE_CHECKING:
-    import requests
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
@@ -773,27 +772,27 @@ class Request(MutableMapping, WaitingMixin):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, response) -> dict | None:
+    def _json_loads(self, response: requests.Response) -> dict | None:
         """Return a dict from requests.Response.
 
         .. version-changed:: 8.2
            show a warning to add a :meth:`protocol()
            <family.Family.protocol>` method to the family file if suitable.
-        .. version-changed:: 11.0
+        .. version-removed:: 11.0
            The warning about missing or wrong ``protocol()`` method
            introduced in version 8.2 was removed.
 
         :param response: a requests.Response object
-        :type response: requests.Response
         :return: a data dict
-        :raises pywikibot.exceptions.APIError: unknown action found
-        :raises pywikibot.exceptions.APIError: unknown query result type
+        :raises SiteDefinitionError: Invalid :class:`family.AutoFamily`
+        :raises pywikibot.exceptions.APIError: unknown action found or
+            unknown query result type
 
         :meta public:
         """
         try:
             result = response.json()
-        except ValueError:
+        except requests.exceptions.JSONDecodeError:
             # if the result isn't valid JSON, there may be a server problem.
             # Wait a few seconds and try again.
             # Show 20 lines of bare text without script parts
