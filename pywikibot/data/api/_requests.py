@@ -28,6 +28,7 @@ import requests
 
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import sentinel
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -147,7 +148,7 @@ class Request(MutableMapping, WaitingMixin):
     """
 
     # To make sure the default value of 'parameters' can be identified.
-    _PARAM_DEFAULT = object()
+    PARAM_DEFAULT = sentinel('PARAM_DEFAULT')
 
     def __init__(self, site=None,
                  mime: dict | None = None,
@@ -155,7 +156,7 @@ class Request(MutableMapping, WaitingMixin):
                  max_retries: int | None = None,
                  retry_wait: int | None = None,
                  use_get: bool | None = None,
-                 parameters=_PARAM_DEFAULT,
+                 parameters: dict[str, Any] | sentinel = PARAM_DEFAULT,
                  **kwargs) -> None:
         """Create a new Request instance with the given parameters.
 
@@ -225,7 +226,7 @@ class Request(MutableMapping, WaitingMixin):
         # it MUST have at least an action parameter for the request which would
         # be in kwargs if it's using the old mode.
         if kwargs:
-            if parameters is not self._PARAM_DEFAULT:
+            if parameters is not self.PARAM_DEFAULT:
                 # 'parameters' AND kwargs is set. In that case think of
                 # 'parameters' being an old kwarg which is now filled in an
                 # actual parameter
@@ -234,7 +235,7 @@ class Request(MutableMapping, WaitingMixin):
             # When parameters wasn't set it's likely that kwargs-mode was used
             self._warn_kwargs()
             parameters = kwargs
-        elif parameters is self._PARAM_DEFAULT:
+        elif parameters is self.PARAM_DEFAULT:
             parameters = {}
         self._params: dict[str, Any] = {}
         if 'action' not in parameters:
