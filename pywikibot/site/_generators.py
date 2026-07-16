@@ -28,11 +28,18 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
-from pywikibot.tools import deprecate_arg, deprecated_signature, is_ip_address
+from pywikibot.tools import (
+    deprecate_arg,
+    deprecated_args,
+    deprecated_signature,
+    is_ip_address,
+)
 from pywikibot.tools.itertools import filter_unique
 
 
 if typing.TYPE_CHECKING:
+    from datetime import datetime
+
     from pywikibot.data.api import ParamInfo, Request
     from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
     from pywikibot.site._tokenwallet import TokenWallet
@@ -1630,17 +1637,21 @@ class GeneratorsMixin:
                                total=total, g_content=content,
                                parameters=parameters)
 
+    @deprecated_args(top_only='top')  # since 11.6.0
     def usercontribs(
         self,
         user: str | None = None,
         userprefix: str | None = None,
-        start=None,
-        end=None,
+        start: pywikibot.time.Timestamp | datetime | str | None = None,
+        end: pywikibot.time.Timestamp | datetime | str | None = None,
         reverse: bool = False,
         namespaces: NamespaceArgType = None,
         minor: bool | None = None,
         total: int | None = None,
-        top_only: bool = False,
+        top: bool | None = None,
+        *,
+        prop: Iterable[str] | str | None = None,
+        formatversion: int = 1
     ) -> Iterable[dict[str, Any]]:
         """Iterate contributions by a particular user.
 
@@ -1650,20 +1661,36 @@ class GeneratorsMixin:
            - :api:`Usercontribs`
            - :meth:`pywikibot.User.contributions`
 
+        .. version-changed:: 3.0.20200609
+           The *showMinor* parameter was renamed to *minor*.
+        .. version-changed:: 11.6
+           The *prop* and *formatversion* parameter were added. The
+           *top_only* was renamed to *top*. This parameter now accepts
+           ``None`` to iterate both latest and non-latest contributions.
+           ``False`` now iterates only non-latest contributions. Default
+           is ``None``. The ``size`` property is included by default.
+
         :param user: Iterate contributions by this user (name or IP)
-        :param userprefix: Iterate contributions by all users whose names
-            or IPs start with this substring
+        :param userprefix: Iterate contributions by all users whose
+            names or IPs start with this substring
         :param start: Iterate contributions starting at this Timestamp
         :param end: Iterate contributions ending at this Timestamp
-        :param reverse: Iterate oldest contributions first (default: newest)
+        :param reverse: Iterate oldest contributions first (default:
+            newest)
         :param namespaces: Only iterate pages in these namespaces
-        :param minor: If True, iterate only minor edits; if False and
-            not None, iterate only non-minor edits (default: iterate both)
+        :param minor: If ``True``, iterate only minor edits; if ``False``
+            and not ``None``, iterate only non-minor edits (default:
+            iterate both)
         :param total: Limit result to this number of pages
-        :param top_only: If True, iterate only edits which are the latest
-            revision (default: False)
-        :raises pywikibot.exceptions.Error: either user or userprefix must be
-            non-empty
+        :param top: if ``True``, iterate only edits which are the latest
+            revision; if ``False``, do not iterate last revision edits;
+            ``None`` to iterate both (default: ``None``)
+        :param prop: Include additional pieces of information. Refer
+            :api:`Usercontribs` for the elements and the default setting.
+        :param formatversion: The API format version to use for the
+            response. (``1`` by deault)
+        :raises pywikibot.exceptions.Error: either user or userprefix
+            must be non-empty
         :raises KeyError: A namespace identifier was not resolved
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -1675,22 +1702,25 @@ class GeneratorsMixin:
         if start and end:
             self.assert_valid_iter_params('usercontribs', start, end, reverse)
 
-        ucgen = self._generator(api.ListGenerator, type_arg='usercontribs',
-                                ucprop='ids|title|timestamp|comment|flags',
-                                namespaces=namespaces,
-                                total=total, uctoponly=top_only)
+        ucgen = self._generator(
+            api.ListGenerator,
+            type_arg='usercontribs',
+            namespaces=namespaces,
+            total=total,
+            ucprop=prop,
+            ucstart=start,
+            ucend=end,
+            formatversion=formatversion
+        )
         if user:
             ucgen.request['ucuser'] = user
         if userprefix:
             ucgen.request['ucuserprefix'] = userprefix
-        if start is not None:
-            ucgen.request['ucstart'] = str(start)
-        if end is not None:
-            ucgen.request['ucend'] = str(end)
         if reverse:
             ucgen.request['ucdir'] = 'newer'
         option_set = api.OptionSet(self, 'usercontribs', 'show')
         option_set['minor'] = minor
+        option_set['top'] = top
         ucgen.request['ucshow'] = option_set
         return ucgen
 

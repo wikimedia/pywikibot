@@ -57,9 +57,10 @@ the framework::
           +-- ApiTimeoutError
           |    +-- MaxlagTimeoutError
           +-- TranslationError
+          +-- UnexpectedAPIDataError (ValueError)
+          +-- UnknownExtensionError (NotImplementedError)
           +-- UserRightsError
           |    +-- HiddenKeyError (KeyError)
-          +-- UnknownExtensionError (NotImplementedError)
           +-- VersionParseError
           +-- WikiBaseError
                +-- CoordinateGlobeUnknownError (NotImplementedError)
@@ -84,6 +85,7 @@ Error: Base class, all exceptions should the subclass of this class.
   - SectionError: The section specified by # does not exist
   - TranslationError: no language translation found, i18n/l10n message
     not available
+  - UnexpectedAPIDataError: API data contains unexpected fields or values
   - UnknownExtensionError: Extension is not defined for this site
   - UserRightsError: insufficient rights for requested action
   - VersionParseError: failed to parse version information
@@ -177,6 +179,9 @@ UserWarning: warnings targeted at users
 .. version-changed:: 8.1
    ``Server414Error`` class is deprecated; use :class:`Client414Error`
    instead.
+
+.. version-changed:: 11.6
+   :exc:`UnexpectedAPIDataError` was added.
 """
 from __future__ import annotations
 
@@ -448,6 +453,14 @@ class UnknownSiteError(SiteDefinitionError):
 class UnknownFamilyError(SiteDefinitionError):
 
     """Family is not registered."""
+
+
+class UnexpectedAPIDataError(Error, ValueError):
+
+    """Raised when API data contains unexpected fields or values.
+
+    .. version-added:: 11.6
+    """
 
 
 class UnknownExtensionError(Error, NotImplementedError):
