@@ -123,7 +123,7 @@ class SetupBase(abc.ABC):
     def _check_module(module: str, module_type: int) -> bool:
         """Return whether a module or CLI command is available.
 
-        .. version-added: 11.5
+        .. version-added:: 11.5
 
         :param module: Module or command name.
         :param module_type: Type of module, either MODULE or COMMAND.
