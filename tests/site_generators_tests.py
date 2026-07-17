@@ -529,12 +529,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # starttime earlier than endtime
         with self.subTest(starttime=low, endtime=high, reverse=False), \
-                self.assertRaises(AssertionError):
+                self.assertRaises(ValueError):
             mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
         with self.subTest(starttime=high, endtime=low, reverse=True), \
-                self.assertRaises(AssertionError):
+                self.assertRaises(ValueError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
     def test_exturlusage(self) -> None:
@@ -623,22 +623,22 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # reverse=False, is_ts=False
         self.assertIsNone(func('m', 1, 2, False, False))
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             func('m', 2, 1, False, False)
 
         # reverse=False, is_ts=True
         self.assertIsNone(func('m', 2, 1, False, True))
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             func('m', 1, 2, False, True)
 
         # reverse=True, is_ts=False
         self.assertIsNone(func('m', 2, 1, True, False))
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             func('m', 1, 2, True, False)
 
         # reverse=True, is_ts=True
         self.assertIsNone(func('m', 1, 2, True, True))
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             func('m', 2, 1, True, True)
 
 
@@ -871,13 +871,13 @@ class TestLogEvents(DefaultSiteTestCase):
                 '2008-02-03T00:00:01Z' <= str(entry.timestamp())
                 <= '2008-02-03T23:59:59Z')
         # starttime earlier than endtime
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.logevents(start=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T00:00:01Z'),
                              end=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T23:59:59Z'), total=5)
         # reverse: endtime earlier than starttime
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.logevents(start=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T23:59:59Z'),
                              end=pywikibot.Timestamp.fromISOformat(
@@ -943,11 +943,11 @@ class TestRecentChanges(DefaultSiteTestCase):
                 '2008-10-05T06:00:01Z' <= change['timestamp']
                 <= '2008-10-05T23:59:59Z')
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.recentchanges(start='2008-02-03T00:00:01Z',
                                  end='2008-02-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat(
                                  '2008-02-03T23:59:59Z'),
                                  end=pywikibot.Timestamp.fromISOformat(
@@ -1278,12 +1278,12 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         """Test the site.usercontribs() method with invalid parameters."""
         mysite = self.get_site()
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.usercontribs(userprefix='Jim',
                                 start='2008-10-03T00:00:01Z',
                                 end='2008-10-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.usercontribs(userprefix='Jim',
                                 start='2008-10-03T23:59:59Z',
                                 end='2008-10-03T00:00:01Z',

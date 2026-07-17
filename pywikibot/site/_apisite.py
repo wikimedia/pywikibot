@@ -915,44 +915,57 @@ class APISite(
         return f'[{pattern}]*'
 
     @staticmethod
+    @deprecated_signature(since='11.7.0')
     def assert_valid_iter_params(
         msg_prefix: str,
+        /,
         start: datetime.datetime | int | str,
         end: datetime.datetime | int | str,
         reverse: bool,
+        *,
         is_ts: bool = True
     ) -> None:
         """Validate iterating API parameters.
+
+        .. version-changed:: 11.7
+           *msg_prefix* is now positional-only and *is_ts* is now
+           keyword-only. If *start* and *end* are ``datetime`` objects,
+           *is_ts* is always treated as ``True``. A ``ValueError`` is
+           raised instead of ``AssertionError`` when *start* and *end*
+           are in wrong order.
 
         :param msg_prefix: The calling method name
         :param start: The start value to compare
         :param end: The end value to compare
         :param reverse: The reverse option
-        :param is_ts: When comparing timestamps (with is_ts=True) the
-            start is usually greater than end. Comparing titles this is
-            vice versa.
-        :raises AssertionError: Start/end values are not comparable
-            types or are in the wrong order
+        :param is_ts: When comparing timestamps (with :code:`is_ts=True`)
+            the start is usually greater than end. Comparing titles this
+            is vice versa.
+        :raises TypeError: The *start* and *end* values are not
+            comparable types.
+        :raises ValueError: The *start* and *end* values are in the wrong
+            order.
         """
         if not (isinstance(end, type(start)) or isinstance(start, type(end))):
             raise TypeError(
                 f'start ({start!r}) and end ({end!r}) must be comparable')
+
+        if isinstance(start, datetime.datetime):
+            is_ts = True
+
         if reverse ^ is_ts:
             low, high = end, start
             order = 'follow'
         else:
             low, high = start, end
             order = 'precede'
-        msg = ('{method}: "start" must {order} "end" '
-               'with reverse={reverse} and is_ts={is_ts} '
-               'but "start" is "{start}" and "end" is "{end}".')
-        assert low < high, fill(msg.format(  # type: ignore[operator]
-            method=msg_prefix,
-            order=order,
-            start=start,
-            end=end,
-            reverse=reverse,
-            is_ts=is_ts))
+
+        if low >= high:  # type: ignore[operator]
+            msg = fill(
+                f"{msg_prefix}: 'start' must {order} 'end' with {reverse=} "
+                f"and {is_ts=} but 'start' is '{start}' and 'end' is '{end}'."
+            )
+            raise ValueError(msg)
 
     def has_right(self, right: str) -> bool:
         """Return true if and only if the user has a specific right.
