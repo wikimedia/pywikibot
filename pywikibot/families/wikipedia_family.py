@@ -27,6 +27,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'dk', 'mo', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
     ]
 
+    # Do not update this list by hand.
+    # Run the addwikis maintenance script to update it.
     codes = {
         'ab', 'ace', 'ady', 'af', 'als', 'alt', 'am', 'ami', 'an', 'ang',
         'ann', 'anp', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj', 'av',
