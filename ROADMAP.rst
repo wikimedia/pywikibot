@@ -1,7 +1,10 @@
 Release 11.6
 ============
 
-* (no changes yet)
+* Provide :class:`backports.sentinel` implementation backported from Python 3.15
+* Update translations (i18n)
+* Fix :meth:`WikiStats.get()<data.wikistats.WikiStats.get>` to propagate HTTP fetch exceptions
+  instead of raising `AttributeError`.
 
 
 Deprecations
