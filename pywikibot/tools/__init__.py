@@ -884,9 +884,9 @@ def compute_file_hash(filename: str | os.PathLike,
     Result is expressed as hexdigest().
 
     .. version-added:: 3.0
-     .. version-changed:: 8.2
-         The *sha* parameter may also be a hash constructor, or a callable
-         that returns a hash object.
+    .. version-changed:: 8.2
+       The *sha* parameter may also be a hash constructor, or a callable
+       that returns a hash object.
 
 
     :param filename: Filename path

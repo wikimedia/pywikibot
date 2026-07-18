@@ -77,7 +77,6 @@ the framework::
 Error: Base class, all exceptions should the subclass of this class.
 
   - CaptchaError: Captcha is asked and config.solve_captcha == False
-  - ClientError: A problem with the client request
   - AutoblockUserError: requested action on a virtual autoblock user not valid
   - InvalidTitleError: Invalid page title
   - NoUsernameError: Username is not in user config file, or it is invalid.
@@ -134,8 +133,11 @@ PageSaveRelatedError: page exceptions within the save operation on a Page
 ServerError: a problem with the server.
 
   - FatalServerError: A fatal/non-recoverable server error
-  - Server414Error: Server timed out with HTTP 414 code
   - Server504Error: Server timed out with HTTP 504 code
+
+ClientError: A problem with the client request
+
+  - Client414Error: HTTP 414 code - URI too long
 
 WikiBaseError: any issue specific to Wikibase.
 

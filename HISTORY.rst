@@ -5,7 +5,7 @@ Release History
 ------
 *11 July 2026*
 
-* Dreprecate ``cross_projects`` :mod:`family.Family` settings (:phab:`T431178`)
+* Deprecate ``cross_projects`` :mod:`family.Family` settings (:phab:`T431178`)
 * Deprecate :func:`family.Family.post_get_convert` and
   :func:`family.Family.pre_put_convert` functions (:phab:`T431188`)
 * Update :mod:`families.wikiquote_family`

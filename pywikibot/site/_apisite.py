@@ -1113,14 +1113,14 @@ class APISite(
     ) -> str:
         """Parse the given text for preprocessing and rendering.
 
-        e.g expand templates and strip comments if includecomments
-        parameter is not True. Keeps text inside <nowiki></nowiki> tags
-        unchanges etc. Can be used to parse magic parser words like
+        Expand templates and strip comments if *includecomments*
+        parameter is not ``True``. Keeps text inside ``<nowiki></nowiki>``
+        tags unchanged. Can be used to parse magic parser words like
         {{CURRENTTIMESTAMP}}.
 
         :param text: Text to be expanded
         :param title: Page title without section
-        :param includecomments: If True do not strip comments
+        :param includecomments: If ``True`` do not strip comments
         """
         if not isinstance(text, str):
             raise ValueError('text must be a string')

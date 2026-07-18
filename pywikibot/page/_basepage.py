@@ -1437,7 +1437,7 @@ class BasePage(ComparableMixin):
         """Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
-        For new code, using :meth:`save` is preferred; also ee that
+        For new code, using :meth:`save` is preferred; also see that
         method docs for all parameters not listed here.
 
         .. version-added:: 7.0
