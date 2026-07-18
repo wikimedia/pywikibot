@@ -63,6 +63,7 @@ from functools import partial
 from http import HTTPStatus
 from pathlib import Path
 from textwrap import shorten
+from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
@@ -562,7 +563,8 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # for each link to change
         for match in linksInRef.finditer(raw_text):
             link = match['url']
-            if 'jstor.org' in link:
+            hostname = urlparse(link).hostname or ''
+            if hostname == 'jstor.org' or hostname.endswith('.jstor.org'):
                 # TODO: Clean URL blacklist
                 continue
 

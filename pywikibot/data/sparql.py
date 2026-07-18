@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from textwrap import fill
 from typing import Any, cast
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 from requests import JSONDecodeError, Response
 from requests.exceptions import Timeout
@@ -170,7 +170,7 @@ class SparqlQuery(WaitingMixin):
             # not in case the response otherwise might have it in between
             strcontent = self.last_response.content.decode()
             if (strcontent.startswith('<!DOCTYPE html>')
-                and 'https://commons-query.wikimedia.org' in url
+                and urlparse(url).hostname == 'commons-query.wikimedia.org'
                 and ('Special:UserLogin' in strcontent
                      or 'Special:OAuth' in strcontent)):
                 raise NoUsernameError(fill(
