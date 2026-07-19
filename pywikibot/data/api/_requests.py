@@ -70,13 +70,15 @@ WRITE_ACTIONS = {
     'strikevote', 'tag', 'thank', 'threadaction', 'transcodereset',
     'translationreview', 'unblock', 'undelete', 'unlinkaccount', 'upload',
     'userrights', 'watch', 'wikilove',
+    # FlaggedRevs extension
+    'review',
     # wikibase actions, see https://www.mediawiki.org/wiki/Wikibase/API
     'wbcreateclaim', 'wbcreateredirect', 'wbeditentity', 'wblinktitles',
     'wbmergeitems', 'wbremoveclaims', 'wbremovequalifiers',
     'wbremovereferences', 'wbsetaliases', 'wbsetclaim', 'wbsetclaimvalue',
     'wbsetdescription', 'wbsetlabel', 'wbsetqualifier', 'wbsetreference',
     'wbsetsitelink',
-    # lexeme (internal) actions
+    # WikibaseLexeme (internal) actions
     'wbladdform', 'wbladdsense', 'wbleditformelements', 'wbleditsenseelements',
     'wblmergelexemes', 'wblremoveform', 'wblremovesense',
 }

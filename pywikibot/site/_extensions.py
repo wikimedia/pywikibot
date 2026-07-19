@@ -18,8 +18,9 @@ from pywikibot.exceptions import (
     InconsistentTitleError,
     NoPageError,
     SiteDefinitionError,
+    UnexpectedAPIDataError,
 )
-from pywikibot.site._decorators import need_extension
+from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import merge_unique_dicts
 
 
@@ -497,3 +498,65 @@ class FlaggedRevsMixin:
             return None
 
         return pages[0].get('flagged', {}).get('stable_revid')
+
+    @need_extension('FlaggedRevs')
+    @need_right('review')
+    def review_revision(
+        self,
+        revid: int,
+        *,
+        comment: str | None = None,
+        unapprove: bool = False,
+        flag: int | None = None,
+    ) -> None:
+        """Review a revision using the FlaggedRevs ``action=review`` API.
+
+        .. note::
+           Reviewing or unapproving a revision may change the stable
+           revision of the associated page. Cached
+           :attr:`BasePage.stable_revision_id
+           <page.BasePage.stable_revision_id>` values are not
+           invalidated automatically.
+
+        :param revid: Revision ID to review.
+        :param comment: Optional review comment.
+        :param unapprove: If True, the revision will be *unapproved*.
+        :param flag: Set the review flag value.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data for review
+            parameters or review result.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Unsupported *flag* parameter.
+        """
+        try:
+            review_params = self._paraminfo['review']['parameters']
+        except KeyError as e:
+            raise UnexpectedAPIDataError(
+                'Unexpected API data: no param info found') from e
+
+        names = {item['name'] for item in review_params}
+        flag_param = next((p for p in names if p.startswith('flag_')), None)
+
+        params = {
+            'action': 'review',
+            'token': self.tokens['csrf'],
+            'revid': revid,
+            'comment': comment,
+        }
+
+        if flag is not None:
+            if flag_param is None:
+                raise ValueError(
+                    "The 'flag' parameter is not supported by this wiki")
+            params[flag_param] = flag
+
+        if unapprove:
+            params['unapprove'] = '1'
+
+        request = self.simple_request(**params, formatversion=2)
+        data = request.submit()
+
+        if data.get('review', {}).get('result') != 'Success':
+            raise UnexpectedAPIDataError(
+                f'Unexpected review result:\n{data!r}')

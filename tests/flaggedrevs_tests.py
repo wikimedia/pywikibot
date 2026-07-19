@@ -11,9 +11,9 @@ from contextlib import suppress
 from unittest.mock import MagicMock, patch
 
 import pywikibot
-from pywikibot.exceptions import UnknownExtensionError
+from pywikibot.exceptions import APIError, UnknownExtensionError
 from pywikibot.page import Revision
-from tests.aspects import TestCase
+from tests.aspects import PatchingTestCase, TestCase
 
 
 class TestPageStableRevision(TestCase):
@@ -139,6 +139,143 @@ class TestPageStableRevision(TestCase):
 
             result = self.page.stable_revision
             self.assertEqual(result.revid, 999)
+
+
+class TestFlaggedRevsReview(PatchingTestCase):
+
+    """Test site.review() with flagged revisions."""
+
+    family = 'wikipedia'
+    code = 'fi'
+    dry = True
+
+    def setUp(self):
+        """Set up Test and patches."""
+        super().setUp()
+        self.token = '123ABC+\\'
+
+        self.mock_req = MagicMock()
+        self.patch(
+            pywikibot.site._apisite.APISite,
+            'simple_request',
+            self.mock_req,
+        )
+        self.submit = self.mock_req.return_value.submit
+
+        self.patch(
+            pywikibot.site._tokenwallet.TokenWallet,
+            '__getitem__',
+            lambda *_: self.token,
+        )
+
+        self.patch(
+            pywikibot.site._apisite.APISite,
+            'has_extension',
+            lambda *_: True,
+        )
+
+        self.patch(
+            pywikibot.site._apisite.APISite,
+            'has_right',
+            lambda *_: True,
+        )
+
+        self.patch(
+            self.site,
+            '_paraminfo',
+            {
+                'review': {
+                    'parameters': [
+                        {'name': 'comment'},
+                        {'name': 'flag_accuracy'},
+                    ]
+                }
+            },
+        )
+
+    def _mock_success(self, revid: int, **extra):
+        return {
+            'review': {
+                'revid': revid,
+                'result': 'Success',
+                **extra
+            }
+        }
+
+    def test_review_basic(self) -> None:
+        """Review a revision without any flags (simple approval)."""
+        revid = 12345
+        self.submit.return_value = self._mock_success(revid)
+        self.site.review_revision(revid=revid, comment='unit test')
+
+        self.mock_req.assert_called_once_with(
+            action='review',
+            token=self.token,
+            revid=revid,
+            comment='unit test',
+            formatversion=2,
+        )
+
+    def test_review_unapprove(self) -> None:
+        """Un-approve a previously approved revision."""
+        revid = 12347
+        self.submit.return_value = self._mock_success(revid)
+
+        self.site.review_revision(
+            revid=revid,
+            comment='unit test unapprove',
+            unapprove=True
+        )
+
+        self.mock_req.assert_called_once_with(
+            action='review',
+            token=self.token,
+            revid=revid,
+            comment='unit test unapprove',
+            unapprove='1',
+            formatversion=2,
+        )
+
+    def test_review_missing_token(self) -> None:
+        """Calling review() without a token raises ``notoken``."""
+        self.site.tokens.clear()
+        self.submit.side_effect = APIError(
+            code='notoken',
+            info='No CSRF token',
+            other={},
+        )
+
+        with self.assertRaises(APIError) as cm:
+            self.site.review_revision(revid=999)
+
+        self.assertEqual(cm.exception.code, 'notoken')
+
+    def test_review_insufficient_rights(self) -> None:
+        """User without ``review`` right gets ``permissiondenied``."""
+        self.submit.side_effect = APIError(
+            code='permissiondenied',
+            info="You don't have permission to review revisions.",
+            other={},
+        )
+
+        with self.assertRaises(APIError) as cm:
+            self.site.review_revision(revid=888)
+
+        self.assertEqual(cm.exception.code, 'permissiondenied')
+
+    def test_review_defaults(self) -> None:
+        """Calling review() with only revid and token is allowed."""
+        revid = 12348
+        self.submit.return_value = self._mock_success(revid)
+        self.site.review_revision(revid=revid)
+
+        self.mock_req.assert_called_once_with(
+            action='review',
+            token=self.token,
+            revid=revid,
+            comment=None,
+            formatversion=2,
+        )
 
 
 if __name__ == '__main__':
