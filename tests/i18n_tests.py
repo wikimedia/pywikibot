@@ -40,6 +40,7 @@ class TestFallbackDicts(TestCase):
     def test_groupnames(self):
         """Test that groupnames are in groups."""
         groupnames = set(i18n._LANG_TO_GROUP_NAME.values())
+        groupnames.discard('')  # might be created by defaultdict
         self.assertLess(groupnames, i18n._LANG_TO_GROUP_NAME.keys())
         groups = list(i18n._GROUP_NAME_TO_FALLBACKS)
         groups.remove('')  # remove empty fallback
