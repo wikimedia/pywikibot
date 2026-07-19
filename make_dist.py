@@ -142,11 +142,9 @@ class SetupBase(abc.ABC):
 
         :return: True if no error occurs, else False
         """
-        tools = (
-            ('build', MODULE),
-            ('pyclean', COMMAND),
-            ('twine', MODULE),
-        )
+        tools = (('pyclean', COMMAND), )
+        if not self.clear:
+            tools += ('build', MODULE), ('twine', MODULE)
         for tool, tool_type in tools:
             if not self._check_module(tool, tool_type):
                 if not self.upgrade:
