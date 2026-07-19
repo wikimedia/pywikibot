@@ -256,7 +256,7 @@ class LinkCheckThread(threading.Thread):
         # known fallback languages, then English, each with a
         # decreasing quality value
         lang = self.page.site.lang
-        langs = [lang, *i18n._altlang(lang), 'en']
+        langs = [lang, *i18n.altlang(lang), 'en']
         accept_language = ','.join(
             code if i == 0 else f'{code};q={max(0.1, 1 - i * 0.2):.1f}'
             for i, code in enumerate(langs)

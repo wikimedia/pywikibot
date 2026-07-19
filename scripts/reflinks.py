@@ -445,7 +445,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         code = None
-        for alt in [self.site.code, *i18n._altlang(self.site.code)]:
+        for alt in [self.site.code, *i18n.altlang(self.site.code)]:
             if alt in localized_msg:
                 code = alt
                 break
