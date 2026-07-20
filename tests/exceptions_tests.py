@@ -28,10 +28,10 @@ class TestApiTimeoutError(TestCase):
 
     def test_raise_catch(self) -> None:
         """Test raising and catching ApiTimeoutError."""
-        with self.assertRaises(ApiTimeoutError):
+        with self.assertRaisesRegex(ApiTimeoutError, 'Test timeout'):
             raise ApiTimeoutError('Test timeout')
 
-        with self.assertRaises(ApiTimeoutError):
+        with self.assertRaisesRegex(ApiTimeoutError, 'Test maxlag timeout'):
             raise MaxlagTimeoutError('Test maxlag timeout')
 
 
