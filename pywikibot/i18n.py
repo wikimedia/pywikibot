@@ -25,7 +25,7 @@ import json
 import os
 import pkgutil
 import re
-from collections import abc, defaultdict
+from collections import abc
 from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
@@ -48,7 +48,7 @@ _messages_package_name = 'scripts.i18n'
 # Flag to indicate whether translation messages are available
 _messages_available = None
 
-_LANG_TO_GROUP_NAME = defaultdict(str, {
+_LANG_TO_GROUP_NAME: dict[str, str] = {
     'aa': 'aa',
     'ab': 'ab',
     'ace': 'ace',
@@ -264,10 +264,11 @@ _LANG_TO_GROUP_NAME = defaultdict(str, {
     'zh-hans': 'zh-classical',
     'zh-min-nan': 'zh-min-nan',
     'zh-tw': 'zh-classical',
-    'zh-yue': 'cdo'})
+    'zh-yue': 'cdo'
+}
 
 _GROUP_NAME_TO_FALLBACKS: dict[str, list[str]] = {
-    '': [],
+    '_default': [],
     'aa': ['am'],
     'ab': ['ru'],
     'ace': ['id', 'ms', 'jv'],
@@ -392,25 +393,36 @@ def messages_available() -> bool:
     return _messages_available
 
 
-def altlang(lang: str) -> list[str]:
+def altlang(lang: str, /) -> tuple[str, ...]:
     """Define fallback languages for particular languages.
 
-    If no translation is available to a specified language, translate() will
-    try each of the specified fallback languages, in order, until it finds
-    one with a translation, with 'en' and '_default' as a last resort.
+    If no translation is available to a specified language,
+    :func:`translate` will try each of the specified fallback languages,
+    in order, until it finds one with a translation, with ``'_default'``
+    (for :func:`translate`) and finally ``'en'`` as a last resort.
 
-    For example, if for language 'xx', you want the preference of languages
-    to be: xx > fr > ru > en, you let this method return ['fr', 'ru'].
+    For example, if for language 'xx', you want the preference of
+    languages to be: ``xx > fr > ru > en``, you let this method return
+    ``('fr', 'ru')``.
 
-    This code is used by other translating methods below.
+    This function is used by :func:`translate` and :func:`twtranslate`.
 
     .. version-changed:: 11.6
-       renamed from :func:`_altlang`.
+       Renamed from ``_altlang``.
+    .. version-changed:: 11.7
+       The *lang* parameter is now positional-only. The function now
+       returns a tuple of fallback anguages instead of a list and no
+       longer includes *lang* itself.
 
     :param lang: The language code
-    :return: Language codes
+    :return: Fallback language codes
     """
-    return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
+    return tuple(
+        code for code in _GROUP_NAME_TO_FALLBACKS[
+            _LANG_TO_GROUP_NAME.get(lang, '_default')
+        ]
+        if code != lang
+    )
 
 
 @cache
