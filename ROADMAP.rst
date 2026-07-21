@@ -1,6 +1,9 @@
 Release 11.6
 ============
 
+* Make :func:`i18n.altlang` a public function (:phab:`T432543`)
+* use :exc:`requests.exceptions.JSONDecodeError` instead of :exc:`ValueError` in
+  :meth:`data.api.Request._json_loads`
 * Provide :class:`backports.sentinel` implementation backported from Python 3.15
 * Update translations (i18n)
 * Fix :meth:`WikiStats.get()<data.wikistats.WikiStats.get>` to propagate HTTP fetch exceptions

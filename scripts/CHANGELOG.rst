@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+11.6.0
+------
+
+weblinkchecker
+^^^^^^^^^^^^^^
+
+* use :func:`i18n.altlang` for ``Accept-Language`` fallbacks (:phab:`T417572`)
+
 11.5.0
 ------
 
