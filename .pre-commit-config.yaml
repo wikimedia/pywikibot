@@ -7,7 +7,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://gitlab.wikimedia.org/repos/ci-tools/commit-message-validator
-    rev: v2.3.0
+    rev: v3.0.0
     hooks:
       - id: commit-message-validator
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -64,7 +64,7 @@ repos:
     hooks:
       - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.21
+    rev: v0.15.22
     hooks:
       - id: ruff-check
         alias: ruff
@@ -86,7 +86,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 9.0.0a3
+    rev: 9.0.0b1
     hooks:
       - id: isort
         name: isort
@@ -96,7 +96,7 @@ repos:
         name: isort (skip future annotations)
         files: ^(pwb|pywikibot/families/__init__)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.90.0
+    rev: v0.91.6
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
@@ -113,7 +113,7 @@ repos:
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.2.0
+    rev: v2.3.0
     hooks:
       - id: mypy
         args: [--config-file=pyproject.toml, --follow-imports=silent]
