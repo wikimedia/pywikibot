@@ -668,6 +668,6 @@ autoclass_content = 'both'
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
-    'special-members': False,
+    'special-members': '__missing__',
     'show-inheritance': True,
 }

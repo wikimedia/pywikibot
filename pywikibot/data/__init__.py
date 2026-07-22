@@ -25,7 +25,7 @@ class WaitingMixin:
         request. Starting with 1 if attribute is missing.
     """
 
-    def wait(self, delay: int | None = None) -> None:
+    def wait(self, delay: int | float | None = None) -> None:
         """Determine how long to wait after a failed request.
 
         :param delay: Minimum time in seconds to wait. Overwrites
@@ -36,7 +36,7 @@ class WaitingMixin:
             self.max_retries = pywikibot.config.max_retries
 
         if not hasattr(self, 'retry_wait'):
-            self.retry_wait = pywikibot.config.retry_wait
+            self.retry_wait: int | float = pywikibot.config.retry_wait
 
         if not hasattr(self, 'current_retries'):
             self.current_retries = 1

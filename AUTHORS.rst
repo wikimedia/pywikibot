@@ -263,6 +263,7 @@ P
     pietrodn
     Platonides
     Priyanka
+    Priyankar Shukla
     Purodha B Blissenbach
     Pyfisch
 
@@ -286,6 +287,7 @@ R
     Robert Leverington
     Rob W.W. Hooft
     Rotem Liss
+    RoySmith
     Rua
     Russell Blau
 
@@ -313,6 +315,7 @@ S
     Stitipragyan Barik
     Strainu
     Sumana Harihareswara
+    Sydneynoh
 
 T
 -

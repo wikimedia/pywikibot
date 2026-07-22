@@ -31,9 +31,25 @@ class Site:
         self.family.name = family
 
 
+class TestFallbackDicts(TestCase):
+
+    """Test the fallback dicts."""
+
+    net = False
+
+    def test_groupnames(self):
+        """Test that groupnames are in groups."""
+        groupnames = set(i18n._LANG_TO_GROUP_NAME.values())
+        groupnames.discard('')  # might be created by defaultdict
+        self.assertLess(groupnames, i18n._LANG_TO_GROUP_NAME.keys())
+        groups = list(i18n._GROUP_NAME_TO_FALLBACKS)
+        groups.remove('')  # remove empty fallback
+        self.assertEqual(sorted(groupnames), groups)
+
+
 class TestTranslate(TestCase):
 
-    """Test translate method with fallback True."""
+    """Test translation lookup using family-specific localization."""
 
     net = False
 

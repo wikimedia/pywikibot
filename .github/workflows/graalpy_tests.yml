@@ -25,10 +25,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [graalpy-24.1, graalpy-25.0]
-        site: ['wikipedia:test']
-        os: [macOS-latest, ubuntu-latest]
-        experimental: [true]
+        include:
+          - python-version: graalpy-24.1
+            os: macOS-latest
+            experimental: true
+          - python-version: graalpy-24.1
+          - python-version: graalpy-25.0
+            os: macOS-latest
+          - python-version: graalpy-25.0
+            experimental: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -59,7 +64,7 @@ jobs:
         run: pip install setuptools
       - name: Generate user files
         run: |
-          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -v -debug;
+          python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -v -debug;
       - name: Test with pytest
         id: ci_test
         continue-on-error: true

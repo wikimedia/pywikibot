@@ -7,13 +7,17 @@
 from __future__ import annotations
 
 import hashlib
-from collections.abc import Mapping
 from contextlib import suppress
+from typing import Any
 
 from pywikibot import Timestamp
+from pywikibot.tools.collections import DataRecord
 
 
-class Revision(Mapping):
+__all__ = ('Revision', )
+
+
+class Revision(DataRecord):
 
     """A structure holding information about a single revision of a Page.
 
@@ -32,68 +36,35 @@ class Revision(Mapping):
        - :api:`Alldeletedrevisions`
     """
 
-    def __init__(self, **kwargs) -> None:
-        """Initializer."""
-        self._data = kwargs
-        self._upcast_dict(self._data)
-        super().__init__()
-
     @staticmethod
-    def _upcast_dict(map_) -> None:
+    def normalize(data: dict[str, Any]) -> None:
         """Upcast dictionary values."""
         with suppress(KeyError):  # enable doctest
-            map_['timestamp'] = Timestamp.fromISOformat(map_['timestamp'])
+            data['timestamp'] = Timestamp.fromISOformat(data['timestamp'])
 
-        map_.update(anon='anon' in map_)
-        map_.update(minor='minor' in map_)
-        map_.update(userhidden='userhidden' in map_)
-        map_.update(commenthidden='commenthidden' in map_)
+        data.update(anon='anon' in data)
+        data.update(minor='minor' in data)
+        data.update(userhidden='userhidden' in data)
+        data.update(commenthidden='commenthidden' in data)
 
-        map_.setdefault('comment', '')
-        map_.setdefault('user', '')
+        data.setdefault('comment', '')
+        data.setdefault('user', '')
 
-        if 'slots' in map_:  # mw 1.32+
-            mainslot = map_['slots'].get('main', {})
-            map_['text'] = mainslot.get('*')
-            map_['contentmodel'] = mainslot.get('contentmodel')
+        if 'slots' in data:  # mw 1.32+
+            mainslot = data['slots'].get('main', {})
+            data['text'] = mainslot.get('*')
+            data['contentmodel'] = mainslot.get('contentmodel')
         else:
-            map_['slots'] = None
-            map_['text'] = map_.get('*')
+            data['slots'] = None
+            data['text'] = data.get('*')
 
-        map_.setdefault('sha1')
-        if map_['sha1'] is None and map_['text'] is not None:
-            map_['sha1'] = hashlib.sha1(
-                map_['text'].encode('utf8')).hexdigest()
+        data.setdefault('sha1')
+        if data['sha1'] is None and data['text'] is not None:
+            data['sha1'] = hashlib.sha1(
+                data['text'].encode('utf8')).hexdigest()
 
-    def __len__(self) -> int:
-        """Return the number of data items."""
-        return len(self._data)
-
-    def __getitem__(self, name: str):
-        """Return a single Revision item given by name."""
-        if name in self._data:
-            return self._data[name]
-
-        return self.__missing__(name)
-
-    # provide attribute access
-    __getattr__ = __getitem__
-
-    def __iter__(self):
-        """Provide Revision data as iterator."""
-        return iter(self._data)
-
-    def __repr__(self) -> str:
-        """String representation of Revision."""
-        return f'{self.__class__.__name__}({self._data})'
-
-    def __str__(self) -> str:
-        """Printable representation of Revision data."""
-        return str(self._data)
-
-    def __missing__(self, key):
+    def __missing__(self, key: str, /):
         """Provide backward compatibility for exceptions."""
-        # raise AttributeError instead of KeyError for backward compatibility
         raise AttributeError(
-            f"'{type(self).__name__}' object has no attribute '{key}'"
+            f'{type(self).__name__!r} object has no attribute {key!r}'
         )

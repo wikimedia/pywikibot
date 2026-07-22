@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
 from itertools import chain
-from types import TracebackType
+from types import MappingProxyType, TracebackType
 from typing import Any, NamedTuple
 
 from pywikibot.exceptions import ArgumentDeprecationWarning
@@ -20,6 +20,7 @@ from pywikibot.tools import deprecated_args, issue_deprecation_warning
 
 __all__ = (
     'CombinedError',
+    'DataRecord',
     'DequeGenerator',
     'EmptyDefault',
     'GeneratorWrapper',
@@ -380,3 +381,73 @@ class RateLimit(NamedTuple):
     def ratio(self) -> float:
         """Calculate a ratio how many hits can be done within one second."""
         return self.hits / self.seconds if self.seconds != 0 else float('inf')
+
+
+class DataRecord(Mapping):
+
+    """A read-only structure holding named data items.
+
+    Each data item can be accessed either by its key or as an attribute
+    with the attribute name equal to the key.
+
+    For example:
+
+    >>> d = DataRecord(sample='Sample for DataRecord access')
+    >>> d.sample == d['sample']
+    True
+    >>> d.sample
+    'Sample for DataRecord access'
+
+    .. version-added:: 11.6
+    """
+
+    def __init__(self, **kwargs) -> None:
+        """Initializer."""
+        self.normalize(kwargs)
+        self._data = MappingProxyType(kwargs)
+
+    @staticmethod
+    def normalize(data: dict[str, Any]) -> None:
+        """Normalize *data* items in-place.
+
+        This method can be overridden by subclasses to normalize their
+        specific data items. Changes should be applied directly to the
+        provided dictionary.
+
+        :param data: The data dictionary to normalize in-place.
+        """
+
+    def __len__(self) -> int:
+        """Return the number of data items."""
+        return len(self._data)
+
+    def __getitem__(self, name: str) -> Any:
+        """Return a data item by name."""
+        return self._data[name]
+
+    def __getattr__(self, name: str) -> Any:
+        """Return a data item by attribute name."""
+        if name in self._data:
+            return self._data[name]
+
+        return self.__missing__(name)
+
+    def __iter__(self):
+        """Return an iterator over data item names."""
+        return iter(self._data)
+
+    def __repr__(self) -> str:
+        """Return the formal string representation."""
+        return f'{type(self).__name__}({self._data})'
+
+    def __str__(self) -> str:
+        """Return the string representation of the data."""
+        return str(self._data)
+
+    def __missing__(self, key: str, /) -> Any:
+        """Handle missing data items.
+
+        Subclasses can override this method to provide custom handling
+        for missing data items.
+        """
+        raise KeyError(key)

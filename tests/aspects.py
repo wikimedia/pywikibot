@@ -22,11 +22,11 @@ from collections.abc import Iterable, Iterator, Sized
 from contextlib import contextmanager, suppress
 from functools import wraps
 from http import HTTPStatus
-from typing import Any
 from unittest.util import safe_repr
 
 import pywikibot
 from pywikibot import Site, config
+from pywikibot.backports import sentinel
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import (
@@ -1555,9 +1555,9 @@ class DeprecationTestCase(TestCase):
     ]
 
     # Require no instead string
-    NO_INSTEAD = object()
+    NO_INSTEAD = sentinel('NO_INSTEAD')
     # Require an instead string
-    INSTEAD = object()
+    INSTEAD = sentinel('INSTEAD')
 
     def __init__(self, *args, **kwargs) -> None:
         """Initializer."""
@@ -1587,7 +1587,7 @@ class DeprecationTestCase(TestCase):
     @classmethod
     def _build_message(cls,
                        deprecated: str | None,
-                       instead: str | bool | None) -> Any:
+                       instead: str | bool | None) -> str | None | sentinel:
         """Build a deprecation warning result.
 
         .. version-changed:: 9.3
@@ -1628,13 +1628,12 @@ class DeprecationTestCase(TestCase):
         """
         self.assertDeprecation(self._build_message(deprecated, instead))
 
-    def assertDeprecation(self, msg=None) -> None:
+    def assertDeprecation(self, msg: str | None | sentinel = None) -> None:
         """Assert that a deprecation warning happened.
 
         :param msg: Either the specific message or None to allow any generic
             message. When set to ``INSTEAD`` it only counts those supplying an
             alternative and when ``NO_INSTEAD`` only those not supplying one.
-        :type msg: str or None or INSTEAD or NO_INSTEAD
         """
         if msg is None or msg is self.INSTEAD or msg is self.NO_INSTEAD:
             deprecation_messages = self.deprecation_messages

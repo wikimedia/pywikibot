@@ -415,7 +415,7 @@ def fetch(uri: str,
           headers: dict[str, str] | None = None,
           default_error_handling: bool = True,
           use_fake_user_agent: bool | str = False,
-          **kwargs) -> requests.Response:
+          **kwargs) -> requests.Response | Exception:
     """HTTP request.
 
     .. version-changed:: 7.0

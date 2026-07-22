@@ -57,9 +57,10 @@ the framework::
           +-- ApiTimeoutError
           |    +-- MaxlagTimeoutError
           +-- TranslationError
+          +-- UnexpectedAPIDataError (ValueError)
+          +-- UnknownExtensionError (NotImplementedError)
           +-- UserRightsError
           |    +-- HiddenKeyError (KeyError)
-          +-- UnknownExtensionError (NotImplementedError)
           +-- VersionParseError
           +-- WikiBaseError
                +-- CoordinateGlobeUnknownError (NotImplementedError)
@@ -77,7 +78,6 @@ the framework::
 Error: Base class, all exceptions should the subclass of this class.
 
   - CaptchaError: Captcha is asked and config.solve_captcha == False
-  - ClientError: A problem with the client request
   - AutoblockUserError: requested action on a virtual autoblock user not valid
   - InvalidTitleError: Invalid page title
   - NoUsernameError: Username is not in user config file, or it is invalid.
@@ -85,6 +85,7 @@ Error: Base class, all exceptions should the subclass of this class.
   - SectionError: The section specified by # does not exist
   - TranslationError: no language translation found, i18n/l10n message
     not available
+  - UnexpectedAPIDataError: API data contains unexpected fields or values
   - UnknownExtensionError: Extension is not defined for this site
   - UserRightsError: insufficient rights for requested action
   - VersionParseError: failed to parse version information
@@ -134,8 +135,11 @@ PageSaveRelatedError: page exceptions within the save operation on a Page
 ServerError: a problem with the server.
 
   - FatalServerError: A fatal/non-recoverable server error
-  - Server414Error: Server timed out with HTTP 414 code
   - Server504Error: Server timed out with HTTP 504 code
+
+ClientError: A problem with the client request
+
+  - Client414Error: HTTP 414 code - URI too long
 
 WikiBaseError: any issue specific to Wikibase.
 
@@ -175,6 +179,9 @@ UserWarning: warnings targeted at users
 .. version-changed:: 8.1
    ``Server414Error`` class is deprecated; use :class:`Client414Error`
    instead.
+
+.. version-changed:: 11.6
+   :exc:`UnexpectedAPIDataError` was added.
 """
 from __future__ import annotations
 
@@ -446,6 +453,14 @@ class UnknownSiteError(SiteDefinitionError):
 class UnknownFamilyError(SiteDefinitionError):
 
     """Family is not registered."""
+
+
+class UnexpectedAPIDataError(Error, ValueError):
+
+    """Raised when API data contains unexpected fields or values.
+
+    .. version-added:: 11.6
+    """
 
 
 class UnknownExtensionError(Error, NotImplementedError):

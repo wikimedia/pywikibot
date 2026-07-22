@@ -86,6 +86,10 @@ class WikiStats:
     def get(self, table: str) -> list:
         """Get a list of a table of data.
 
+        .. version-changed:: 11.6
+           Raise the exception from :func:`comms.http.fetch` instead of
+           raising :exc:`AttributeError` if that function fails.
+
         :param table: table of data to fetch
         """
         if table in _data:
@@ -98,6 +102,9 @@ class WikiStats:
         path = '/api.php?action=dump&table={table}&format=csv'
         url = self.url + path
         r = http.fetch(url.format(table=table))
+        if isinstance(r, Exception):
+            raise r
+
         f = StringIO(r.text)
         reader = DictReader(f)
         data = list(reader)

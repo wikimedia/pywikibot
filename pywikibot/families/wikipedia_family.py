@@ -27,12 +27,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'dk', 'mo', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
     ]
 
+    # Do not update this list by hand.
+    # Run the addwikis maintenance script to update it.
     codes = {
         'ab', 'ace', 'ady', 'af', 'als', 'alt', 'am', 'ami', 'an', 'ang',
         'ann', 'anp', 'ar', 'arc', 'ary', 'arz', 'as', 'ast', 'atj', 'av',
         'avk', 'awa', 'ay', 'az', 'azb', 'ba', 'ban', 'bar', 'bat-smg', 'bbc',
         'bcl', 'bdr', 'be', 'be-tarask', 'bew', 'bg', 'bh', 'bi', 'bjn', 'blk',
-        'bm', 'bn', 'bo', 'bpy', 'br', 'bs', 'btm', 'bug', 'bxr', 'ca',
+        'bm', 'bn', 'bo', 'bol', 'bpy', 'br', 'bs', 'btm', 'bug', 'bxr', 'ca',
         'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy', 'ckb', 'co', 'cr',
         'crh', 'cs', 'csb', 'cu', 'cv', 'cy', 'da', 'dag', 'de', 'dga', 'din',
         'diq', 'dsb', 'dtp', 'dty', 'dv', 'dz', 'ee', 'el', 'eml', 'en', 'eo',

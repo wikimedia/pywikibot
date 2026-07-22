@@ -62,7 +62,7 @@ snglValsFormats = ['CurrEvents']
 
 
 @singledispatch
-def multi(value, tuplst: tuplst_type) -> Any:
+def multi(value: int | str, tuplst: tuplst_type) -> Any:
     """Run multiple pattern checks for the same entry.
 
     For example: 1st century, 2nd century, etc.
@@ -78,7 +78,7 @@ def multi(value, tuplst: tuplst_type) -> Any:
 
 
 @multi.register(int)
-def _(value: int, tuplst: tuplst_type) -> Any:
+def _(value: int, tuplst: tuplst_type) -> str:
     # Find a predicate that gives true for this int value, and run a
     # function
     for func, pred in tuplst:
@@ -88,7 +88,7 @@ def _(value: int, tuplst: tuplst_type) -> Any:
 
 
 @multi.register(str)
-def _(value: str, tuplst: tuplst_type) -> Any:
+def _(value: str, tuplst: tuplst_type) -> int:
     # Try all functions, and test result against predicates
     for func, pred in tuplst:
         try:
@@ -394,7 +394,7 @@ _digitDecoders: dict[str, decoder_type] = {
 _reParameters = re.compile('|'.join(f'(%[1-9]?{s})' for s in _digitDecoders))
 
 # A map of sitecode+pattern to (re matching object and corresponding decoders)
-_escPtrnCache2 = {}
+_escPtrnCache2: dict[str, tuple[re.Pattern[str], str, list[decoder_type]]] = {}
 
 
 def escapePattern2(
@@ -680,6 +680,7 @@ class MonthFormat(abc.MutableMapping):  # type: ignore[type-arg]
             else:
                 raise KeyError(f"Wrong variant '{self.variant}'")
 
+            f: Callable[[str], str]
             if ucase:
                 f = first_upper
             elif ucase is False:

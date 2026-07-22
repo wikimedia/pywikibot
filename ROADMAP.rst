@@ -1,17 +1,24 @@
-Release 11.5
+Release 11.6
 ============
 
-* Dreprecate ``cross_projects`` :mod:`family.Family` settings (:phab:`T431178`)
-* Deprecate :func:`family.Family.post_get_convert` and
-  :func:`family.Family.pre_put_convert` functions (:phab:`T431188`)
-* Update :mod:`families.wikiquote_family`
-* Add support for minwikiquote (:phab:`T429945`)
-* Rename ``exceptions.TimeoutError`` exception to :exc:`exceptions.ApiTimeoutError` to avoid
-  collision with Python's built-in exception (:phab:`T431174`)
-* Drop :mod:`config` ``textfile_encoding`` variable and use 'utf-8' directly instead (:phab:`T430454`)
-* Use pyclean package with :mod:`make_dist` script.
-* Fix redirected link for :class:`pagegenerators.PetScanPageGenerator`
+* Add support for bolwiki (:phab:`T429953`)
+* The *top_only* parameter of :meth:`page.User.contributions` and :meth:`APISite.usercontribs
+  <pywikibot.site._generators.GeneratorsMixin.usercontribs>` was renamed to *top*. Its behavior has
+  changed, and `False` can now be used as an argument. (:phab:`T308961`)
+* Add a new collection class :class:`page.Contribution` to hold results from
+  :meth:`page.User.contribs` (:phab:`T308961`)
+* Add a new method :meth:`page.User.contribs` to retrieve user contributions.
+  This method supports all ``prop`` items from :api:`Usercontribs` (:phab:`T308961`)
+* Add a new exception :exc:`exceptions.UnexpectedAPIDataError` (:phab:`T308961`)
+* Add a new collection class :class:`tools.collections.DataRecord` and derive
+  :class:`page.Revision` from it (:phab:`T432464`)
+* Make :func:`i18n.altlang` a public function (:phab:`T432543`)
+* Use :exc:`requests.exceptions.JSONDecodeError` instead of :exc:`ValueError` in
+  :meth:`data.api.Request._json_loads`
+* Provide a :class:`backports.sentinel` implementation backported from Python 3.15
 * Update translations (i18n)
+* Fix :meth:`WikiStats.get()<data.wikistats.WikiStats.get>` to propagate HTTP fetch exceptions
+  instead of raising `AttributeError`
 
 
 Deprecations
@@ -114,6 +121,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.6.0: The *top_only* parameter of :meth:`APISite.usercontribs
+  <pywikibot.site._generators.GeneratorsMixin.usercontribs>` has been deprecated; use *top* instead
+  (:phab:`T308961`)
 * 11.5.0: :func:`family.Family.post_get_convert` and :func:`family.Family.pre_put_convert` functions
   are deprecated and will be removed (:phab:`T431188`)
 * 11.5.0: ``exceptions.TimeoutError`` is deprecated in favour of :exc:`exceptions.ApiTimeoutError`

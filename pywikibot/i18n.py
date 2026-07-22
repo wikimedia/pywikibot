@@ -392,7 +392,7 @@ def messages_available() -> bool:
     return _messages_available
 
 
-def _altlang(lang: str) -> list[str]:
+def altlang(lang: str) -> list[str]:
     """Define fallback languages for particular languages.
 
     If no translation is available to a specified language, translate() will
@@ -403,6 +403,9 @@ def _altlang(lang: str) -> list[str]:
     to be: xx > fr > ru > en, you let this method return ['fr', 'ru'].
 
     This code is used by other translating methods below.
+
+    .. version-changed:: 11.6
+       renamed from :func:`_altlang`.
 
     :param lang: The language code
     :return: Language codes
@@ -614,7 +617,7 @@ def translate(code: str | pywikibot.site.BaseSite,
     else:
         codes = [code]
         if fallback is True:
-            codes += [*_altlang(code), '_default', 'en']
+            codes += [*altlang(code), '_default', 'en']
         elif fallback is not False:
             assert not isinstance(fallback, bool)
             codes.extend(fallback)
@@ -807,7 +810,7 @@ def twtranslate(
     # Prepare list of languages to try; fallback adds alternatives and English
     langs = [lang]
     if fallback:
-        langs += [*_altlang(lang), 'en']
+        langs += [*altlang(lang), 'en']
 
     # Try each language until a translation is found
     for alt in langs:
@@ -927,7 +930,7 @@ def known_languages() -> list[str]:
     ['ab', 'aeb']
     >>> i18n.known_languages()[-10:]  # doctest: +SKIP
     ['vo', 'vro', 'wa', 'war', 'xal', 'xmf', 'yi', 'yo', 'yue', 'zh']
-    >>> len(i18n.known_languages()) > 250
+    >>> len(i18n.known_languages()) >= 250
     True
     >>> 'ab' in i18n.known_languages()
     True

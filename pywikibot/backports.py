@@ -15,7 +15,8 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
+import sys
+from typing import TYPE_CHECKING, Any, Union
 
 from pywikibot.tools import PYTHON_VERSION, SPHINX_RUNNING
 
@@ -37,6 +38,7 @@ if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
            <library/itertools.html#itertools.pairwise>`,
            backported from Python 3.10.
         .. version-added:: 7.6
+        .. version-removed:: 12.0
         """
         a, b = tee(iterable)
         next(b, None)
@@ -84,6 +86,7 @@ if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
         .. version-added:: 8.2
         .. version-changed:: 9.0
            Added *strict* option, backported from Python 3.13
+        .. version-removed:: 15.0
 
         :param n: How many items of the iterable to get in one chunk
         :param strict: Raise a ValueError if the final batch is shorter
@@ -151,6 +154,10 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
         .. version-added:: 6.2
         .. version-changed:: 10.2
            moved from :mod:`tools.threading` to :mod:`backports`.
+        .. version-deprecated:: 10.2
+           Passing any arguments is deprecated; a TypeError will be
+           raised with Pywikibot 13.0.
+        .. version-removed:: 16.0
         .. note:: Passing any arguments has no effect and has been
            deprecated since Python 3.14 and was removed in Python 3.15.
         """
@@ -202,3 +209,135 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
 
 else:
     from threading import RLock  # type: ignore[assignment]
+
+
+if PYTHON_VERSION < (3, 15) or SPHINX_RUNNING:
+
+    class sentinel:  # noqa: N801
+
+        """Implementation of a unique sentinel object.
+
+        Usage:
+
+        >>> MISSING = sentinel('MISSING')
+        >>> MISSING
+        MISSING
+        >>> MISSING = sentinel('MISSING', repr="'MISSING'")
+        >>> MISSING
+        'MISSING'
+        >>> import copy
+        >>> value = copy.copy(MISSING)
+        >>> value is MISSING
+        True
+
+        .. version-added:: 11.6
+        .. version-removed:: 17.0
+        .. seealso::
+           - :pylib:`sentinel<functions#sentinel>` backported
+             from Python 3.15.
+           - :pep:`661`
+
+        :param name: Name of the sentinel object; it should be the name
+            of the variable to which the sentinel shall be assigned.
+        :param repr: Representation returned by :func:`repr`.
+        :raises TypeError: If *name* is not a string or subclassing is
+            attempted.
+        :raises AttributeError: If an attribute other than ``__module__``
+            is assigned.
+        """
+
+        if TYPE_CHECKING:
+            __name__: str
+            _repr: str
+            __module__: str
+
+        def __init__(self, name: str, /, *, repr: str | None = None) -> None:
+            """Initializer."""
+            if not isinstance(name, str):
+                raise TypeError(f'sentinel name must be a string, '
+                                f'not {type(name).__name__}')
+            object.__setattr__(self, '__name__', name)
+            object.__setattr__(self, '_repr',
+                               repr if repr is not None else name)
+            object.__setattr__(
+                self,
+                '__module__',
+                self._get_module_name()
+            )
+
+        def __init_subclass__(cls):
+            """Prevent subclassing of sentinel objects.
+
+            :raises TypeError: Always, as sentinel objects cannot be
+                subclassed.
+            """
+            raise TypeError(
+                "type 'sentinel' is not an acceptable base type")
+
+        def __repr__(self) -> str:
+            """Return the representation of the sentinel."""
+            return self._repr
+
+        def __reduce__(self) -> str:
+            """Return the name used to restore the sentinel object.
+
+            The returned name is resolved in the original module during
+            unpickling.
+
+            :return: The sentinel name.
+            """
+            return self.__name__
+
+        def __copy__(self) -> sentinel:
+            """Return the same instance when shallow-copied."""
+            return self
+
+        def __deepcopy__(self, memo: dict[int, Any]) -> sentinel:
+            """Return the same instance when deep-copied.
+
+            :param memo: Deep-copy memo dictionary.
+
+            :return: The sentinel instance itself.
+            """
+            return self
+
+        def __setattr__(self, attr: str, value: object) -> None:
+            """Prevent modification of sentinel attributes.
+
+             Sentinel objects are immutable after initialization. The
+            ``__module__`` attribute is excluded to support pickle
+            compatibility.
+
+            :param attr: Attribute name.
+            :param value: Attribute value.
+            :raises AttributeError: If an attribute other than
+                ``__module__`` is assigned.
+            """
+            if attr == '__module__':
+                object.__setattr__(self, attr, value)
+                return
+
+            raise AttributeError(
+                "'sentinel' object has no attribute assignment")
+
+        @staticmethod
+        def _get_module_name(depth: int = 1, default: str = '__main__') -> str:
+            """Return the module name of a caller frame."""
+            d = depth + 1
+            if PYTHON_VERSION >= (3, 12):
+                return (
+                    sys._getframemodulename(d)  # type: ignore[attr-defined]
+                    or default
+                )
+
+            return sys._getframe(d).f_globals.get('__name__', default)
+
+        if PYTHON_VERSION >= (3, 10):
+            def __or__(self, other: object) -> Any:
+                return Union[self, other]
+
+            def __ror__(self, other: object) -> Any:
+                return Union[other, self]
+
+else:
+    from builtins import sentinel  # type: ignore[no-redef, attr-defined]

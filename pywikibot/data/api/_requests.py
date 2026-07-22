@@ -20,12 +20,15 @@ from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import Any, NoReturn
 from urllib.parse import unquote, urlencode
 from warnings import warn
 
+import requests
+
 import pywikibot
 from pywikibot import config
+from pywikibot.backports import sentinel
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import (
@@ -41,9 +44,6 @@ from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
 from pywikibot.tools import deprecated
 
-
-if TYPE_CHECKING:
-    import requests
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
 
@@ -148,7 +148,7 @@ class Request(MutableMapping, WaitingMixin):
     """
 
     # To make sure the default value of 'parameters' can be identified.
-    _PARAM_DEFAULT = object()
+    PARAM_DEFAULT = sentinel('PARAM_DEFAULT')
 
     def __init__(self, site=None,
                  mime: dict | None = None,
@@ -156,7 +156,7 @@ class Request(MutableMapping, WaitingMixin):
                  max_retries: int | None = None,
                  retry_wait: int | None = None,
                  use_get: bool | None = None,
-                 parameters=_PARAM_DEFAULT,
+                 parameters: dict[str, Any] | sentinel = PARAM_DEFAULT,
                  **kwargs) -> None:
         """Create a new Request instance with the given parameters.
 
@@ -226,7 +226,7 @@ class Request(MutableMapping, WaitingMixin):
         # it MUST have at least an action parameter for the request which would
         # be in kwargs if it's using the old mode.
         if kwargs:
-            if parameters is not self._PARAM_DEFAULT:
+            if parameters is not self.PARAM_DEFAULT:
                 # 'parameters' AND kwargs is set. In that case think of
                 # 'parameters' being an old kwarg which is now filled in an
                 # actual parameter
@@ -235,7 +235,7 @@ class Request(MutableMapping, WaitingMixin):
             # When parameters wasn't set it's likely that kwargs-mode was used
             self._warn_kwargs()
             parameters = kwargs
-        elif parameters is self._PARAM_DEFAULT:
+        elif parameters is self.PARAM_DEFAULT:
             parameters = {}
         self._params: dict[str, Any] = {}
         if 'action' not in parameters:
@@ -773,27 +773,27 @@ class Request(MutableMapping, WaitingMixin):
         self.wait()
         return None, use_get
 
-    def _json_loads(self, response) -> dict | None:
+    def _json_loads(self, response: requests.Response) -> dict | None:
         """Return a dict from requests.Response.
 
         .. version-changed:: 8.2
            show a warning to add a :meth:`protocol()
            <family.Family.protocol>` method to the family file if suitable.
-        .. version-changed:: 11.0
+        .. version-removed:: 11.0
            The warning about missing or wrong ``protocol()`` method
            introduced in version 8.2 was removed.
 
         :param response: a requests.Response object
-        :type response: requests.Response
         :return: a data dict
-        :raises pywikibot.exceptions.APIError: unknown action found
-        :raises pywikibot.exceptions.APIError: unknown query result type
+        :raises SiteDefinitionError: Invalid :class:`family.AutoFamily`
+        :raises pywikibot.exceptions.APIError: unknown action found or
+            unknown query result type
 
         :meta public:
         """
         try:
             result = response.json()
-        except ValueError:
+        except requests.exceptions.JSONDecodeError:
             # if the result isn't valid JSON, there may be a server problem.
             # Wait a few seconds and try again.
             # Show 20 lines of bare text without script parts

@@ -14,7 +14,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable
 from contextlib import suppress
-from typing import Any
+from typing import Any, cast
 from warnings import warn
 
 import pywikibot
@@ -521,8 +521,13 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         if not self.support_namespace():
             raise TypeError(f'{self.limited_module or self.modules} module'
                             ' does not support a namespace parameter')
-        param = self.site._paraminfo.parameter('query+' + self.limited_module,
-                                               'namespace')
+
+        # mypy cannot infer that support_namespace() guarantees
+        # self.limited_module is not None; therefore use cast here.
+        param = self.site._paraminfo.parameter(
+            'query+' + cast(str, self.limited_module),
+            'namespace'
+        )
         if isinstance(namespaces, str):
             namespaces = namespaces.split('|')
 

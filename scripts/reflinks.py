@@ -63,6 +63,7 @@ from functools import partial
 from http import HTTPStatus
 from pathlib import Path
 from textwrap import shorten
+from urllib.parse import urlparse
 
 import pywikibot
 from pywikibot import comms, config, i18n, pagegenerators, textlib
@@ -444,7 +445,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         code = None
-        for alt in [self.site.code, *i18n._altlang(self.site.code)]:
+        for alt in [self.site.code, *i18n.altlang(self.site.code)]:
             if alt in localized_msg:
                 code = alt
                 break
@@ -562,7 +563,8 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
         # for each link to change
         for match in linksInRef.finditer(raw_text):
             link = match['url']
-            if 'jstor.org' in link:
+            hostname = urlparse(link).hostname or ''
+            if hostname == 'jstor.org' or hostname.endswith('.jstor.org'):
                 # TODO: Clean URL blacklist
                 continue
 

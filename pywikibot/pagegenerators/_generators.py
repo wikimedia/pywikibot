@@ -546,8 +546,10 @@ def UserContributionsGenerator(username: str,
         pywikibot.warning(
             f'User "{user.username}" does not exist on site "{site}".')
 
-    gen = (contrib[0] for contrib in user.contributions(
-        namespaces=namespaces, total=total))
+    gen = (
+        contrib.page for contrib in user.contribs(namespaces=namespaces,
+                                                  total=total, prop='title')
+    )
     if _filter_unique:
         return _filter_unique(gen)
     return gen

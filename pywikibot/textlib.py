@@ -577,7 +577,7 @@ def removeHTMLParts(text: str,
         and markup. Defaults to :code:`['tt', 'nowiki', 'small', 'sup']`
         if None.
     :param removetags: List of tag names whose tags and content should
-        be removed. The tags ca be preserved if listed in *keeptags*.
+        be removed. The tags can be preserved if listed in *keeptags*.
         Defaults to :code:`['style', 'script']` if None.
     :return: The cleaned text with specified HTML parts removed.
     """
@@ -1799,7 +1799,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     :param oldtext: Content of the old category
     :param oldcat: :class:`pywikibot.Category` object of the old
         category
-    :param newcat: :class:`Pywikibot.Category` object of the new
+    :param newcat: :class:`pywikibot.Category` object of the new
         category
     :param add_only: If add_only is True, the old category won't be
         replaced and the category given will be added after it.

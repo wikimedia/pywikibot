@@ -15,15 +15,37 @@ from pywikibot.exceptions import (
     AutoblockUserError,
     NoRenameTargetError,
     NotEmailableError,
+    UnexpectedAPIDataError,
     UserRightsError,
 )
 from pywikibot.page._links import Link
 from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
+from pywikibot.time import Timestamp
 from pywikibot.tools import is_ip_address, is_ip_network
+from pywikibot.tools.collections import DataRecord
 
 
-__all__ = ('User', )
+__all__ = ('Contribution', 'User')
+
+
+class Contribution(DataRecord):
+
+    """A structure holding information about a user contribution.
+
+    In addition to the API result, it provides the ``site`` and ``page``
+    for the current Site and Page object of the contribution.
+
+    .. version-added:: 11.6
+    """
+
+    @staticmethod
+    def normalize(data: dict[str, Any]) -> None:
+        """Upcast dictionary values."""
+        if 'timestamp' in data:
+            data['timestamp'] = Timestamp.fromISOformat(data['timestamp'])
+        if 'title' in data:
+            data['page'] = Page(data['site'], data['title'], data['ns'])
 
 
 class User(Page):
@@ -488,7 +510,8 @@ class User(Page):
 
         Each tuple is composed of a pywikibot.Page object, the revision
         id, the edit timestamp and the comment. Pages returned are not
-        guaranteed to be unique.
+        guaranteed to be unique. Use :meth:`contribs` if you need
+        additional revision information.
 
         Example:
 
@@ -506,8 +529,18 @@ class User(Page):
         >>> contrib[3]
         ''
 
-        .. seealso:: :meth:`Site.usercontribs()
-           <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
+        .. version-changed:: 3.0.20200609
+           The *showMinor* parameter was renamed to *minor*.
+        .. version-changed:: 11.6
+           The keyword *top_only* was renamed to *top*. This parameter
+           now accepts ``None`` to iterate both latest and non-latest
+           contributions. ``False`` now iterates only non-latest
+           contributions. Default is ``None``.
+        .. seealso::
+           - :meth:`contribs`
+           - :meth:`Site.usercontribs()
+             <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
+           - :api:`Usercontribs`
 
         :param total: Limit result to this number of pages
         :keyword start: Iterate contributions starting at this Timestamp
@@ -517,19 +550,79 @@ class User(Page):
         :type namespaces: Iterable of str or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        :keyword showMinor: If True, iterate only minor edits; if False and
+        :keyword minor: If True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
-        :keyword top_only: If True, iterate only edits which are the latest
-            revision (default: False)
+        :param top: if ``True``, iterate only edits which are the latest
+            revision; if ``False``, do not iterate last revision edits;
+            ``None`` to iterate both (default: ``None``)
         :return: Tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         """
+        prop = ('comment', 'ids', 'timestamp', 'title')
+        for c in self.contribs(total=total, prop=prop, **kwargs):
+            yield c.page, c.revid, c.timestamp, c.comment  # type: ignore[attr-defined] # noqa: E501
+
+    def contribs(self, **kwargs) -> Generator[Contribution]:
+        """Yield :class:`Contribution` items describing this user edits.
+
+        Refer :meth:`APISite.usercontribs()
+        <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
+        method for for keyword parameters except of `user`and `userprefix`.
+
+        .. version-added:: 11.6
+
+        Usage:
+
+        >>> site = pywikibot.Site('wikipedia:test')
+        >>> user = pywikibot.User(site, 'Pywikibot-oauth')
+        >>> prop = ['title', 'tags', 'flags']
+        >>> uc = list(user.contribs(total=8, reverse=True, prop=prop))
+        >>> contrib = uc[-1]
+        >>> contrib.user == user
+        True
+        >>> str(contrib.site)
+        'wikipedia:test'
+        >>> contrib.title
+        'User:Pywikibot-oauth/edit test'
+        >>> contrib.page.title() == contrib.title
+        True
+        >>> contrib.top
+        False
+        >>> contrib.tags  # attribute access
+        ['OAuth CID: 281']
+        >>> contrib['tags']  # key access
+        ['OAuth CID: 281']
+
+        .. seealso::
+           - :meth:`contributions`
+           - :meth:`Site.usercontribs()
+             <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
+           - :api:`Usercontribs`
+
+        :keyword start: Iterate contributions starting at this Timestamp
+        :keyword end: Iterate contributions ending at this Timestamp
+        :keyword reverse: Iterate oldest contributions first (default:
+            newest)
+        :keyword namespaces: Only iterate pages in these namespaces
+        :keyword minor: If ``True``, iterate only minor edits; if ``False``
+            and not ``None``, iterate only non-minor edits (default:
+            iterate both)
+        :keyword total: Limit result to this number of pages
+        :keyword top: if ``True``, iterate only edits which are the latest
+            revision; if ``False``, do not iterate last revision edits;
+            ``None`` to iterate both (default: ``None``)
+        :keyword prop: Include additional pieces of information. Refer
+            :api:`Usercontribs` for the elements and the default setting.
+        :return: For each entry return a tuple of Page, Revision
+        """
         for contrib in self.site.usercontribs(
-                user=self.username, total=total, **kwargs):
-            ts = pywikibot.Timestamp.fromISOformat(contrib['timestamp'])
-            yield (Page(self.site, contrib['title'], contrib['ns']),
-                   contrib['revid'],
-                   ts,
-                   contrib.get('comment'))
+                user=self.username, formatversion=2, **kwargs):
+            if {'site', 'page'} & contrib.keys() or 'user' not in contrib:
+                raise UnexpectedAPIDataError(
+                    "API response contains reserved keys 'site' or 'page' "
+                    "or 'user' is missing"
+                )
+            contrib.pop('user')
+            yield Contribution(site=self.site, user=self, **contrib)
 
     @property
     def first_edit(

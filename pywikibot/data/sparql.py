@@ -7,10 +7,10 @@
 from __future__ import annotations
 
 from textwrap import fill
-from typing import Any
-from urllib.parse import quote
+from typing import Any, cast
+from urllib.parse import quote, urlparse
 
-from requests import JSONDecodeError
+from requests import JSONDecodeError, Response
 from requests.exceptions import Timeout
 
 from pywikibot import Site
@@ -74,7 +74,7 @@ class SparqlQuery(WaitingMixin):
             self.endpoint = endpoint
             self.entity_url = entity_url
 
-        self.last_response = None
+        self.last_response: Response | Exception | None = None
 
         if max_retries is not None:
             self.max_retries = max_retries
@@ -148,7 +148,8 @@ class SparqlQuery(WaitingMixin):
         url = f'{self.endpoint}?query={quote(query)}'
         while True:
             try:
-                self.last_response = http.fetch(url, headers=headers)
+                self.last_response = cast(Response,
+                                          http.fetch(url, headers=headers))
             except Timeout:
                 pass
             except ServerError as e:
@@ -169,7 +170,7 @@ class SparqlQuery(WaitingMixin):
             # not in case the response otherwise might have it in between
             strcontent = self.last_response.content.decode()
             if (strcontent.startswith('<!DOCTYPE html>')
-                and 'https://commons-query.wikimedia.org' in url
+                and urlparse(url).hostname == 'commons-query.wikimedia.org'
                 and ('Special:UserLogin' in strcontent
                      or 'Special:OAuth' in strcontent)):
                 raise NoUsernameError(fill(

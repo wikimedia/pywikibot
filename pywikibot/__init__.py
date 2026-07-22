@@ -314,7 +314,7 @@ def showDiff(oldtext: str,  # noqa: N802
 # Throttle and thread handling
 
 
-def sleep(secs: int) -> None:
+def sleep(secs: int | float) -> None:
     """Suspend execution of the current thread for the given number of seconds.
 
     Drop this process from the throttle log if wait time is greater than

@@ -7,7 +7,7 @@ repos:
       - id: check-hooks-apply
       - id: check-useless-excludes
   - repo: https://gitlab.wikimedia.org/repos/ci-tools/commit-message-validator
-    rev: v2.2.0
+    rev: v2.3.0
     hooks:
       - id: commit-message-validator
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -64,7 +64,7 @@ repos:
     hooks:
       - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.20
+    rev: v0.15.21
     hooks:
       - id: ruff-check
         alias: ruff
@@ -96,7 +96,7 @@ repos:
         name: isort (skip future annotations)
         files: ^(pwb|pywikibot/families/__init__)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.89.0
+    rev: v0.90.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
@@ -113,7 +113,7 @@ repos:
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+    rev: v2.2.0
     hooks:
       - id: mypy
         args: [--config-file=pyproject.toml, --follow-imports=silent]
@@ -124,10 +124,10 @@ repos:
         # They should be also used in conftest.py to exclude them from non-voting mypy test.
         files: |-
           (?x)^pywikibot/(
-            (__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|exceptions|fixes|logging|plural|time|titletranslate)|
+            (__metadata__|backports|config|cosmetic_changes|daemonize|diff|echo|exceptions|fixes|logging|login|plural|time|titletranslate)|
             (comms|data|families|specialbots)/__init__|
             comms/eventstreams|
-            data/(api/(__init__|_optionset)|citoid|memento|wikistats)|
+            data/(api/(__init__|_generators|_optionset)|citoid|memento|wikistats)|
             families/[a-z][a-z\d]+_family|
             page/(__init__|_decorators|_page|_revision|_user)|
             pagegenerators/(__init__|_filters)|

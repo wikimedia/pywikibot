@@ -128,7 +128,7 @@ Pywikibot provides bot classes to develop your own script easily:
                 options[opt[1:]] = value
         MyBot(generator=gen_factory.getCombinedGenerator(), **options).run()
 
-    if __name == '__main__':
+    if __name__ == '__main__':
         main()
 
 

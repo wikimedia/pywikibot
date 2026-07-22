@@ -14,7 +14,7 @@ from pywikibot.page._filepage import FileInfo, FilePage
 from pywikibot.page._links import BaseLink, Link, SiteLink, html2unicode
 from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
-from pywikibot.page._user import User
+from pywikibot.page._user import Contribution, User
 from pywikibot.page._wikibase import (
     Claim,
     ItemPage,
@@ -50,6 +50,7 @@ __all__ = (
     'FileInfo',
     'WikibaseEntity',
     'MediaInfo',
+    'Contribution',
     'Revision',
     'html2unicode',
 )

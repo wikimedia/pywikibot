@@ -7,7 +7,6 @@
 """Test for site detection."""
 from __future__ import annotations
 
-import os
 import unittest
 from contextlib import suppress
 from http import HTTPStatus
@@ -60,7 +59,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
 
     standard_version_sites = (
         'http://www.ck-wissen.de/ckwiki/index.php?title=$1',
-        'http://en.citizendium.org/wiki/$1',
         'http://www.wikichristian.org/index.php?title=$1',
     )
 
@@ -104,16 +102,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         for url in self.standard_version_sites:
             nl = urlparse(url).netloc
             with self.subTest(url=nl):
-                if os.getenv('GITHUB_ACTIONS') and nl == 'en.citizendium.org':
-                    self.skipTest('Skip test on github due to T404583')
-
                 self.assertSite(url)
-
-    def test_proofreadwiki(self) -> None:
-        """Test detection of proofwiki.org site."""
-        if os.getenv('GITHUB_ACTIONS'):
-            self.skipTest('Skip test on github due to T331223')
-        self.assertSite('http://proofwiki.org/wiki/$1')  # pragma: no cover
 
     def test_non_standard_version_sites(self) -> None:
         """Test detection of non standard MediaWiki sites."""

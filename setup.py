@@ -15,7 +15,7 @@
     make_dist -remote
 
 - create a new tag with the version number of the final release
-- synchronize the local tags with the remote repositoy
+- synchronize the local tags with the remote repository
 - merge current master branch to stable branch
 - push new stable branch to Gerrit and merge it the stable repository
 - prepare the next master release by increasing the version number in

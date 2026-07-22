@@ -154,7 +154,7 @@ user_agent_description: str | None = None
 # True for enabling fake UA, False for disabling / using pywikibot's own UA,
 # str to specify custom UA.
 fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
-# Website domains excepted to the default behaviour.
+# Website domains that are exceptions to the default behaviour.
 # True for enabling, False for disabling, str to hardcode a UA.
 # Example: {'problematic.site.example': True,
 #           'prefers.specific.ua.example': 'snakeoil/4.2'}

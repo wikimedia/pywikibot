@@ -123,7 +123,7 @@ class SetupBase(abc.ABC):
     def _check_module(module: str, module_type: int) -> bool:
         """Return whether a module or CLI command is available.
 
-        .. version-added: 11.5
+        .. version-added:: 11.5
 
         :param module: Module or command name.
         :param module_type: Type of module, either MODULE or COMMAND.
@@ -142,11 +142,9 @@ class SetupBase(abc.ABC):
 
         :return: True if no error occurs, else False
         """
-        tools = (
-            ('build', MODULE),
-            ('pyclean', COMMAND),
-            ('twine', MODULE),
-        )
+        tools = (('pyclean', COMMAND), )
+        if not self.clear:
+            tools += ('build', MODULE), ('twine', MODULE)
         for tool, tool_type in tools:
             if not self._check_module(tool, tool_type):
                 if not self.upgrade:
