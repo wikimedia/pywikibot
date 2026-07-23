@@ -68,7 +68,6 @@ jobs:
       - name: Test with pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 25
         env:
           PYTHONWARNINGS: ignore:urllib3 v2 only supports OpenSSL
           PYTHONIOENCODING: utf-8
