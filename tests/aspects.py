@@ -39,6 +39,7 @@ from pywikibot.site import BaseSite
 from pywikibot.tools import (  # noqa: F401 (used by eval())
     PYTHON_VERSION,
     MediaWikiVersion,
+    classproperty,
     suppress_warnings,
 )
 from tests import (
@@ -1734,15 +1735,13 @@ class HttpbinTestCase(TestCase):
 
     hostname = 'httpbin.org'
 
-    def get_httpbin_url(self, path=''):
-        """Return url of httpbin."""
-        return 'http://httpbin.org' + path
+    @classproperty
+    def httpbin(cls) -> str:
+        """Return URL of httpbin."""
+        return f'http://{cls.hostname}'
 
-    def get_httpbin_hostname(self) -> str:
-        """Return httpbin hostname."""
-        return 'httpbin.org'
-
-    def fetch(self, *args, **kwargs):
+    @staticmethod
+    def fetch(*args, **kwargs):
         """Delegate http request to http.fetch but skip on ServerError."""
         with skipping(ServerError):
             return http.fetch(*args, **kwargs)

@@ -132,7 +132,7 @@ class TestHttpStatus(HttpbinTestCase):
                 Server504Error,
                 r'Server ([^\:]+|[^\:]+:[0-9]+)'
                 r' timed out'):
-            http.fetch(self.get_httpbin_url('/status/504'))
+            http.fetch(self.httpbin + '/status/504')
 
     def test_server_not_found(self) -> None:
         """Test server not found exception."""
@@ -160,8 +160,8 @@ class TestHttpStatus(HttpbinTestCase):
                          HTTPStatus.MOVED_PERMANENTLY.value)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
-        r = http.fetch(
-            self.get_httpbin_url('/redirect-to?url=https://www.wikidata.org'))
+        r = http.fetch(self.httpbin
+                       + 'redirect-to?url=https://www.wikidata.org')
         self.assertIsNotEmpty(r.history)
         self.assertEqual(r.history[0].status_code, HTTPStatus.FOUND.value)
         self.assertEqual(r.history[-1].status_code,
@@ -251,44 +251,38 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     def test_existing_headers(self) -> None:
         """Test fake_user_agent with existing headers."""
-        r = self.fetch(self.get_httpbin_url('/status/200'),
+        r = self.fetch(self.httpbin + '/status/200',
                        headers={'user-agent': 'EXISTING'})
         self.assertEqual(r.request.headers['user-agent'], 'EXISTING')
 
     def test_argument_values_changes(self) -> None:
         """Test fake_user_agent with argument value changes."""
-        r = self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent=True)
+        url = self.httpbin + '/status/200'
+        r = self.fetch(url, use_fake_user_agent=True)
         self.assertNotEqual(r.request.headers['user-agent'], http.user_agent())
 
-        r = self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent=False)
+        r = self.fetch(url, use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], http.user_agent())
 
-        r = self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent='ARBITRARY')
+        r = self.fetch(url, use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.request.headers['user-agent'], 'ARBITRARY')
 
     def test_empty_value(self) -> None:
         """Test fake_user_agent with empty value."""
         with self.assertRaisesRegex(ValueError,
                                     'Invalid parameter: use_fake_user_agent'):
-            self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent='')
+            self.fetch(self.httpbin + '/status/200', use_fake_user_agent='')
 
     def test_parameter_set_to_none(self) -> None:
         """Test fake_user_agent with parameter wrongly set to None."""
         with self.assertRaisesRegex(ValueError,
                                     'Invalid parameter: use_fake_user_agent'):
-            self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent=None)
+            self.fetch(self.httpbin + '/status/200', use_fake_user_agent=None)
 
     def test_overridden_domains(self) -> None:
         """Test fake_user_agent with manually overridden domains."""
-        config.fake_user_agent_exceptions = {
-            self.get_httpbin_hostname(): 'OVERRIDDEN'}
-        r = self.fetch(self.get_httpbin_url('/status/200'),
-                       use_fake_user_agent=False)
+        config.fake_user_agent_exceptions = {self.hostname: 'OVERRIDDEN'}
+        r = self.fetch(self.httpbin + '/status/200', use_fake_user_agent=False)
         self.assertEqual(r.request.headers['user-agent'], 'OVERRIDDEN')
 
 
@@ -496,7 +490,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     def setUp(self) -> None:
         """Set up tests."""
         super().setUp()
-        self.url = self.get_httpbin_url('/get')
+        self.url = self.httpbin + '/get'
 
     def test_no_params(self) -> None:
         """Test fetch method with no parameters."""
