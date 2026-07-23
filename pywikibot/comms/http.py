@@ -176,7 +176,13 @@ class _UserAgentFormatter(Formatter):
             if key == 'revision':
                 return revision
 
-        if key in ('code', 'lang', 'family', 'script_product', 'version'):
+        if key in (
+            'code',
+            'lang',
+            'family',
+            'script_product',
+            'version'
+        ):  # pragma: no cover
             repl = replacements[key]
             issue_deprecation_warning(
                 f'{{{key}}} value for user_agent',
@@ -283,7 +289,7 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     return formatted.replace('()', '').replace('  ', ' ').strip()
 
 
-def fake_user_agent() -> str:
+def fake_user_agent() -> str:  # pragma: no cover
     """Return a fake user agent."""
     try:
         from fake_useragent import UserAgent
