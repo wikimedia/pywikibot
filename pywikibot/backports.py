@@ -324,12 +324,10 @@ if PYTHON_VERSION < (3, 15) or SPHINX_RUNNING:
         def _get_module_name(depth: int = 1, default: str = '__main__') -> str:
             """Return the module name of a caller frame."""
             d = depth + 1
-            if PYTHON_VERSION >= (3, 12):
-                return (
-                    sys._getframemodulename(d)  # type: ignore[attr-defined]
-                    or default
-                )
+            if hasattr(sys, '_getframemodulename'):
+                return sys._getframemodulename(d) or default
 
+            # Python < 3.12 or GraalPy
             return sys._getframe(d).f_globals.get('__name__', default)
 
         if PYTHON_VERSION >= (3, 10):
