@@ -5,8 +5,8 @@ Pywikibot tests
 The Pywikibot tests are based on the `unittest framework
 <https://docs.python.org/3/library/unittest.html>`_.
 
-The tests package provides a function load_tests that supports the
-`load tests protocol
+The tests package provides a function :func:`tests.load_tests` that supports
+the `load tests protocol
 <https://docs.python.org/3/library/unittest.html#load-tests-protocol>`_.
 The default ordering begins with tests of underlying components, then tests
 site and page semantics, and finishes with tests of the scripts and finally
@@ -30,7 +30,7 @@ The entire suite of tests may be run in the following ways from the root directo
 
 **pytest**
 
-.. note:: Python 3.10 or higher is required to run pytest.
+.. note:: Running the test suite with pytest requires Python 3.10 or higher.
 
 ::
 
@@ -110,17 +110,17 @@ Environment variables
     PYWIKIBOT_TEST_NO_RC=1
 
 **PYWIKIBOT_TEST_OAUTH**
-  This environment variable holds the Oauth token. It is set by
+  This environment variable holds the OAuth token. It is set by
   ``oauth_tests-ci.yml`` CI config file and is solely used by
   :source:`tests/oauth_tests`. You can use it for your private tests. The
   environment variable must contain consumer key and secret and access
   key and secret delimited by ``:`` as::
 
-    PYWIKIBOT_TEST_OAUTH=consumer_key:consumer_secret:access_key:access:secret
+    PYWIKIBOT_TEST_OAUTH=consumer_key:consumer_secret:access_key:access_secret
 
 **PYWIKIBOT_TEST_QUIET**
-  This environment variable can be set for quit mode. It prevents output by
-  test package, i.e. 'max_retries reduced from x to y'. It is used be the
+  This environment variable can be set for quiet mode. It prevents output by
+  test package, i.e. 'max_retries reduced from x to y'. It is used by the
   :func:`tests.utils.execute` test runner. To enable it for other tests use::
 
         PYWIKIBOT_TEST_QUIET=1
@@ -230,33 +230,44 @@ avoided.
   def test_patch(self):
     self.assertEqual('pong', http_ping())
 
+
 Contributing tests
 ==================
 
-Test modules should be named according to the pywikibot that is being tested.
-e.g. the module pywikibot.page is tested by tests.page_tests.
+The test package distinguishes between framework tests, which cover Pywikibot
+framework components, and script tests, which cover individual Pywikibot
+scripts.
 
-New test classes should be added to the existing test modules unless it
-tests a new component of pywikibot.
+Test modules should be named according to the Pywikibot component being
+tested. For example, the module :mod:`pywikibot.page` is tested by
+:source:`tests/page_tests`.
 
-All test classes must be a subclass of tests.aspects.TestCase, which uses a
-metaclass to dynamically check the test can be run on a specified site, or
-run a test on multiple sites.
+New test classes should be added to the existing test modules unless they
+test a new component of Pywikibot.
+
+All test classes must be a subclass of :class:`TestCase
+<tests.aspects.TestCase>`. Its metaclass validates the declared test environment
+and dynamically creates the required site objects. Tests can declare a specific
+site, multiple sites, or other behaviour attributes as described in
+:ref:`Test behaviour attributes`.
+
 
 Test sites
 ----------
 
-If a test depends on a specific site, add class attributes 'family' and code'.
+If a test depends on a specific site, add the class attributes ``family``
+and ``code``:
 
 ::
 
     family = 'wikipedia'
     code = 'en'
 
-Once declared, the Site object can be accessed at self.site.
+Once declared, the Site object is available as ``self.site``.
 
 
-If a test requires multiple specific sites, add a class attribute 'sites'.
+If a test requires multiple specific sites, define the ``sites`` class
+attribute. Each key becomes a separate test variant.
 
 ::
 
@@ -271,30 +282,139 @@ If a test requires multiple specific sites, add a class attribute 'sites'.
         }
     }
 
-To obtain the Site object, call self.get_site with the key given to the site.
+To obtain the Site object, call :meth:`get_site<tests.TestCase.get_site>`
+with the key given to the site:
 
 ::
 
     self.get_site('itwikt')
 
-For tests which require network access to a website which is not an APISite,
-the class attribute 'sites' may include a hostname.
+If a test method accepts the site key as its second positional argument,
+the metaclass creates one test for each entry in ``sites`` and passes the
+corresponding key to the test method:
+
+::
+
+    def test_something(self, site_key):
+        site = self.get_site(site_key)
+
+For tests which require network access to a host which is not a MediaWiki
+API site, the class attribute 'sites' may include a hostname:
 
 ::
 
     sites = {
-        'wdq':
+        'wdq': {
             'hostname': 'query.wikidata.org',
         }
     }
 
+If no API site is used and only hosts are require, you may define
+``hostname`` or ``hostnames``:
 
-Other class attributes
-----------------------
+::
 
-- ``net = False``: test class does not use a site
-- ``dry = True``: test class can use a fake site object
-- ``cached = True``: test class may aggressively cache API responses
-- ``login = True``: test class needs to login to site
-- ``rights = '<rights>'``: test class needs specific rights. Multiple rights  must be delimited with ``,``.
-- ``write = True``: test class needs to write to a site
+    hostname = 'query.wikidata.org'
+
+or:
+
+::
+
+    hostnames = [
+        'query.wikidata.org',
+        'example.org',
+    ]
+
+The hosts are added to the test site's definitions and checked for network
+availability.
+
+
+Test behaviour attributes
+-------------------------
+
+The following class attributes control the behaviour of a test class.
+Attributes which enable additional functionality are normally set to
+``True``. Attributes which are not set keep their default behaviour.
+
+Some attributes implicitly enable additional behaviour or add mixins to
+the test class.
+
+
+Caching
+~~~~~~~
+
+``cached = True``
+    The test class may aggressively cache API responses. This adds
+    :class:`ForceCacheMixin<tests.aspects.ForceCacheMixin>`. ``cached``
+    is intended for read-only tests and must not be combined with
+    ``write = True``.
+
+
+Network access
+~~~~~~~~~~~~~~
+
+``net = True``
+    The test class explicitly requires network access.
+
+``net = False``
+    The test class explicitly declares that no network access is used.
+
+    Test classes which do not use a site must explicitly define ``net``.
+
+``site = False``
+    The test class does not use a Site object. This adds
+    :class:`DisableSiteMixin<tests.aspects.DisableSiteMixin>` and prevents
+    calls to :func:`pywikibot.Site`. ``site = False`` is commonly combined
+    with ``net = False`` for tests which do not access a site or the network.
+
+Disconnected site tests
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``dry = True``
+    The test class uses disconnected Site objects instead of accessing real
+    sites. This adds :class:`DisconnectedSiteMixin
+    <tests.aspects.DisconnectedSiteMixin>`. ``dry`` implicitly disables
+    network access (equivalent to ``net = False``).
+
+
+Authentication
+~~~~~~~~~~~~~~
+
+``login = True``
+    The test class requires authentication on the configured site. This
+    adds :class:`RequireLoginMixin<tests.aspects.RequireLoginMixin>`.
+
+``oauth = True``
+    The test class uses OAuth authentication when authentication is required.
+
+``rights = '<rights>'``
+    The test class requires specific user rights. Multiple rights must be
+    separated by commas. Setting ``rights`` implicitly enables ``login = True``
+    and adds :class:`NeedRightsMixin<tests.aspects.NeedRightsMixin>`.
+
+
+Writing tests
+~~~~~~~~~~~~~
+
+``write = True``
+    The test class performs write operations on a site. This adds
+    :class:`SiteWriteMixin<tests.aspects.SiteWriteMixin>`. Setting ``write``
+    implicitly enables ``login = True``. Write tests require explicit enabling
+    through the test environment ``PYWIKIBOT_TEST_WRITE``.
+
+
+Script execution
+~~~~~~~~~~~~~~~~
+
+``pwb = True``
+    The test class invokes scripts through :mod:`pwb`. Test classes using
+    ``pwb`` normally require a configured site. If a ``pwb`` test does not
+    use a site, it must explicitly define ``site = False``.
+
+
+Wikibase tests
+~~~~~~~~~~~~~~
+
+``wikibase = True``
+    The test class requires sites with a Wikibase data repository. This
+    is used by :class:`WikibaseTestCase<tests.aspects.WikibaseTestCase>`.

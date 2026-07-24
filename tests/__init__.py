@@ -3,15 +3,38 @@
 #
 # Distributed under the terms of the MIT license.
 #
-"""Package tests."""
+"""Core infrastructure for the Pywikibot test suite.
+
+This module defines the main groups of test modules and implements the
+`unittest load tests protocol
+<https://docs.python.org/3/library/unittest.html#load-tests-protocol>`_.
+It controls the order in which test modules are loaded and provides the
+entry point used by the test runner.
+
+It also provides helpers for locating test data paths and for controlling
+API request caching during tests.
+
+The test modules are grouped into library tests, which cover Pywikibot
+library components, and script tests, which cover Pywikibot scripts. The
+corresponding module collections are available as
+:data:`library_test_modules` and :data:`script_test_modules`.
+
+Shared test infrastructure such as test case classes and reusable test
+components is implemented in :mod:`tests.aspects`, :mod:`tests.basepage`,
+and :mod:`tests.utils`.
+
+For information about running tests, writing new tests, and available test
+options, see :ref:`Pywikibot tests`.
+"""
 from __future__ import annotations
 
 
 __all__ = (
-    'create_path_func', 'join_cache_path', 'join_data_path',
-    'join_html_data_path', 'join_images_path', 'join_pages_path',
-    'join_root_path', 'join_xml_data_path', 'patch_request', 'unittest_print',
-    'unpatch_request',
+    'TestRequest', 'create_path_func', 'collector', 'join_cache_path',
+    'join_data_path', 'join_html_data_path', 'join_images_path',
+    'join_pages_path', 'join_root_path', 'join_xml_data_path',
+    'library_test_modules', 'load_tests', 'patch_request',
+    'script_test_modules', 'unittest_print', 'unpatch_request',
 )
 
 import functools
@@ -65,6 +88,8 @@ join_html_data_path = create_path_func(join_data_path, 'html')
 # Find the root directory of the checkout
 _pwb_py = join_root_path('pwb.py')
 
+#: Names of test modules covering Pywikibot framework components.
+#: The corresponding test files end with ``_tests.py``.
 library_test_modules = {
     'api',
     'basesite',
@@ -143,6 +168,8 @@ library_test_modules = {
     'xmlreader'
 }
 
+#: Names of test modules covering Pywikibot scripts.
+#: The corresponding test files end with ``_tests.py``.
 script_test_modules = {
     'add_text',
     'archivebot',

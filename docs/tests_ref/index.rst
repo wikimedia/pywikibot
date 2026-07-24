@@ -12,6 +12,7 @@ Test utilities
 .. toctree::
    :titlesonly:
 
+   tests
    aspects
    basepage
    utils
