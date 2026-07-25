@@ -132,7 +132,7 @@ class TestHttpStatus(HttpbinTestCase):
                 Server504Error,
                 r'Server ([^\:]+|[^\:]+:[0-9]+)'
                 r' timed out'):
-            http.fetch(self.httpbin + '/status/504')
+            self.fetch(self.httpbin + '/status/504')
 
     def test_server_not_found(self) -> None:
         """Test server not found exception."""
@@ -160,7 +160,7 @@ class TestHttpStatus(HttpbinTestCase):
                          HTTPStatus.MOVED_PERMANENTLY.value)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
-        r = http.fetch(self.httpbin
+        r = self.fetch(self.httpbin
                        + '/redirect-to?url=https://www.wikidata.org')
         self.assertIsNotEmpty(r.history)
         self.assertEqual(r.history[0].status_code, HTTPStatus.FOUND.value)
