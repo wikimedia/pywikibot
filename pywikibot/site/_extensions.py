@@ -472,7 +472,7 @@ class FlaggedRevsMixin:
     """APISite mixin for the FlaggesRevs extension.
 
     .. version-added:: 11.7
-    .. seealso:: https://www.mediawiki.org/wiki/Extension:FlaggedRevs
+    .. seealso:: :ext:`FlaggedRevs`
     """
 
     @need_extension('FlaggedRevs')
