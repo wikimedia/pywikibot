@@ -1,7 +1,13 @@
 Release 11.7
 ============
 
-* (no changes yet)
+* All ``ucshow`` parameters of :api:`Usercontribs` are supported by
+  :meth:`APSite.usercontribs()<pywikibot.site._generators.GeneratorsMixin.usercontribs>`,
+  :meth:`pywikibot.User.contributions` and :meth:`pywikibot.User.contribs`.
+* :ext:`FlaggedRevs` support was added. The :meth:`APSite.stable_revid()
+  <pywikibot.site._extensions.FlaggedRevsMixin.stable_revid>` site method
+  and the :attr:`page.BasePage.stable_revision_id` and :attr:`page.BasePage.stable_revision`
+  properties were added to retrieve the stable revision and its id. (:phab:`T409848`)
 
 
 Deprecations

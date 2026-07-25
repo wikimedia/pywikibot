@@ -1,6 +1,18 @@
 Scripts Changelog
 =================
 
+11.7.0
+------
+
+revertbot
+^^^^^^^^^
+
+* :class:`scripts.revertbot.ContribRevertBot` class was introduced where
+  contribution items are :class:`page.Contributions`. Users who want to
+  customize the bot's behaviour should subclass from it. The legacy classes
+  :class:`scripts.revertbot.BaseRevertBot` and :class:`scripts.revertbot.myRevertBot`
+  are deprecated.
+
 11.6.0
 ------
 
