@@ -13,11 +13,13 @@ from __future__ import annotations
 import os
 import shlex
 import subprocess
+import sys
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 from sys import platform
 from textwrap import fill
+from typing import Protocol, cast, no_type_check
 
 import pywikibot
 from pywikibot import config
@@ -30,9 +32,20 @@ except ImportError as e:
     GUI_ERROR = e
 
 
-OSWIN32 = platform == 'win32'
+OSWIN32 = sys.platform == 'win32'
 if OSWIN32:
     import winreg
+
+
+__all__ = ('TextEditor', )
+
+
+class EditableUI(Protocol):  # noqa: D101
+
+    def editText(self, text: str,  # noqa: D102, N802
+                 jumpIndex: int | None = None,
+                 highlight: str | None = None) -> str | None:
+        ...
 
 
 class TextEditor:
@@ -144,10 +157,11 @@ class TextEditor:
                 ' separately on your platform.') + '\n')
 
         assert pywikibot.ui is not None
-        return pywikibot.ui.editText(text, jumpIndex=jumpIndex,
-                                     highlight=highlight)
+        return cast(EditableUI, pywikibot.ui).editText(
+            text, jumpIndex=jumpIndex, highlight=highlight)
 
     @staticmethod
+    @no_type_check  # winreg is unavailable on non-Windows platforms
     def _win32_extension_command(extension: str) -> str | None:
         """Get the command from the Win32 registry for an extension."""
         fileexts_key = \
