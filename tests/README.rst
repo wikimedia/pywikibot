@@ -83,6 +83,16 @@ With -code and -family or -site options pwb can be used to specify a site.
 Environment variables
 =====================
 
+**PYWIKIBOT_TEST_DEFAULT_ONLY**
+  Only run tests which use the configured default site, i.e. tests derived
+  from :class:`DefaultSiteTestCase<tests.aspects.DefaultSiteTestCase>`.
+  This can be used to skip tests with fixed ``family``/``code`` values in
+  redundant CI jobs where only the default site differs. To enable it, set::
+
+    PYWIKIBOT_TEST_DEFAULT_ONLY=1
+
+  .. version-added:: 11.7
+
 **PYWIKIBOT_TEST_LOGOUT**
   Used when a test is logging out the test user. This environment variable
   enables :source:`tests/site_login_logout_tests`. The environment setting is

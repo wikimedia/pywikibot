@@ -1060,6 +1060,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     """Run tests on pre-defined sites."""
 
+    is_defaultsite_test = False
+
     @classmethod
     def setUpClass(cls) -> None:
         """Set up the test class.
@@ -1068,6 +1070,9 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         has declared are needed.
         """
         super().setUpClass()
+        if (os.getenv('PYWIKIBOT_TEST_DEFAULT_ONLY', '0') == '1'
+                and not cls.is_defaultsite_test):
+            raise unittest.SkipTest('Only default site tests are enabled.')
 
         if not hasattr(cls, 'sites'):
             return
@@ -1270,6 +1275,7 @@ class DefaultSiteTestCase(TestCase):
 
     family = config.family
     code = config.mylang
+    is_defaultsite_test = True
 
     @classmethod
     def override_default_site(cls, site) -> None:
