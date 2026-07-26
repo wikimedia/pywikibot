@@ -125,7 +125,6 @@ jobs:
       - name: Oauth tests with unittest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 8
         env:
           PYWIKIBOT_TEST_WRITE: 1
           PYWIKIBOT_TEST_OAUTH: ${{ secrets[format('{0}', steps.token.outputs.uppercase)] }}

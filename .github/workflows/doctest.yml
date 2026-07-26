@@ -20,7 +20,7 @@ env:
 jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -69,7 +69,6 @@ jobs:
       - name: doctest with pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 5
         env:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
           # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
