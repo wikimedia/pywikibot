@@ -1435,14 +1435,14 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
         """Test site.alldeletedrevisions() method with invalid range."""
         mysite = self.get_site()
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             adrgen = mysite.alldeletedrevisions(user=mysite.user(),
                                                 start='2008-10-03T00:00:01Z',
                                                 end='2008-10-03T23:59:59Z',
                                                 total=5)
             next(adrgen)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             adrgen = mysite.alldeletedrevisions(user=mysite.user(),
                                                 start='2008-10-03T23:59:59Z',
                                                 end='2008-10-03T00:00:01Z',
@@ -1517,11 +1517,11 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
                 '2008-10-15T06:00:01Z' <= rev['timestamp']
                 <= '2008-10-15T23:59:59Z')
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.watchlist_revs(start='2008-09-03T00:00:01Z',
                                   end='2008-09-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.watchlist_revs(start='2008-09-03T23:59:59Z',
                                   end='2008-09-03T00:00:01Z',
                                   reverse=True, total=5)
