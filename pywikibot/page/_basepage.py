@@ -23,6 +23,7 @@ from pywikibot.backports import NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
+    InconsistentTitleError,
     InvalidPageError,
     IsNotRedirectPageError,
     IsRedirectPageError,
@@ -458,11 +459,21 @@ class BasePage(ComparableMixin):
         """Return an old revision of this page.
 
         .. version-added:: 9.6
+        .. version-changed:: 11.7
+           Validate the *oldid* parameter.
 
         :param oldid: The revid of the revision desired.
-        :param content: If True, retrieve the content of the revision
-            (default False)
+        :param force:  If ``True``, reload revision information from the
+            live site.
+        :param content: If ``True``, retrieve the content of the
+            revision.
+        :raises ValueError: Invalid revision id *oldid*.
+        :raises InconsistentTitleError: The *oldid* does not belong to
+            the current :class:`BasePage`.
         """
+        if type(oldid) is not int or oldid <= 0:
+            raise ValueError(f'Invalid revision id {oldid!r}')
+
         if force or oldid not in self._revisions \
            or (content and self._revisions[oldid].text is None):
             self.site.loadrevisions(self, content=content, revids=oldid)
@@ -621,6 +632,108 @@ class BasePage(ComparableMixin):
             return self.get_revision(revid, content=True)
 
         return None
+
+    def _check_revision(self, revid: int, refresh: bool) -> None:
+        """Check whether the *revid* is valid and belongs to this page."""
+        try:
+            self.get_revision(revid, force=refresh)
+        except InconsistentTitleError as e:
+            raise ValueError(
+                f'Revision {revid} does not belong to {self}'
+            ) from e
+
+    def review(
+        self,
+        *,
+        summary: str | None = None,
+        revid: int | None = None,
+        flag: int | None = None,
+        refresh: bool = False,
+    ) -> None:
+        """Review a revision of this page.
+
+        .. version-added:: 11.7
+
+        .. seealso::
+           - :meth:`unreview`
+           - :attr:`stable_revision_id`
+           - :attr:`latest_revision_id`
+           - :attr:`APISite.review_revision
+             <pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+
+        :param summary: Optional review comment.
+        :param revid: Revision ID to review. If None, review the latest
+            revision.
+        :param flag: Set the review flag value.
+        :param refresh: If ``True``, reload revision information from
+            the live site.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Invalid *revid* or unsupported *flag* parameter.
+        """
+        if revid is None:
+            if refresh:
+                del self.latest_revision_id
+            revid = self.latest_revision_id
+        else:
+            self._check_revision(revid, refresh)
+
+        self.site.review_revision(
+            revid,
+            summary=summary,
+            flag=flag,
+        )
+
+        # The stable revision may have changed.
+        del self.stable_revision_id
+
+    def unreview(
+        self,
+        *,
+        summary: str | None = None,
+        revid: int | None = None,
+        refresh: bool = False,
+    ) -> None:
+        """Unreview a revision of this page.
+
+        .. version-added:: 11.7
+
+        .. seealso::
+           - :meth:`review`
+           - :attr:`stable_revision_id`
+           - :attr:`APISite.review_revision
+             <pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+
+        :param summary: Optional review comment.
+        :param revid: Revision ID to unreview. If None, unreview the
+            latest **stable** revision.
+        :param refresh: If ``True``, reload revision information from
+            the live site.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Invalid *revid* parameter.
+        """
+        if revid is None:
+            if refresh:
+                del self.stable_revision_id
+            revid = self.stable_revision_id
+            if revid is None:
+                return
+        else:
+            self._check_revision(revid, refresh)
+
+        self.site.review_revision(
+            revid,
+            summary=summary,
+            unapprove=True,
+        )
+
+        # The stable revision may have changed.
+        del self.stable_revision_id
 
     @property
     def text(self) -> str:

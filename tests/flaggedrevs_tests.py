@@ -11,7 +11,11 @@ from contextlib import suppress
 from unittest.mock import MagicMock, patch
 
 import pywikibot
-from pywikibot.exceptions import APIError, UnknownExtensionError
+from pywikibot.exceptions import (
+    APIError,
+    UnknownExtensionError,
+    UserRightsError,
+)
 from pywikibot.page import Revision
 from tests.aspects import PatchingTestCase, TestCase
 
@@ -276,6 +280,118 @@ class TestFlaggedRevsReview(PatchingTestCase):
             comment=None,
             formatversion=2,
         )
+
+
+class TestBasePageReview(TestCase):
+
+    """Test review and unreview methods."""
+
+    family = 'wikipedia'
+    code = 'test2'
+    cache = True
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Set up test class."""
+        super().setUpClass()
+        cls.flagged = pywikibot.Page(cls.site, 'BTP')
+        cls.unflagged = pywikibot.Page(cls.site, 'UBTP')
+
+    def test_revision_ids(self):
+        """Test revision ids."""
+        self.assertEqual(self.flagged.stable_revision_id,
+                         self.flagged.latest_revision_id)
+        self.assertIsNotNone(self.unflagged.latest_revision_id)
+        self.assertIsNone(self.unflagged.stable_revision_id)
+
+    def test_review_check_revisions(self):
+        """Test exceptions."""
+        with self.assertRaisesRegex(
+            ValueError,
+            r'Revision 4711 does not belong to \[\[test2:BTP\]\]'
+        ):
+            self.flagged.review(revid=4711)
+        with self.assertRaisesRegex(ValueError, "Invalid revision id '0815'"):
+            self.flagged.review(revid='0815')
+        with self.assertRaisesRegex(ValueError, 'Invalid revision id True'):
+            self.flagged.review(revid=True)
+        with self.assertRaisesRegex(ValueError, 'Invalid revision id 3.14159'):
+            self.flagged.review(revid=3.14159)
+        with self.assertRaisesRegex(ValueError, 'Invalid revision id -273'):
+            self.flagged.review(revid=-273)
+
+    def test_review(self):
+        """Test review calls without site.review_revision."""
+        with self.assertRaisesRegex(
+            UserRightsError,
+            r'User ".+" does not have required user right "review" on site'
+        ):
+            self.flagged.review()
+        self.assertNotHasAttr(self.flagged, '_stable_revision_id')
+
+        with self.assertRaisesRegex(
+            UserRightsError,
+            r'User ".+" does not have required user right "review" on site'
+        ):
+            self.unflagged.review()
+        self.assertNotHasAttr(self.flagged, '_stable_revision_id')
+
+    def test_unreview(self):
+        """Test unreview calls without site.review_revision."""
+        self.assertIsNone(self.unflagged.unreview())
+        self.assertHasAttr(self.unflagged, '_stable_revision_id')
+        self.assertIsNone(self.unflagged.unreview(refresh=True))
+        self.assertHasAttr(self.unflagged, '_stable_revision_id')
+
+        with self.assertRaisesRegex(
+            UserRightsError,
+            r'User ".+" does not have required user right "review" on site'
+        ):
+            self.flagged.unreview()
+        self.assertHasAttr(self.flagged, '_stable_revision_id')
+
+        with self.assertRaisesRegex(
+            UserRightsError,
+            r'User ".+" does not have required user right "review" on site'
+        ):
+            self.flagged.unreview(refresh=True)
+        self.assertHasAttr(self.flagged, '_stable_revision_id')
+
+    def test_review_calls_site(self):
+        """Test review calls site.review_revision."""
+        revid = self.unflagged.latest_revision_id
+
+        with patch.object(
+            self.site,
+            'review_revision',
+            return_value=None,
+        ) as review_revision:
+            self.unflagged.review()
+
+        review_revision.assert_called_once_with(
+            revid,
+            summary=None,
+            flag=None,
+        )
+        self.assertNotHasAttr(self.unflagged, '_stable_revision_id')
+
+    def test_unreview_calls_site(self):
+        """Test unreview calls site.review_revision."""
+        revid = self.flagged.stable_revision_id
+
+        with patch.object(
+            self.site,
+            'review_revision',
+            return_value=None,
+        ) as review_revision:
+            self.flagged.unreview()
+
+        review_revision.assert_called_once_with(
+            revid,
+            summary=None,
+            unapprove=True,
+        )
+        self.assertNotHasAttr(self.flagged, '_stable_revision_id')
 
 
 if __name__ == '__main__':
