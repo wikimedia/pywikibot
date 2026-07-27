@@ -622,24 +622,24 @@ class TestSiteGenerators(DefaultSiteTestCase):
         func = self.site.assert_valid_iter_params
 
         # reverse=False, is_ts=False
-        self.assertIsNone(func('m', 1, 2, False, False))
+        self.assertIsNone(func('m', 1, 2, False, is_ts=False))
         with self.assertRaises(ValueError):
-            func('m', 2, 1, False, False)
+            func('m', 2, 1, False, is_ts=False)
 
         # reverse=False, is_ts=True
-        self.assertIsNone(func('m', 2, 1, False, True))
+        self.assertIsNone(func('m', 2, 1, False, is_ts=True))
         with self.assertRaises(ValueError):
-            func('m', 1, 2, False, True)
+            func('m', 1, 2, False, is_ts=True)
 
         # reverse=True, is_ts=False
-        self.assertIsNone(func('m', 2, 1, True, False))
+        self.assertIsNone(func('m', 2, 1, True, is_ts=False))
         with self.assertRaises(ValueError):
-            func('m', 1, 2, True, False)
+            func('m', 1, 2, True, is_ts=False)
 
         # reverse=True, is_ts=True
-        self.assertIsNone(func('m', 1, 2, True, True))
+        self.assertIsNone(func('m', 1, 2, True, is_ts=True))
         with self.assertRaises(ValueError):
-            func('m', 2, 1, True, True)
+            func('m', 2, 1, True, is_ts=True)
 
 
 class TestUnconnectedPages(DefaultSiteTestCase):
