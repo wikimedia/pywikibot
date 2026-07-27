@@ -15,6 +15,7 @@ the framework::
           |    └── UploadError
           ├── AutoblockUserError
           ├── CaptchaError
+          ├── CitoidError
           ├── ClientError
           |    └── Client414Error
           ├── InvalidTitleError
@@ -287,6 +288,14 @@ class UploadError(APIError):
     def message(self) -> str:
         """Return warning message."""
         return self.info
+
+
+class CitoidError(Error):
+
+    """The Citoid service returned an error.
+
+    .. version-added:: 11.7
+    """
 
 
 class PageRelatedError(Error):
