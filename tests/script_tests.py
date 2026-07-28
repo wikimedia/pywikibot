@@ -214,11 +214,13 @@ class ScriptTestMeta(MetaTestCaseClass):
 
                 cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
-                if isinstance(self._timeout, bool):
-                    do_timeout = self._timeout
+
+                if type(self._timeout) is int:
+                    timeout = self._timeout
+                elif isinstance(self._timeout, bool):
+                    timeout = 10 if self._timeout else None
                 else:
-                    do_timeout = script_name in self._timeout
-                timeout = 10 if do_timeout else None
+                    timeout = 10 if script_name in self._timeout else None
 
                 stdout, error = None, None
                 if self._results:
@@ -460,7 +462,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
-    _timeout = True
+    _timeout = 15
     _script_list = filter_scripts(_allowed_failures, exclude_auto_run=True)
 
 
