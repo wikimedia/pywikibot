@@ -212,25 +212,29 @@ class Python314AssertionsMixin:  # pragma: no cover
 
 class TestTimerMixin(unittest.TestCase):
 
-    """Time each test and report excessive durations."""
+    """Time each test and report excessive durations.
 
-    # Number of seconds each test may consume
-    # before a note is added after the test.
-    test_duration_warning_interval = 10
+    .. version-changed:: 11.7
+       Test durations are now measured in :meth:`run` using
+       :func:`time.perf_counter`.
+    """
 
-    def setUp(self) -> None:
-        """Set up test."""
-        self.test_start = time.time()
-        super().setUp()
+    #: Number of seconds each test may consume
+    #: before a note is added after the test.
+    test_duration_warning_interval = 10.0
 
-    def tearDown(self) -> None:
-        """Tear down test."""
-        super().tearDown()
-        self.test_completed = time.time()
-        duration = self.test_completed - self.test_start
-        if duration > self.test_duration_warning_interval:
-            unittest_print(f' {duration:.3f}s', end=' ')
-            sys.stdout.flush()
+    def run(
+        self,
+        result: unittest.TestResult | None = None
+    ) -> unittest.TestResult:
+        """Run the test and report its duration."""
+        start = time.perf_counter()
+        try:
+            return super().run(result)
+        finally:
+            duration = time.perf_counter() - start
+            if duration > self.test_duration_warning_interval:
+                unittest_print(f'{self._testMethodName}: {duration:.1f} s')
 
 
 # Add Python314AssertionsMixin on Python < 3.14
