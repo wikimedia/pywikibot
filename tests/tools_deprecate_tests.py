@@ -279,6 +279,7 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         rv = deprecated_func(1)
         self.assertEqual(rv, 1)
+        self.assertDeprecation(self.NO_INSTEAD)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func')
 
     def test_deprecated_function2(self) -> None:
@@ -295,6 +296,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         """Test @deprecated with functions, using instead."""
         rv = deprecated_func_instead('a')
         self.assertEqual(rv, 'a')
+        self.assertDeprecation(self.INSTEAD)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_instead',
                                        'baz')
 

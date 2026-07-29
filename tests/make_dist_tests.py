@@ -52,7 +52,7 @@ class TestMakeDist(TestCase):
                 msg,
                 'Distribution must not be a developmental release to upload'
             )
-        else:
+        else:  # pragma: no cover
             self.assertEqual(msg, '')
 
     @patch.object(make_dist.SetupBase, '_check_module', return_value=False)
