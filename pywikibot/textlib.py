@@ -241,14 +241,14 @@ def _tag_pattern(tag_name: str) -> str:
     """Return a tag pattern for the given tag name."""
     return (
         rf'<{ignore_case(tag_name)}(?:>|\s+[^>]*(?<!/)>)'  # start tag
-        r'[\s\S]*?'  # contents
+        r'.*?'  # contents
         rf'</{ignore_case(tag_name)}\s*>'  # end tag
     )
 
 
 def _tag_regex(tag_name: str):
     """Return a compiled tag regex for the given tag name."""
-    return re.compile(_tag_pattern(tag_name))
+    return re.compile(_tag_pattern(tag_name), re.DOTALL)
 
 
 def _create_default_regexes() -> None:
@@ -265,14 +265,14 @@ def _create_default_regexes() -> None:
         # categories
         'category': (r'\[\[ *(?:%s)\s*:.*?\]\]',
                      lambda site: '|'.join(site.namespaces[14])),
-        'comment': re.compile(r'<!--[\s\S]*?-->'),
+        'comment': re.compile(r'<!--.*?-->', re.DOTALL),
         # files
         'file': (FILE_LINK_REGEX, lambda site: '|'.join(site.namespaces[6])),
         # section headers
         'header': re.compile(
-            r'(?:(?<=\n)|\A)(?:<!--[\s\S]*?-->)*'
-            r'(=(?:[^\n]|<!--[\s\S]*?-->)+=)'
-            r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
+            r'(?:(?<=\n)|\A)(?s:<!--.*?-->)*'
+            r'(=(?:[^\n]|(?s:<!--.*?-->))+=)'
+            r' *(?s:<!--.*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
         # also finds links to foreign sites with preleading ":"
@@ -283,15 +283,15 @@ def _create_default_regexes() -> None:
                 + list(site.family.obsolete.keys()))),
         # Module invocations (currently only Lua)
         'invoke': (
-            r'\{\{\s*\#(?:%s):[\s\S]*?\}\}',
+            r'\{\{\s*\#(?:%s):(?s:.*?)\}\}',
             lambda site: '|'.join(
                 ignore_case(mw) for mw in site.getmagicwords('invoke'))),
         # this matches internal wikilinks, but also interwiki, categories, and
         # images.
         'link': re.compile(r'\[\[[^\]|]*(\|[^\]]*)?\]\]'),
         # pagelist tag (used in Proofread extension).
-        'pagelist': re.compile(r'<{}[\s\S]*?/>'
-                               .format(ignore_case('pagelist'))),
+        'pagelist': re.compile(r'<{}.*?/>'
+                               .format(ignore_case('pagelist')), re.DOTALL),
         # Wikibase property inclusions
         'property': (
             r'\{\{\s*\#(?:%s):\s*[Pp]\d+.*?\}\}',
@@ -306,7 +306,8 @@ def _create_default_regexes() -> None:
         # source code readability.
         # TODO: handle nested tables.
         'table': re.compile(
-            r'(?:(?<=\n)|\A){\|[\S\s]*?\n\|}|%s' % _tag_pattern('table')),
+            r'(?:(?<=\n)|\A){\|.*?\n\|}|%s' % _tag_pattern('table'),
+            re.DOTALL),
         'template': NESTED_TEMPLATE_REGEX,
     })
 

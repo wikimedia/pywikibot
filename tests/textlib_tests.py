@@ -1183,6 +1183,17 @@ class TestReplaceExcept(DefaultSiteTestCase):
                                                '\n-->\n', 'x', 'y',
                                                ['header'], site=self.site),
                          '\n<!--\ncomment-->==x==<!--comment\n-->\n')
+        self.assertEqual(textlib.replaceExcept('\n==x<!--\n'
+                                               'comment-->==\n', 'x', 'y',
+                                               ['header'], site=self.site),
+                         '\n==x<!--\n'
+                         'comment-->==\n')
+        self.assertEqual(textlib.replaceExcept('\n{|\n x \n|}\n', 'x', 'y',
+                                               ['table'], site=self.site),
+                         '\n{|\n x \n|}\n')
+        self.assertEqual(textlib.replaceExcept('{{#invoke:foo\n|x}}', 'x', 'y',
+                                               ['invoke'], site=self.site),
+                         '{{#invoke:foo\n|x}}')
         self.assertEqual(textlib.replaceExcept('<pre>x</pre>', 'x', 'y',
                                                ['pre'], site=self.site),
                          '<pre>x</pre>')

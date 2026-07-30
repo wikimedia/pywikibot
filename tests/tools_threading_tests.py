@@ -238,7 +238,7 @@ class BoundedThreadPoolTests(TestCase):
             BoundedPoolExecutor(Executor)
         with self.assertRaisesRegex(
             TypeError,
-            r'(duplicate base class |Cannot create a consistent method[\s\S]*)'
+            r'(duplicate base class |Cannot create a consistent method(?s:.*))'
             "'?BoundedPoolExecutor'?"
         ):
             BoundedPoolExecutor(BoundedPoolExecutor)
