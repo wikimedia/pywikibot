@@ -105,6 +105,7 @@ library_test_modules = {
     'dry_site',
     'echo',
     'edit',
+    'editor',
     'edit_failure',
     'exceptions',
     'eventstreams',
