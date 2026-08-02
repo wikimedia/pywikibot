@@ -145,7 +145,7 @@ class AbstractRevertBot(OptionHandler, abc.ABC):
                 comment += ': ' + self.opt.comment
 
             old = page.text
-            page.text = page.getOldVersion(rev.revid)
+            page.text = page.get_revision(rev.revid, content=True).text
             pywikibot.showDiff(old, page.text)
             page.save(comment)
             return comment

@@ -300,13 +300,13 @@ class TestPageObjectEnglish(TestCase):
         self.assertIsInstance(mainpage.oldest_revision.timestamp,
                               pywikibot.Timestamp)
 
-    def test_old_version(self) -> None:
-        """Test page.getOldVersion()."""
+    def test_get_revision_content(self) -> None:
+        """Test page.get_revision() with content."""
         mainpage = self.get_mainpage()
         revid = mainpage.oldest_revision.revid
         self.assertIsNone(mainpage.oldest_revision.text)
         self.assertIsNone(mainpage._revisions[revid].text)
-        text = mainpage.getOldVersion(revid)
+        text = mainpage.get_revision(revid, content=True).text
         self.assertEqual(
             text[:53], "'''[[Welcome, newcomers|Welcome]] to [[Wikipedia]]'''")
         self.assertEqual(text, mainpage._revisions[revid].text)
