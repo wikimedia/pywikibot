@@ -133,7 +133,8 @@ class Timestamp(datetime.datetime):
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
     @classmethod
-    def _from_iso8601(cls, timestr: str) -> Timestamp:
+    def _from_iso8601(cls, timestr: str,
+                      separators: str = 'T ') -> Timestamp:
         """Convert a string in ISO8601 format to a Timestamp object.
 
         ISO8601 format:
@@ -141,7 +142,8 @@ class Timestamp(datetime.datetime):
 
         .. version-added:: 7.5
         """
-        RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
+        RE_ISO8601 = (rf'(?:\d{{4}}-\d{{2}}-\d{{2}})'  # noqa: N806
+                      rf'(?P<sep>[{re.escape(separators)}])'
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
                       r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?'
                       )
@@ -253,7 +255,8 @@ class Timestamp(datetime.datetime):
                 f'ts argument must be a string or a Timestamp object,'
                 f' not {type(ts).__name__}')
 
-        return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
+        assert len(sep) == 1
+        return cls._from_iso8601(ts, sep)
 
     @classmethod
     def fromtimestampformat(cls,
