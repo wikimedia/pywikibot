@@ -157,6 +157,7 @@ library_test_modules = {
     'tools_threading',
     'ui',
     'ui_options',
+    'unlinkbot',
     'upload',
     'uploadbot',
     'user',

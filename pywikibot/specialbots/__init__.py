@@ -6,12 +6,17 @@
 """Module containing special bots reusable by scripts."""
 from __future__ import annotations
 
-from pywikibot.specialbots._unlink import BaseUnlinkBot, InteractiveUnlink
+from pywikibot.specialbots._unlink import (
+    BaseUnlinkBot,
+    EditReplacementError,
+    InteractiveUnlink,
+)
 from pywikibot.specialbots._upload import UploadRobot
 
 
 __all__ = (
     'BaseUnlinkBot',
+    'EditReplacementError',
     'InteractiveUnlink',
     'UploadRobot',
 )
