@@ -596,6 +596,21 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 self.assertRaises(ValueError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
+    def test_blocks_show(self) -> None:
+        """Test the site.blocks() show filter."""
+        mysite = self.get_site()
+
+        for filters, expected in (
+            ({}, []),
+            ({'ip': True, 'temp': False}, ['ip', '!temp']),
+            ({'account': False, 'ip_range': True}, ['!account', 'range']),
+        ):
+            with self.subTest(filters=filters):
+                generator = mysite.blocks(**filters)
+                options = generator.request['bkshow']
+                self.assertIsInstance(options, api.OptionSet)
+                self.assertCountEqual(options.api_iter(), expected)
+
     def test_exturlusage(self) -> None:
         """Test the site.exturlusage() method."""
         mysite = self.get_site()

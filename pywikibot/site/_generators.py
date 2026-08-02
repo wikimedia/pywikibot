@@ -1264,6 +1264,11 @@ class GeneratorsMixin:
         users: str | Iterable[str] | None = None,
         iprange: str | None = None,
         total: int | None = None,
+        *,
+        account: bool | None = None,
+        ip: bool | None = None,
+        ip_range: bool | None = None,
+        temp: bool | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Iterate all current blocks, in order of creation.
 
@@ -1278,6 +1283,9 @@ class GeneratorsMixin:
         .. warning::
            ``iprange`` parameter cannot be used together with ``users``.
 
+        .. version-changed:: 11.7
+           The *account*, *ip*, *ip_range* and *temp* parameters were added.
+
         :param starttime: Start iterating at this Timestamp
         :param endtime: Stop iterating at this Timestamp
         :param reverse: If True, iterate oldest blocks first (default: newest)
@@ -1287,6 +1295,14 @@ class GeneratorsMixin:
         :param iprange: A single IP or an IP range. Ranges broader than
             IPv4/16 or IPv6/19 are not accepted.
         :param total: Total amount of block entries
+        :param account: If ``True``, only iterate account blocks; if ``False``,
+            only iterate non-account blocks; if ``None``, iterate both.
+        :param ip: If ``True``, only iterate IP blocks; if ``False``, only
+            iterate non-IP blocks; if ``None``, iterate both.
+        :param ip_range: If ``True``, only iterate range blocks; if ``False``,
+            only iterate non-range blocks; if ``None``, iterate both.
+        :param temp: If ``True``, only iterate temporary blocks; if ``False``,
+            only iterate permanent blocks; if ``None``, iterate both.
         """
         if starttime and endtime:
             self.assert_valid_iter_params('blocks', starttime, endtime,
@@ -1314,6 +1330,14 @@ class GeneratorsMixin:
             bkgen.request['bkusers'] = users
         elif iprange:
             bkgen.request['bkip'] = iprange
+        filters = {
+            'account': account,
+            'ip': ip,
+            'range': ip_range,
+            'temp': temp,
+        }
+        bkgen.request['bkshow'] = api.OptionSet(self, 'blocks', 'show',
+                                                filters)
         return bkgen
 
     def exturlusage(
