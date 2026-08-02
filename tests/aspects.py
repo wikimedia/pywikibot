@@ -22,6 +22,8 @@ from collections.abc import Iterable, Iterator, Sized
 from contextlib import contextmanager, suppress
 from functools import wraps
 from http import HTTPStatus
+from itertools import chain
+from typing import TypeVar
 from unittest.util import safe_repr
 
 import pywikibot
@@ -58,6 +60,7 @@ from tests.utils import (
 )
 
 
+T = TypeVar('T')
 OSWIN32 = (sys.platform == 'win32')
 SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
 
@@ -249,22 +252,32 @@ class TestCaseBase(*bases):
     """Base class for all tests."""
 
     def assertIsEmpty(self, seq, msg=None) -> None:
-        """Check that the sequence is empty."""
+        """Check that the sequence is empty.
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None) -> None:
-        """Check that the sequence is not empty."""
+        """Check that the sequence is not empty.
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if not seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None) -> None:
-        """Verify that a sequence seq has the length of other."""
-        # the other parameter may be given as a sequence too
+        """Verify that a sequence seq has the length of other.
+
+        The *other* parameter may be given as a sequence too
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         first_len = len(seq)
         try:
@@ -276,6 +289,37 @@ class TestCaseBase(*bases):
             msg = self._formatMessage(
                 msg, f'len({safe_repr(seq)}): {first_len} != {second_len}')
             self.fail(msg)
+
+    def assertHasItems(
+        self,
+        iterable: Iterable[T],
+        msg: str | None = None,
+    ) -> Iterator[T]:
+        """Assert that an iterable yields at least one item.
+
+        Return an iterator yielding all items from *iterable*, including
+        the first one.
+
+        .. note::
+           If *iterable* is an iterator, use the returned iterator
+           instead of the original one.
+
+        .. version-added:: 11.7
+
+        :param iterable: Iterable to check.
+        :param msg: The message to be shown on failure.
+        :return: An iterator yielding all items from *iterable*.
+        """
+        missing = sentinel('MISSING')
+        iterator = iter(iterable)
+        first = next(iterator, missing)
+
+        if first is missing:
+            msg = self._formatMessage(
+                msg, f'{safe_repr(iterable)} yields no items')
+            self.fail(msg)
+
+        return chain((first,), iterator)
 
     def assertPageInNamespaces(self, page, namespaces: int | set[int]) -> None:
         """Assert that Pages is in namespaces.
@@ -301,7 +345,7 @@ class TestCaseBase(*bases):
            the *count* parameter was dropped; all pages from *gen* are
            tested.
 
-        :param gen: Page generator
+        :param gen: Page iterable
         :param site: Site of expected pages
         :meta public:
         """
