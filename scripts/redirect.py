@@ -160,7 +160,6 @@ class RedirectGenerator(OptionHandler):
         redict = {}
         # open xml dump and read page titles out of it
         dump = xmlreader.XmlDump(xmlFilename, on_error=pywikibot.error)
-        redirR = self.site.redirect_regex
         readPagesCount = 0
         pageTitles = set()
         for entry in dump.parse():
@@ -177,7 +176,10 @@ class RedirectGenerator(OptionHandler):
                 pageTitles.add(space_to_underscore(pywikibot.Link(entry.title,
                                                                   self.site)))
 
-            m = redirR.match(entry.text)
+            m = None
+            if entry.isredirect:
+                m = self.site.redirect_match(
+                    entry.text, content_model=entry.content_model)
             if m:
                 target = m[1]
                 # There might be redirects to another wiki. Ignore these.

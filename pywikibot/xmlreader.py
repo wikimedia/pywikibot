@@ -40,7 +40,11 @@ from pywikibot.tools import (
 @dataclass
 class XmlEntry:
 
-    """Represent a page."""
+    """Represent a page.
+
+    .. version-changed:: next
+       The *content_model* field was added.
+    """
 
     # TODO: there are more tags we can read.
     title: str
@@ -55,6 +59,7 @@ class XmlEntry:
     revisionid: str
     comment: str
     isredirect: bool
+    content_model: str = 'wikitext'
 
 
 class Headers(NamedTuple):
@@ -323,6 +328,7 @@ class XmlDump:
             timestamp=revision.findtext(f'{uri}timestamp'),
             revisionid=revision.findtext(f'{uri}id'),
             comment=revision.findtext(f'{uri}comment'),
+            content_model=(revision.findtext(f'{uri}model') or 'wikitext'),
             # could get comment, minor as well
         )
 

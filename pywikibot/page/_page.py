@@ -160,6 +160,8 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
 
         .. version-changed:: 9.3
            *botflag* keyword parameter was renamed to *bot*.
+        .. version-changed:: next
+           Scribunto redirects use their Lua redirect syntax.
 
         :param target_page: Target of the redirect, this argument is
             required.
@@ -184,8 +186,10 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
         if self.exists() and not self.isRedirectPage() and not force:
             raise IsNotRedirectPageError(self)
 
+        content_model = self.content_model
         old_text = self.text
-        result = self.site.redirect_regex.search(old_text)
+        result = self.site.redirect_match(
+            old_text, content_model=content_model)
         if result:
             oldlink = result[1]
             if (keep_section and '#' in oldlink
@@ -200,10 +204,9 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
         else:
             prefix = suffix = ''
 
-        target_link = target_page.title(as_link=True, textlink=True,
-                                        allow_interwiki=False)
-        target_link = f'#{self.site.redirect()} {target_link}'
-        self.text = prefix + target_link + suffix
+        redirect_text = self.site.format_redirect(
+            target_page, content_model=content_model)
+        self.text = prefix + redirect_text + suffix
         if save:
             self.save(**kwargs)
 

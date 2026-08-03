@@ -66,6 +66,54 @@ class TestBaseSiteProperties(TestCase):
         self.assertEqual(mysite.doc_subpage, self.sites[key]['result'])
 
 
+class TestRedirectMethods(DefaultSiteTestCase):
+
+    """Test content-model-aware redirect methods."""
+
+    dry = True
+
+    def test_redirect_match(self) -> None:
+        """Test redirect matching for supported content models."""
+        tests = (
+            ('#REDIRECT [[Target]]', 'wikitext', 'Target'),
+            ('return require [[Module:Target]]',
+             'Scribunto', 'Module:Target'),
+        )
+        for text, content_model, target in tests:
+            with self.subTest(content_model=content_model):
+                match = self.site.redirect_match(
+                    text, content_model=content_model)
+                self.assertIsNotNone(match)
+                self.assertEqual(match[1], target)
+
+    def test_redirect_match_uses_content_model(self) -> None:
+        """Test that redirect syntax is not applied to another model."""
+        self.assertIsNone(self.site.redirect_match(
+            'return require [[Module:Target]]',
+            content_model='wikitext',
+        ))
+        self.assertIsNone(self.site.redirect_match(
+            '#REDIRECT [[Target]]',
+            content_model='Scribunto',
+        ))
+        self.assertIsNone(self.site.redirect_match(
+            'Return require [[Module:Target]]',
+            content_model='Scribunto',
+        ))
+
+    def test_format_redirect(self) -> None:
+        """Test redirect formatting for supported content models."""
+        target = pywikibot.Page(self.site, 'Target#section')
+        self.assertEqual(
+            self.site.format_redirect(target),
+            f'#{self.site.redirect()} [[Target#section]]',
+        )
+        self.assertEqual(
+            self.site.format_redirect(target, content_model='Scribunto'),
+            'return require [[Target]]',
+        )
+
+
 class TestSiteObject(DefaultSiteTestCase):
 
     """Test cases for Site methods."""

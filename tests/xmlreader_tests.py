@@ -108,6 +108,7 @@ class ExportDotTenTestCase(TestCase):
         for entry in entries:
             self.assertEqual(entry.username, 'Carlossuarez46')
             self.assertFalse(entry.isredirect)
+            self.assertEqual(entry.content_model, 'wikitext')
 
         articles = entries[0:2]
         talks = entries[2:4]

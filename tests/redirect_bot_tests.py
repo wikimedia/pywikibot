@@ -13,7 +13,7 @@ from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot import Page
-from scripts.redirect import RedirectRobot
+from scripts.redirect import RedirectGenerator, RedirectRobot
 from tests.aspects import DefaultSiteTestCase
 
 
@@ -30,6 +30,41 @@ class RedirectTestRobot(RedirectRobot):
     def site(self):
         """Patch site to return a site object."""
         return pywikibot.Site()
+
+
+class TestRedirectGenerator(DefaultSiteTestCase):
+
+    """Test the RedirectGenerator class."""
+
+    dry = True
+
+    @patch('scripts.redirect.xmlreader.XmlDump')
+    def test_scribunto_redirect_from_dump(self, xml_dump) -> None:
+        """Test extracting a Scribunto redirect from an XML dump."""
+        entry = Mock(
+            title='SoundTable',
+            text='return require [[Sound table]]',
+            isredirect=True,
+            content_model='Scribunto',
+        )
+        not_redirect = Mock(
+            title='Lua example',
+            text='return require [[Example]]',
+            isredirect=False,
+            content_model='Scribunto',
+        )
+        xml_dump.return_value.parse.return_value = [entry, not_redirect]
+        with patch.object(pywikibot, 'Site', return_value=self.site):
+            generator = RedirectGenerator(
+                'double', xml='dump.xml', namespaces={0})
+
+        redirects, page_titles = generator.get_redirects_from_dump()
+
+        self.assertEqual(
+            redirects,
+            {'SoundTable': 'Sound_table'},
+        )
+        self.assertIsEmpty(page_titles)
 
 
 @patch.object(Page, 'exists', new=Mock(return_value=True))

@@ -424,6 +424,54 @@ class BaseSite(ComparableMixin):
         return re.compile(fr'\s*#(?:{tags})\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]',
                           re.IGNORECASE | re.DOTALL)
 
+    def redirect_match(
+        self,
+        text: str,
+        *,
+        content_model: str | None = 'wikitext',
+    ) -> re.Match[str] | None:
+        """Return a match object for redirect *text*.
+
+        Group 1 in the match object is the redirect target. Matching is
+        selected by *content_model*; unrecognized models use wikitext syntax.
+
+        .. version-added:: next
+
+        :param text: Text to match.
+        :param content_model: Content model used to interpret *text*.
+        :return: Match object whose first group is the redirect target, or
+            ``None`` if *text* is not a redirect.
+        """
+        if content_model == 'Scribunto':
+            return re.fullmatch(r'return require \[\[(.*?)\]\]', text)
+        return self.redirect_regex.search(text)
+
+    def format_redirect(
+        self,
+        target_page: pywikibot.Page,
+        *,
+        content_model: str | None = 'wikitext',
+    ) -> str:
+        """Return redirect text pointing to *target_page*.
+
+        Formatting is selected by *content_model*; unrecognized models use
+        wikitext syntax.
+
+        .. version-added:: next
+
+        :param target_page: Target page of the redirect.
+        :param content_model: Content model used to format the redirect.
+        """
+        target_link = target_page.title(
+            as_link=True,
+            textlink=True,
+            allow_interwiki=False,
+            with_section=content_model != 'Scribunto',
+        )
+        if content_model == 'Scribunto':
+            return f'return require {target_link}'
+        return f'#{self.redirect()} {target_link}'
+
     def sametitle(self, title1: str, title2: str) -> bool:
         """Return True if title1 and title2 identify the same wiki page.
 
