@@ -1,13 +1,34 @@
 Release 11.7
 ============
 
+* Add ``show`` filters to :meth:`APISite.blocks()
+  <pywikibot.site._generators.GeneratorsMixin.blocks>`; they can be set by the new *account*, *ip*,
+  *ip_range* and *temp* parameters. (:phab:`T433531`)
+* Duplicate pages are no longer yielded in :meth:`page.BasePage.getReferences` and
+  :meth:`APISite.pagereferences()<pywikibot.site._generators.GeneratorsMixin.pagereferences>` when
+  backlinks and template inclusions overlap. (:phab:`T405551`)
+* :meth:`page.BasePage.getOldVersion` is only a convenience wrapper around
+  :meth:`page.BasePage.get_revision`. It is deprecated now in favour of
+  ``get_revision(oldid, content=True).text``.  (:phab:`T433799`)
+* HTML comments spanning multiple lines are now recognized with :class:`textlib.Timestripper`.
+  (:phab:`T432541`)
+* The *lang* parameter of the :func:`i18n.altlang` function is now positional-only. The *lang* value
+  is no longer included in the returned fallback sequence; the fallback sequence was changed from a
+  list to a tuple.
+* Raise the newly implemented :exc:`exceptions.CitoidError` when the Citoid service of the
+  :mod:`data.citoid` module returns an error response. (:phab:`T433230`)
+* Improvements for :meth:`APISite.assert_valid_iter_params()
+  <pywikibot.site._apisite.APISite.assert_valid_iter_params>`: the *msg_prefix* parameter is now
+  positional-only and the *is_ts* parameter is now keyword-only. If *start* and *end* parameters are
+  ``datetime`` objects, the *is_ts* parameter is always treated as ``True``. A ``ValueError`` is
+  raised instead of ``AssertionError`` when *start* and *end* parameters are in the wrong order.
 * All ``ucshow`` parameters of :api:`Usercontribs` are supported by
   :meth:`APSite.usercontribs()<pywikibot.site._generators.GeneratorsMixin.usercontribs>`,
   :meth:`pywikibot.User.contributions` and :meth:`pywikibot.User.contribs`.
 * :ext:`FlaggedRevs` support was added. The :meth:`APSite.stable_revid()
   <pywikibot.site._extensions.FlaggedRevsMixin.stable_revid>` site method
   and the :attr:`page.BasePage.stable_revision_id` and :attr:`page.BasePage.stable_revision`
-  properties were added to retrieve the stable revision and its id. (:phab:`T409848`)
+  properties were added to retrieve the stable revision and its ID. (:phab:`T409848`)
 
 
 Deprecations
@@ -110,6 +131,14 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.7.0: :meth:`page.BasePage.getOldVersion` is now deprecated in favour of
+  :meth:`get_revision(oldid, content=True).text<page.BasePage.get_revision>`. (:phab:`T433799`)
+* 11.7.0: The *lang* parameter of the :func:`i18n.altlang` function is positional-only. Passing
+  *lang* as a keyword argument is deprecated.
+* 11.7.0: The interface of :meth:`APISite.assert_valid_iter_params()
+  <pywikibot.site._apisite.APISite.assert_valid_iter_params>` was changed. The *msg_prefix*
+  parameter is now positional-only and the *is_ts* parameter is now keyword-only. The previous
+  interface is deprecated.
 * 11.6.0: The *top_only* parameter of :meth:`APISite.usercontribs
   <pywikibot.site._generators.GeneratorsMixin.usercontribs>` has been deprecated; use *top* instead
   (:phab:`T308961`)
