@@ -43,6 +43,9 @@ class TestPwb(PwbTestCase):
 
         direct = execute([sys.executable, '-m', package_name])
         vpwb = execute_pwb([script_path])
+
+        self.assertIsNone(direct['timeout'])
+        self.assertIsNone(vpwb['timeout'])
         self.maxDiff = None
         self.assertEqual(direct['stdout'], vpwb['stdout'])
 
@@ -112,6 +115,8 @@ class TestPwb(PwbTestCase):
             'in 5.0 seconds; type CTRL-C to stop.',
         ]
         stream = execute_pwb(['hello'], data_in=chr(3), timeout=10)
+        self.assertIsNone(stream['timeout'])
+
         stderr = io.StringIO(stream['stderr'])
         with self.subTest(line=0):
             self.assertEqual(stderr.readline().strip(), result[0])

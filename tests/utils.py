@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from contextlib import contextmanager, suppress
 from pathlib import Path
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Any, NoReturn
+from typing import NoReturn, TypedDict
 
 import pywikibot
 from pywikibot import config
@@ -463,15 +463,37 @@ class FakeLoginManager(pywikibot.login.ClientLoginManager):
         """Ignore password changes."""
 
 
-def execute(command: list[str], *, data_in=None, timeout=None):
+class ExecuteResult(TypedDict):
+
+    """Result returned by execute()."""
+
+    exit_code: int
+    stdout: str
+    stderr: str
+    timeout: TimeoutExpired | None
+
+
+def execute(
+    command: list[str],
+    *,
+    data_in: Sequence[str] | None = None,
+    timeout: int | float | None = None,
+) -> ExecuteResult:
     """Execute a command and capture outputs.
 
     .. version-changed:: 8.2
        *error* parameter was removed.
     .. version-changed:: 9.1
        parameters except *command* are keyword only.
+    .. version-changed:: 11.7
+       Return timeout information.
 
-    :param command: executable to run and arguments to use
+    :param command: executable to run and arguments to use.
+    :param data_in: Lines to send to the process via standard input.
+    :param timeout: Maximum number of seconds to wait for the process.
+    :return: Mapping containing the process exit code, captured stdout,
+        captured stderr, and the :exc:`subprocess.TimeoutExpired`
+        exception if the process timed out.
     """
     env = os.environ.copy()
 
@@ -493,28 +515,43 @@ def execute(command: list[str], *, data_in=None, timeout=None):
     # Set EDITOR to an executable that ignores all arguments and does nothing.
     env['EDITOR'] = 'break' if OSWIN32 else 'true'
 
-    p = Popen(command, env=env, stdout=PIPE, stderr=PIPE,
-              stdin=PIPE if data_in is not None else None)
+    p = Popen(
+        command,
+        env=env,
+        stdout=PIPE,
+        stderr=PIPE,
+        stdin=PIPE if data_in is not None else None
+    )
 
     if data_in is not None:
         data_in = data_in.encode(config.console_encoding)
 
+    timeout_error: TimeoutExpired | None = None
     try:
-        stdout_data, stderr_data = p.communicate(input=data_in,
-                                                 timeout=timeout)
-    except TimeoutExpired:
+        stdout_data, stderr_data = p.communicate(
+            input=data_in,
+            timeout=timeout
+        )
+    except TimeoutExpired as e:
+        timeout_error = e
         p.kill()
         stdout_data, stderr_data = p.communicate()
 
-    return {'exit_code': p.returncode,
-            'stdout': stdout_data.decode(config.console_encoding),
-            'stderr': stderr_data.decode(config.console_encoding)}
+    return {
+        'exit_code': p.returncode,
+        'stdout': stdout_data.decode(config.console_encoding),
+        'stderr': stderr_data.decode(config.console_encoding),
+        'timeout': timeout_error,
+    }
 
 
-def execute_pwb(args: list[str], *,
-                data_in: Sequence[str] | None = None,
-                timeout: int | float | None = None,
-                overrides: dict[str, str] | None = None) -> dict[str, Any]:
+def execute_pwb(
+    args: list[str],
+    *,
+    data_in: Sequence[str] | None = None,
+    timeout: int | float | None = None,
+    overrides: dict[str, str] | None = None,
+) -> ExecuteResult:
     """Execute the pwb.py script and capture outputs.
 
     .. version-changed:: 8.2
@@ -524,9 +561,18 @@ def execute_pwb(args: list[str], *,
     .. version-changed:: 10.4
        coverage is used if running github actions and a temporary file
        is used for overrides.
+    .. version-changed:: 11.7
+       The return value includes timeout information.
+
+    .. seealso:: :func:`execute`
 
     :param args: list of arguments for pwb.py
+    :param data_in: Lines to send to the process via standard input.
+    :param timeout: Maximum number of seconds to wait for the process.
     :param overrides: mapping of pywikibot symbols to test replacements
+    :return: Mapping containing the process exit code, captured stdout,
+        captured stderr, and the :exc:`subprocess.TimeoutExpired`
+        exception if the process timed out.
     """
     tmp_path: Path | None = None
     command = [sys.executable]
@@ -547,7 +593,10 @@ def execute_pwb(args: list[str], *,
         if use_coverage:
             # Write overrides in temporary file
             with tempfile.NamedTemporaryFile(
-                    'w', suffix='.py', delete=False) as f:
+                'w',
+                suffix='.py',
+                delete=False,
+            ) as f:
                 f.write(override_code)
                 tmp_path = Path(f.name)
                 command.append(f.name)
@@ -560,7 +609,10 @@ def execute_pwb(args: list[str], *,
     try:
         # Run subprocess
         result = execute(
-            command=command + args, data_in=data_in, timeout=timeout)
+            command=command + args,
+            data_in=data_in,
+            timeout=timeout,
+        )
     finally:
         # delete temporary file if created
         if tmp_path and tmp_path.exists():

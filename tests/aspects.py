@@ -54,6 +54,7 @@ from tests.utils import (
     AssertAPIErrorContextManager,
     DryRequest,
     DrySite,
+    ExecuteResult,
     WarningSourceSkipContextManager,
     execute_pwb,
     skipping,
@@ -1552,15 +1553,18 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:  # pragma: no cover
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
-    def execute(self, args: list[str], **kwargs):
+    def execute(self, args: list[str], **kwargs) -> ExecuteResult:
         """Run :func:`tests.utils.execute_pwb` with default site.
 
         .. version-changed:: 9.1
            pass all arguments to :func:`tests.utils.execute_pwb`; make
            this method public.
+        .. version-changed:: 11.7
+           Return timeout information.
 
         :param args: :mod:`pwb` warapper script arguments
         :param kwargs: keyword arguments of :func:`tests.utils.execute_pwb`
+        :return: Result of :func:`tests.utils.execute_pwb`.
         """
         site = self.get_site()
         args.append(f'-site:{site.sitename}')

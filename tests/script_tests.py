@@ -236,12 +236,22 @@ class ScriptTestMeta(MetaTestCaseClass):
                     test_overrides['pywikibot.Site'] = 'lambda *a, **k: None'
 
                 # run the script
-                result = execute_pwb(cmd, data_in=data_in, timeout=timeout,
-                                     overrides=test_overrides)
+                result = execute_pwb(
+                    cmd,
+                    data_in=data_in,
+                    timeout=timeout,
+                    overrides=test_overrides,
+                )
 
                 err_result = result['stderr']
                 out_result = result['stdout']
                 stderr_other = err_result.splitlines()
+
+                if timeout_error := result['timeout']:
+                    unittest_print(
+                        f' timeout after {timeout_error.timeout} s',
+                        end='  '
+                    )
 
                 if result['exit_code'] == -9:
                     unittest_print(' killed', end='  ')
