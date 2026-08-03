@@ -34,7 +34,7 @@ from pywikibot.tools import (
     deprecated_signature,
     is_ip_address,
 )
-from pywikibot.tools.itertools import filter_unique
+from pywikibot.tools.itertools import filter_unique, union_generators
 
 
 if typing.TYPE_CHECKING:
@@ -400,8 +400,13 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Convenience method combining pagebacklinks and page_embeddedin.
 
+        .. version-changed:: 11.7
+           Duplicate pages are no longer yielded when backlinks and template
+           inclusions overlap.
+
         :param namespaces: If present, only return links from the
             namespaces in this list.
+        :param total: Maximum number of unique pages to retrieve in total.
         :raises KeyError: A namespace identifier was not resolved
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -416,16 +421,24 @@ class GeneratorsMixin:
                                       filter_redirects=filter_redirects,
                                       namespaces=namespaces, total=total,
                                       content=content)
-        return itertools.islice(
-            itertools.chain(
-                self.pagebacklinks(
-                    page, follow_redirects=follow_redirects,
-                    filter_redirects=filter_redirects,
-                    namespaces=namespaces, content=content),
-                self.page_embeddedin(
-                    page, filter_redirects=filter_redirects,
-                    namespaces=namespaces, content=content)
-            ), total)
+        generators = (
+            self.pagebacklinks(
+                page, follow_redirects=follow_redirects,
+                filter_redirects=filter_redirects,
+                namespaces=namespaces, content=content),
+            self.page_embeddedin(
+                page, filter_redirects=filter_redirects,
+                namespaces=namespaces, content=content),
+        )
+        if follow_redirects:
+            # Following redirects chains multiple sorted backlink generators,
+            # so the resulting iterable itself is not necessarily sorted.
+            references = filter_unique(
+                itertools.chain(*generators), key=lambda item: item.pageid)
+        else:
+            references = union_generators(
+                *generators, key=lambda item: item.pageid)
+        return itertools.islice(references, total)
 
     def pagelinks(
         self,

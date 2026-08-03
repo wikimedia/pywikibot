@@ -1055,6 +1055,10 @@ class BasePage(ComparableMixin):
         If you need a full list of referring pages, use
         ``pages = list(s.getReferences())``
 
+        .. version-changed:: 11.7
+           Duplicate pages are no longer yielded when backlinks and template
+           inclusions overlap.
+
         :param follow_redirects: If True, also iterate pages that link to a
             redirect pointing to the page.
         :param with_template_inclusion: If True, also iterate pages where self
@@ -1063,7 +1067,7 @@ class BasePage(ComparableMixin):
             is used as a template.
         :param filter_redirects: If True, only iterate redirects to self.
         :param namespaces: Only iterate pages in these namespaces
-        :param total: Iterate no more than this number of pages in total
+        :param total: Iterate no more than this number of unique pages in total
         :param content: If True, retrieve the content of the current version
             of each referring page (default False)
         """

@@ -37,6 +37,63 @@ global_expected_params = {
 }
 
 
+class TestPageReferences(TestCase):
+
+    """Offline tests for Site.pagereferences."""
+
+    family = 'wikipedia'
+    code = 'en'
+    dry = True
+
+    def setUp(self) -> None:
+        """Initialize the test site."""
+        super().setUp()
+        self.site = self.get_site()
+        self.target = pywikibot.Page(self.site, 'Target')
+
+    def _page(self, title: str, pageid: int) -> pywikibot.Page:
+        """Create a page with a known page ID."""
+        page = pywikibot.Page(self.site, title)
+        page._pageid = pageid
+        return page
+
+    def test_pagereferences_unique(self) -> None:
+        """Test overlapping sorted generators only yield unique pages."""
+        page_a = self._page('A', 1)
+        backlink_b = self._page('B', 3)
+        embedded_b = self._page('B', 3)
+        page_c = self._page('C', 4)
+
+        with (
+            patch.object(self.site, 'pagebacklinks',
+                         return_value=iter((page_a, backlink_b))),
+            patch.object(self.site, 'page_embeddedin',
+                         return_value=iter((embedded_b, page_c))),
+        ):
+            references = list(self.site.pagereferences(self.target, total=3))
+
+        self.assertEqual(references, [page_a, backlink_b, page_c])
+        self.assertIs(references[1], backlink_b)
+
+    def test_pagereferences_follow_redirects_unique(self) -> None:
+        """Test unsorted redirect backlinks only yield unique pages."""
+        backlink_c = self._page('C', 3)
+        backlink_a = self._page('A', 1)
+        embedded_a = self._page('A', 1)
+        embedded_b = self._page('B', 2)
+
+        with (
+            patch.object(self.site, 'pagebacklinks',
+                         return_value=iter((backlink_c, backlink_a))),
+            patch.object(self.site, 'page_embeddedin',
+                         return_value=iter((embedded_a, embedded_b))),
+        ):
+            references = list(self.site.pagereferences(
+                self.target, follow_redirects=True))
+
+        self.assertEqual(references, [backlink_c, backlink_a, embedded_b])
+
+
 class TestSiteGenerators(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
@@ -68,11 +125,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
         with skipping(ApiTimeoutError):
             embedded = set(self.site.page_embeddedin(self.mainpage,
                                                      namespaces=[0]))
-        refs = set(self.site.pagereferences(self.mainpage, namespaces=[0]))
+        refs = list(self.site.pagereferences(self.mainpage, namespaces=[0]))
+        unique_refs = set(refs)
 
-        self.assertLessEqual(backlinks, refs)
-        self.assertLessEqual(embedded, refs)
-        self.assertEqual(refs, backlinks | embedded)
+        self.assertLength(refs, len(unique_refs))
+        self.assertLessEqual(backlinks, unique_refs)
+        self.assertLessEqual(embedded, unique_refs)
+        self.assertEqual(unique_refs, backlinks | embedded)
 
     def test_backlinks(self) -> None:
         """Test Site.pagebacklinks."""
