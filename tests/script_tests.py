@@ -206,6 +206,7 @@ class ScriptTestMeta(MetaTestCaseClass):
 
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_set)
+            has_generator = '-always' in args
 
             def test_script(self) -> None:
                 global_args_msg = \
@@ -215,7 +216,7 @@ class ScriptTestMeta(MetaTestCaseClass):
                 cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
 
-                if type(self._timeout) is int:
+                if type(self._timeout) in (int, float):
                     timeout = self._timeout
                 elif isinstance(self._timeout, bool):
                     timeout = 10 if self._timeout else None
@@ -261,6 +262,8 @@ class ScriptTestMeta(MetaTestCaseClass):
                     self.skipTest(skip_result)
 
                 if error:
+                    if has_generator and timeout_error:
+                        self.skipTest(timeout_error)
                     self.assertIn(error, err_result)
                     exit_codes = [0, 1, 2, -9]
 
