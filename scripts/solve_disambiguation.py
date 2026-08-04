@@ -976,36 +976,41 @@ class DisambiguationRobot(SingleSiteBot):
                 else:
                     replaceit = include == 'redirect'
 
-                new_page_title = answer[1]
-                rep = pywikibot.Page(pywikibot.Link(new_page_title,
+                rep = pywikibot.Page(pywikibot.Link(answer[1],
                                                     disamb_page.site))
-                new_page_title = rep.title()
+                new_page_title = rep.title(with_section=False)
+                new_page_section = rep.section()
                 if not (new_page_title[0].isupper()
                         or link_text[0].isupper()):
                     new_page_title = first_lower(new_page_title)
 
-                if new_page_title not in new_targets:
-                    new_targets.append(new_page_title)
+                new_link_target = new_page_title + (
+                    f'#{new_page_section}' if new_page_section else '')
+                # An explicit replacement section takes precedence.
+                section = section if new_page_section is None else ''
+
+                if new_link_target not in new_targets:
+                    new_targets.append(new_link_target)
 
                 if replaceit and trailing_chars:
-                    newlink = f'[[{new_page_title}{section}]]{trailing_chars}'
-                elif replaceit or (new_page_title == link_text
+                    newlink = f'[[{new_link_target}{section}]]{trailing_chars}'
+                elif replaceit or (new_link_target == link_text
                                    and not section):
-                    newlink = f'[[{new_page_title}]]'
+                    newlink = f'[[{new_link_target}]]'
                 # check if we can create a link with trailing characters
                 # instead of a pipelink
                 elif (
-                    (len(new_page_title) <= len(link_text))
-                    and (first_upper(link_text[:len(new_page_title)])
-                         == first_upper(new_page_title))
+                    (len(new_link_target) <= len(link_text))
+                    and (first_upper(link_text[:len(new_link_target)])
+                         == first_upper(new_link_target))
                     and (self.trailR.sub(
-                        '', link_text[len(new_page_title):]) == '')
+                        '', link_text[len(new_link_target):]) == '')
                     and (not section)
                 ):
-                    newlink = (f'[[{link_text[:len(new_page_title)]}]]'
-                               f'{link_text[len(new_page_title):]}')
+                    newlink = (f'[[{link_text[:len(new_link_target)]}]]'
+                               f'{link_text[len(new_link_target):]}')
                 else:
-                    newlink = f'[[{new_page_title}{section}|{link_text}]]'
+                    newlink = f'[[{new_link_target}{section}|{link_text}]]'
                 text = text[:match_start] + newlink + text[match_end:]
                 continue
 
