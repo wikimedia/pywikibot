@@ -490,18 +490,36 @@ class RedirectRobot(ExistingPageBot):
             pywikibot.info(f'{page} is on another site, skipping.')
         return None
 
-    def fix_moved_broken_redirects(self, target: pywikibot.Page) -> None:
+    def fix_moved_broken_redirects(
+        self,
+        target: pywikibot.Page,
+        visited: set[pywikibot.Page] | None = None,
+    ) -> None:
         """Try to fix a deleted redirect using moved_target method."""
         redir_page = self.current_page
         done = not self.opt.delete
         movedTarget = None
 
+        if visited is None:
+            visited = {redir_page}
+
+        if target in visited:
+            pywikibot.info(f'Redirect target {target} forms a redirect loop')
+            return
+
+        visited.add(target)
+
         with suppress(NoMoveTargetError):
             movedTarget = target.moved_target()
 
         if movedTarget:
+            if movedTarget in visited:
+                pywikibot.info(
+                    f'Redirect target {movedTarget} forms a redirect loop')
+                return
+
             if not movedTarget.exists():
-                self.fix_moved_broken_redirects(movedTarget)
+                self.fix_moved_broken_redirects(movedTarget, visited=visited)
                 # process other cases within recursive loop
                 return
 

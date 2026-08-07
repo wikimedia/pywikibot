@@ -71,6 +71,30 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         w.assert_called_with('No speedy deletion template "n" available.')
 
 
+class TestFixMovedBrokenRedirects(DefaultSiteTestCase):
+
+    """Test fix_moved_broken_redirects() loop handling."""
+
+    def test_cyclic_move_chain_terminates_without_editing_or_deleting(
+            self) -> None:
+        """Move chain A -> B -> C -> A must terminate without edits."""
+        page_a, page_b, page_c = Mock(), Mock(), Mock()
+        page_a.moved_target.return_value = page_b
+        page_b.moved_target.return_value = page_c
+        page_c.moved_target.return_value = page_a  # closes the loop
+        page_b.exists.return_value = False
+        page_c.exists.return_value = False
+
+        bot = RedirectTestRobot('broken', delete=True)
+        bot.delete_redirect = Mock()
+        bot.userPut = Mock(return_value=True)
+
+        bot.fix_moved_broken_redirects(page_a)  # must not hang/recurse
+
+        bot.delete_redirect.assert_not_called()
+        bot.userPut.assert_not_called()
+
+
 if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()
