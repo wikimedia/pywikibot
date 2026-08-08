@@ -131,11 +131,12 @@ class UploadRobot(BaseBot):
         self.filename_prefix = filename_prefix
         self.force_if_shared = force_if_shared
 
-        if config.upload_to_commons:
-            default_site = pywikibot.Site('commons')
+        if target_site:
+            self.target_site = target_site
+        elif config.upload_to_commons:
+            self.target_site = pywikibot.Site('commons')
         else:
-            default_site = pywikibot.Site()
-        self.target_site = target_site or default_site
+            self.target_site = pywikibot.Site()
 
     def read_file_content(self, file_url: str):
         """Return name of temp file in which remote file is saved."""

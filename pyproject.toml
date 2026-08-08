@@ -137,7 +137,7 @@ exclude_also = [
     "@unittest\\.skip",
     "class .+\\bProtocol\\):",
     "except (ImportError|ModuleNotFoundError)",
-    "except KeyboardInterrupt",
+    "except (Quit)?KeyboardInterrupt",
     "except OSError",
     "except SyntaxError",
     "except \\w*ServerError",

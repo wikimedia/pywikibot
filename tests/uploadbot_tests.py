@@ -68,18 +68,16 @@ class TestDryUploadbot(DefaultSiteTestCase):
 
     net = False
 
-    params = dict(  # noqa: C408
-        description='pywikibot upload.py script test',
-        keep_filename=True,
-        aborts=set(),
-        ignore_warning=True,
-    )
-
     def test_png_file(self) -> None:
         """Test UploadRobot attributes and methods."""
-        bot = UploadRobot(url=['test.png'], target_site=self.site,
-                          **self.params)
-        self.assertEqual(bot.description, self.params['description'])
+        params = {
+            'description': 'pywikibot upload.py script test',
+            'keep_filename': True,
+            'aborts': set(),
+            'ignore_warning': True,
+        }
+        bot = UploadRobot(url=['test.png'], target_site=self.site, **params)
+        self.assertEqual(bot.description, params['description'])
         self.assertTrue(bot._handle_warning('any warning'))  # ignore_warning
         self.assertTrue(bot.ignore_on_warn('any warning'))  # ignore_warning
         self.assertFalse(bot.abort_on_warn('any warning'))  # aborts
