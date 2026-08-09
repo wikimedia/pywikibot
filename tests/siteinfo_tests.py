@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 
 import pywikibot
 from pywikibot import async_request, page_put_queue
-from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase
 from tests.utils import entered_loop
 
 
@@ -98,9 +98,11 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertNotIn('### key not in siteinfo ###', self.site.siteinfo)
 
 
-class TestSiteinfoDry(DefaultDrySiteTestCase):
+class TestSiteinfoDry(DefaultSiteTestCase):
 
     """Test Siteinfo in dry mode."""
+
+    dry = True
 
     def test_siteinfo_timestamps(self) -> None:
         """Test that cache has the timestamp of CachedRequest."""

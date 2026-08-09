@@ -22,7 +22,7 @@ from pywikibot.site._interwikimap import _IWEntry
 from pywikibot.textlib import MultiTemplateMatchBuilder, extract_sections
 from pywikibot.tools import has_module
 from tests.aspects import (
-    DefaultDrySiteTestCase,
+    DefaultSiteTestCase,
     SiteAttributeTestCase,
     TestCase,
     require_modules,
@@ -131,9 +131,11 @@ class TestFormatInterwiki(TestCase):
                          textlib.interwikiFormat(interwikis, self.site))
 
 
-class TestFormatCategory(DefaultDrySiteTestCase):
+class TestFormatCategory(DefaultSiteTestCase):
 
     """Test category formatting."""
+
+    dry = True
 
     catresult = '[[Category:Cat1]]\n[[Category:Cat2]]\n'
 
@@ -164,9 +166,11 @@ class TestFormatCategory(DefaultDrySiteTestCase):
                          textlib.categoryFormat(data, self.site))
 
 
-class TestAddText(DefaultDrySiteTestCase):
+class TestAddText(DefaultSiteTestCase):
 
     """Test add_text function."""
+
+    dry = True
 
     def test_add_text(self) -> None:
         """Test adding text."""
@@ -176,13 +180,15 @@ class TestAddText(DefaultDrySiteTestCase):
         )
 
 
-class TestCategoryRearrangement(DefaultDrySiteTestCase):
+class TestCategoryRearrangement(DefaultSiteTestCase):
 
     """Ensure that sorting keys are not being lost.
 
     Tests .getCategoryLinks() and .replaceCategoryLinks(), with both a
     newline and an empty string as separators.
     """
+
+    dry = True
 
     old = '[[Category:Cat1]]\n[[Category:Cat2|]]\n' \
           '[[Category:Cat1| ]]\n[[Category:Cat2|key]]'
@@ -625,9 +631,11 @@ class TestTemplateParams(TestCase):
             self.assertEndsWith(m[0], 'foo {{bar}}')
 
 
-class TestDisabledParts(DefaultDrySiteTestCase):
+class TestDisabledParts(DefaultSiteTestCase):
 
     """Test the removeDisabledParts function in textlib."""
+
+    dry = True
 
     def test_remove_disabled_parts(self) -> None:
         """Test removeDisabledParts function."""
@@ -1017,9 +1025,11 @@ class TestDigitsConversion(TestCase):
             textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
 
 
-class TestReplaceExcept(DefaultDrySiteTestCase):
+class TestReplaceExcept(DefaultSiteTestCase):
 
     """Test to verify the replacements with exceptions are done correctly."""
+
+    dry = True
 
     def test_no_replace(self) -> None:
         """Test replacing when the old text does not match."""
@@ -1436,9 +1446,11 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
             r'X\g<bar>X')
 
 
-class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
+class TestMultiTemplateMatchBuilder(DefaultSiteTestCase):
 
     """Test MultiTemplateMatchBuilder."""
+
+    dry = True
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -1529,9 +1541,11 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         self.assertEqual(set(lang_links), self.sites_set - {self.site})
 
 
-class TestExtractSections(DefaultDrySiteTestCase):
+class TestExtractSections(DefaultSiteTestCase):
 
     """Test the extract_sections function."""
+
+    dry = True
 
     def _extract_sections_tests(self, result, header, sections, footer='',
                                 title='') -> None:

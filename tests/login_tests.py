@@ -21,7 +21,7 @@ from unittest import mock
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.login import LoginManager
 from pywikibot.tools import PYTHON_VERSION
-from tests.aspects import DefaultDrySiteTestCase
+from tests.aspects import DefaultSiteTestCase
 
 
 class FakeFamily:
@@ -52,7 +52,7 @@ class FakeConfig:
 
 @mock.patch('pywikibot.Site', FakeSite)
 @mock.patch('pywikibot.login.config', FakeConfig)
-class TestOfflineLoginManager(DefaultDrySiteTestCase):
+class TestOfflineLoginManager(DefaultSiteTestCase):
 
     """Test offline operation of login.LoginManager."""
 
@@ -89,9 +89,11 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
 
 
 @mock.patch('pywikibot.Site', FakeSite)
-class TestPasswordFile(DefaultDrySiteTestCase):
+class TestPasswordFile(DefaultSiteTestCase):
 
     """Test parsing password files."""
+
+    dry = True
 
     def patch(self, name):
         """Patch up <name> in self.setUp."""

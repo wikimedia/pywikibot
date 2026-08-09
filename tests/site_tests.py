@@ -28,7 +28,6 @@ from pywikibot.exceptions import (
 )
 from tests.aspects import (
     AlteredDefaultSiteTestCase,
-    DefaultDrySiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
     PatchingTestCase,
@@ -1116,10 +1115,11 @@ class TestLinktrails(TestCase):
                 self.assertEqual(site.linktrail(), linktrail)
 
 
-class TestSingleCodeFamilySite(DefaultDrySiteTestCase):
+class TestSingleCodeFamilySite(TestCase):
 
     """Test single code family sites."""
 
+    dry = True
     family = 'i18n'
     code = 'i18n'
 

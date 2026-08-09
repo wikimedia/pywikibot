@@ -21,7 +21,7 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase, TestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 from tests.utils import FakeLoginManager
 
 
@@ -45,9 +45,11 @@ class TestApiFunctions(DefaultSiteTestCase):
         self.assertEqual(req.site, self.get_site())
 
 
-class TestDryApiFunctions(DefaultDrySiteTestCase):
+class TestDryApiFunctions(DefaultSiteTestCase):
 
     """API Request object test class."""
+
+    dry = True
 
     def testObjectCreation(self) -> None:
         """Test api.Request() constructor."""
@@ -346,9 +348,11 @@ class TestOptionSet(TestCase):
             options._set_site(self.get_site(), 'recentchanges', 'show')
 
 
-class TestDryOptionSet(DefaultDrySiteTestCase):
+class TestDryOptionSet(DefaultSiteTestCase):
 
     """OptionSet class test class."""
+
+    dry = True
 
     def test_mutable_mapping(self) -> None:
         """Test keys, values and items from MutableMapping."""

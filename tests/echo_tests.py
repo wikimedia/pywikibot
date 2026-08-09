@@ -12,10 +12,10 @@ from contextlib import suppress
 
 import pywikibot
 from pywikibot.echo import Notification
-from tests.aspects import DefaultDrySiteTestCase
+from tests.aspects import DefaultSiteTestCase
 
 
-class TestNotification(DefaultDrySiteTestCase):
+class TestNotification(DefaultSiteTestCase):
 
     """Test cases for Notification class."""
 
