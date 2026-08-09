@@ -8,17 +8,13 @@
 from __future__ import annotations
 
 import sys
+import unittest
 from contextlib import suppress
 
 import pywikibot
 import pywikibot.bot
 from pywikibot import i18n
-from tests.aspects import (
-    DefaultSiteTestCase,
-    SiteAttributeTestCase,
-    TestCase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 
 
 class TWNBotTestCase(TestCase):

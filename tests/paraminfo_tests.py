@@ -7,6 +7,8 @@
 """Test confirming paraminfo contains expected values."""
 from __future__ import annotations
 
+import unittest
+
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
@@ -15,7 +17,6 @@ from tests.aspects import (
     DefaultWikibaseClientTestCase,
     TestCaseBase,
     WikimediaDefaultSiteTestCase,
-    unittest,
 )
 from tests.utils import skipping
 
