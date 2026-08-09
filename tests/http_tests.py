@@ -86,6 +86,19 @@ class TestGetAuthenticationConfig(TestCase):
             for url, auth in pairs.items():
                 self.assertEqual(http.get_authentication(url), auth)
 
+    @patch.object(http.session, 'request')
+    def test_disable_url_authentication(self, request) -> None:
+        """Test configured authentication can be explicitly disabled."""
+        response = requests.Response()
+        response.request = requests.Request(headers={})
+        response.url = 'https://en.wikipedia.beta.wmcloud.org'
+        response._content = b''
+        request.return_value = response
+        http.fetch('https://en.wikipedia.beta.wmcloud.org', auth=None,
+                   default_error_handling=False)
+
+        self.assertIsNone(request.call_args.kwargs['auth'])
+
 
 class HttpsCertificateTestCase(TestCase):
 

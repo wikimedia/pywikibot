@@ -15,19 +15,22 @@ import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot import config
+from pywikibot.comms import http
 from pywikibot.exceptions import (
     APIError,
     Error,
     IsNotRedirectPageError,
     NoPageError,
+    NoUsernameError,
     PageInUseError,
     UnknownExtensionError,
     UnknownSiteError,
 )
+from pywikibot.login import LoginStatus
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
@@ -37,6 +40,100 @@ from tests.aspects import (
     WikimediaDefaultSiteTestCase,
 )
 from tests.basepage import BasePageLoadRevisionsCachingTestBase
+
+
+class _OAuthLoginSite(pywikibot.site.APISite):
+
+    """APISite stub providing OAuth and cookie identities."""
+
+    def __init__(self, oauth_user: str, cookie_user: str | None) -> None:
+        pywikibot.site.BaseSite.__init__(
+            self, 'test', 'wikipedia', user='Xqt')
+        self._oauth_user = oauth_user
+        self._cookie_user = cookie_user
+        self._oauth_disabled = False
+        self._userinfo = {}
+        self._loginstatus = LoginStatus.NOT_ATTEMPTED
+
+    @property
+    def userinfo(self) -> dict:
+        """Return the identity for the effective authentication method."""
+        username = (self._cookie_user if self._oauth_disabled
+                    else self._oauth_user)
+        if username is None:
+            return {'name': '', 'id': 0, 'anon': ''}
+        return {'name': username, 'id': 1}
+
+    @userinfo.deleter
+    def userinfo(self) -> None:
+        """Ignore attempts to clear the generated userinfo."""
+
+
+class TestOAuthUserOverride(PatchingTestCase):
+
+    """Test OAuth interaction with the global ``-user`` option."""
+
+    net = False
+    oauth_tokens = ('consumer', 'secret', 'access', 'secret')
+
+    def setUp(self) -> None:
+        """Set OAuth and site configuration."""
+        super().setUp()
+        self.patch(config, 'authenticate',
+                   {'*.wikipedia.org': self.oauth_tokens})
+        self.patch(config, 'family', 'wikipedia')
+        self.patch(config, 'mylang', 'test')
+        self.patch(http.cookie_jar, 'load', Mock())
+
+    def test_matching_oauth_user(self) -> None:
+        """Keep OAuth when its identity matches the explicit username."""
+        site = _OAuthLoginSite('Xqt', None)
+        override = ('wikipedia', 'test', 'Xqt')
+        with patch.object(pywikibot.bot, '_user_override', override), \
+             patch.object(pywikibot, 'info') as info:
+            site.login(cookie_only=True)
+
+        self.assertFalse(site._oauth_disabled)
+        self.assertTrue(site.logged_in())
+        info.assert_not_called()
+
+    def test_mismatching_oauth_user_override(self) -> None:
+        """Bypass OAuth when ``-user`` requests another identity."""
+        site = _OAuthLoginSite('Pywikibot-oauth', 'Xqt')
+        override = ('wikipedia', 'test', 'Xqt')
+        with patch.object(pywikibot.bot, '_user_override', override), \
+             patch.object(pywikibot, 'info') as info:
+            site.login(cookie_only=True)
+
+        self.assertTrue(site._oauth_disabled)
+        self.assertTrue(site.logged_in())
+        info.assert_called_once_with(
+            'OAuth authentication on wikipedia:test uses Pywikibot-oauth; '
+            'ignoring it because -user:Xqt was given.')
+
+    def test_mismatching_configured_oauth_user(self) -> None:
+        """Reject an OAuth mismatch without an explicit user override."""
+        site = _OAuthLoginSite('Pywikibot-oauth', 'Xqt')
+        with patch.object(pywikibot.bot, '_user_override', None), \
+             self.assertRaisesRegex(NoUsernameError,
+                                    'via OAuth as Pywikibot-oauth'):
+            site.login(cookie_only=True)
+
+        self.assertFalse(site._oauth_disabled)
+
+    def test_disabled_oauth_not_added_to_request(self) -> None:
+        """Do not add configured OAuth to requests for an override site."""
+        site = _OAuthLoginSite('Pywikibot-oauth', 'Xqt')
+        site._oauth_disabled = True
+        response = Mock(headers={})
+
+        with patch.object(http, 'fetch', return_value=response) as fetch:
+            http.request(site, site.apipath())
+
+        self.assertIsNone(fetch.call_args.kwargs['auth'])
+        self.assertEqual(
+            http.get_authentication('https://en.wikipedia.org'),
+            self.oauth_tokens)
 
 
 class TestSiteObject(DefaultSiteTestCase):

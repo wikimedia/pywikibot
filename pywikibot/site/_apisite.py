@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
 from warnings import warn
 
 import pywikibot
-from pywikibot import login
+from pywikibot import bot, login
 from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import (
@@ -135,6 +135,7 @@ class APISite(
     ) -> None:
         """Initializer."""
         super().__init__(code, fam, user)
+        self._oauth_disabled = False
         self._globaluserinfo: dict[int | str, Any] = {}
         self._interwikimap = _InterwikiMap(self)
         self._msgcache: dict[str, str] = {}
@@ -339,8 +340,20 @@ class APISite(
 
     def is_oauth_token_available(self) -> bool:
         """Check whether OAuth token is set for this site."""
+        if getattr(self, '_oauth_disabled', False):
+            return False
         auth_token = http.get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
+
+    def _is_global_user_override(self) -> bool:
+        """Return whether this site uses the global ``-user`` option."""
+        override = bot._user_override
+        return (
+            override is not None
+            and self.family.name == override[0]
+            and self.code == override[1]
+            and normalize_username(override[2]) == self.username()
+        )
 
     def login(
         self,
@@ -411,6 +424,19 @@ class APISite(
                 raise
 
         if self.is_oauth_token_available():
+            if (self.userinfo['name'] != self.username()
+                    and self._is_global_user_override()):
+                oauth_user = self.userinfo['name']
+                self._oauth_disabled = True
+                pywikibot.info(
+                    f'OAuth authentication on {self} uses {oauth_user}; '
+                    f'ignoring it because -user:{self.username()} was given.')
+                del self.userinfo
+                self._loginstatus = login.LoginStatus.NOT_ATTEMPTED
+                self.login(autocreate=autocreate, user=user,
+                           cookie_only=cookie_only)
+                return
+
             if self.userinfo['name'] == self.username():
                 error_msg = f'Logging in on {self} via OAuth failed'
             elif self.username() is None:

@@ -327,6 +327,8 @@ def request(site: pywikibot.site.BaseSite,
     headers['user-agent'] = user_agent(site, format_string)
 
     baseuri = site.base_url(uri, protocol=kwargs.pop('protocol', None))
+    if getattr(site, '_oauth_disabled', False):
+        kwargs.setdefault('auth', None)
     r = fetch(baseuri, headers=headers, **kwargs)
     retry_after = r.headers.get('retry-after', '0')
     # literal of retry_after may int or float (T414197)
@@ -455,6 +457,9 @@ def fetch(uri: str,
     :type verify: bool or path to certificates
     :keyword callbacks: Methods to call once data is fetched
     :type callbacks: list of callable
+    :keyword auth: Authentication handler. If omitted, authentication is read
+        from :attr:`config.authenticate`; use ``None`` to disable configured
+        authentication.
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
@@ -496,8 +501,11 @@ def fetch(uri: str,
 
     charset = kwargs.pop('charset', None)
 
-    auth = get_authentication(uri)
-    if auth is not None and len(auth) == 4:
+    if 'auth' in kwargs:
+        auth = kwargs.pop('auth')
+    else:
+        auth = get_authentication(uri)
+    if isinstance(auth, tuple) and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):
             raise ModuleNotFoundError(f"""{requests_oauthlib}. Install it with
 
