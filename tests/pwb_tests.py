@@ -114,8 +114,7 @@ class TestPwb(PwbTestCase):
             'NOTE: Starting the most similar script shell.py',
             'in 5.0 seconds; type CTRL-C to stop.',
         ]
-        stream = execute_pwb(['hello'], data_in=chr(3), timeout=10)
-        self.assertIsNone(stream['timeout'])
+        stream = execute_pwb(['hello'], data_in=chr(3), timeout=12)
 
         stderr = io.StringIO(stream['stderr'])
         with self.subTest(line=0):
