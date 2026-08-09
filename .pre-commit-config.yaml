@@ -64,7 +64,7 @@ repos:
     hooks:
       - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.22
+    rev: v0.16.2
     hooks:
       - id: ruff-check
         alias: ruff
@@ -86,7 +86,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 9.0.0b1
+    rev: 9.0.0b2
     hooks:
       - id: isort
         name: isort
@@ -96,7 +96,7 @@ repos:
         name: isort (skip future annotations)
         files: ^(pwb|pywikibot/families/__init__)\.py$
   - repo: https://github.com/jshwi/docsig
-    rev: v0.91.6
+    rev: v0.94.0
     hooks:
       - id: docsig
         exclude: ^(tests|scripts)
