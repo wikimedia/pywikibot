@@ -1353,7 +1353,7 @@ class DefaultSiteTestCase(TestCase):
         }
 
 
-class AlteredDefaultSiteTestCase(TestCase):
+class SiteConfigTestCase(TestCase):
 
     """Save and restore the config.mylang and config.family."""
 
@@ -1370,7 +1370,7 @@ class AlteredDefaultSiteTestCase(TestCase):
         super().tearDown()
 
 
-class ScriptMainTestCase(AlteredDefaultSiteTestCase):
+class ScriptMainTestCase(SiteConfigTestCase):
 
     """Tests that depend on the default site being set to the test site."""
 

@@ -16,8 +16,8 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
 from tests.aspects import (
-    AlteredDefaultSiteTestCase,
     DefaultSiteTestCase,
+    SiteConfigTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,
     unittest,
@@ -232,7 +232,7 @@ class Issue10254TestCase(DefaultSiteTestCase):
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
-class LinkTestCase(AlteredDefaultSiteTestCase):
+class LinkTestCase(SiteConfigTestCase):
 
     """Cached API test for link tests."""
 

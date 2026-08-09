@@ -27,10 +27,10 @@ from pywikibot.exceptions import (
     UnknownSiteError,
 )
 from tests.aspects import (
-    AlteredDefaultSiteTestCase,
     DefaultSiteTestCase,
     DeprecationTestCase,
     PatchingTestCase,
+    SiteConfigTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,
 )
@@ -1163,7 +1163,7 @@ class TestSubdomainFamilySite(TestCase):
 
 
 @unittest.skip('Skipping TimeoutError due to T431173')
-class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
+class TestProductionAndTestSite(SiteConfigTestCase):
 
     """Test site without other production sites in its family."""
 
