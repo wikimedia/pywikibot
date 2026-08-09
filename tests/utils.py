@@ -15,6 +15,7 @@ import warnings
 from collections.abc import Sequence
 from contextlib import contextmanager, suppress
 from pathlib import Path
+from platform import python_implementation
 from subprocess import PIPE, Popen, TimeoutExpired
 from typing import NoReturn, TypedDict
 
@@ -576,7 +577,10 @@ def execute_pwb(
     """
     tmp_path: Path | None = None
     command = [sys.executable]
-    use_coverage = os.environ.get('GITHUB_ACTIONS')
+    use_coverage = (
+        os.environ.get('GITHUB_ACTIONS')
+        and python_implementation() != 'GraalVM'
+    )
 
     if use_coverage:
         # Test running and coverage is installed,
