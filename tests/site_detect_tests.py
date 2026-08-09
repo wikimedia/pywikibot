@@ -68,7 +68,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
 
     old_version_sites = (
         'http://tfwiki.net/wiki/$1',  # 1.19.5-1+deb7u1
-        'http://www.thelemapedia.org/index.php/$1',
         'http://www.werelate.org/wiki/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
     )
