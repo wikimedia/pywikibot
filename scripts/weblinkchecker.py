@@ -653,6 +653,7 @@ def main(*args: str) -> None:
     """
     gen = None
     xml_filename = None
+    xml_start = None
     http_ignores = []
 
     # Process global args and prepare generator args parser
@@ -685,10 +686,6 @@ def main(*args: str) -> None:
             gen_factory.handle_arg(arg)
 
     if xml_filename:
-        try:
-            xml_start
-        except NameError:
-            xml_start = None
         gen = XmlDumpPageGenerator(xml_filename, xml_start,
                                    gen_factory.namespaces)
 
