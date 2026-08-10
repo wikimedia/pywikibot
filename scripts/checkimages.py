@@ -1119,8 +1119,7 @@ class CheckImagesBot:
             no_licenses_to_skip = pywikibot.Category(self.site,
                                                      'License-related tags')
             for license_given in no_licenses_to_skip.articles():
-                if license_given in licenses:
-                    licenses.remove(license_given)
+                licenses.discard(license_given)
 
         # Add the licenses set in the default page as licenses to check
         if self.page_allowed:
