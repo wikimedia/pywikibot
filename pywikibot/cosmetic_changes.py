@@ -956,14 +956,13 @@ class CosmeticChangesToolkit:
         text = textlib.replaceExcept(text, r'(?i)<hr ([^>/]+?)>',
                                      r'<hr \1 />',
                                      exceptions)
+        # TODO: maybe we can make the bot replace <p> tags with \r\n's.
         # a header where only spaces are in the same line
-        text = textlib.replaceExcept(
+        return textlib.replaceExcept(
             text,
             r'(?i)(?<=[\r\n]) *<h([1-7])> *([^<]+?) *</h\1> *(?=[\r\n])',
             replace_header,
             exceptions)
-        # TODO: maybe we can make the bot replace <p> tags with \r\n's.
-        return text
 
     def fixReferences(self, text: str) -> str:
         """Fix references tags."""
@@ -978,10 +977,9 @@ class CosmeticChangesToolkit:
         text = textlib.replaceExcept(text,
                                      r'(?i)(<ref\s*/>|<ref *>\s*</ref>)',
                                      r'', exceptions)
-        text = textlib.replaceExcept(text,
+        return textlib.replaceExcept(text,
                                      r'(?i)<ref\s+([^>]+?)\s*>\s*</ref>',
                                      r'<ref \1/>', exceptions)
-        return text
 
     def fixStyle(self, text: str) -> str:
         """Convert prettytable to wikitable class."""
@@ -1019,10 +1017,9 @@ class CosmeticChangesToolkit:
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
                                      r'\1&nbsp;°\2', exceptions,
                                      site=self.site)
-        text = textlib.replaceExcept(text, 'º([CF])', '°' + r'\1',
+        return textlib.replaceExcept(text, 'º([CF])', '°' + r'\1',
                                      exceptions,
                                      site=self.site)
-        return text
 
     def fixArabicLetters(self, text: str) -> str:
         """Fix Arabic and Persian letters."""
@@ -1064,10 +1061,8 @@ class CosmeticChangesToolkit:
                                          site=self.site)
         text = textlib.replaceExcept(text, 'ك', 'ک', exceptions,
                                      site=self.site)
-        text = textlib.replaceExcept(text, '[ىي]', 'ی', exceptions,
+        return textlib.replaceExcept(text, '[ىي]', 'ی', exceptions,
                                      site=self.site)
-
-        return text
 
     def commonsfiledesc(self, text: str) -> str:
         """Clean up file descriptions on Wikimedia Commons.
@@ -1128,12 +1123,11 @@ class CosmeticChangesToolkit:
             r'([\r\n]|^)\=\= *{{int:filedesc}} *\=\=(?:[\r\n ]*)\=\= *'
             r'{{int:filedesc}} *\=\=',
             r'\1== {{int:filedesc}} ==', exceptions, True)
-        text = textlib.replaceExcept(
+        return textlib.replaceExcept(
             text,
             r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)'
             r'\=\= *{{int:license-header}} *\=\=',
             r'\1== {{int:license-header}} ==', exceptions, True)
-        return text
 
     def fix_ISBN(self, text: str) -> str:
         """Hyphenate ISBN numbers."""
