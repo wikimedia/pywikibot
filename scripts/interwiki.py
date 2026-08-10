@@ -1469,6 +1469,9 @@ class Subject(interwiki_graph.Subject):
             return
 
         if self.forcedStop:  # autonomous with problem
+            if config.interwiki_graph:
+                graphDrawer = interwiki_graph.GraphDrawer(self)
+                graphDrawer.createGraph()
             pywikibot.info(f'======Aborted processing {self.origin}======')
             return
 
