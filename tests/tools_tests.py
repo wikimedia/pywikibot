@@ -34,6 +34,7 @@ from pywikibot.tools.itertools import (
     intersect_generators,
     islice_with_ellipsis,
     roundrobin_generators,
+    union_generators,
 )
 from tests import join_xml_data_path
 from tests.aspects import TestCase
@@ -829,6 +830,14 @@ class TestMergeGenerator(TestCase):
         self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
         result = ''.join(roundrobin_generators('HlWrd', 'e', 'lool'))
         self.assertEqual(result, 'HelloWorld')
+
+    def test_union_generators_is_lazy(self) -> None:
+        """Test that duplicate groups are processed lazily."""
+        source = iter([1, 1, 1, 2])
+        generator = union_generators(source)
+
+        self.assertEqual(next(generator), 1)
+        self.assertEqual(next(source), 1)
 
 
 class TestIsIpAddress(TestCase):
