@@ -165,7 +165,7 @@ def run_python_file(filename: str, args: list[str], package=None) -> None:
 # end of snippet from coverage
 
         # Restore environment values
-        for key, value in environ:
+        for key, _ in environ:
             if key in old_env:
                 os.environ[key] = old_env[key]
             else:
@@ -186,6 +186,7 @@ def handle_args(
     fname = None
     local = []
     env = []
+    script_args = args
     for index, arg in enumerate(args, start=1):
         if arg in ('-version', '--version'):
             fname = 'version.py'
@@ -201,11 +202,10 @@ def handle_args(
             if not fname.endswith('.py'):
                 fname += '.py'
         if fname:
+            script_args = args[index:]
             break
-    else:
-        index = 0
 
-    return fname, list(args[index:]), local, env
+    return fname, list(script_args), local, env
 
 
 def _print_requirements(requirements,
