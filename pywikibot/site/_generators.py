@@ -1508,12 +1508,11 @@ class GeneratorsMixin:
         if start and end:
             self.assert_valid_iter_params('abuselog', start, end, reverse)
 
-        gen = self._generator(api.ListGenerator, type_arg='abuselog',
-                              afluser=user, total=total,
-                              aflstart=start, aflend=end,
-                              afldir=('newer' if reverse else 'older'),
-                              **kwargs)
-        return gen
+        return self._generator(api.ListGenerator, type_arg='abuselog',
+                               afluser=user, total=total,
+                               aflstart=start, aflend=end,
+                               afldir=('newer' if reverse else 'older'),
+                               **kwargs)
 
     def recentchanges(
         self,
