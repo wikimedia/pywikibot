@@ -353,7 +353,7 @@ def find_alternates(filename, script_paths):
     for folder in script_paths:
         if not folder.exists():
             warning(
-                f'{folder} does not exists; remove it from user_script_paths')
+                f'{folder} does not exist; remove it from user_script_paths')
             continue
         for script_name in folder.iterdir():
             name, suffix = script_name.stem, script_name.suffix

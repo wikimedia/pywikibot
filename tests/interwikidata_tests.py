@@ -62,7 +62,7 @@ class TestInterwikidataBot(SiteConfigTestCase, SiteAttributeTestCase):
 
         if site.has_data_repository:
             with empty_sites():
-                # The main function return None.
+                # The main function returns None.
                 self.assertIsNone(interwikidata.main())
         else:
             with empty_sites(), self.assertRaisesRegex(

@@ -476,7 +476,7 @@ class TestMediaInfoEditing(TestCase):
 
     def test_edit_label(self) -> None:
         """Test label editing."""
-        # Test label editing when file doesn't exists
+        # Test label editing when file doesn't exist
         page = pywikibot.FilePage(self.site, 'File:123_4_DOESNT_EXISTS.jpg')
         item = page.data_item()
         error_message = "Entity '-1' doesn't exist on commons:beta"

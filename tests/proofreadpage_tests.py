@@ -820,13 +820,13 @@ class TestIndexPageMappings(BS4TestCase):
 
         # Get label from number.
         self.assertEqual(index_page.get_label_from_page_number(num), label)
-        # Error if number does not exists.
+        # Error if number does not exist.
         with self.assertRaises(KeyError):
             index_page.get_label_from_page_number(-1)
 
         # Get label from page.
         self.assertEqual(index_page.get_label_from_page(proofread_page), label)
-        # Error if page does not exists.
+        # Error if page does not exist.
         with self.assertRaises(KeyError):
             index_page.get_label_from_page(None)
 
@@ -861,7 +861,7 @@ class TestIndexPageMappings(BS4TestCase):
             n = index_page.get_number(p)
             self.assertEqual(index_page.get_page(n), p)
 
-        # Error if label does not exists.
+        # Error if label does not exist.
         with self.assertRaises(KeyError):
             index_page.get_page_number_from_label('dummy label')
 
@@ -995,18 +995,18 @@ class TestIndexPageHasValidContent(BS4TestCase):
         self.assertFalse(self.index.has_valid_content())
 
     def test_has_valid_content_misnamed_template(self) -> None:
-        """Test nested templates is valid."""
+        """Test a misnamed template is invalid."""
         self.index.text = '{{%s_bar|foo=bar}}' % IndexPage.INDEX_TEMPLATE
         self.assertFalse(self.index.has_valid_content())
 
     def test_has_valid_content_nested_template(self) -> None:
-        """Test nested templates is valid."""
+        """Test a nested template is valid."""
         self.index.text = ('{{%s|foo=%s}}'
                            % (IndexPage.INDEX_TEMPLATE, self.other_template))
         self.assertTrue(self.index.has_valid_content())
 
     def test_has_valid_content_multiple_valid(self) -> None:
-        """Test multiple Index templates is invalid."""
+        """Test multiple Index templates are invalid."""
         self.index.text = self.valid_template * 2
         self.assertFalse(self.index.has_valid_content())
 

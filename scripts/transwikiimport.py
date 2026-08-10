@@ -128,7 +128,7 @@ overwritten*.
 Hints
 -----
 
-The list of wikis that can be used as a interwiki source is defined in
+The list of wikis that can be used as an interwiki source is defined in
 the variable ``$wgImportSources``. It can be viewed on the
 ``Special:Import`` page.
 

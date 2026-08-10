@@ -71,7 +71,7 @@ class BoundedThreadPoolTests(TestCase):
                                  pool._max_workers)
 
     def test_class(self) -> None:
-        """Test string and repr methods for a executor class."""
+        """Test string and repr methods for an executor class."""
         executors = [ThreadPoolExecutor, ProcessPoolExecutor]
         if PYTHON_VERSION >= (3, 14):
             from concurrent.futures import InterpreterPoolExecutor

@@ -74,7 +74,7 @@ class TestDryApiFunctions(DefaultSiteTestCase):
         'Instead of using kwargs |Both kwargs and parameters are set',
         DeprecationWarning)
     def test_mixed_mode(self) -> None:
-        """Test if parameters is used with kwargs."""
+        """Test using parameters with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')
         self.assertIn('parameters', req1._params)
 

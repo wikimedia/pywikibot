@@ -613,7 +613,7 @@ class Family:
         determine which code applies.
 
         .. version-changed:: 10.0
-           *url* parameter does not have to contain a api/query/script
+           *url* parameter does not have to contain an API/query/script
            path
         .. version-changed:: 10.3
            accept a trailing slash in *url* after domain.

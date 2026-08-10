@@ -212,7 +212,7 @@ class RightsEntry(LogEntry):
         """Return old rights groups.
 
         .. version-changed:: 7.5
-           No longer raise KeyError if `oldgroups` does not exists or
+           No longer raise KeyError if `oldgroups` does not exist or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
@@ -223,7 +223,7 @@ class RightsEntry(LogEntry):
         """Return new rights groups.
 
         .. version-changed:: 7.5
-           No longer raise KeyError if `oldgroups` does not exists or
+           No longer raise KeyError if `newgroups` does not exist or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """

@@ -2100,7 +2100,7 @@ class GeneratorsMixin:
             to be patrolled.
         :param revid: An int/string/iterable/iterator providing revid of pages
             to be patrolled.
-        :param revision: An Revision/iterable/iterator providing Revision
+        :param revision: A Revision/iterable/iterator providing Revision
             object of pages to be patrolled.
         """
         # If patrol is not enabled, attr will be set the first time a

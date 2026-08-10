@@ -865,7 +865,7 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         self.assertTrue(link._is_interwiki)
 
     def test_other_wiki_prefix(self) -> None:
-        """Test that Link fails if the interwiki prefix is a unknown family.
+        """Test that Link fails if the interwiki prefix is an unknown family.
 
         Sometimes *bulba* does not return a json content but a security
         script. api.Request._json_loads raises a

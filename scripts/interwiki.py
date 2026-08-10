@@ -1017,7 +1017,7 @@ class Subject(interwiki_graph.Subject):
         return (False, None)
 
     def isIgnored(self, page) -> bool:
-        """Return True if pages is to be ignored."""
+        """Return True if page is to be ignored."""
         code = page.site.code
 
         if code in self.conf.neverlink:

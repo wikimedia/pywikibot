@@ -92,7 +92,7 @@ class SupersetQuery:
         url = f'{self.superset_url}/login/mediawiki?next='
         self.last_response = http.fetch(url)
 
-        # Test if uset has been successfully logged in
+        # Test if user has been successfully logged in
         url = f'{self.superset_url}/api/v1/me/'
         try:
             self.last_response = http.fetch(url)

@@ -462,7 +462,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         """Return the name of a valid commons category.
 
         If the page is a redirect this function tries to follow it. If
-        the page doesn't exists the function will return an empty string
+        the page doesn't exist the function will return an empty string
         """
         if not name:  # target name is empty
             return ''

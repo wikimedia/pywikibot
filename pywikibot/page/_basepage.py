@@ -380,7 +380,7 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 9.2
            :exc:`exceptions.SectionError` is raised if the
-           :meth:`section` does not exists
+           :meth:`section` does not exist
         .. seealso:: :attr:`text` property
 
         :param force: Reload all page attributes, including errors.

@@ -361,8 +361,8 @@ PAGE_WITH_ALLOWED_TEMPLATES = {
     'sr': 'User:KizuleBot/checkimages.py/дозвољенишаблони',
 }
 
-# Template added when the bot finds only an hidden template and nothing else.
-# Note: every __botnick__ will be repleaced with your bot's nickname
+# Template added when the bot finds only a hidden template and nothing else.
+# Note: every __botnick__ will be replaced with your bot's nickname
 # (feel free not to use if you don't need it)
 HIDDEN_TEMPALTE_NOTIFICATION = {
     'commons': ("\n{{subst:User:Filnik/whitetemplate|File:%s}}\n\n''This "
@@ -660,7 +660,7 @@ class CheckImagesBot:
     def put_mex_in_talk(self) -> None:
         """Function to put the warning in talk page of the uploader.
 
-        When the bot find that the usertalk is empty it adds the welcome
+        When the bot finds that the usertalk is empty it adds the welcome
         message first. The messages are imported from welcome.py script.
         """
         email_page_name = i18n.translate(self.site, EMAIL_PAGE_WITH_TEXT)
@@ -933,7 +933,7 @@ class CheckImagesBot:
                         " or in the dupe's page. Skip.")
                     return False  # Ok - Let's continue the checking phase
 
-            # true if the image are not to be tagged as dupes
+            # true if the image is not to be tagged as a duplicate
             only_report = False
 
             # put only one image or the whole list according to the request
@@ -1300,7 +1300,7 @@ class CheckImagesBot:
             return False
 
         skip_number = min(skip_number, limit)
-        # Print a starting message only if no images has been skipped
+        # Print a starting message only if no images have been skipped
         if not self.skip_list:
             pywikibot.info(
                 i18n.translate(
@@ -1437,7 +1437,7 @@ class CheckImagesBot:
 
         # The header of the Unknown extension's message.
         dih = i18n.twtranslate(self.site, 'checkimages-unknown-extension-head')
-        # Text that will be add if the bot find a unknown extension.
+        # Text that will be added if the bot finds an unknown extension.
         din = i18n.twtranslate(self.site,
                                'checkimages-unknown-extension-msg') + ' ~~~~'
         # Header that the bot will add if the image hasn't the license.

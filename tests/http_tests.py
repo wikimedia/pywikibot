@@ -144,7 +144,7 @@ class TestHttpStatus(HttpbinTestCase):
 
     def test_invalid_scheme(self) -> None:
         """Test invalid scheme."""
-        # A InvalidSchema is raised within requests
+        # An InvalidSchema is raised within requests
         with self.assertRaisesRegex(
                 FatalServerError,
                 "No connection adapters were found for 'invalid://url'"):

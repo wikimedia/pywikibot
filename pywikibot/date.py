@@ -181,7 +181,7 @@ def dh_centuryAD(value: int, pattern: str) -> str:
 
 
 def dh_centuryBC(value: int, pattern: str) -> str:
-    """Helper for decoding an BC century."""
+    """Helper for decoding a BC century."""
     return dh_noConv(value, pattern, formatLimits['CenturyBC'][0])
 
 
@@ -191,7 +191,7 @@ def dh_millenniumAD(value: int, pattern: str) -> str:
 
 
 def dh_millenniumBC(value: int, pattern: str) -> str:
-    """Helper for decoding an BC millennium."""
+    """Helper for decoding a BC millennium."""
     return dh_noConv(value, pattern, formatLimits['MillenniumBC'][0])
 
 
@@ -2015,7 +2015,7 @@ def apply_month_delta(date: datetime.date, month_delta: int = 1,
                       add_overlap: bool = False) -> datetime.date:
     """Add or subtract months from the date.
 
-    By default if the new month has less days then the day of the date
+    By default if the new month has fewer days than the day of the date
     it chooses the last day in the new month. For example a date in the
     March 31st added by one month will result in April 30th.
 

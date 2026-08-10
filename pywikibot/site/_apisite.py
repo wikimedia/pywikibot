@@ -2690,7 +2690,7 @@ class APISite(
             be a FilePage.
         :raises TypeError: *oldimage* option is given but page object is
             neither a page id nor a :class:`pywikibot.FilePage`.
-        :raises NoPageError: the *page* does not exists.
+        :raises NoPageError: the *page* does not exist.
         :raises Error: Any of the following conditions occurred:
             noapiwrite, writeapidenied, permissiondenied, cantdelete,
             nodeleteablefile.
