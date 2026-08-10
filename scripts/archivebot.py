@@ -984,7 +984,6 @@ def process_page(page, *args: Any, asynchronous: bool = False) -> bool:
     .. version-changed:: 10.0
        *asynchronous* parameter was added.
     """
-    global outlock
     if not page.exists():
         pywikibot.info(f'{page} does not exist, skipping...')
         return True
