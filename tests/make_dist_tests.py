@@ -22,6 +22,12 @@ class TestMakeDist(TestCase):
 
     net = False
 
+    def setUp(self) -> None:
+        """Use an isolated command-line argument list for each test."""
+        super().setUp()
+        self.addCleanup(setattr, sys, 'argv', sys.argv)
+        sys.argv = sys.argv.copy()
+
     def test_handle_args_empty(self) -> None:
         """Test make_dist handle_args function."""
         args = make_dist.handle_args()
@@ -63,13 +69,12 @@ class TestMakeDist(TestCase):
         self.assertFalse(make_dist.main())
 
         try:
-            import build  # noqa: autoflake
+            import build  # noqa: F401
         except ModuleNotFoundError:
             # no build or twine modules
             self.assertFalse(make_dist.main())
             sys.argv = [*saved_argv, '-local']
             self.assertFalse(make_dist.main())
-            sys.argv = saved_argv
 
 
 if __name__ == '__main__':
