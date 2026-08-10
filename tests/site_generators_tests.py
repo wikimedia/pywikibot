@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from datetime import timedelta
 from unittest.mock import patch
 
 import pywikibot
@@ -993,48 +994,37 @@ class TestRecentChanges(DefaultSiteTestCase):
     def test_time_range(self) -> None:
         """Test the site.recentchanges() method with start/end."""
         mysite = self.site
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-01T01:02:03Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertLessEqual(change['timestamp'], '2008-10-01T01:02:03Z')
-        for change in mysite.recentchanges(
-                end=pywikibot.Timestamp.fromISOformat('2008-04-01T02:03:04Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertGreaterEqual(change['timestamp'],
-                                    '2008-10-01T02:03:04Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-01T03:05:07Z'),
-                total=5, reverse=True):
-            self.assertIsInstance(change, dict)
-            self.assertGreaterEqual(change['timestamp'],
-                                    '2008-10-01T03:05:07Z')
-        for change in mysite.recentchanges(
-                end=pywikibot.Timestamp.fromISOformat('2008-10-01T04:06:08Z'),
-                total=5, reverse=True):
-            self.assertIsInstance(change, dict)
-            self.assertLessEqual(change['timestamp'], '2008-10-01T04:06:08Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-03T11:59:59Z'),
-                end=pywikibot.Timestamp.fromISOformat('2008-10-03T00:00:01Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertTrue(
-                '2008-10-03T00:00:01Z' <= change['timestamp']
-                <= '2008-10-03T11:59:59Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-05T06:00:01Z'),
-                end=pywikibot.Timestamp.fromISOformat('2008-10-05T23:59:59Z'),
-                reverse=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertTrue(
-                '2008-10-05T06:00:01Z' <= change['timestamp']
-                <= '2008-10-05T23:59:59Z')
+        recent_changes = list(mysite.recentchanges(total=1))
+        self.assertLength(recent_changes, 1)
+        anchor = pywikibot.Timestamp.fromISOformat(
+            recent_changes[0]['timestamp'])
+        older = anchor - timedelta(seconds=1)
+        newer = anchor + timedelta(seconds=1)
+
+        cases = (
+            ('newest-first start', {'start': newer}, None, newer),
+            ('newest-first end', {'end': older}, older, None),
+            ('newest-first range', {'start': newer, 'end': older},
+             older, newer),
+            ('oldest-first start', {'start': older, 'reverse': True},
+             older, None),
+            ('oldest-first end', {'end': newer, 'reverse': True},
+             None, newer),
+            ('oldest-first range',
+             {'start': older, 'end': newer, 'reverse': True}, older, newer),
+        )
+        for name, params, lower, upper in cases:
+            with self.subTest(name=name):
+                changes = list(mysite.recentchanges(total=1, **params))
+                self.assertLength(changes, 1)
+                self.assertIsInstance(changes[0], dict)
+                timestamp = pywikibot.Timestamp.fromISOformat(
+                    changes[0]['timestamp'])
+                if lower is not None:
+                    self.assertGreaterEqual(timestamp, lower)
+                if upper is not None:
+                    self.assertLessEqual(timestamp, upper)
+
         # start earlier than end
         with self.assertRaises(ValueError):
             mysite.recentchanges(start='2008-02-03T00:00:01Z',
