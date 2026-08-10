@@ -136,10 +136,8 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         # save the content retrieved from generator
         contents = getattr(page, CTX_ATTR)
 
-        if self.opt.summary:
-            comment = self.opt.summary
-        else:
-            comment = i18n.twtranslate(self.site, 'pagefromfile-msg')
+        comment = self.opt.summary or i18n.twtranslate(
+            self.site, 'pagefromfile-msg')
 
         comment_top = comment + ' - ' + i18n.twtranslate(
             self.site, 'pagefromfile-msg_top')
