@@ -252,8 +252,8 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         file_on_commons = par[par.find(':') + 1:]
                         break
                     if val[0].strip() == '1':
-                        file_on_commons = \
-                            val[1].strip()[val[1].strip().find(':') + 1:]
+                        filename = val[1].strip()
+                        file_on_commons = filename[filename.find(':') + 1:]
                         break
                     skip = True
                 if not file_on_commons:
