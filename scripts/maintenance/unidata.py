@@ -74,13 +74,11 @@ def process_site(fam_name, site_code):
     parsed_text = result['parse']['text']['*']
     titles = findall(r'title="[^:]*:(.)', parsed_text)
 
-    site_excepts = {
+    return {
         orig: title
         for orig, upper, title in zip(chars, uppers, titles)
         if upper != title
     }
-
-    return site_excepts
 
 
 def threads_target(q) -> None:
