@@ -820,7 +820,7 @@ class DryFactoryGeneratorTest(TestCase):
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
-    """Test item claim filter page generator generator."""
+    """Test item claim filter page generator."""
 
     def _simple_claim_test(self, prop, claim, qualifiers, valid,
                            negate: bool = False) -> None:

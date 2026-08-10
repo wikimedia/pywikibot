@@ -445,7 +445,7 @@ class DataSite(APISite):
         :param summary: Edit summary
         :param bot: Whether to mark the edit as a bot edit
         :param tags: Change tags to apply to the revision
-        :raises NoPageError: missing the the snak value
+        :raises NoPageError: missing the snak value
         :raises NotImplementedError: ``claim.isReference`` or
             ``claim.isQualifier`` is given
         """

@@ -335,7 +335,7 @@ class Throttle:
 
     @staticmethod
     def wait(seconds: int | float) -> None:
-        """Wait for seconds seconds.
+        """Wait for the specified number of seconds.
 
         Announce the delay if it exceeds a preset limit.
         """

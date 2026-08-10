@@ -1749,7 +1749,7 @@ class GeneratorsMixin:
         :param prop: Include additional pieces of information. Refer
             :api:`Usercontribs` for the elements and the default setting.
         :param formatversion: The API format version to use for the
-            response. (``1`` by deault)
+            response. (``1`` by default)
         :raises pywikibot.exceptions.Error: either user or userprefix
             must be non-empty
         :raises KeyError: A namespace identifier was not resolved

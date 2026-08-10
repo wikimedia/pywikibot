@@ -676,7 +676,7 @@ def get_bot_prefix(
 
     .. note:: If *source* is a str and ``config.bot_prefix`` is set to
        None, it cannot be determined whether the current user is a bot
-       account. In this cas the prefix will be returned.
+       account. In this case the prefix will be returned.
     .. version-added:: 8.1
 
     :param source: When it's a site it's using the lang attribute and otherwise

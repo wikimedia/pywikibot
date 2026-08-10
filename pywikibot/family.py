@@ -52,7 +52,7 @@ class Family:
        method a ``NotImplementedWarning`` will be given.
     .. version-changed:: 8.0
        ``alphabetic``, ``alphabetic_revised`` and ``fyinterwiki``
-       attributes where removed.
+       attributes were removed.
     .. version-changed:: 8.2
        :attr:`obsolete` setter was removed.
     .. version-changed:: 8.3

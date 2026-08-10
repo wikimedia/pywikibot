@@ -541,7 +541,7 @@ def get_charset_from_content_type(content_type: str) -> str | None:
         # fix cp encodings (T304830, T307760, T312230)
         # remove delimiter in front of the code number
         # replace win/windows with cp
-        # remove language code in font of win/windows
+        # remove language code in front of win/windows
         charset = re.sub(
             r'\A(?:cp[ _\-]|(?:[a-z]+[_\-]?)?win(?:dows)?[_\-]?)(\d{3,4})',
             r'cp\1', charset)

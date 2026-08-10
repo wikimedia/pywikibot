@@ -1947,7 +1947,7 @@ def categoryFormat(categories, insite=None) -> str:
     :param categories: A list of Category or Page objects or strings which can
         be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
     :type categories: Iterable
-    :param insite: Used to to localise the category namespace.
+    :param insite: Used to localise the category namespace.
     :type insite: pywikibot.Site
     :return: String of categories
     """

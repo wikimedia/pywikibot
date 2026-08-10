@@ -585,7 +585,7 @@ class User(Page):
 
         Refer :meth:`APISite.usercontribs()
         <pywikibot.site._generators.GeneratorsMixin.usercontribs>`
-        method for for keyword parameters except of `user`and `userprefix`.
+        method for keyword parameters except for `user` and `userprefix`.
 
         .. version-added:: 11.6
 

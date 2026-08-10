@@ -76,7 +76,7 @@ class SupersetQuery:
         to superset.wmcloud.org. Working login expects that the user has
         manually permitted the username to login to the superset.
 
-        :raises NoUsernameError: if not not logged in.
+        :raises NoUsernameError: if not logged in.
         :raises ServerError: For other errors
         :return: True if user has been logged to superset
         """
