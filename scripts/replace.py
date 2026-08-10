@@ -800,8 +800,7 @@ def prepareRegexForMySQL(pattern: str) -> str:
     pattern = pattern.replace(r'\s', '[:space:]')
     pattern = pattern.replace(r'\d', '[:digit:]')
     pattern = pattern.replace(r'\w', '[:alnum:]')
-    pattern = pattern.replace("'", '\\' + "'")
-    return pattern
+    return pattern.replace("'", '\\' + "'")
 
 
 EXC_KEYS = {
