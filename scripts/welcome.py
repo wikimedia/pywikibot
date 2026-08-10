@@ -794,8 +794,8 @@ class WelcomeBot(SingleSiteBot):
                 pywikibot.error('No fileName!')
                 raise FilenameNotSet('No signature filename specified.')
 
-            sign_text = f.read()
-            f.close()
+            with f:
+                sign_text = f.read()
         else:
             # Read from wiki page
             sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
