@@ -300,8 +300,8 @@ class Coordinate(WbRepresentation):
 
         .. code-block:: python
 
-           dim = int(round(math.radians(
-               precision)*radius*math.cos(math.radians(self.lat))))
+           dim = round(math.radians(
+               precision) * radius * math.cos(math.radians(self.lat)))
 
         :return: Dimension in meters
         :raises ValueError: If neither *dim* nor *precision* is set
@@ -313,11 +313,9 @@ class Coordinate(WbRepresentation):
             raise ValueError('No values set for dim or precision')
 
         radius = 6378137
-        self._dim = int(
-            round(
-                math.radians(self._precision) * radius * math.cos(
-                    math.radians(self.lat))
-            )
+        self._dim = round(
+            math.radians(self._precision) * radius * math.cos(
+                math.radians(self.lat))
         )
         return self._dim
 
