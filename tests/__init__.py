@@ -201,6 +201,7 @@ script_test_modules = {
     'template_bot',
     'uploadscript',
     'weblinkchecker',
+    'welcome',
 }
 
 disabled_test_modules = {

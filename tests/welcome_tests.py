@@ -21,6 +21,65 @@ class TestWelcomeBot(TestCase):
 
     net = False
 
+    def test_rejected_bad_account_not_queued(self) -> None:
+        """Test rejecting the first bad account leaves an empty queue."""
+        site = MagicMock()
+
+        def init(bot, **kwargs) -> None:
+            bot._site = site
+
+        with (
+            patch.object(welcome.SingleSiteBot, '__init__', init),
+            patch.object(welcome.i18n, 'translate', return_value='Log'),
+            patch.object(welcome, 'get_welcome_text'),
+            patch.object(welcome.globalvar, 'random_sign', False),
+        ):
+            bot = welcome.WelcomeBot()
+
+        with (
+            patch.object(welcome.globalvar, 'confirm', True),
+            patch.object(welcome.pywikibot, 'input_choice', return_value='n'),
+        ):
+            bot.collect_bad_accounts('Bad name')
+
+        self.assertIsEmpty(bot._BAQueue)
+
+    def test_report_bad_account_clears_queue(self) -> None:
+        """Test that reported bad accounts are removed from the queue."""
+        report_page = MagicMock()
+        report_page.exists.return_value = False
+        site = MagicMock()
+        site.code = 'en'
+        bot = SimpleNamespace(
+            _BAQueue=['Bad name'], bname={}, show_status=MagicMock(),
+            site=site)
+
+        with (
+            patch.object(welcome.pywikibot, 'Page',
+                         return_value=report_page),
+            # T75017: report_bad_account still uses compat's url2link.
+            patch.object(welcome.pywikibot, 'url2link',
+                         create=True, return_value='Bad name'),
+            patch.object(welcome.i18n, 'translate',
+                         side_effect=['Report page', '* %s']),
+            patch.object(welcome.i18n, 'twtranslate',
+                         return_value='Report bad username'),
+        ):
+            welcome.WelcomeBot.report_bad_account(bot)
+
+        self.assertIsEmpty(bot._BAQueue)
+
+    def test_write_log_ignores_empty_bad_account_queue(self) -> None:
+        """Test that an empty bad-account queue is not reported."""
+        bot = SimpleNamespace(
+            _BAQueue=[], report_bad_account=MagicMock(),
+            show_status=MagicMock(), welcomed_users=[])
+
+        with patch.object(welcome.globalvar, 'make_welcome_log', False):
+            welcome.WelcomeBot.write_log(bot)
+
+        bot.report_bad_account.assert_not_called()
+
     def test_skip_page_reuses_edit_count(self) -> None:
         """Test that the edit count is retrieved once."""
         bot = SimpleNamespace(show_status=MagicMock())
