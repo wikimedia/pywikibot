@@ -13,6 +13,7 @@ from __future__ import annotations
 import os
 import unittest
 from contextlib import suppress
+from unittest import mock
 
 from pywikibot.specialbots import UploadRobot
 from tests import join_images_path
@@ -82,6 +83,31 @@ class TestDryUploadbot(DefaultSiteTestCase):
         self.assertTrue(bot.ignore_on_warn('any warning'))  # ignore_warning
         self.assertFalse(bot.abort_on_warn('any warning'))  # aborts
         self.assertIsNone(bot.post_processor)
+
+
+class TestUploadbotCounter(TestCase):
+
+    """Dry tests for UploadRobot counters."""
+
+    net = False
+
+    def test_upload_counter(self) -> None:
+        """Test that a successful upload is counted once."""
+        bot = UploadRobot(
+            url=['test.png'], target_site=mock.Mock(), always=False)
+
+        with (
+            mock.patch.object(bot, 'skip_run', return_value=False),
+            mock.patch.object(bot, 'process_filename',
+                              return_value='test.png'),
+            mock.patch.object(bot, 'exit'),
+            mock.patch('pywikibot.FilePage') as file_page,
+        ):
+            file_page.return_value.upload.return_value = True
+            bot.run()
+
+        self.assertEqual(bot.counter['read'], 1)
+        self.assertEqual(bot.counter['upload'], 1)
 
 
 if __name__ == '__main__':

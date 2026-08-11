@@ -484,8 +484,6 @@ class UploadRobot(BaseBot):
             for file_url in self.url:
                 filename = self.upload_file(file_url)
                 self.counter['read'] += 1
-                if filename:
-                    self.counter['upload'] += 1
                 if callable(self.post_processor):
                     self.post_processor(file_url, filename)
         except QuitKeyboardInterrupt:
