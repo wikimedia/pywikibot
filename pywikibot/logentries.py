@@ -191,8 +191,8 @@ class BlockEntry(LogEntry):
         :return: datetime.timedelta, or None if block is indefinite.
         """
         # Doing the difference is easier than parsing the string
-        return (self.expiry() - self.timestamp()
-                if self.expiry() is not None else None)
+        expiry = self.expiry()
+        return expiry - self.timestamp() if expiry is not None else None
 
     @cached
     def expiry(self) -> pywikibot.Timestamp | None:
