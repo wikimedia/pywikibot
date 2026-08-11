@@ -12,6 +12,7 @@ import operator
 import unittest
 from contextlib import suppress
 from decimal import Decimal
+from unittest import mock
 
 import pywikibot
 from pywikibot.page import ItemPage, Page
@@ -848,6 +849,27 @@ class TestWbMonolingualText(WbRepresentationTestCase):
             pywikibot.WbMonolingualText(text='Test this!', language='')
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbMonolingualText(text=None, language='sv')
+
+
+class TestWbDataPage(WbRepresentationTestCase):
+
+    """Test the common Wikibase data-page behavior."""
+
+    dry = True
+
+    def test_validate_reuses_title(self) -> None:
+        """Test that title validation retrieves the title once."""
+        site = self.get_site()
+        page = Page(site, 'Data:Example.map')
+
+        with (
+            mock.patch.object(page, 'exists', return_value=True),
+            mock.patch.object(page, 'title', wraps=page.title) as title,
+        ):
+            pywikibot.WbGeoShape._validate(
+                page, site, '.map', 'geo-shape')
+
+        title.assert_called_once_with()
 
 
 class TestWbGeoShapeNonDry(WbRepresentationTestCase):
