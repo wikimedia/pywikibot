@@ -8,11 +8,37 @@
 from __future__ import annotations
 
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 from scripts.reflinks import ReferencesRobot, XmlDumpPageGenerator, main
 from tests import join_xml_data_path
 from tests.aspects import ScriptMainTestCase, TestCase
 from tests.utils import empty_sites
+
+
+class TestPDFTitle(TestCase):
+
+    """Tests for PDF title extraction."""
+
+    net = False
+
+    def test_pdf_bytes_passed_to_pdfinfo(self) -> None:
+        """Test that pdfinfo receives the unchanged PDF content."""
+        content = b'%PDF-1.7\x00\xff'
+        process = SimpleNamespace(
+            stdout=b'Pages: 1\nTitle: Example document\n')
+        ref = SimpleNamespace(title='')
+        response = SimpleNamespace(content=content)
+
+        with patch('scripts.reflinks.subprocess.run',
+                   return_value=process) as run:
+            ReferencesRobot.getPDFTitle(ref, response)
+
+        self.assertEqual(ref.title, 'Example document')
+        run.assert_called_once_with(
+            ['pdfinfo', '-'], input=content,
+            capture_output=True, check=False)
 
 
 class TestXMLPageGenerator(TestCase):

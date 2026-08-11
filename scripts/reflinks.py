@@ -53,10 +53,8 @@ from __future__ import annotations
 
 import http.client as httplib
 import itertools
-import os
 import re
 import subprocess
-import tempfile
 from contextlib import suppress
 from enum import IntEnum
 from functools import partial
@@ -498,18 +496,14 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
     @staticmethod
     def getPDFTitle(ref, response) -> None:
         """Use pdfinfo to retrieve title from a PDF."""
-        # pdfinfo is Unix-only
         pywikibot.info('Reading PDF file...')
-        infile = None
         try:
-            fd, infile = tempfile.mkstemp()
-            urlobj = os.fdopen(fd, 'w+')
-            urlobj.write(response.text)
-            pdfinfo_out = subprocess.Popen([r'pdfinfo', '/dev/stdin'],
-                                           stdin=urlobj,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE,
-                                           shell=False).communicate()[0]
+            pdfinfo_out = subprocess.run(
+                ['pdfinfo', '-'],
+                input=response.content,
+                capture_output=True,
+                check=False,
+            ).stdout
         except ValueError:
             pywikibot.info('pdfinfo value error.')
         except OSError:
@@ -527,10 +521,6 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
                         pywikibot.info('title: ' + ref.title)
                         break
             pywikibot.info('PDF done.')
-        finally:
-            if infile is not None:
-                urlobj.close()
-                os.unlink(infile)
 
     def setup(self) -> None:
         """Read dead links from file."""
