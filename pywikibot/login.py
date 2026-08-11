@@ -435,8 +435,8 @@ class ClientLoginManager(LoginManager):
         :raises APIError: API login error
         """
         if hasattr(self, '_waituntil') \
-           and datetime.datetime.now() < self._waituntil:
-            diff = self._waituntil - datetime.datetime.now()
+           and (now := datetime.datetime.now()) < self._waituntil:
+            diff = self._waituntil - now
             pywikibot.warning(f'Too many tries, waiting {diff.seconds}'
                               ' seconds before retrying.')
             pywikibot.sleep(diff.seconds)
