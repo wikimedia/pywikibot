@@ -179,6 +179,7 @@ script_test_modules = {
     'cache',
     'category_bot',
     'checkimages',
+    'commonscat',
     'data_ingestion',
     'deletionbot',
     'fixing_redirects',
