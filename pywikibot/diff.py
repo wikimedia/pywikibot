@@ -684,8 +684,8 @@ def get_close_matches_ratio(
         s.set_seq1(x.lower() if ignorecase else x)
         if s.real_quick_ratio() >= cutoff and \
            s.quick_ratio() >= cutoff and \
-           s.ratio() >= cutoff:
-            result.append((s.ratio(), x))
+           (ratio := s.ratio()) >= cutoff:
+            result.append((ratio, x))
 
     # Move the best scorers to head of list
     return nlargest(n, result)
