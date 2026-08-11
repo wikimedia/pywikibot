@@ -1,6 +1,12 @@
 Release 11.7
 ============
 
+* Avoid unnecessary :class:`pywikibot.Site` creation in :class:`specialbots.UploadRobot`.
+* Add :meth:`page.BasePage.review` and :meth:`page.BasePage.unreview`, which call
+  :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`.
+  (:phab:`T408389`)
+* Add :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+  for the :ext:`FlaggedRevs` extension. (:phab:`T408389`)
 * Add ``show`` filters to :meth:`APISite.blocks()
   <pywikibot.site._generators.GeneratorsMixin.blocks>`; they can be set by the new *account*, *ip*,
   *ip_range* and *temp* parameters. (:phab:`T433531`)

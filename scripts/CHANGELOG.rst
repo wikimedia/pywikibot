@@ -4,14 +4,29 @@ Scripts Changelog
 11.7.0
 ------
 
+interwiki
+^^^^^^^^^
+
+* Create an interwiki graph in ``-autonomous`` mode when processing is forced to stop before
+  reaching the normal end, e.g. because duplicate pages were found. (:phab:`T416086`)
+
+reflinks
+^^^^^^^^
+
+* Fix processing of PDF responses with binary data.
+
 revertbot
 ^^^^^^^^^
 
-* :class:`scripts.revertbot.ContribRevertBot` class was introduced where
-  contribution items are :class:`page.Contributions`. Users who want to
-  customize the bot's behaviour should subclass from it. The legacy classes
-  :class:`scripts.revertbot.BaseRevertBot` and :class:`scripts.revertbot.myRevertBot`
-  are deprecated.
+* Introduce :class:`scripts.revertbot.ContribRevertBot`, whose contribution items are
+  :class:`page.Contributions`. Users who want to customize the bot's behavior should subclass it.
+  The legacy classes :class:`scripts.revertbot.BaseRevertBot` and
+  :class:`scripts.revertbot.myRevertBot` are deprecated.
+
+welcome
+^^^^^^^
+
+* Fix bad-account queue handling to correctly process and clear reported usernames.
 
 11.6.0
 ------
