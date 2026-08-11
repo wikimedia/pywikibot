@@ -2549,7 +2549,7 @@ class GeneratorsMixin:
         def ignore_talkpages(page: pywikibot.page.BasePage) -> bool:
             """Ignore talk pages and special pages."""
             ns = page.namespace()
-            return ns >= 0 and not page.namespace() % 2
+            return ns >= 0 and not ns % 2
 
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',

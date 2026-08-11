@@ -94,6 +94,25 @@ class TestPageReferences(TestCase):
         self.assertEqual(references, [backlink_c, backlink_a, embedded_b])
 
 
+class TestWatchedPages(DefaultSiteTestCase):
+
+    """Offline tests for Site.watched_pages."""
+
+    dry = True
+
+    def test_reuses_namespace(self) -> None:
+        """Test that watchlist filtering retrieves the namespace once."""
+        page = pywikibot.Page(self.site, 'Test page')
+        gen = self.site.watched_pages(with_talkpage=False)
+
+        with patch.object(page, 'namespace',
+                          wraps=page.namespace) as namespace:
+            result = gen._check_result_namespace(page)
+
+        self.assertTrue(result)
+        namespace.assert_called_once_with()
+
+
 class TestSiteGenerators(DefaultSiteTestCase):
 
     """Test cases for Site methods."""
