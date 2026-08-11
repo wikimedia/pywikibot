@@ -21,6 +21,26 @@ class TestWelcomeBot(TestCase):
 
     net = False
 
+    def test_skip_page_reuses_edit_count(self) -> None:
+        """Test that the edit count is retrieved once."""
+        bot = SimpleNamespace(show_status=MagicMock())
+        user = MagicMock(username='Alice')
+        user.is_blocked.return_value = False
+        user.is_locked.return_value = False
+        user.groups.return_value = []
+        user.editCount.return_value = 1
+
+        with (
+            patch.object(welcome.globalvar, 'attach_edit_count', 2),
+            patch.object(welcome.pywikibot, 'info') as info,
+        ):
+            result = welcome.WelcomeBot.skip_page(bot, user)
+
+        self.assertTrue(result)
+        user.editCount.assert_called_once_with()
+        bot.show_status.assert_called_once_with(welcome.Msg.IGNORE)
+        info.assert_called_once_with('Alice has only 1 contributions.')
+
     def test_signature_file_closed_on_read_error(self) -> None:
         """Test that the signature file is closed when reading fails."""
         file_obj = MagicMock()

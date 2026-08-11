@@ -837,10 +837,10 @@ class WelcomeBot(SingleSiteBot):
             self.show_status(Msg.SKIP)
             pywikibot.info(f'{user.username} might be a global bot!')
 
-        elif user.editCount() < globalvar.attach_edit_count:
-            if user.editCount() != 0:
+        elif (edit_count := user.editCount()) < globalvar.attach_edit_count:
+            if edit_count != 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.info(f'{user.username} has only {user.editCount()}'
+                pywikibot.info(f'{user.username} has only {edit_count}'
                                ' contributions.')
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)
