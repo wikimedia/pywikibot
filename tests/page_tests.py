@@ -169,6 +169,23 @@ class TestLinkObject(SiteAttributeTestCase):
             l3.ns_title(onsite=self.itws)
 
 
+class TestPageTitle(DefaultSiteTestCase):
+
+    """Test Page title formatting."""
+
+    dry = True
+
+    def test_reuses_section(self) -> None:
+        """Test that title formatting retrieves the section once."""
+        page = pywikibot.Page(self.site, 'Help:Test page#Testing')
+
+        with mock.patch.object(page, 'section', wraps=page.section) as section:
+            title = page.title()
+
+        self.assertEqual(title, 'Help:Test page#Testing')
+        section.assert_called_once_with()
+
+
 class TestPageObjectEnglish(TestCase):
 
     """Test Page Object using English Wikipedia."""

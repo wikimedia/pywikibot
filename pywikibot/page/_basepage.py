@@ -254,8 +254,8 @@ class BasePage(ComparableMixin):
         """
         title = self._link.canonical_title()
         label = self._link.title
-        if with_section and self.section():
-            section = '#' + self.section()
+        if with_section and (page_section := self.section()):
+            section = '#' + page_section
         else:
             section = ''
         if as_link:
