@@ -794,6 +794,60 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
 
+    def test_callback_context(self) -> None:
+        """Test callback data and ranges after changing the text."""
+        calls = []
+
+        def callback(link, text, groups, rng):
+            calls.append((link.title, text, groups, rng))
+            return 'expanded replacement' if link.title == 'A' else None
+
+        source = 'Start [[A|label]]s [[B]] end'
+        result = textlib.replace_links(source, callback, self.wp_site)
+        changed = 'Start expanded replacement [[B]] end'
+
+        self.assertEqual(result, changed)
+        self.assertEqual(calls, [
+            ('A', source, {
+                'title': 'A',
+                'section': None,
+                'label': 'label',
+                'linktrail': 's',
+            }, (6, 18)),
+            ('B', changed, {
+                'title': 'B',
+                'section': None,
+                'label': None,
+                'linktrail': '',
+            }, (27, 32)),
+        ])
+
+    def test_skipped_links(self) -> None:
+        """Test that same-page sections and interwiki links are skipped."""
+        links = []
+
+        def callback(link, text, groups, rng):
+            links.append(link.title)
+            return False
+
+        source = '[[#Section]] [[fr:Page]] [[Valid]]'
+        result = textlib.replace_links(source, callback, self.wp_site)
+
+        self.assertEqual(result, '[[#Section]] [[fr:Page]] Valid')
+        self.assertEqual(links, ['Valid'])
+
+    def test_invalid_arguments(self) -> None:
+        """Test invalid site and sequence replacement arguments."""
+        with self.assertRaisesRegex(
+                ValueError, 'must be a BaseSite not object'):
+            textlib.replace_links('', lambda *_: None, object())
+
+        with self.assertRaisesRegex(ValueError, 'exactly 2 items'):
+            textlib.replace_links('', ('A',), self.wp_site)
+
+        with self.assertRaisesRegex(ValueError, 'must be either str'):
+            textlib.replace_links('', (object(), False), self.wp_site)
+
     def test_replacements_once(self) -> None:
         """Test dynamic replacement."""
         def callback(link, text, groups, rng):
