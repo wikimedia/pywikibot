@@ -1120,8 +1120,9 @@ The text message is:
 
             if code == 'maxlag':
                 retries += 1
-                if retries > max(5, pywikibot.config.max_retries):
+                if retries > pywikibot.config.max_retries:
                     break
+
                 pywikibot.log('Pausing due to database lag: ' + info)
 
                 try:
