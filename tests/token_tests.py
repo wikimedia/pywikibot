@@ -9,14 +9,51 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest import mock
 
 from pywikibot.exceptions import APIError, Error
+from pywikibot.site import TokenWallet
 from tests.aspects import (
     DefaultSiteTestCase,
     DeprecationTestCase,
     TestCase,
     TestCaseBase,
 )
+
+
+class TestTokenWallet(TestCase):
+
+    """Test the TokenWallet container."""
+
+    net = False
+
+    def test_reuses_current_user(self) -> None:
+        """Test that a known current user is retrieved once."""
+        site = mock.Mock()
+        site.user.return_value = 'Alice'
+        site.get_tokens.return_value = {'csrf': 'token'}
+        wallet = TokenWallet(site)
+        site.user.reset_mock()
+
+        self.assertEqual(wallet['csrf'], 'token')
+
+        site.user.assert_called_once_with()
+        site.login.assert_not_called()
+
+    def test_refreshes_current_user_after_login(self) -> None:
+        """Test that the current user is refreshed after login."""
+        site = mock.Mock()
+        site.user.return_value = None
+        site.get_tokens.return_value = {'csrf': 'token'}
+        wallet = TokenWallet(site)
+        site.user.reset_mock()
+        site.user.side_effect = [None, 'Alice']
+
+        self.assertEqual(wallet['csrf'], 'token')
+
+        self.assertEqual(site.user.call_count, 2)
+        site.login.assert_called_once_with()
+        self.assertEqual(wallet._currentuser, 'Alice')
 
 
 class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
