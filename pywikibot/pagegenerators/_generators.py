@@ -1297,17 +1297,18 @@ def WikidataPageFromItemGenerator(
     :param site: Site for generator results.
     """
     repo = site.data_repository()
+    dbname = site.dbName()
     for batch in batched(gen, 50):
         req = {'ids': [item.id for item in batch],
-               'sitefilter': site.dbName(),
+               'sitefilter': dbname,
                'action': 'wbgetentities',
                'props': 'sitelinks'}
 
         wbrequest = repo.simple_request(**req)
         wbdata = wbrequest.submit()
         entities = (item for item in wbdata['entities'].values() if
-                    'sitelinks' in item and site.dbName() in item['sitelinks'])
-        sitelinks = (item['sitelinks'][site.dbName()]['title']
+                    'sitelinks' in item and dbname in item['sitelinks'])
+        sitelinks = (item['sitelinks'][dbname]['title']
                      for item in entities)
         for sitelink in sitelinks:
             yield pywikibot.Page(site, sitelink)
