@@ -196,6 +196,7 @@ script_test_modules = {
     'reflinks',
     'replacebot',
     'script',
+    'speedy_delete',
     'template_bot',
     'uploadscript',
     'weblinkchecker',
