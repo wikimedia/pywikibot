@@ -10,6 +10,8 @@ from __future__ import annotations
 import unittest
 from contextlib import suppress
 from datetime import datetime
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pywikibot
 from pywikibot.exceptions import Error
@@ -80,6 +82,28 @@ class TestArchiveBotFunctions(TestCase):
     """Test functions in archivebot."""
 
     net = False
+
+    def test_get_params_reuses_isocalendar(self) -> None:
+        """Test that the ISO calendar is calculated once."""
+        date = datetime(2024, 12, 30)
+        timestamp = SimpleNamespace(
+            year=date.year,
+            month=date.month,
+            isocalendar=Mock(return_value=date.isocalendar()),
+            timetuple=date.timetuple,
+        )
+        archiver = SimpleNamespace(
+            site=SimpleNamespace(lang='en'),
+            month_num2orig_names={
+                12: {'long': 'December', 'short': 'Dec'},
+            },
+        )
+
+        params = archivebot.PageArchiver.get_params(
+            archiver, timestamp, counter=1)
+
+        self.assertEqual((params['isoyear'], params['isoweek']), (2025, 1))
+        timestamp.isocalendar.assert_called_once_with()
 
     def test_str2size(self) -> None:
         """Test for parsing the shorthand notation of sizes."""

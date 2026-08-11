@@ -762,11 +762,12 @@ class PageArchiver:
     def get_params(self, timestamp, counter: int) -> dict:
         """Make params for archiving template."""
         lang = self.site.lang
+        iso_year, iso_week, _ = timestamp.isocalendar()
         params = {
             'counter': counter,
             'year': timestamp.year,
-            'isoyear': timestamp.isocalendar()[0],
-            'isoweek': timestamp.isocalendar()[1],
+            'isoyear': iso_year,
+            'isoweek': iso_week,
             'semester': int(ceil(timestamp.month / 6)),
             'quarter': int(ceil(timestamp.month / 3)),
             'month': timestamp.month,
