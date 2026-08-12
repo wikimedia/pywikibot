@@ -220,6 +220,22 @@ class OpenArchiveWriteTestCase(TestCase):
             self.assertEqual(f.mode, 'rb')
             self.assertIsInstance(f.read(), bytes)
 
+    def test_write_archive_uncompressed(self) -> None:
+        """Test writing an uncompressed file."""
+        content = self._write_content('')
+        self.assertEqual(content, self.original_content)
+
+    def test_append_archive_uncompressed(self) -> None:
+        """Test appending to an uncompressed file."""
+        with tempfile.TemporaryDirectory() as directory:
+            filename = os.path.join(directory, 'archive')
+            with open(filename, 'wb') as f:
+                f.write(b'foo')
+            with tools.open_archive(filename, 'ab') as f:
+                f.write(b'bar')
+            with open(filename, 'rb') as f:
+                self.assertEqual(f.read(), b'foobar')
+
     def test_write_archive_bz2(self) -> None:
         """Test writing a bz2 archive."""
         content = self._write_content('.bz2')

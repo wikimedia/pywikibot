@@ -816,7 +816,7 @@ def open_archive(filename: str, /,
         binary = lzma.open(filename, mode, format=lzma_fmts[extension])
 
     else:  # assume it's an uncompressed file
-        binary = open(filename, 'rb')
+        binary = open(filename, mode)
 
     return binary
 
