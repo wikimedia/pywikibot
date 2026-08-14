@@ -788,7 +788,8 @@ class PageArchiver:
         for c in range(counter):
             params = self.get_params(thread.timestamp, c + 1)
             self.get_archive_page(pattern % params, params)
-        list(self.site.preloadpages(self.archives.values()))
+        for _ in self.site.preloadpages(self.archives.values()):
+            pass
 
     def analyze_page(self) -> set[tuple[str, str]]:
         """Analyze DiscussionPage."""
