@@ -403,14 +403,14 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                 deprecated_params = {
                     'rvexpandtemplates', 'rvparse', 'rvdiffto', 'rvdifftotext',
                     'rvdifftotextpst', 'rvcontentformat', 'parsetree'}
-                if not set(request) & deprecated_params:
+                if request.keys().isdisjoint(deprecated_params):
                     request['rvslots'] = '*'
             if 'deletedrevisions' in props:
                 deprecated_params = {
                     'drvexpandtemplates', 'drvparse', 'drvdiffto',
                     'drvdifftotext', 'drvdifftotextpst', 'drvcontentformat',
                     'parsetree'}
-                if not set(request) & deprecated_params:
+                if request.keys().isdisjoint(deprecated_params):
                     request['drvslots'] = '*'
         lists = request.get('list')
         if lists:
@@ -419,14 +419,14 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
                     'arvexpandtemplates', 'arvparse', 'arvdiffto',
                     'arvdifftotext', 'arvdifftotextpst', 'arvcontentformat',
                     'parsetree'}
-                if not set(request) & deprecated_params:
+                if request.keys().isdisjoint(deprecated_params):
                     request['arvslots'] = '*'
             if 'alldeletedrevisions' in lists:
                 deprecated_params = {
                     'adrexpandtemplates', 'adrparse', 'adrdiffto',
                     'adrdifftotext', 'adrdifftotextpst', 'adrcontentformat',
                     'parsetree'}
-                if not set(request) & deprecated_params:
+                if request.keys().isdisjoint(deprecated_params):
                     request['adrslots'] = '*'
 
     def set_query_increment(self, value) -> None:
