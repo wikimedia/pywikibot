@@ -1698,7 +1698,7 @@ class APISite(
             page._redirtarget = target
             return page._redirtarget
 
-        pagedata = list(result['query']['pages'].values())[0]
+        pagedata = next(iter(result['query']['pages'].values()))
         # There should be only one value in 'pages' (the ultimate
         # target, also in case of double redirects).
         if self.sametitle(pagedata['title'], target_title):
