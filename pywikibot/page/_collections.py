@@ -465,18 +465,17 @@ class SiteLinkCollection(MutableMapping):
                 diffto_link = diffto[dbname]
                 if diffto_link.get('title') == sitelink.get('title'):
                     # compare badges
-                    diffto_badges = diffto_link.get('badges', [])
-                    badges = sitelink.get('badges', [])
-                    tmp_badges = [''] * len(set(diffto_badges) - set(badges))
-                    for badge in set(badges) - set(diffto_badges):
-                        tmp_badges.append(badge)
+                    diffto_badges = set(diffto_link.get('badges', []))
+                    badges = set(sitelink.get('badges', []))
+                    tmp_badges = [''] * len(diffto_badges - badges)
+                    tmp_badges.extend(badges - diffto_badges)
                     if tmp_badges:
                         data[dbname]['badges'] = tmp_badges
                     else:
                         to_nuke.append(dbname)
 
             # find removed sitelinks
-            for dbname in (set(diffto.keys()) - set(self.keys())):
+            for dbname in diffto.keys() - self.keys():
                 badges = [''] * len(diffto[dbname].get('badges', []))
                 data[dbname] = {'site': dbname, 'title': ''}
                 if badges:
