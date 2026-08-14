@@ -167,13 +167,11 @@ class Throttle:
 
     def _write_file(self, processes) -> None:
         """Write process entries to file."""
-        if not isinstance(processes, list):
-            processes = list(processes)
-        processes.sort(key=lambda p: (p.pid, p.site))
+        processes = sorted(processes, key=lambda p: (p.pid, p.site))
 
         with suppress(IOError), open(self.ctrlfilename, 'w') as f:
-            for p in processes:
-                f.write(FORMAT_LINE.format_map(p._asdict()))
+            f.writelines(FORMAT_LINE.format_map(p._asdict())
+                         for p in processes)
 
     def checkMultiplicity(self) -> None:
         """Count running processes for site and set process_multiplicity.
@@ -215,7 +213,7 @@ class Throttle:
             if not mysite:
                 del processes[-1]
 
-            self._write_file(sorted(processes, key=lambda p: p.pid))
+            self._write_file(processes)
 
             self.process_multiplicity = count
             pywikibot.log(f'Found {count} {mysite} processes running,'

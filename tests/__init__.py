@@ -146,6 +146,7 @@ library_test_modules = {
     'tests',
     'textlib',
     'thanks',
+    'throttle',
     'time',
     'timestripper',
     'titletranslate',
