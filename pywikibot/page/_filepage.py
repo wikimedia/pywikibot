@@ -425,16 +425,17 @@ class FilePage(Page):
         self.site.throttle()
         self.site.throttle.set_delays()
 
-        req = http.fetch(url, stream=True)
-        if req.status_code == HTTPStatus.OK:
+        with http.fetch(url, stream=True) as response:
+            if response.status_code != HTTPStatus.OK:
+                pywikibot.warning(
+                    f'Unsuccessful request ({response.status_code}): '
+                    f'{response.url}')
+                return False
+
             with path.open('wb') as f:
-                f.writelines(req.iter_content(chunk_size))
+                f.writelines(response.iter_content(chunk_size))
 
-            return thumb or compute_file_hash(path) == revision.sha1
-
-        pywikibot.warning(
-            f'Unsuccessful request ({req.status_code}): {req.url}')
-        return False
+        return thumb or compute_file_hash(path) == revision.sha1
 
     def globalusage(self, total=None):
         """Iterate all global usage for this page.
