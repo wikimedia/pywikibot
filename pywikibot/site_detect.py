@@ -126,10 +126,11 @@ class MWSite:
                     # Fallback for old versions which didn't wrap help in json
                     d = {'error': {'*': r.text}}
 
-                self.version = list(filter(
-                    lambda x: x.startswith('MediaWiki'),
-                    (line.strip()
-                     for line in d['error']['*'].split('\n'))))[0].split()[1]
+                lines = (line.strip()
+                         for line in d['error']['*'].split('\n'))
+                self.version = next(
+                    line.split()[1] for line in lines
+                    if line.startswith('MediaWiki'))
             except Exception:
                 pass
             else:
