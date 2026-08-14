@@ -9,10 +9,11 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest.mock import Mock
 
 import pywikibot
 from scripts import interwiki
-from tests.aspects import DrySite, PatchingTestCase
+from tests.aspects import DrySite, PatchingTestCase, TestCase
 
 
 class TestIwConfig(PatchingTestCase):
@@ -61,6 +62,35 @@ class TestIwConfig(PatchingTestCase):
         self.assertIsEmpty(iwc.skip)
         iwc.readOptions('-skipfile:tests/data/pagelist-lines.txt')
         self.assertLength(iwc.skip, 5)
+
+
+class TestReplaceLinks(TestCase):
+
+    """Tests for replacing interwiki links."""
+
+    dry = True
+    sites = {
+        'local': {'family': 'wikipedia', 'code': 'en'},
+        'foreign': {'family': 'commons', 'code': 'commons'},
+    }
+
+    def test_foreign_family_link(self) -> None:
+        """Test removing a link to a non-forwarded family."""
+        local_site = self.get_site('local')
+        page = pywikibot.Page(local_site, 'Test page')
+        page._langlinks = set()
+        foreign_page = pywikibot.Page(
+            self.get_site('foreign'), 'File:Test.jpg')
+        pages = {page.site: page, foreign_page.site: foreign_page}
+
+        subject = interwiki.Subject.__new__(interwiki.Subject)
+        subject.conf = interwiki.InterwikiBotConfig()
+        subject.conf.quiet = True
+        subject._fetch_text = Mock(return_value='Test page content')
+
+        self.assertFalse(subject.replaceLinks(page, pages))
+        self.assertEqual(pages,
+                         {page.site: page, foreign_page.site: foreign_page})
 
 
 if __name__ == '__main__':
