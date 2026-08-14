@@ -830,11 +830,10 @@ def merge_unique_dicts(*args, **kwargs):
 
     .. version-added:: 3.0
     """
-    args = [*list(args), dict(kwargs)]
     conflicts = set()
     result = {}
-    for arg in args:
-        conflicts |= set(arg.keys()) & set(result.keys())
+    for arg in (*args, kwargs):
+        conflicts.update(key for key in arg if key in result)
         result.update(arg)
     if conflicts:
         raise ValueError('Multiple dicts contain the same keys: {}'
