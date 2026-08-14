@@ -427,9 +427,8 @@ class FilePage(Page):
 
         req = http.fetch(url, stream=True)
         if req.status_code == HTTPStatus.OK:
-            with open(path, 'wb') as f:
-                for chunk in req.iter_content(chunk_size):
-                    f.write(chunk)
+            with path.open('wb') as f:
+                f.writelines(req.iter_content(chunk_size))
 
             return thumb or compute_file_hash(path) == revision.sha1
 
