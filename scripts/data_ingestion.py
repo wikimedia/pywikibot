@@ -101,7 +101,7 @@ import hashlib
 import io
 import os
 import posixpath
-from typing import Any, BinaryIO
+from typing import Any
 from urllib.parse import urlparse
 
 import pywikibot
@@ -131,7 +131,7 @@ class Photo(pywikibot.FilePage):
             urlparse(url)[2])[1]
         ext = filename.split('.')[-1]
         self.metadata['_ext'] = None if ext == filename else ext
-        self.contents = None
+        self.contents: io.BytesIO | None = None
 
         if not site:
             site = pywikibot.Site('commons')
@@ -139,12 +139,12 @@ class Photo(pywikibot.FilePage):
         # default title
         super().__init__(site, self.get_title('%(_filename)s.%(_ext)s'))
 
-    def download_photo(self) -> BinaryIO:
+    def download_photo(self) -> io.BytesIO:
         """Download the photo and store it in an io.BytesIO object.
 
         TODO: Add exception handling
         """
-        if not self.contents:
+        if self.contents is None:
             image_file = fetch(self.URL).content
             self.contents = io.BytesIO(image_file)
         return self.contents
@@ -157,8 +157,8 @@ class Photo(pywikibot.FilePage):
 
         TODO: Add exception handling, fix site thing
         """
-        hash_object = hashlib.sha1()
-        hash_object.update(self.download_photo().getvalue())
+        hash_object = hashlib.sha1(
+            self.download_photo().getbuffer(), usedforsecurity=False)
         return [page.title(with_ns=False)
                 for page in self.site.allimages(
                     sha1=base64.b16encode(hash_object.digest()))]
