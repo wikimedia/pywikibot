@@ -292,12 +292,15 @@ class FilePage(Page):
 
         :param source: Path or URL to the file to be uploaded.
 
-        :keyword comment: Edit summary; if this is not provided, then
+        .. version-changed:: 11.8
+           The *comment* keyword was renamed to *summary*.
+
+        :keyword summary: Edit summary; if this is not provided, then
             filepage.text will be used. An empty summary is not
             permitted. This may also serve as the initial page text (see
             below).
         :keyword text: Initial page text; if this is not set, then
-            filepage.text will be used, or comment.
+            filepage.text will be used, or summary.
         :keyword watch: If true, add filepage to the bot user's
             watchlist
         :keyword ignore_warnings: It may be a static boolean, a callable

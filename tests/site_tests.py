@@ -7,12 +7,14 @@
 """Tests for the site module."""
 from __future__ import annotations
 
+import inspect
 import pickle
 import random
 import threading
 import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
+from unittest import mock
 from unittest.mock import patch
 
 import pywikibot
@@ -552,6 +554,70 @@ class SiteSysopTestCase(DefaultSiteTestCase):
             next(gen)
 
 
+class TestActionSummaryParameters(DeprecationTestCase):
+
+    """Test action summary parameters in APISite methods."""
+
+    net = False
+
+    methods = (
+        pywikibot.site.APISite.delete,
+        pywikibot.site.APISite.undelete,
+        pywikibot.site.APISite.protect,
+    )
+
+    def setUp(self) -> None:
+        """Create a mock site which can pass the rights decorator."""
+        super().setUp()
+        self.mock_site = mock.MagicMock()
+        self.mock_site.obsolete = False
+        self.mock_site.has_right.return_value = True
+        self.mock_site.tokens = {'csrf': 'TOKEN'}
+        self.mock_site.simple_request.return_value.submit.return_value = {}
+        self.page = mock.MagicMock()
+
+    def test_signatures(self) -> None:
+        """Public signatures expose the new name and deprecated alias."""
+        for method in self.methods:
+            with self.subTest(method=method.__name__):
+                parameters = inspect.signature(method).parameters
+                self.assertIn('summary', parameters)
+                self.assertIn('reason', parameters)
+
+    def test_summary_maps_to_reason(self) -> None:
+        """The public summary is sent using MediaWiki's reason key."""
+        pywikibot.site.APISite.undelete(
+            self.mock_site, self.page, summary='Canonical summary')
+
+        self.mock_site.simple_request.assert_called_once_with(
+            action='undelete',
+            title=self.page,
+            reason='Canonical summary',
+            token='TOKEN',
+            timestamps=None,
+            fileids=None,
+        )
+        self.assertNoDeprecation()
+
+    def test_reason_alias(self) -> None:
+        """The deprecated reason alias maps to the new public parameter."""
+        pywikibot.site.APISite.undelete(
+            self.mock_site, self.page, reason='Legacy summary')
+
+        self.mock_site.simple_request.assert_called_once_with(
+            action='undelete',
+            title=self.page,
+            reason='Legacy summary',
+            token='TOKEN',
+            timestamps=None,
+            fileids=None,
+        )
+        self.assertOneDeprecationParts(
+            'reason argument of pywikibot.site._apisite.APISite.undelete',
+            'summary',
+        )
+
+
 class TestSiteSysopWrite(TestCase):
 
     """Test site methods that require writing rights."""
@@ -570,7 +636,7 @@ class TestSiteSysopWrite(TestCase):
         r = site.protect(protections={'edit': 'sysop',
                                       'move': 'autoconfirmed'},
                          page=p1,
-                         reason='Pywikibot unit test')
+                         summary='Pywikibot unit test')
         self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', 'infinite'),
@@ -580,7 +646,7 @@ class TestSiteSysopWrite(TestCase):
         site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                      page=p1,
                      expiry=expiry,
-                     reason='Pywikibot unit test')
+                     summary='Pywikibot unit test')
 
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', '2050-01-01T00:00:00Z'),
@@ -588,7 +654,7 @@ class TestSiteSysopWrite(TestCase):
 
         site.protect(protections={'edit': '', 'move': ''},
                      page=p1,
-                     reason='Pywikibot unit test')
+                     summary='Pywikibot unit test')
         self.assertEqual(site.page_restrictions(page=p1), {})
 
     def test_protect_alt(self) -> None:
@@ -599,7 +665,7 @@ class TestSiteSysopWrite(TestCase):
         r = site.protect(protections={'edit': 'sysop',
                                       'move': 'autoconfirmed'},
                          page=p1,
-                         reason='Pywikibot unit test')
+                         summary='Pywikibot unit test')
         self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', 'infinite'),
@@ -610,7 +676,7 @@ class TestSiteSysopWrite(TestCase):
         site.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
                      page=p1,
                      expiry=expiry,
-                     reason='Pywikibot unit test')
+                     summary='Pywikibot unit test')
 
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', '2050-01-01T00:00:00Z'),
@@ -619,7 +685,7 @@ class TestSiteSysopWrite(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         site.protect(protections={'edit': '', 'move': ''},
                      page=p1,
-                     reason='Pywikibot unit test')
+                     summary='Pywikibot unit test')
         self.assertEqual(site.page_restrictions(page=p1), {})
 
     def test_protect_exception(self) -> None:
@@ -631,12 +697,12 @@ class TestSiteSysopWrite(TestCase):
             self.assertRaisesRegex(APIError,
                                    'Invalid protection type "anInvalidType"'):
             site.protect(protections={'anInvalidType': 'sysop'},
-                         page=page, reason='Pywikibot unit test')
+                         page=page, summary='Pywikibot unit test')
 
         with self.subTest(test='anInvalidLevel'), \
                 self.assertRaisesRegex(Error, 'Invalid protection level'):
             site.protect(protections={'edit': 'anInvalidLevel'},
-                         page=page, reason='Pywikibot unit test')
+                         page=page, summary='Pywikibot unit test')
 
     def test_delete(self) -> None:
         """Test the site.delete() and site.undelete() methods."""
@@ -646,7 +712,7 @@ class TestSiteSysopWrite(TestCase):
         if not p.exists():
             site.undelete(p, 'pywikibot unit tests')
 
-        site.delete(p, reason='pywikibot unit tests')
+        site.delete(p, summary='pywikibot unit tests')
         with self.assertRaises(NoPageError):
             p.get(force=True)
 
@@ -659,7 +725,7 @@ class TestSiteSysopWrite(TestCase):
         self.assertEqual(revs[0].revid, 219995)
         self.assertEqual(revs[1].revid, 219994)
 
-        site.delete(p, reason='pywikibot unit tests')
+        site.delete(p, summary='pywikibot unit tests')
         site.undelete(p, 'pywikibot unit tests')
         revs = list(p.revisions())
         self.assertGreater(len(revs), 2)

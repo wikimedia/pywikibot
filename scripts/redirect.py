@@ -463,7 +463,7 @@ class RedirectRobot(ExistingPageBot):
             f'target page is on different site {page.site}')
         reason = i18n.twtranslate(page.site, summary_key, bot_prefix=True)
         if page.site.has_right('delete'):
-            page.delete(reason, prompt=False)
+            page.delete(summary=reason, prompt=False)
         elif self.sdtemplate:
             pywikibot.info('User does not have delete right, '
                            'put page to speedy deletion.')

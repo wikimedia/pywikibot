@@ -86,7 +86,7 @@ class MovePagesBot(CurrentPageBot):
             msg = i18n.twtranslate(page.site, 'movepages-moving')
         pywikibot.info(f'Moving page {page} to [[{new_page_tite}]]')
         try:
-            page.move(new_page_tite, reason=msg,
+            page.move(new_page_tite, summary=msg,
                       movetalk=self.opt.movetalkpage,
                       movesubpages=self.opt.movesubpages,
                       noredirect=self.opt.noredirect)

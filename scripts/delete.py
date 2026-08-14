@@ -183,7 +183,7 @@ class DeletionRobot(CurrentPageBot):
     def treat_page(self) -> None:
         """Process one page from the generator."""
         if self.opt.undelete:
-            self.current_page.undelete(self.summary)
+            self.current_page.undelete(summary=self.summary)
             self.counter['undelete'] += 1
         else:
             if (self.opt.isorphan is not False
@@ -203,9 +203,9 @@ class DeletionRobot(CurrentPageBot):
 
             if self.current_page.site.user() is None:
                 self.current_page.site.login()
-            res = self.current_page.delete(self.summary,
-                                           not self.opt.always,
-                                           self.opt.always,
+            res = self.current_page.delete(summary=self.summary,
+                                           prompt=not self.opt.always,
+                                           mark=self.opt.always,
                                            automatic_quit=True)
             if res > 0:
                 self.counter['delete'] += 1

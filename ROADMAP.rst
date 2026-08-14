@@ -29,6 +29,9 @@ Release 11.8
 * Update translations (i18n).
 * Add new :class:`family.WikimediaSubdomainFamily`.
 * Update documentation for :meth:`page.BasePage.exists`. (:phab:`T334341`)
+* Public *reason* and *comment* parameters used for page-action and upload
+  summaries were renamed to *summary*. The old parameter names remain
+  available as deprecated aliases. (:phab:`T62442`)
 
 
 Deprecations
@@ -131,6 +134,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.8.0: Public *reason* and *comment* parameters used for page-action and
+  upload summaries were renamed to *summary*. The old parameter names will
+  be removed. (:phab:`T62442`)
 * 11.7.0: :meth:`page.BasePage.getOldVersion` is now deprecated in favour of
   :meth:`get_revision(oldid, content=True).text<page.BasePage.get_revision>`. (:phab:`T433799`)
 * 11.7.0: The *lang* parameter of the :func:`i18n.altlang` function is positional-only. Passing

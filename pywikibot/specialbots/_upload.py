@@ -463,7 +463,7 @@ class UploadRobot(BaseBot):
                         ignore_warnings=ignore_warnings,
                         chunk_size=self.chunk_size,
                         asynchronous=self.asynchronous,
-                        comment=self.summary)
+                        summary=self.summary)
                 except APIError as error:
                     if error.code == 'uploaddisabled':
                         pywikibot.error(

@@ -446,7 +446,7 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
             pywikibot.info(f'The chosen reason is: <<lightred>>{reason}')
             # don't produce orphaned talk pages
             deletetalk = not page.isTalkPage() and page.namespace() != 2
-            page.delete(reason, prompt=False, deletetalk=deletetalk)
+            page.delete(summary=reason, prompt=False, deletetalk=deletetalk)
 
         # skip this page
         else:

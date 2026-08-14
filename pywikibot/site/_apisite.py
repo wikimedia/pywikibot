@@ -73,6 +73,7 @@ from pywikibot.tools import (
     cached,
     deprecate_arg,
     deprecated,
+    deprecated_args,
     deprecated_signature,
     issue_deprecation_warning,
     merge_unique_dicts,
@@ -2648,10 +2649,11 @@ class APISite(
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def delete(
         self,
         page: BasePage | int | str,
-        reason: str,
+        summary: str,
         *,
         deletetalk: bool = False,
         oldimage: str | None = None
@@ -2679,13 +2681,16 @@ class APISite(
         .. version-changed:: 11.2
            *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         .. seealso::
            - :api:`Delete`
            - :meth:`undelete`
            - :meth:`page.BasePage.delete`
 
         :param page: Page to be deleted or its pageid.
-        :param reason: Deletion reason.
+        :param summary: Deletion summary.
         :param deletetalk: Also delete the talk page, if it exists.
         :param oldimage: Oldimage id of the file version to be deleted.
             If a BasePage object is given with page parameter, it has to
@@ -2708,7 +2713,7 @@ class APISite(
         params = {
             'action': 'delete',
             'token': token,
-            'reason': reason,
+            'reason': summary,
             'oldimage': oldimage,
         }
 
@@ -2766,13 +2771,14 @@ class APISite(
                     'Cannot delete a non-existing associated talk page.'
                 )
             else:
-                self.delete(talk_page, reason)
+                self.delete(talk_page, summary=summary)
 
     @need_right('undelete')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def undelete(
         self,
         page: BasePage,
-        reason: str,
+        summary: str,
         *,
         revisions: list[str] | None = None,
         fileids: list[int | str] | None = None
@@ -2786,13 +2792,16 @@ class APISite(
            `fileids` parameter was added,
            keyword argument required for `revisions`.
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         .. seealso::
            - :api:`Undelete`
            - :meth:`delete`
            - :meth:`page.BasePage.undelete`
 
         :param page: Page to be deleted.
-        :param reason: Undeletion reason.
+        :param summary: Undeletion summary.
         :param revisions: List of timestamps to restore.
             If None, restores all revisions.
         :param fileids: List of fileids to restore.
@@ -2801,7 +2810,7 @@ class APISite(
         params = {
             'action': 'undelete',
             'title': page,
-            'reason': reason,
+            'reason': summary,
             'token': token,
             'timestamps': revisions,
             'fileids': fileids,
@@ -2894,11 +2903,12 @@ class APISite(
     }
 
     @need_right('protect')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def protect(
         self,
         page: BasePage,
         protections: dict[str, str | None],
-        reason: str,
+        summary: str,
         expiry: datetime.datetime | str | None = None,
         **kwargs: Any
     ) -> None:
@@ -2910,11 +2920,14 @@ class APISite(
            - :meth:`page_restrictions`
            - :api:`Protect`
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         :param protections: A dict mapping type of protection to
             protection level of that type. Refer :meth:`restrictions`
             for valid restriction types restriction levels. If None is
             given, however, that protection will be skipped.
-        :param reason: Reason for the action
+        :param summary: Summary for the action.
         :param expiry: When the block should expire. This expiry will be
             applied to all protections. If ``None``, ``'infinite'``,
             ``'indefinite'``, ``'never'``, or ``''`` is given, there is
@@ -2932,7 +2945,7 @@ class APISite(
             title=page,
             token=token,
             protections=protections_list,
-            reason=reason,
+            reason=summary,
             expiry=expiry or None,  # pass None instead of empty str
         )
 

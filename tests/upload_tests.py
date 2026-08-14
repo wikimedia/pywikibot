@@ -9,12 +9,13 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest import mock
 
 import pywikibot
 from pywikibot.site._upload import Uploader
 from pywikibot.tools import compute_file_hash
 from tests import join_images_path
-from tests.aspects import TestCase
+from tests.aspects import DeprecationTestCase, TestCase
 from tests.utils import DryRequest, DrySite
 
 
@@ -121,7 +122,7 @@ class TestUploaderStateTransitions(TestCase):
         page = _FilePage()
         uploader = Uploader(
             site, page, source_filename=self.source,
-            comment='upload test', chunk_size=1024,
+            summary='upload test', chunk_size=1024,
             ignore_warnings=callback)
         return uploader, site, page
 
@@ -223,7 +224,7 @@ class TestUploaderStateTransitions(TestCase):
         site = _Site([], stash_info)
         uploader = Uploader(
             site, _FilePage(), source_filename=source,
-            comment='upload test', chunk_size=1024,
+            summary='upload test', chunk_size=1024,
             ignore_warnings=True)
 
         with self.assertRaises(ValueError) as cm:
@@ -272,7 +273,7 @@ class TestUploaderStateTransitions(TestCase):
         page = _FilePage()
         uploader = Uploader(
             site, page, source_url='https://example.invalid/Test.png',
-            comment='upload test', ignore_warnings=lambda warnings: True)
+            summary='upload test', ignore_warnings=lambda warnings: True)
 
         self.assertTrue(uploader.upload())
         submitted = [request for request in site.requests
@@ -289,12 +290,38 @@ class TestUploaderStateTransitions(TestCase):
         page = _FilePage()
         uploader = Uploader(
             site, page, source_url='https://example.invalid/Test.png',
-            comment='upload test')
+            summary='upload test')
         request = site.simple_request(action='upload', token='token')
 
         self.assertTrue(uploader.submit(
             request, None, None, False, False, False, None))
         self.assertIsNotNone(page.revisions)
+
+
+class TestUploadSummaryParameter(DeprecationTestCase):
+
+    """Test the upload summary parameter and its compatibility alias."""
+
+    net = False
+
+    def test_summary(self) -> None:
+        """Uploader stores the canonical summary without a warning."""
+        uploader = Uploader(
+            mock.MagicMock(), mock.MagicMock(), summary='Canonical summary')
+
+        self.assertEqual(uploader.comment, 'Canonical summary')
+        self.assertNoDeprecation()
+
+    def test_comment_alias(self) -> None:
+        """The deprecated comment alias maps to the upload summary."""
+        uploader = Uploader(
+            mock.MagicMock(), mock.MagicMock(), comment='Legacy summary')
+
+        self.assertEqual(uploader.comment, 'Legacy summary')
+        self.assertOneDeprecationParts(
+            'comment argument of pywikibot.site._upload.Uploader.__init__',
+            'summary',
+        )
 
 
 class TestUpload(TestCase):
@@ -314,7 +341,7 @@ class TestUpload(TestCase):
         """Test uploading a png using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         self.site.upload(page, source_filename=self.sounds_png,
-                         comment='pywikibot test',
+                         summary='pywikibot test',
                          ignore_warnings=True)
 
     def test_png_chunked(self) -> None:
@@ -337,7 +364,7 @@ class TestUpload(TestCase):
         self.assertNotEqual(current_sha1, source_sha1)
         self.assertTrue(
             self.site.upload(page, source_filename=source_filename,
-                             comment='pywikibot test',
+                             summary='pywikibot test',
                              ignore_warnings=True, chunk_size=1024))
 
     def _init_upload(self, chunk_size) -> None:
@@ -365,7 +392,7 @@ class TestUpload(TestCase):
         self.assertNotHasAttr(self, '_file_key')
         self.assertFalse(
             self.site.upload(page, source_filename=self.sounds_png,
-                             comment='pywikibot test', chunk_size=chunk_size,
+                             summary='pywikibot test', chunk_size=chunk_size,
                              ignore_warnings=warn_callback))
 
         # Check that the warning happened and it's cached
@@ -388,7 +415,7 @@ class TestUpload(TestCase):
         # Finish/continue upload with the given file key
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         self.site.upload(page, source_filename=file_name,
-                         comment='pywikibot test', chunk_size=chunk_size,
+                         summary='pywikibot test', chunk_size=chunk_size,
                          ignore_warnings=True, report_success=False)
 
     def _test_continue_filekey(self, chunk_size) -> None:
@@ -397,7 +424,7 @@ class TestUpload(TestCase):
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         uploader = Uploader(
             self.site, page, source_filename=self.sounds_png,
-            comment='pywikibot test', text=page.text,
+            summary='pywikibot test', text=page.text,
             chunk_size=chunk_size,
             ignore_warnings=True, report_success=False)
         self.assertTrue(uploader._upload(

@@ -759,7 +759,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                     old_cat_title = self.oldcat.title()
                     old_cat_text = self.oldcat.text
                     self.newcat = self.oldcat.move(self.newcat.title(),
-                                                   reason=self.move_comment,
+                                                   summary=self.move_comment,
                                                    movetalk=can_move_talk,
                                                    noredirect=self.noredirect)
                     # Copy over the article text so it can be stripped of
@@ -819,12 +819,12 @@ class CategoryMoveRobot(CategoryPreprocess):
         :type moved_talk: pywikibot.page.BasePage
         """
         if moved_page and self.oldcat.exists():
-            self.oldcat.delete(self.deletion_comment, not self.batch,
-                               mark=True)
+            self.oldcat.delete(summary=self.deletion_comment,
+                               prompt=not self.batch, mark=True)
         self.counter['delete'] += 1
         if moved_talk and self.oldtalk.exists():
-            self.oldtalk.delete(self.deletion_comment, not self.batch,
-                                mark=True)
+            self.oldtalk.delete(summary=self.deletion_comment,
+                                prompt=not self.batch, mark=True)
         self.counter['delete talk'] += 1
 
     def _change(self, gen) -> None:
@@ -936,7 +936,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         comment = i18n.twtranslate(self.site, 'category-was-moved',
                                    {'newcat': cat_name_only,
                                     'title': cat_name_only})
-        self.oldtalk.move(self.newtalk.title(), comment)
+        self.oldtalk.move(self.newtalk.title(), summary=comment)
 
     def _update_wikibase_item(self) -> None:
         """Private function to update the Wikibase item for the category.

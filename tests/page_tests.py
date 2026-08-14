@@ -7,6 +7,7 @@
 """Tests for the page module."""
 from __future__ import annotations
 
+import inspect
 import pickle
 import re
 import time
@@ -31,7 +32,12 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
-from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
+from tests.aspects import (
+    DefaultSiteTestCase,
+    DeprecationTestCase,
+    SiteAttributeTestCase,
+    TestCase,
+)
 from tests.utils import skipping
 
 
@@ -1169,6 +1175,47 @@ class TestPageRedirects(TestCase):
         self.assertEqual(text, p2.get(get_redirect=True))
 
 
+class TestActionSummaryParameters(DeprecationTestCase):
+
+    """Test action summary parameters in Page methods."""
+
+    net = False
+
+    def test_signatures(self) -> None:
+        """Public signatures expose the new name and deprecated alias."""
+        methods = (
+            pywikibot.page.BasePage.move,
+            pywikibot.page.BasePage.delete,
+            pywikibot.page.BasePage.undelete,
+            pywikibot.page.BasePage.protect,
+        )
+        for method in methods:
+            with self.subTest(method=method.__name__):
+                parameters = inspect.signature(method).parameters
+                self.assertIn('summary', parameters)
+                self.assertIn('reason', parameters)
+
+    def test_reason_alias(self) -> None:
+        """The reason alias forwards its value to the summary position."""
+        page = mock.MagicMock()
+        result = pywikibot.page.BasePage.move(
+            page, 'New title', reason='Legacy summary')
+
+        self.assertEqual(result, page.site.movepage.return_value)
+        page.site.movepage.assert_called_once_with(
+            page,
+            'New title',
+            summary='Legacy summary',
+            movetalk=True,
+            noredirect=False,
+            movesubpages=True,
+        )
+        self.assertOneDeprecationParts(
+            'reason argument of pywikibot.page._basepage.BasePage.move',
+            'summary',
+        )
+
+
 class TestPageUserAction(DefaultSiteTestCase):
 
     """Test page user actions."""
@@ -1236,7 +1283,7 @@ class TestPageDelete(TestCase):
         p.save('Pywikibot unit test')
 
         # Test deletion
-        res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
+        res = p.delete(summary='Pywikibot unit test', prompt=False, mark=False)
         self.assertEqual(p.pageid, 0)
         self.assertEqual(res, 1)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
@@ -1249,7 +1296,7 @@ class TestPageDelete(TestCase):
         p.markDeletedRevision(del_revs[-2])
         with self.assertRaisesRegex(ValueError, 'is not a deleted revision'):
             p.markDeletedRevision(123)
-        p.undelete(reason='Pywikibot unit test')
+        p.undelete(summary='Pywikibot unit test')
         revs = list(p.revisions())
         self.assertLength(revs, 2)
         self.assertEqual(revs[1].revid, revid)
@@ -1296,13 +1343,13 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(protections={'edit': '', 'move': ''},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
     def test_protect_with_empty_parameters(self) -> None:
@@ -1311,12 +1358,12 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
 
-        p1.protect(reason='Pywikibot unit test')
+        p1.protect(summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
     def test_protect_alt(self) -> None:
@@ -1325,14 +1372,14 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
         # workaround
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p1.protect(protections={'edit': '', 'move': ''},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
 

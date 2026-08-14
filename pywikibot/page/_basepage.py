@@ -672,7 +672,7 @@ class BasePage(ComparableMixin):
 
         self.site.review_revision(
             revid,
-            summary=summary,
+            comment=summary,
             flag=flag,
         )
 
@@ -718,7 +718,7 @@ class BasePage(ComparableMixin):
 
         self.site.review_revision(
             revid,
-            summary=summary,
+            comment=summary,
             unapprove=True,
         )
 
@@ -2145,9 +2145,10 @@ class BasePage(ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def move(self,
              newtitle: str,
-             reason: str | None = None,
+             summary: str | None = None,
              movetalk: bool = True,
              noredirect: bool = False,
              movesubpages: bool = True) -> pywikibot.page.Page:
@@ -2155,18 +2156,20 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 7.2
            The *movesubpages* parameter was added
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
 
         :param newtitle: The new page title.
-        :param reason: The edit summary for the move.
+        :param summary: The edit summary for the move.
         :param movetalk: If true, move this page's talk page (if it exists)
         :param noredirect: If move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
         :param movesubpages: Rename subpages, if applicable.
         """
-        if reason is None:
+        if summary is None:
             pywikibot.info(f'Moving {self} to [[{newtitle}]].')
-            reason = pywikibot.input('Please enter a reason for the move:')
-        return self.site.movepage(self, newtitle, reason,
+            summary = pywikibot.input('Please enter a reason for the move:')
+        return self.site.movepage(self, newtitle, summary=summary,
                                   movetalk=movetalk,
                                   noredirect=noredirect,
                                   movesubpages=movesubpages)
@@ -2215,9 +2218,10 @@ class BasePage(ComparableMixin):
         """
         return self.site.rollbackpage(self, **kwargs)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def delete(
         self,
-        reason: str | None = None,
+        summary: str | None = None,
         prompt: bool = True,
         mark: bool = False,
         automatic_quit: bool = False,
@@ -2231,6 +2235,8 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 11.2
            *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
 
         .. seealso::
            - :meth:`undelete`
@@ -2239,7 +2245,7 @@ class BasePage(ComparableMixin):
            - :meth:`site.APISite.delete
              <pywikibot.site._apisite.APISite.delete>`
 
-        :param reason: The edit summary for the deletion, or rationale
+        :param summary: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
         :param prompt: If true, prompt user for confirmation before deleting.
         :param mark: If true, and user does not have sysop rights, place a
@@ -2255,9 +2261,10 @@ class BasePage(ComparableMixin):
             1        page was deleted
             -1       page was marked for deletion
         """
-        if reason is None:
+        if summary is None:
             pywikibot.info(f'Deleting {self.title(as_link=True)}.')
-            reason = pywikibot.input('Please enter a reason for the deletion:')
+            summary = pywikibot.input(
+                'Please enter a reason for the deletion:')
 
         # If user has 'delete' right, delete the page
         if self.site.has_right('delete'):
@@ -2272,7 +2279,8 @@ class BasePage(ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                self.site.delete(self, reason, deletetalk=deletetalk)
+                self.site.delete(
+                    self, summary=summary, deletetalk=deletetalk)
                 return 1
             return 0
 
@@ -2289,7 +2297,7 @@ class BasePage(ComparableMixin):
                 answer = 'y'
                 self.site._noMarkDeletePrompt = True
         if answer == 'y':
-            template = '{{delete|1=%s}}\n' % reason
+            template = '{{delete|1=%s}}\n' % summary
             # We can't add templates in a wikidata item, so let's use its
             # talk page
             if isinstance(self, pywikibot.ItemPage):
@@ -2299,7 +2307,7 @@ class BasePage(ComparableMixin):
             else:
                 target = self
             target.text = template + target.text
-            target.save(summary=reason)
+            target.save(summary=summary)
             return -1
         return 0
 
@@ -2400,7 +2408,8 @@ class BasePage(ComparableMixin):
                 f'Timestamp {timestamp} is not a deleted revision')
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    def undelete(self, reason: str | None = None) -> None:
+    @deprecated_args(reason='summary')  # since 11.8.0
+    def undelete(self, summary: str | None = None) -> None:
         """Undelete revisions based on the markers set by previous calls.
 
         If no calls have been made since :meth:`loadDeletedRevisions`,
@@ -2430,23 +2439,28 @@ class BasePage(ComparableMixin):
            - :meth:`site.APISite.undelete
              <pywikibot.site._apisite.APISite.undelete>`
 
-        :param reason: Reason for the action.
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
+        :param summary: Summary for the action.
         """
         if hasattr(self, '_deletedRevs'):
             undelete_revs = [ts for ts, rev in self._deletedRevs.items()
                              if rev.get('marked')]
         else:
             undelete_revs = []
-        if reason is None:
+        if summary is None:
             warn('Not passing a reason for undelete() is deprecated.',
                  DeprecationWarning, stacklevel=2)
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
-            reason = pywikibot.input(
+            summary = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete(self, reason, revisions=undelete_revs)
+        self.site.undelete(
+            self, summary=summary, revisions=undelete_revs)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def protect(self,
-                reason: str | None = None,
+                summary: str | None = None,
                 protections: dict[str, str | None] | None = None,
                 **kwargs) -> None:
         """Protect or unprotect a wiki page. Requires  *protect* right.
@@ -2470,7 +2484,10 @@ class BasePage(ComparableMixin):
              <pywikibot.site._apisite.APISite.protect>`
            - :meth:`applicable_protections`
 
-        :param reason: Reason for the action, default is None and will
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
+        :param summary: Summary for the action, default is None and will
             set an empty string.
         :param protections: A dict mapping type of protection to
             protection level of that type. Allowed protection types for
@@ -2482,9 +2499,9 @@ class BasePage(ComparableMixin):
 
         """
         protections = protections or {}  # protections is converted to {}
-        reason = reason or ''  # None is converted to ''
+        summary = summary or ''  # None is converted to ''
 
-        self.site.protect(self, protections, reason, **kwargs)
+        self.site.protect(self, protections, summary=summary, **kwargs)
 
     def change_category(self, old_cat, new_cat,
                         summary: str | None = None,

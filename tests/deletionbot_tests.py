@@ -147,17 +147,17 @@ class TestDeletionBot(DefaultSiteTestCase):
             self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(page_self, reason, prompt, mark, automatic_quit, *,
+def delete_dummy(page_self, summary, prompt, mark, automatic_quit, *,
                  deletetalk=False) -> int:
     """Dummy delete method."""
-    TestDeletionBot.delete_args = [page_self.title(as_link=True), reason,
+    TestDeletionBot.delete_args = [page_self.title(as_link=True), summary,
                                    prompt, mark, automatic_quit]
     return 0
 
 
-def undelete_dummy(page_self, reason) -> None:
+def undelete_dummy(page_self, summary) -> None:
     """Dummy undelete method."""
-    TestDeletionBot.undelete_args = [page_self.title(as_link=True), reason]
+    TestDeletionBot.undelete_args = [page_self.title(as_link=True), summary]
 
 
 if __name__ == '__main__':

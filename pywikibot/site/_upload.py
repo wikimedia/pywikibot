@@ -13,7 +13,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot.exceptions import APIError, Error, UploadError
-from pywikibot.tools import compute_file_hash
+from pywikibot.tools import compute_file_hash, deprecated_args
 
 
 __all__ = ('Uploader', )
@@ -30,11 +30,11 @@ class Uploader:
         file will be obtained.
     :param source_filename: path to the file to be uploaded
     :param source_url: URL of the file to be uploaded
-    :param comment: Edit summary; if this is not provided, then
+    :param summary: Edit summary; if this is not provided, then
         filepage.text will be used. An empty summary is not permitted.
         This may also serve as the initial page text (see below).
     :param text: Initial page text; if this is not set, then
-        filepage.text will be used, or comment.
+        filepage.text will be used, or summary.
     :param watch: If true, add filepage to the bot user's watchlist
     :param chunk_size: The chunk size in bytes for chunked uploading
         (see :api:`Upload#Chunked_uploading`). It will only upload in
@@ -84,23 +84,28 @@ class Uploader:
                              'version(s) of this file.',
     }
 
+    @deprecated_args(comment='summary')  # since 11.8.0
     def __init__(self,
                  site: pywikibot.site.APISite,
                  filepage: pywikibot.FilePage,
                  *,
                  source_filename: str | None = None,
                  source_url: str | None = None,
-                 comment: str | None = None,
+                 summary: str | None = None,
                  text: str | None = None,
                  watch: bool = False,
                  chunk_size: int = 0,
                  asynchronous: bool = False,
                  ignore_warnings=False,
                  report_success: bool | None = None) -> None:
-        """Initializer."""
+        """Initializer.
+
+        .. version-changed:: 11.8
+           The *comment* parameter was renamed to *summary*.
+        """
         self.site = site
         self.filepage = filepage
-        self.comment = comment
+        self.comment = summary
         self.text = text
         self.watch = watch
         self.ignore_warnings = ignore_warnings

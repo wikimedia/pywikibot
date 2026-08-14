@@ -374,7 +374,8 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                     'Does the description on Commons contain all required '
                         'source and license\ninformation?', default=False):
                     local_file_page.delete(
-                        f'{self.summary} [[:commons:File:{file_on_commons}]]',
+                        summary=f'{self.summary} '
+                                f'[[:commons:File:{file_on_commons}]]',
                         prompt=False)
                     self.counter['delete'] += 1
             else:

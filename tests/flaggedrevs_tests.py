@@ -371,7 +371,7 @@ class TestBasePageReview(TestCase):
 
         review_revision.assert_called_once_with(
             revid,
-            summary=None,
+            comment=None,
             flag=None,
         )
         self.assertNotHasAttr(self.unflagged, '_stable_revision_id')
@@ -389,7 +389,7 @@ class TestBasePageReview(TestCase):
 
         review_revision.assert_called_once_with(
             revid,
-            summary=None,
+            comment=None,
             unapprove=True,
         )
         self.assertNotHasAttr(self.flagged, '_stable_revision_id')

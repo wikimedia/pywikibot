@@ -112,7 +112,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
         applicable = self.current_page.applicable_protections()
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)
-        self.current_page.protect(reason=self.opt.summary,
+        self.current_page.protect(summary=self.opt.summary,
                                   expiry=self.opt.expiry,
                                   protections=protections)
 
