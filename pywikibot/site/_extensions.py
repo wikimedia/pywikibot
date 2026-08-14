@@ -315,7 +315,8 @@ class WikibaseClientMixin:
             return
 
         if not strict:
-            return self.querypage('UnconnectedPages', total)
+            yield from self.querypage('UnconnectedPages', total)
+            return
 
         count = 0
         for page in self.querypage('UnconnectedPages'):

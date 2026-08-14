@@ -95,11 +95,24 @@ class TestPageReferences(TestCase):
         self.assertEqual(references, [backlink_c, backlink_a, embedded_b])
 
 
-class TestWatchedPages(DefaultSiteTestCase):
+class TestDrySiteGenerators(DefaultSiteTestCase):
 
-    """Offline tests for Site.watched_pages."""
+    """Offline tests for site generators."""
 
     dry = True
+
+    def test_unconnected_non_strict(self) -> None:
+        """Test that the non-strict generator yields query pages."""
+        pages = [pywikibot.Page(self.site, title) for title in ('A', 'B')]
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site, 'querypage', return_value=iter(pages))
+            as querypage,
+        ):
+            result = list(self.site.unconnected_pages(total=2))
+
+        self.assertEqual(result, pages)
+        querypage.assert_called_once_with('UnconnectedPages', 2)
 
     def test_reuses_namespace(self) -> None:
         """Test that watchlist filtering retrieves the namespace once."""
