@@ -7,7 +7,6 @@
 """Tests for threading tools."""
 from __future__ import annotations
 
-import time
 import unittest
 from concurrent.futures import (
     Executor,
@@ -16,6 +15,7 @@ from concurrent.futures import (
     ThreadPoolExecutor,
 )
 from contextlib import suppress
+from threading import Condition, Event, Thread
 
 from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.threading import BoundedPoolExecutor, ThreadedGenerator
@@ -86,23 +86,55 @@ class BoundedThreadPoolTests(TestCase):
                 self.assertEqual(pool._bound_semaphore._initial_value,
                                  pool._max_workers)
 
+    def _check_bound(self, bound: int) -> None:
+        """Check executor operation for the given bound."""
+        release = Event()
+        submitted = Condition()
+        futures = []
+
+        def wait_for_release() -> None:
+            release.wait()
+
+        with BoundedPoolExecutor('ThreadPoolExecutor',
+                                 max_bound=bound,
+                                 max_workers=5) as pool:
+            def submit_tasks() -> None:
+                for _ in range(10):
+                    future = pool.submit(wait_for_release)
+                    with submitted:
+                        futures.append(future)
+                        submitted.notify_all()
+
+            producer = Thread(target=submit_tasks)
+            producer.start()
+            try:
+                with submitted:
+                    reached_bound = submitted.wait_for(
+                        lambda: len(futures) >= bound,
+                        timeout=5,
+                    )
+                self.assertTrue(reached_bound)
+                self.assertLength(futures, bound)
+                self.assertFalse(
+                    pool._bound_semaphore.acquire(blocking=False)
+                )
+            finally:
+                release.set()
+
+            producer.join(5)
+            self.assertFalse(producer.is_alive())
+
+        self.assertLength(futures, 10)
+        for future in futures:
+            self.assertIsInstance(future, Future)
+            self.assertTrue(future.done())
+            self.assertIsNone(future.result())
+
     def test_run(self) -> None:
         """Test examples for Executor during run."""
         for bound in (2, 5, 7):
-            futures = []
-            with self.subTest(bound=bound), \
-                 BoundedPoolExecutor('ThreadPoolExecutor',
-                                     max_bound=bound,
-                                     max_workers=5) as pool:
-                for _ in range(10):
-                    future = pool.submit(time.sleep, 1)
-                    self.assertIsInstance(future, Future)
-                    futures.append(future)
-
-            self.assertLength(futures, 10)
-            for future in futures:
-                self.assertTrue(future.done())
-                self.assertIsNone(future.result())
+            with self.subTest(bound=bound):
+                self._check_bound(bound)
 
     def test_exceptions(self) -> None:
         """Test exceptions when creating a bounded executor."""
