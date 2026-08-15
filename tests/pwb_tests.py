@@ -10,8 +10,13 @@ from __future__ import annotations
 import io
 import sys
 import unittest
+from pathlib import Path
 from platform import python_implementation
+from unittest.mock import patch
 
+import pywikibot
+from pywikibot import config
+from pywikibot.scripts import wrapper
 from tests import create_path_func, join_tests_path
 from tests.aspects import PwbTestCase
 from tests.utils import execute, execute_pwb
@@ -106,26 +111,27 @@ class TestPwb(PwbTestCase):
         self.assertEqual(stderr.readline().strip(),
                          'ERROR: pywikibot.py not found! Misspelling?')
 
-    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T413711')
     def test_one_similar_script(self) -> None:
         """Test shell.py script call which gives one similar result."""
-        result = [
-            'ERROR: hello.py not found! Misspelling?',
-            'NOTE: Starting the most similar script shell.py',
-            'in 5.0 seconds; type CTRL-C to stop.',
-        ]
-        stream = execute_pwb(['hello'], data_in=chr(3), timeout=12)
+        wait_time = config.pwb_autostart_waittime
+        scripts_path = Path(wrapper.__file__).parent
+        shell_path = scripts_path / 'shell.py'
 
-        stderr = io.StringIO(stream['stderr'])
-        with self.subTest(line=0):
-            self.assertEqual(stderr.readline().strip(), result[0])
-        with self.subTest(line=1):
-            text = stderr.readline().strip()
-            self.assertTrue(
-                text.startswith(result[1]),
-                msg=f'"{text}" does not start with "{result[1]}"')
-        with self.subTest(line=2):
-            self.assertEqual(stderr.readline().strip(), result[2])
+        with (
+            patch.object(pywikibot, 'error') as error,
+            patch.object(pywikibot, 'info') as info,
+            patch.object(wrapper, 'sleep') as sleep,
+        ):
+            filename = wrapper.find_alternates('hello.py', [scripts_path])
+
+        self.assertEqual(filename, str(shell_path))
+        error.assert_called_once_with('hello.py not found! Misspelling?')
+        info.assert_called_once_with(
+            'NOTE: Starting the most similar script '
+            '<<lightyellow>>shell.py<<default>>\n'
+            f'      in {wait_time} seconds; type CTRL-C to stop.'
+        )
+        sleep.assert_called_once_with(wait_time)
 
     @unittest.skipIf(python_implementation() == 'GraalVM', reason='T413711')
     def test_similar_scripts_found(self) -> None:
