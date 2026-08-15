@@ -10,10 +10,10 @@ from __future__ import annotations
 import pickle
 import random
 import threading
-import time
 import unittest
 from collections.abc import Iterable, Mapping
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot import config
@@ -284,30 +284,51 @@ class TestLockingPage(DefaultSiteTestCase):
     cached = True
 
     def worker(self) -> None:
-        """Lock a page, wait few seconds and unlock the page."""
+        """Lock and unlock a page."""
         page = pywikibot.Page(self.site, 'Foo')
         page.site.lock_page(page=page, block=True)
-        wait = random.randint(1, 25) / 10
-        time.sleep(wait)
         page.site.unlock_page(page=page)
 
     def test_threads_locking_page(self) -> None:
         """Test lock_page and unlock_page methods for multiple threads."""
-        # Start few threads
-        threads = []
-        for _ in range(5):
-            thread = threading.Thread(target=self.worker, daemon=True)
-            thread.start()
-            threads.append(thread)
+        page = pywikibot.Page(self.site, 'Foo')
+        worker_count = 5
+        waiting_workers = 0
+        all_waiting = threading.Event()
+        original_wait = self.site._pagemutex.wait
 
-        for thread in threads:
-            thread.join(15)  # maximum wait time for all threads
+        def track_waiting_workers() -> None:
+            nonlocal waiting_workers
+            waiting_workers += 1
+            if waiting_workers == worker_count:
+                all_waiting.set()
+            original_wait()
 
-            with self.subTest(name=thread.name):
-                # Check whether a timeout happened.
-                # In that case is_alive() is True
-                self.assertFalse(thread.is_alive(),
-                                 'test page is still locked')
+        # Hold the page lock until every worker is blocked on it.
+        with patch.object(self.site._pagemutex,
+                          'wait', track_waiting_workers):
+            self.site.lock_page(page)
+            # Start few threads
+            threads = []
+            for _ in range(worker_count):
+                thread = threading.Thread(target=self.worker, daemon=True)
+                thread.start()
+                threads.append(thread)
+
+            try:
+                self.assertTrue(all_waiting.wait(5),
+                                'workers did not wait for the page lock')
+            finally:
+                self.site.unlock_page(page)
+
+            for thread in threads:
+                thread.join(15)  # maximum wait time for all threads
+
+                with self.subTest(name=thread.name):
+                    # Check whether a timeout happened.
+                    # In that case is_alive() is True
+                    self.assertFalse(thread.is_alive(),
+                                     'test page is still locked')
 
     def test_lock_page(self) -> None:
         """Test the site.lock_page() and site.unlock_page() method."""
