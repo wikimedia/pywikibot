@@ -136,7 +136,10 @@ class PatrolTestCase(TokenTestBase, TestCase):
         try:
             result = list(mysite.patrol(rcid=rc['rcid']))
         except APIError as error:
-            if error.code == 'permissiondenied':
+            if error.code in (
+                'permissiondenied',
+                'protectednamespace-interface'
+            ):
                 self.skipTest(error)
             raise
 
