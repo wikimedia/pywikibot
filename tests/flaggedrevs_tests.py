@@ -308,7 +308,8 @@ class TestBasePageReview(TestCase):
         """Test exceptions."""
         with self.assertRaisesRegex(
             ValueError,
-            r'Revision 4711 does not belong to \[\[test2:BTP\]\]'
+            'Revision 4711 does not belong to '
+            fr'\[\[({self.family}:)?{self.code}:BTP\]\]'
         ):
             self.flagged.review(revid=4711)
         with self.assertRaisesRegex(ValueError, "Invalid revision id '0815'"):
