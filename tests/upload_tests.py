@@ -4,18 +4,270 @@
 #
 # Distributed under the terms of the MIT license.
 #
-"""Site upload test.
-
-These tests write to the wiki.
-"""
+"""Site upload tests."""
 from __future__ import annotations
 
 import unittest
 from contextlib import suppress
 
 import pywikibot
+from pywikibot.site._upload import Uploader
+from pywikibot.tools import compute_file_hash
 from tests import join_images_path
 from tests.aspects import TestCase
+from tests.utils import DryRequest, DrySite
+
+
+class _Request(DryRequest):
+
+    """Dry upload request returning scripted responses."""
+
+    def __init__(self, site, parameters, *, throttle=True, mime=None) -> None:
+        super().__init__(site=site, parameters=parameters,
+                         throttle=throttle, mime=mime)
+        self.submitted = False
+
+    def submit(self):
+        """Return the next scripted response."""
+        self.submitted = True
+        response = self.site.responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+
+class _TokenWallet:
+
+    """Return a distinct token for each upload attempt."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def __getitem__(self, key):
+        assert key == 'csrf'
+        self.calls += 1
+        return f'token-{self.calls}'
+
+
+class _Site(DrySite):
+
+    """Dry site recording upload requests."""
+
+    def __init__(self, responses, stash_info=None) -> None:
+        super().__init__('test', 'wikipedia', 'UploadTest')
+        self._userinfo = {
+            'id': 1,
+            'name': 'UploadTest',
+            'rights': ['upload_by_url'],
+        }
+        self.responses = list(responses)
+        self.requests = []
+        self.stash_calls = []
+        self._tokens = _TokenWallet()
+        self._stash_info = stash_info
+
+    def _request(self, *, throttle=True, parameters, mime=None):
+        request = _Request(
+            self, parameters, throttle=throttle, mime=mime)
+        self.requests.append(request)
+        return request
+
+    def simple_request(self, **parameters):
+        request = _Request(self, parameters)
+        self.requests.append(request)
+        return request
+
+    def stash_info(self, file_key, props):
+        self.stash_calls.append((file_key, props))
+        return self._stash_info
+
+
+class _FilePage:
+
+    """FilePage test double recording revision loading."""
+
+    text = 'description'
+
+    def __init__(self) -> None:
+        self.revisions = None
+
+    def title(self, *, with_ns, with_section):
+        assert not with_ns and not with_section
+        return 'Test.png'
+
+    def _load_file_revisions(self, revisions) -> None:
+        self.revisions = revisions
+
+
+class TestUploaderStateTransitions(TestCase):
+
+    """Offline tests for upload state transitions."""
+
+    net = False
+
+    source = join_images_path('MP_sounds.png')
+
+    @staticmethod
+    def _success():
+        return {
+            'upload': {
+                'result': 'Success',
+                'imageinfo': {'timestamp': '2026-08-14T00:00:00Z'},
+            },
+        }
+
+    def _uploader(self, responses, callback, *, stash_info=None):
+        site = _Site(responses, stash_info)
+        page = _FilePage()
+        uploader = Uploader(
+            site, page, source_filename=self.source,
+            comment='upload test', chunk_size=1024,
+            ignore_warnings=callback)
+        return uploader, site, page
+
+    def test_first_chunk_warning_restarts_upload(self) -> None:
+        """Test accepting an unstashed warning starts a new attempt."""
+        seen = []
+        responses = [
+            {'upload': {
+                'result': 'Warning',
+                'warnings': {'exists': 'Test.png'},
+                'filekey': 'unused-key',
+            }},
+            {'upload': {
+                'result': 'Continue', 'offset': 1024,
+                'filekey': 'second-key',
+            }},
+            {'upload': {'result': 'Success', 'filekey': 'second-key'}},
+            self._success(),
+        ]
+
+        def callback(warnings):
+            seen.extend(warnings)
+            return True
+
+        uploader, site, page = self._uploader(responses, callback)
+
+        self.assertTrue(uploader.upload())
+        chunks = [request for request in site.requests
+                  if request.get('stash')]
+        self.assertEqual([request['offset'] for request in chunks],
+                         [[0], [0], [1024]])
+        self.assertEqual([request['ignorewarnings'] for request in chunks],
+                         [[False], [True], [True]])
+        self.assertEqual(site.tokens.calls, 2)
+        self.assertIsEmpty(site.stash_calls)
+        self.assertEqual(seen[0].file_key, 'unused-key')
+        self.assertIs(seen[0].offset, True)
+        self.assertIsNotNone(page.revisions)
+
+    def test_chunk_warning_continues_current_attempt(self) -> None:
+        """Test an accepted stashed chunk warning continues directly."""
+        responses = [
+            {'upload': {
+                'result': 'Warning', 'offset': 1024,
+                'warnings': {'exists': 'Test.png'},
+                'filekey': 'upload-key',
+            }},
+            {'upload': {'result': 'Success', 'filekey': 'upload-key'}},
+            self._success(),
+        ]
+        uploader, site, _ = self._uploader(
+            responses, lambda warnings: True)
+
+        self.assertTrue(uploader.upload())
+        chunks = [request for request in site.requests
+                  if request.get('stash')]
+        self.assertEqual([request['offset'] for request in chunks],
+                         [[0], [1024]])
+        self.assertEqual(site.tokens.calls, 1)
+        self.assertIsEmpty(site.stash_calls)
+
+    def test_final_warning_recovers_stash(self) -> None:
+        """Test accepting a final warning validates and reuses its stash."""
+        sha1 = compute_file_hash(self.source)
+        for response_offset in (None, 1276):
+            warning = {
+                'result': 'Warning',
+                'warnings': {'exists': 'Test.png'},
+                'filekey': 'upload-key',
+            }
+            if response_offset is not None:
+                warning['offset'] = response_offset
+            responses = [{'upload': warning}, self._success()]
+            stash_info = {'size': 1276, 'sha1': sha1}
+
+            with self.subTest(offset=response_offset):
+                uploader, site, _ = self._uploader(
+                    responses, lambda warnings: True,
+                    stash_info=stash_info)
+                uploader.chunk_size = 0
+
+                self.assertTrue(uploader.upload())
+                self.assertEqual(site.tokens.calls, 2)
+                self.assertEqual(
+                    site.stash_calls,
+                    [('upload-key', ['size', 'sha1'])])
+                submitted = [request for request in site.requests
+                             if request.submitted]
+                self.assertNotIn('filekey', submitted[0])
+                self.assertEqual(submitted[1]['filekey'], ['upload-key'])
+
+    def test_transfer_and_publication_polling(self) -> None:
+        """Test transfer and publication polling remain distinct."""
+        responses = [
+            {'upload': {'result': 'Poll', 'filekey': 'upload-key'}},
+            {'upload': {'result': 'Continue', 'offset': 1024}},
+            {'upload': {'result': 'Success'}},
+            {'upload': {'result': 'Poll'}},
+            self._success(),
+        ]
+        uploader, site, _ = self._uploader(
+            responses, lambda warnings: True)
+
+        self.assertTrue(uploader.upload())
+        polls = [request for request in site.requests
+                 if request.get('checkstatus')]
+        self.assertLength(polls, 3)
+        self.assertTrue(all(request['filekey'] == ['upload-key']
+                            for request in polls))
+
+    def test_url_warning_restarts_without_stash(self) -> None:
+        """Test accepting a URL warning starts a fresh URL request."""
+        responses = [
+            {'upload': {
+                'result': 'Warning',
+                'warnings': {'exists': 'Test.png'},
+            }},
+            self._success(),
+        ]
+        site = _Site(responses)
+        page = _FilePage()
+        uploader = Uploader(
+            site, page, source_url='https://example.invalid/Test.png',
+            comment='upload test', ignore_warnings=lambda warnings: True)
+
+        self.assertTrue(uploader.upload())
+        submitted = [request for request in site.requests
+                     if request.submitted]
+        self.assertLength(submitted, 2)
+        self.assertEqual([request['ignorewarnings'] for request in submitted],
+                         [[False], [True]])
+        self.assertEqual(site.tokens.calls, 2)
+        self.assertIsEmpty(site.stash_calls)
+
+    def test_submit_compatibility(self) -> None:
+        """Test the existing submit entry point uses the state driver."""
+        site = _Site([self._success()])
+        page = _FilePage()
+        uploader = Uploader(
+            site, page, source_url='https://example.invalid/Test.png',
+            comment='upload test')
+        request = site.simple_request(action='upload', token='token')
+
+        self.assertTrue(uploader.submit(
+            request, None, None, False, False, False, None))
+        self.assertIsNotNone(page.revisions)
 
 
 class TestUpload(TestCase):
