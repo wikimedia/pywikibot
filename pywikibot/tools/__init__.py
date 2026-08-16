@@ -746,6 +746,8 @@ def open_archive(filename: str, /,
     .. version-changed:: 11.4
        *filename* parameter is positional only, *use_extension* is
        keyword only. Uses :class:`SevenZipFile` to open 7zip-files.
+    .. version-changed:: 11.7
+       Honor *mode* for uncompressed archives.
 
     :param filename: The filename.
     :param mode: The mode in which the file should be opened. It may

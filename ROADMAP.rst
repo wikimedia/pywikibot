@@ -1,6 +1,10 @@
 Release 11.7
 ============
 
+* Honor *mode* for uncompressed archives in :func:`tools.open_archive`.
+* Remove minimum retry limit from maxlag wait cycle in :meth:`data.api.Request.submit`.
+  (:phab:`T434566`)
+* Fix upload counter in :class:`specialbots.UploadRobot`.
 * Avoid unnecessary :class:`pywikibot.Site` creation in :class:`specialbots.UploadRobot`.
 * Add :meth:`page.BasePage.review` and :meth:`page.BasePage.unreview`, which call
   :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`.
