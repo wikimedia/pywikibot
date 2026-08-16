@@ -749,7 +749,40 @@ class EntityTypeUnknownError(WikiBaseError):
 
 class ApiTimeoutError(Error):
 
-    """Request failed with a timeout error."""
+    """Request failed with a timeout error.
+
+    .. version-changed:: 11.5
+       :exc:`TimeoutError` was renamed to :exc:`ApiTimeoutError`
+    .. version-changed:: 11.7
+       The *site* and *uri* attributes and parameters were added.
+
+    :param args: Arguments passed to the base exception.
+    :param site: Site associated with the failed request, if available.
+    :param uri: URI associated with the failed request, if available.
+    """
+
+    def __init__(
+        self,
+        *args: Exception | str,
+        site: pywikibot.site.BaseSite | None = None,
+        uri: str | None = None
+    ) -> None:
+        """Initializer."""
+        super().__init__(*args)
+
+        #: Site associated with the failed request.
+        self.site = site
+        #: URI associated with the failed request.
+        self.uri = uri
+
+    def __repr__(self) -> str:
+        """Return a detailed representation of the exception."""
+        args = ', '.join(repr(arg) for arg in self.args)
+        if self.site is not None:
+            args += f', site={self.site!r}'
+        if self.uri is not None:
+            args += f', uri={self.uri!r}'
+        return f'{type(self).__name__}({args})'
 
 
 class MaxlagTimeoutError(ApiTimeoutError):

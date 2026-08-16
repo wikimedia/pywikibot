@@ -12,7 +12,11 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.exceptions import HiddenKeyError, NoMoveTargetError
+from pywikibot.exceptions import (
+    ApiTimeoutError,
+    HiddenKeyError,
+    NoMoveTargetError,
+)
 from pywikibot.family import AutoFamily
 from pywikibot.logentries import (
     LogEntryFactory,
@@ -57,6 +61,16 @@ class TestLogentriesBase(TestCase):
             'target': None,
         }
     }
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Skip tests when the Lobbypedia API times out during setup."""
+        try:
+            super().setUpClass()
+        except ApiTimeoutError as e:
+            if e.site and e.site.family.name == 'lobbypedia':
+                raise unittest.SkipTest(f'API timeout on Lobbypedia: {e}')
+            raise
 
     def _get_logentry(self, logtype):
         """Retrieve a single log entry."""

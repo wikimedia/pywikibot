@@ -772,7 +772,7 @@ class Request(MutableMapping, WaitingMixin):
         else:
             return response, use_get
 
-        self.wait()
+        self.wait(site=self.site, uri=uri)
         return None, use_get
 
     def _json_loads(self, response: requests.Response) -> dict | None:

@@ -190,7 +190,8 @@ class WikiBlameMixin:
 
             pywikibot.sleep(pywikibot.config.retry_wait)
         else:
-            raise pywikibot.exceptions.ApiTimeoutError('WikiHistory Timeout')
+            raise pywikibot.exceptions.ApiTimeoutError(
+                'WikiHistory Timeout', site=self.site, uri=url)
 
         length = len(self.text)
         result: list[list[str]] = []

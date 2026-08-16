@@ -157,7 +157,7 @@ class SparqlQuery(WaitingMixin):
                     raise
             else:
                 break
-            self.wait()
+            self.wait(uri=url)
 
         try:
             return self.last_response.json()

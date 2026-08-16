@@ -25,12 +25,18 @@ class WaitingMixin:
         request. Starting with 1 if attribute is missing.
     """
 
-    def wait(self, delay: int | float | None = None) -> None:
+    def wait(self, delay: int | float | None = None, **kwargs) -> None:
         """Determine how long to wait after a failed request.
+
+        .. version-changed:: 11.7
+           The *kwargs* parameter was added.
 
         :param delay: Minimum time in seconds to wait. Overwrites
             ``retry_wait`` variable if given. The delay doubles each
             retry until ``retry_max`` seconds is reached.
+        :param kwargs: Additional keyword arguments passed to
+            :exc:`exceptions.ApiTimeoutError` if the maximum number of
+            retries is reached.
         """
         if not hasattr(self, 'max_retries'):
             self.max_retries = pywikibot.config.max_retries
@@ -45,7 +51,7 @@ class WaitingMixin:
 
         if self.current_retries > self.max_retries:
             raise pywikibot.exceptions.ApiTimeoutError(
-                'Maximum retries attempted without success.')
+                'Maximum retries attempted without success.', **kwargs)
 
         # double the next wait, but do not exceed config.retry_max seconds
         delay = delay or self.retry_wait
