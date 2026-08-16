@@ -115,7 +115,7 @@ jobs:
           NO_PROXY: ""
         run: |
           if  [ ${{matrix.family || 0}} == wpbeta ]; then
-            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
+            python pwb.py generate_family_file https://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
           fi
       - name: Generate user files
         run: |

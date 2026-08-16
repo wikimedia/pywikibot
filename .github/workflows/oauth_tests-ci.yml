@@ -98,7 +98,7 @@ jobs:
           ALL_PROXY: socks5h://127.0.0.1:1080
           NO_PROXY: ""
         run: |
-          python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
+          python pwb.py generate_family_file https://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files  \
