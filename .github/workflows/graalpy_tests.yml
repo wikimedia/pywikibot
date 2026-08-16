@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [graalpy-24.1, graalpy-25.0]
+        python-version: [graalpy-23.1, graalpy-24.2, graalpy-25.0]
         os: [macOS-latest, ubuntu-latest]
     steps:
       - name: Checkout Repository
@@ -53,7 +53,7 @@ jobs:
           pip install "charset_normalizer<=3.4.5"
           pip install "urllib3<2.7"
       - name: Install setuptools
-        if: matrix.python-version == 'graalpy-25.0'
+        if: ${{ startsWith(matrix.python-version, 'graalpy-25') }}
         run: pip install setuptools
       - name: Generate user files
         run: |
