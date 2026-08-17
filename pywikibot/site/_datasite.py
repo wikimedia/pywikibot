@@ -573,10 +573,11 @@ class DataSite(APISite):
             params['snakhash'] = qualifier.hash
 
         # build up the snak
-        if qualifier.getSnakType() == 'value':
+        snaktype = qualifier.getSnakType()
+        if snaktype == 'value':
             params['value'] = json.dumps(qualifier._formatValue())
 
-        params['snaktype'] = qualifier.getSnakType()
+        params['snaktype'] = snaktype
         params['property'] = qualifier.getID()
 
         req = self.simple_request(**params)
