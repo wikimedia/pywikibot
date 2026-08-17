@@ -586,11 +586,13 @@ def PageClassGenerator(generator: Iterable[pywikibot.page.Page]
     Category, FilePage, Userpage or Page.
     """
     for page in generator:
-        if page.namespace() == page.site.namespaces.USER:
+        namespace = page.namespace()
+        site_namespaces = page.site.namespaces
+        if namespace == site_namespaces.USER:
             yield pywikibot.User(page)
-        elif page.namespace() == page.site.namespaces.FILE:
+        elif namespace == site_namespaces.FILE:
             yield pywikibot.FilePage(page)
-        elif page.namespace() == page.site.namespaces.CATEGORY:
+        elif namespace == site_namespaces.CATEGORY:
             yield pywikibot.Category(page)
         else:
             yield page
