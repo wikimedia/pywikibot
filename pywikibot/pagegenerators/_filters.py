@@ -94,20 +94,20 @@ def PageTitleFilterPageGenerator(
         language codes are mapped to lists of page titles. Each title must
         be a valid regex as they are compared using :py:obj:`re.search`.
     """
-    def is_ignored(page: pywikibot.page.BasePage) -> bool:
+    for page in generator:
         try:
             site_ig_list = ignore_list[page.site.family.name][page.site.code]
         except KeyError:
-            return False
-        return any(re.search(ig, page.title()) for ig in site_ig_list)
+            yield page
+            continue
 
-    for page in generator:
-        if not is_ignored(page):
+        page_title = page.title()
+        if not any(re.search(ig, page_title) for ig in site_ig_list):
             yield page
             continue
 
         if config.verbose_output:
-            pywikibot.info(f'Ignoring page {page.title()}')
+            pywikibot.info(f'Ignoring page {page_title}')
 
 
 def RedirectFilterPageGenerator(
