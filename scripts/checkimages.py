@@ -1120,8 +1120,7 @@ class CheckImagesBot:
         if self.site.code == 'commons':
             no_licenses_to_skip = pywikibot.Category(self.site,
                                                      'License-related tags')
-            for license_given in no_licenses_to_skip.articles():
-                licenses.discard(license_given)
+            licenses.difference_update(no_licenses_to_skip.articles())
 
         # Add the licenses set in the default page as licenses to check
         if self.page_allowed:
@@ -1131,8 +1130,10 @@ class CheckImagesBot:
             except (NoPageError, IsRedirectPageError):
                 pass
             else:
-                for name_license in self.load(page_allowed_text):
-                    licenses.add(pywikibot.Page(self.site, name_license))
+                licenses.update(
+                    pywikibot.Page(self.site, name_license)
+                    for name_license in self.load(page_allowed_text)
+                )
 
         if not licenses:
             raise pywikibot.Error(
