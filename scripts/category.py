@@ -1845,6 +1845,21 @@ def _build_bot(
     return None
 
 
+def _run_bot(
+    bot: _CategoryBot,
+    category_database: CategoryDatabase,
+) -> None:
+    """Log in, run the bot, and save the category database."""
+    pywikibot.Site().login()
+    try:
+        bot.run()
+    except Error:
+        pywikibot.exception('Fatal error:')
+    finally:
+        if category_database:
+            category_database.dump()
+
+
 def main(*args: str) -> None:
     """Process command line arguments and invoke bot.
 
@@ -1853,23 +1868,22 @@ def main(*args: str) -> None:
     :param args: command line arguments.
     """
     settings = _parse_args(args)
-    gen_factory = _configure_generator_factory(settings)
-    suggest_help(unknown_parameters=settings.unknown)
-
-    cat_db = CategoryDatabase(rebuild=settings.rebuild)
-    bot = _build_bot(settings, gen_factory, cat_db)
-
-    if suggest_help(missing_action=not settings.action) or bot is None:
+    generator_factory = _configure_generator_factory(settings)
+    if suggest_help(
+        unknown_parameters=settings.unknown,
+        missing_action=not settings.action,
+    ):
         return
 
-    pywikibot.Site().login()
-    try:
-        bot.run()
-    except Error:
-        pywikibot.exception('Fatal error:')
-    finally:
-        if cat_db:
-            cat_db.dump()
+    category_database = CategoryDatabase(rebuild=settings.rebuild)
+    bot = _build_bot(settings, generator_factory, category_database)
+
+    if bot is None:
+        suggest_help(additional_text=(
+            f'Unable to create a bot for the {settings.action} action.'))
+        return
+
+    _run_bot(bot, category_database)
 
 
 if __name__ == '__main__':

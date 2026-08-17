@@ -408,6 +408,123 @@ class TestCategoryBotConstruction(TestCase):
                     builder.assert_called_once_with(settings)
 
 
+class TestCategoryMain(TestCase):
+
+    """Test category script orchestration."""
+
+    net = False
+
+    @patch.object(category, '_run_bot')
+    @patch.object(category, '_build_bot')
+    @patch.object(category, 'CategoryDatabase')
+    @patch.object(category, '_configure_generator_factory')
+    @patch.object(category, '_parse_args')
+    @patch.object(category, 'suggest_help', return_value=False)
+    def test_main_runs_bot(
+        self,
+        suggest_help_mock,
+        parse_args,
+        configure_generator_factory,
+        database_class,
+        build_bot,
+        run_bot,
+    ) -> None:
+        """Test valid arguments construct and run the selected bot."""
+        args = ('clean', '-always')
+        settings = category._CategorySettings(
+            action='clean', rebuild=True)
+        parse_args.return_value = settings
+        generator_factory = configure_generator_factory.return_value
+        category_database = database_class.return_value
+        bot = build_bot.return_value
+
+        category.main(*args)
+
+        parse_args.assert_called_once_with(args)
+        configure_generator_factory.assert_called_once_with(settings)
+        suggest_help_mock.assert_called_once_with(
+            unknown_parameters=[], missing_action=False)
+        database_class.assert_called_once_with(rebuild=True)
+        build_bot.assert_called_once_with(
+            settings, generator_factory, category_database)
+        run_bot.assert_called_once_with(bot, category_database)
+
+    @patch.object(category, '_run_bot')
+    @patch.object(category, '_build_bot')
+    @patch.object(category, 'CategoryDatabase')
+    @patch.object(category, '_configure_generator_factory')
+    @patch.object(category, '_parse_args')
+    @patch.object(category, 'suggest_help', return_value=True)
+    def test_main_stops_after_help(
+        self,
+        suggest_help_mock,
+        parse_args,
+        configure_generator_factory,
+        database_class,
+        build_bot,
+        run_bot,
+    ) -> None:
+        """Test invalid arguments stop before constructing a bot."""
+        settings = category._CategorySettings(
+            action='clean', unknown=['unknown'])
+        parse_args.return_value = settings
+
+        category.main('clean', 'unknown')
+
+        configure_generator_factory.assert_called_once_with(settings)
+        suggest_help_mock.assert_called_once_with(
+            unknown_parameters=['unknown'], missing_action=False)
+        database_class.assert_not_called()
+        build_bot.assert_not_called()
+        run_bot.assert_not_called()
+
+    @patch.object(category, '_run_bot')
+    @patch.object(category, '_build_bot', return_value=None)
+    @patch.object(category, 'CategoryDatabase')
+    @patch.object(category, '_configure_generator_factory')
+    @patch.object(category, '_parse_args')
+    @patch.object(category, 'suggest_help', return_value=False)
+    def test_main_reports_missing_bot(
+        self,
+        suggest_help_mock,
+        parse_args,
+        configure_generator_factory,
+        database_class,
+        build_bot,
+        run_bot,
+    ) -> None:
+        """Test a failed bot construction is reported to the user."""
+        settings = category._CategorySettings(action='move')
+        parse_args.return_value = settings
+        generator_factory = configure_generator_factory.return_value
+        category_database = database_class.return_value
+
+        category.main('move')
+
+        build_bot.assert_called_once_with(
+            settings, generator_factory, category_database)
+        suggest_help_mock.assert_has_calls([
+            call(unknown_parameters=[], missing_action=False),
+            call(additional_text=(
+                'Unable to create a bot for the move action.')),
+        ])
+        run_bot.assert_not_called()
+
+    @patch.object(category.pywikibot, 'exception')
+    @patch.object(category.pywikibot, 'Site')
+    def test_run_bot_error(self, site_class, exception_mock) -> None:
+        """Test cleanup when the category bot reports a fatal error."""
+        bot = Mock()
+        bot.run.side_effect = category.Error('failure')
+        category_database = Mock()
+
+        category._run_bot(bot, category_database)
+
+        site_class.return_value.login.assert_called_once_with()
+        exception_mock.assert_called_once_with('Fatal error:')
+        category_database.dump.assert_called_once_with()
+
+
 if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()
