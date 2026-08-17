@@ -109,6 +109,23 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(environ['TZ'], 'UTC')
         tzset.assert_called_once_with()
 
+    @patch.object(archivebot.pywikibot, 'handle_args',
+                  side_effect=lambda args: args)
+    @patch.object(archivebot.signal, 'signal')
+    @patch.object(archivebot, 'process_page')
+    @patch.object(archivebot.pywikibot, 'Page')
+    @patch.object(archivebot.pywikibot, 'Site')
+    def test_async_processes_multiple_templates(
+        self, site_mock, page_mock, process_page_mock, signal_mock,
+        handle_args_mock,
+    ) -> None:
+        """Test async processing with more than one template."""
+        archivebot.main(
+            '-async', '-page:Talk:Sandbox', 'Template:One', 'Template:Two')
+
+        self.assertEqual(process_page_mock.call_count, 2)
+        signal_mock.assert_called_once()
+
     def test_get_params_reuses_isocalendar(self) -> None:
         """Test that the ISO calendar is calculated once."""
         date = datetime(2024, 12, 30)

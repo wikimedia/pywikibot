@@ -1104,9 +1104,6 @@ def main(*args: str) -> None:
 
     if asynchronous:
         signal.signal(signal.SIGINT, signal_handler)
-        context = BoundedPoolExecutor('ThreadPoolExecutor')
-    else:
-        context = nullcontext()
 
     for template_name in templates:
         tmpl = pywikibot.Page(site, template_name, ns=10)
@@ -1127,6 +1124,11 @@ def main(*args: str) -> None:
 
         botargs = tmpl, salt, force, keep, sort
         botkwargs = {'asynchronous': asynchronous}
+        if asynchronous:
+            context = BoundedPoolExecutor('ThreadPoolExecutor')
+        else:
+            context = nullcontext()
+
         with context as executor:
             for pg in gen:
                 if asynchronous:
