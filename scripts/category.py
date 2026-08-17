@@ -165,6 +165,7 @@ import pickle
 import re
 from collections.abc import Sequence
 from contextlib import suppress
+from dataclasses import dataclass, field
 from itertools import chain
 from operator import methodcaller
 from textwrap import fill
@@ -1541,6 +1542,132 @@ class CleanBot(Bot):
             grandchild.change_category(self.cat, None, summary)
 
 
+_CATEGORY_ACTIONS = {
+    'add', 'clean', 'listify', 'move', 'remove', 'tidy', 'tree'
+}
+_GENERATOR_ACTIONS = {'add', 'listify', 'move', 'remove', 'tidy'}
+_SETTING_FLAGS = {
+    'allowsplit': ('allow_split', True),
+    'append': ('append', True),
+    'batch': ('batch', True),
+    'create': ('create_pages', True),
+    'hist': ('history', True),
+    'inplace': ('inplace', True),
+    'keepsortkey': ('keep_sortkey', True),
+    'mvtogether': ('move_together', True),
+    'nodelete': ('delete_empty_cat', False),
+    'nodelsum': ('use_deletion_summary', False),
+    'nowb': ('wikibase', False),
+    'overwrite': ('overwrite', True),
+    'pagesonly': ('pagesonly', True),
+    'person': ('sort_by_last_name', True),
+    'rebuild': ('rebuild', True),
+    'redirect': ('follow_redirects', True),
+    'showimages': ('showimages', True),
+    'talkpages': ('talkpages', True),
+}
+
+
+@dataclass
+class _CategorySettings:
+
+    """Configuration parsed from the command line."""
+
+    options: dict[str, str | int | bool] = field(default_factory=dict)
+    action: str | None = None
+    batch: bool = False
+    summary: str = ''
+    inplace: bool = False
+    append: bool = False
+    overwrite: bool = False
+    showimages: bool = False
+    talkpages: bool = False
+    title_regex: str | None = None
+    pagesonly: bool = False
+    wikibase: bool = True
+    history: bool = False
+    rebuild: bool = False
+    allow_split: bool = False
+    move_together: bool = False
+    keep_sortkey: bool | None = None
+    depth: int = 5
+    use_deletion_summary: bool = True
+    sort_by_last_name: bool = False
+    create_pages: bool = False
+    follow_redirects: bool = False
+    delete_empty_cat: bool = True
+    unknown: list[str] = field(default_factory=list)
+    generator_args: list[str] = field(default_factory=list)
+
+
+def _handle_option(
+    settings: _CategorySettings,
+    option: str,
+    value: str,
+) -> bool:
+    """Apply a category option and return whether it was recognized."""
+    if option in _SETTING_FLAGS:
+        name, flag = _SETTING_FLAGS[option]
+        setattr(settings, name, flag)
+    elif option in ('from', 'to'):
+        settings.options[option] = value.replace('_', ' ')
+    elif option == 'summary':
+        settings.summary = value
+    elif option == 'match':
+        settings.title_regex = value or pywikibot.input(
+            'Which regular expression should affected objects match?')
+    elif option == 'recurse':
+        settings.options[option] = True if value == '' else int(value)
+    elif option == 'depth':
+        settings.depth = int(value)
+    elif option == 'prefix':
+        settings.options[option] = value
+    elif option == 'always':
+        settings.options[option] = True
+    else:
+        return False
+    return True
+
+
+def _parse_args(args: Sequence[str]) -> _CategorySettings:
+    """Parse command-line arguments for the category script."""
+    settings = _CategorySettings()
+    local_args = pywikibot.handle_args(args)
+
+    for arg in local_args:
+        if arg in _CATEGORY_ACTIONS:
+            settings.action = arg
+            continue
+
+        if arg[0] != '-':
+            settings.unknown.append(arg)
+            continue
+
+        option, _, value = arg[1:].partition(':')
+        if not _handle_option(settings, option, value):
+            settings.generator_args.append(arg)
+
+    return settings
+
+
+def _configure_generator_factory(
+    settings: _CategorySettings,
+) -> pagegenerators.GeneratorFactory | None:
+    """Create a generator factory for actions which support one."""
+    if settings.action not in _GENERATOR_ACTIONS:
+        settings.unknown += settings.generator_args
+        return None
+
+    enabled = (
+        ['namespace'] if settings.action in ('tidy', 'listify') else None
+    )
+    generator_factory = pagegenerators.GeneratorFactory(
+        enabled_options=enabled)
+    settings.unknown += generator_factory.handle_args(
+        settings.generator_args)
+    return generator_factory
+
+
 def main(*args: str) -> None:
     """Process command line arguments and invoke bot.
 
@@ -1548,200 +1675,107 @@ def main(*args: str) -> None:
 
     :param args: command line arguments.
     """
-    options = {}
-    # TODO: use options instead following variables:
-    batch = False
-    summary = ''
-    inplace = False
-    append = False
-    overwrite = False
-    showimages = False
-    talkpages = False
-    title_regex = None
-    pagesonly = False
-    wikibase = True
-    history = False
-    rebuild = False
-    allow_split = False
-    move_together = False
-    keep_sortkey = None
-    depth = 5
+    settings = _parse_args(args)
+    gen_factory = _configure_generator_factory(settings)
+    suggest_help(unknown_parameters=settings.unknown)
 
-    # Process global args and prepare generator args parser
-    local_args = pywikibot.handle_args(args)
+    cat_db = CategoryDatabase(rebuild=settings.rebuild)
 
-    # When this is True then the custom edit summary given for removing
-    # categories from articles will also be used as the deletion reason.
-    # Otherwise it will generate deletion specific comments.
-    use_deletion_summary = True
-    action = None
-    sort_by_last_name = False
-    create_pages = False
-    follow_redirects = False
-    delete_empty_cat = True
-    unknown = []
-    pg_options = []
-    for arg in local_args:
-        if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify',
-                   'clean'):
-            action = arg
-            continue
-
-        if arg[0] != '-':
-            unknown.append(arg)
-            continue
-
-        option, _, value = arg[1:].partition(':')
-        if option == 'nodelete':
-            delete_empty_cat = False
-        elif option == 'person':
-            sort_by_last_name = True
-        elif option == 'rebuild':
-            rebuild = True
-        elif option in ('from', 'to'):
-            options[option] = value.replace('_', ' ')
-        elif option == 'batch':
-            batch = True
-        elif option == 'inplace':
-            inplace = True
-        elif option == 'nodelsum':
-            use_deletion_summary = False
-        elif option == 'append':
-            append = True
-        elif option == 'overwrite':
-            overwrite = True
-        elif option == 'showimages':
-            showimages = True
-        elif option == 'summary':
-            summary = value
-        elif option == 'match':
-            title_regex = value or pywikibot.input(
-                'Which regular expression should affected objects match?')
-        elif option == 'talkpages':
-            talkpages = True
-        elif option == 'recurse':
-            options[option] = True if value == '' else int(value)
-        elif option == 'pagesonly':
-            pagesonly = True
-        elif option == 'nowb':
-            wikibase = False
-        elif option == 'allowsplit':
-            allow_split = True
-        elif option == 'mvtogether':
-            move_together = True
-        elif option == 'create':
-            create_pages = True
-        elif option == 'redirect':
-            follow_redirects = True
-        elif option == 'hist':
-            history = True
-        elif option == 'depth':
-            depth = int(value)
-        elif option == 'keepsortkey':
-            keep_sortkey = True
-        elif option == 'prefix':
-            options[option] = value
-        elif option == 'always':
-            options[option] = True
-        else:
-            pg_options.append(arg)
-
-    enabled = ['namespace'] if action in ('tidy', 'listify') else None
-    if action in ('add', 'listify', 'move', 'remove', 'tidy'):
-        gen_factory = pagegenerators.GeneratorFactory(enabled_options=enabled)
-        unknown += gen_factory.handle_args(pg_options)
-    else:
-        unknown += pg_options
-    suggest_help(unknown_parameters=unknown)
-
-    cat_db = CategoryDatabase(rebuild=rebuild)
-
-    if action == 'add':
+    if settings.action == 'add':
+        assert gen_factory is not None
         gen = gen_factory.getCombinedGenerator(preload=True)
         if not gen:
             # default for backwards compatibility
             gen_factory.handle_arg('-links')
             gen = gen_factory.getCombinedGenerator(preload=True)
         bot = CategoryAddBot(gen,
-                             newcat=options.get('to'),
-                             sort_by_last_name=sort_by_last_name,
-                             create=create_pages,
-                             comment=summary,
-                             follow_redirects=follow_redirects)
-    elif action == 'remove':
-        if 'from' not in options:
-            options['from'] = \
+                             newcat=settings.options.get('to'),
+                             sort_by_last_name=settings.sort_by_last_name,
+                             create=settings.create_pages,
+                             comment=settings.summary,
+                             follow_redirects=settings.follow_redirects)
+    elif settings.action == 'remove':
+        assert gen_factory is not None
+        if 'from' not in settings.options:
+            settings.options['from'] = \
                 pywikibot.input('Please enter the name of the '
                                 'category that should be removed:')
         gen = gen_factory.getCombinedGenerator()
-        bot = CategoryMoveRobot(oldcat=options.get('from'),
-                                batch=batch,
-                                comment=summary,
-                                inplace=inplace,
-                                delete_oldcat=delete_empty_cat,
-                                title_regex=title_regex,
-                                history=history,
-                                pagesonly=pagesonly,
-                                deletion_comment=use_deletion_summary,
+        bot = CategoryMoveRobot(oldcat=settings.options.get('from'),
+                                batch=settings.batch,
+                                comment=settings.summary,
+                                inplace=settings.inplace,
+                                delete_oldcat=settings.delete_empty_cat,
+                                title_regex=settings.title_regex,
+                                history=settings.history,
+                                pagesonly=settings.pagesonly,
+                                deletion_comment=(
+                                    settings.use_deletion_summary),
                                 generator=gen)
-    elif action == 'move':
+    elif settings.action == 'move':
+        assert gen_factory is not None
         while True:
-            if 'from' not in options:
-                options['from'] = pywikibot.input(
+            if 'from' not in settings.options:
+                settings.options['from'] = pywikibot.input(
                     'Please enter the old name of the category:')
-                if not options['from']:
+                if not settings.options['from']:
                     return
 
-            if 'to' not in options:
-                options['to'] = pywikibot.input(
+            if 'to' not in settings.options:
+                settings.options['to'] = pywikibot.input(
                     'Please enter the new name of the category:')
 
-            if options['from'] != options['to']:
+            if settings.options['from'] != settings.options['to']:
                 break
 
             pywikibot.error('-from and -to arguments are equal, please retry.')
-            del options['from']
-            del options['to']
+            del settings.options['from']
+            del settings.options['to']
 
-        if use_deletion_summary:
+        if settings.use_deletion_summary:
             deletion_comment = \
                 CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
         gen = gen_factory.getCombinedGenerator()
-        bot = CategoryMoveRobot(oldcat=options.get('from'),
-                                newcat=options.get('to'),
-                                batch=batch,
-                                comment=summary,
-                                inplace=inplace,
-                                delete_oldcat=delete_empty_cat,
-                                title_regex=title_regex,
-                                history=history,
-                                pagesonly=pagesonly,
+        bot = CategoryMoveRobot(oldcat=settings.options.get('from'),
+                                newcat=settings.options.get('to'),
+                                batch=settings.batch,
+                                comment=settings.summary,
+                                inplace=settings.inplace,
+                                delete_oldcat=settings.delete_empty_cat,
+                                title_regex=settings.title_regex,
+                                history=settings.history,
+                                pagesonly=settings.pagesonly,
                                 deletion_comment=deletion_comment,
-                                wikibase=wikibase,
-                                allow_split=allow_split,
-                                move_together=move_together,
-                                keep_sortkey=keep_sortkey,
+                                wikibase=settings.wikibase,
+                                allow_split=settings.allow_split,
+                                move_together=settings.move_together,
+                                keep_sortkey=settings.keep_sortkey,
                                 generator=gen)
-    elif action == 'tidy':
-        bot = CategoryTidyRobot(options.get('from'), cat_db,
-                                gen_factory.namespaces, summary)
-    elif action == 'tree':
-        bot = CategoryTreeRobot(options.get('from'), cat_db,
-                                options.get('to'), max_depth=depth)
-    elif action == 'listify':
-        bot = CategoryListifyRobot(options.get('from'),
-                                   options.get('to'), summary,
-                                   append, overwrite, showimages,
-                                   talk_pages=talkpages,
-                                   recurse=options.get('recurse', False),
+    elif settings.action == 'tidy':
+        assert gen_factory is not None
+        bot = CategoryTidyRobot(settings.options.get('from'), cat_db,
+                                gen_factory.namespaces, settings.summary)
+    elif settings.action == 'tree':
+        bot = CategoryTreeRobot(settings.options.get('from'), cat_db,
+                                settings.options.get('to'),
+                                max_depth=settings.depth)
+    elif settings.action == 'listify':
+        assert gen_factory is not None
+        bot = CategoryListifyRobot(settings.options.get('from'),
+                                   settings.options.get('to'),
+                                   settings.summary, settings.append,
+                                   settings.overwrite, settings.showimages,
+                                   talk_pages=settings.talkpages,
+                                   recurse=settings.options.get(
+                                       'recurse', False),
                                    namespaces=gen_factory.namespaces,
-                                   **options)
-    elif action == 'clean':
-        bot = CleanBot(**options)
+                                   **settings.options)
+    elif settings.action == 'clean':
+        bot = CleanBot(**settings.options)
 
-    if not suggest_help(missing_action=not action):
+    if not suggest_help(missing_action=not settings.action):
         pywikibot.Site().login()
         try:
             bot.run()
