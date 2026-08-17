@@ -859,10 +859,11 @@ The text message is:
             # that we are logged in as the correct user. If this is not the
             # case, force a re-login.
             username = result['query']['userinfo']['name']
-            if (self.site.user() is not None and self.site.user() != username
+            current_user = self.site.user()
+            if (current_user is not None and current_user != username
                     and self.site._loginstatus != LoginStatus.IN_PROGRESS):
                 self._relogin(f'Logged in as {username!r} instead of '
-                              f'{self.site.user()!r}.')
+                              f'{current_user!r}.')
                 return True
         return False
 
