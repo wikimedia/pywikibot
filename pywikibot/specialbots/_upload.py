@@ -142,7 +142,8 @@ class UploadRobot(BaseBot):
         """Return name of temp file in which remote file is saved."""
         pywikibot.info('Reading file ' + file_url)
 
-        handle, tempname = tempfile.mkstemp()
+        temp_fd, tempname = tempfile.mkstemp()
+        os.close(temp_fd)
         path = Path(tempname)
         size = 0
 
@@ -155,8 +156,7 @@ class UploadRobot(BaseBot):
             else:
                 headers = {}
 
-            with open(path, 'ab') as fd:
-                os.lseek(handle, file_len, 0)
+            with path.open('ab') as fd:
                 try:
                     response = http.fetch(file_url, stream=True,
                                           headers=headers)
