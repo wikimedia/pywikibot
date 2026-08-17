@@ -333,9 +333,9 @@ def QualityFilterPageGenerator(
     """
     for page in generator:
         if page.namespace() == page.site.proofread_page_ns:
-            page = ProofreadPage(page)
-            if page.quality_level in quality:
-                yield page
+            proofread_page = ProofreadPage(page)
+            if proofread_page.quality_level in quality:
+                yield proofread_page
         else:
             yield page
 
