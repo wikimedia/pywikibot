@@ -1887,9 +1887,10 @@ class Claim(Property):
                 claim = cls.fromJSON(site, {'mainsnak': claimsnak,
                                             'hash': data.get('hash')})
                 claim.isReference = True
-                if claim.getID() not in source:
-                    source[claim.getID()] = []
-                source[claim.getID()].append(claim)
+                claim_id = claim.getID()
+                if claim_id not in source:
+                    source[claim_id] = []
+                source[claim_id].append(claim)
         return source
 
     @classmethod
