@@ -1073,18 +1073,19 @@ class ItemPage(WikibasePage):
         """
         if hasattr(page, '_item'):
             return page._item
-        if not page.site.has_data_repository:
+        repo = page.site.data_repository()
+        if repo is None:
             raise WikiBaseError(f'{page.site} has no data repository')
         if not lazy_load and not page.exists():
             raise NoPageError(page)
 
-        repo = page.site.data_repository()
-        if hasattr(page,
-                   '_pageprops') and page.properties().get('wikibase_item'):
+        if hasattr(page, '_pageprops'):
             # If we have already fetched the pageprops for something else,
             # we already have the id, so use it
-            page._item = cls(repo, page.properties().get('wikibase_item'))
-            return page._item
+            item_id = page.properties().get('wikibase_item')
+            if item_id:
+                page._item = cls(repo, item_id)
+                return page._item
         i = cls(repo)
         # clear id, and temporarily store data needed to lazy loading the item
         del i.id
