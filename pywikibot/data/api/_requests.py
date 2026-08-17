@@ -475,36 +475,38 @@ class Request(MutableMapping, WaitingMixin):
         :return: Parameters either in the site encoding, or ASCII
             strings
         """
-        params = {}
+        params: dict[str, str | bytes] = {}
         for key, values in self._params.items():
             try:
                 iterator = values.api_iter()
             except AttributeError:
                 if len(values) == 1:
-                    value = values[0]
-                    if value is True:
+                    single_value = values[0]
+                    if single_value is True:
                         values = ['']
-                    elif value is False or value is None:
+                    elif single_value is False or single_value is None:
                         # False and None are not included in the http URI
                         continue
                 iterator = iter(values)
-            value = '|'.join(self._format_value(value) for value in iterator)
+            formatted_value = '|'.join(
+                self._format_value(item) for item in iterator)
+            param_value: str | bytes = formatted_value
             # If the value is encodable as ascii, do not encode it.
             # This means that any value which can be encoded as ascii
             # is presumed to be ascii, and servers using a site encoding
             # which is not a superset of ascii may be problematic.
             try:
-                value.encode('ascii')
+                formatted_value.encode('ascii')
             except UnicodeError:
                 try:
-                    value = value.encode(self.site.encoding())
+                    param_value = formatted_value.encode(self.site.encoding())
                 except Exception:
                     pywikibot.error(
                         f'_encoded_items: {key!r} could not be encoded as '
-                        f'{self.site.encoding()!r}: {value!r}')
+                        f'{self.site.encoding()!r}: {formatted_value!r}')
             assert key.encode('ascii')
             assert isinstance(key, str)
-            params[key] = value
+            params[key] = param_value
         return params
 
     def _http_param_string(self):
