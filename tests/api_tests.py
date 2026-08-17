@@ -70,6 +70,20 @@ class TestDryApiFunctions(DefaultSiteTestCase):
         for item in req.items():
             self.assertLength(item, 2)
 
+    def test_wait_context(self) -> None:
+        """Test passing request context to the timeout exception."""
+        uri = 'https://yo.wikipedia.org/w/api.php'
+        req = api.Request(site=self.site, parameters={'action': 'query'},
+                          max_retries=0)
+        req.last_error = {'code': 'error', 'info': 'error'}
+
+        with self.assertRaises(pywikibot.exceptions.ApiTimeoutError) as cm:
+            req.wait(site=self.site, uri=uri)
+
+        self.assertIs(cm.exception.site, self.site)
+        self.assertEqual(cm.exception.uri, uri)
+        self.assertEqual(req.last_error, {'code': None, 'info': None})
+
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
         DeprecationWarning)

@@ -1030,19 +1030,23 @@ The text message is:
         self._params['token'] = tokens
         return True
 
-    def wait(self, delay: int | None = None) -> None:
+    def wait(self, delay: int | None = None, **kwargs) -> None:
         """Determine how long to wait after a failed request.
 
         Also reset last API error with wait cycles.
 
         .. version-added:: 9.0
+        .. version-changed:: 11.7
+           The *kwargs* parameter was added.
 
         :param delay: Minimum time in seconds to wait. Overwrites
             ``retry_wait`` variable if given. The delay doubles each
             retry until ``retry_max`` seconds is reached.
+        :param kwargs: Additional keyword arguments passed to
+            :meth:`WaitingMixin.wait`.
         """
         self.last_error = dict.fromkeys(['code', 'info'])
-        super().wait(delay)
+        super().wait(delay, **kwargs)
 
     def submit(self) -> dict:
         """Submit a query and parse the response.
