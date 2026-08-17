@@ -183,6 +183,7 @@ script_test_modules = {
     'commonscat',
     'data_ingestion',
     'deletionbot',
+    'download_dump',
     'fixing_redirects',
     'generate_family_file',
     'generate_user_files',
