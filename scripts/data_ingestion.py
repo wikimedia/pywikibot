@@ -157,8 +157,10 @@ class Photo(pywikibot.FilePage):
 
         TODO: Add exception handling, fix site thing
         """
+        # getvalue() returns bytes; the memoryview from getbuffer() cannot
+        # be passed to PyPy's cffi based hashlib implementation (T435049)
         hash_object = hashlib.sha1(
-            self.download_photo().getbuffer(), usedforsecurity=False)
+            self.download_photo().getvalue(), usedforsecurity=False)
         return [page.title(with_ns=False)
                 for page in self.site.allimages(
                     sha1=base64.b16encode(hash_object.digest()))]
