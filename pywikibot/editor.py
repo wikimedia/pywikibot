@@ -129,6 +129,7 @@ class TextEditor:
             handle, filename = tempfile.mkstemp(
                 suffix=f'.{config.editor_filename_extension}', text=True)
             path = Path(filename)
+            os.close(handle)
 
             try:
                 encoding = config.editor_encoding
@@ -145,7 +146,6 @@ class TextEditor:
                 return path.read_text(encoding=encoding)
 
             finally:
-                os.close(handle)
                 os.unlink(path)
 
         if GUI_ERROR:

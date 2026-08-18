@@ -7,8 +7,10 @@
 """Tests for :mod:`editor` module."""
 from __future__ import annotations
 
+import os
 import unittest
 from contextlib import suppress
+from unittest.mock import patch
 
 from pywikibot import config, editor
 from tests.aspects import TestCase
@@ -50,6 +52,25 @@ class EditorTestCase(TestCase):
         config.editor = 'custom_editor'
         te = editor.TextEditor()
         self.assertEqual(te.editor, 'custom_editor')
+
+    def test_descriptor_closed_before_editor(self):
+        """Test that the temporary descriptor is closed before editing."""
+        config.editor = 'custom_editor'
+        real_mkstemp = editor.tempfile.mkstemp
+        handle = -1
+
+        def mkstemp(*args, **kwargs):
+            nonlocal handle
+            handle, filename = real_mkstemp(*args, **kwargs)
+            return handle, filename
+
+        def run(*args, **kwargs):
+            with self.assertRaises(OSError):
+                os.fstat(handle)
+
+        with patch.object(editor.tempfile, 'mkstemp', side_effect=mkstemp):
+            with patch.object(editor.subprocess, 'run', side_effect=run):
+                self.assertIsNone(editor.TextEditor().edit('text'))
 
 
 if __name__ == '__main__':
