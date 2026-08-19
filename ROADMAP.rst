@@ -1,6 +1,14 @@
 Release 11.7
 ============
 
+* Yield non-strict unconnected pages in :meth:`APISite.unconnected_pages()
+  <pywikibot.site._extensions.WikibaseClientMixin.unconnected_pages>` and fix the
+  regression introduced in :ref:`10.4.0`.
+* :meth:`api.Request.wait()<data.api.Request.wait>` and :meth:`data.WaitingMixin.wait`
+  accept *kwargs* to be passed to :exc:`exceptions.ApiTimeoutError`. (:phab:`T434974`)
+* :exc:`exceptions.ApiTimeoutError` supports *site* and *uri* attributes passed
+  as parameters. (:phab:`T434974`)
+* Update translations (i18n)
 * Honor *mode* for uncompressed archives in :func:`tools.open_archive`.
 * Remove minimum retry limit from maxlag wait cycle in :meth:`data.api.Request.submit`.
   (:phab:`T434566`)
