@@ -702,11 +702,7 @@ class DisambiguationRobot(SingleSiteBot):
         in command line.
         """
         titles = {first_upper(t) for t in self.firstlinks(page)}
-        links = list(links)
-        for link in links[:]:  # uses a copy because of remove!
-            if link.title() not in titles:
-                links.remove(link)
-        return links
+        return [link for link in links if link.title() in titles]
 
     def treat_links(self, ref_page, disamb_page) -> bool:
         """Resolve the links to disamb_page or its redirects.
