@@ -675,10 +675,19 @@ class GetDataHTML(HTMLParser):
         self.removetags: list[str] = (removetags if removetags is not None
                                       else ['style', 'script'])
 
-        #: The cleaned output text collected during parsing.
-        self.textdata = ''
+        self._textdata: list[str] = []
 
         self._skiptag: str | None = None
+
+    @property
+    def textdata(self) -> str:
+        """Return the cleaned output text collected during parsing."""
+        return ''.join(self._textdata)
+
+    @textdata.setter
+    def textdata(self, value: str) -> None:
+        """Set the cleaned output text collected during parsing."""
+        self._textdata = [value] if value else []
 
     def __call__(self, text: str) -> str:
         """Feed the parser with *text* and return cleaned :attr:`textdata`.
@@ -692,7 +701,7 @@ class GetDataHTML(HTMLParser):
 
     def close(self) -> None:
         """Clean current processing and clear :attr:`textdata`."""
-        self.textdata = ''
+        self._textdata.clear()
         self._skiptag = None
         super().close()
 
@@ -705,7 +714,7 @@ class GetDataHTML(HTMLParser):
         :param data: The text data between HTML tags.
         """
         if not self._skiptag:
-            self.textdata += data
+            self._textdata.append(data)
 
     def handle_starttag(self,
                         tag: str,
@@ -730,7 +739,7 @@ class GetDataHTML(HTMLParser):
                 f' {name}' if value is None else f' {name}="{value}"'
                 for name, value in attrs
             )
-            self.textdata += f'<{tag}{attr_text}>'
+            self._textdata.append(f'<{tag}{attr_text}>')
 
         if tag in self.removetags:
             self._skiptag = tag
@@ -745,7 +754,7 @@ class GetDataHTML(HTMLParser):
         :param tag: The name of the closing tag.
         """
         if tag in self.keeptags:
-            self.textdata += f'</{tag}>'
+            self._textdata.append(f'</{tag}>')
         if tag in self.removetags and tag == self._skiptag:
             self._skiptag = None
 

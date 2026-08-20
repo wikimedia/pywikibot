@@ -631,6 +631,46 @@ class TestTemplateParams(TestCase):
             self.assertEndsWith(m[0], 'foo {{bar}}')
 
 
+class TestGetDataHTML(TestCase):
+
+    """Test the GetDataHTML parser."""
+
+    net = False
+
+    def test_incremental_textdata(self) -> None:
+        """Test textdata while feeding HTML in multiple fragments."""
+        parser = textlib.GetDataHTML(keeptags=['b'])
+
+        parser.feed('<div>one <b class="important">')
+        self.assertEqual(parser.textdata,
+                         'one <b class="important">')
+
+        parser.feed('two</b><!-- hidden --></div>')
+        self.assertEqual(parser.textdata,
+                         'one <b class="important">two</b>')
+
+        parser.close()
+        self.assertEqual(parser.textdata, '')
+
+    def test_textdata_assignment(self) -> None:
+        """Test assigning textdata before feeding additional HTML."""
+        parser = textlib.GetDataHTML()
+        parser.textdata = 'prefix: '
+
+        parser.feed('<i>value</i>')
+
+        self.assertEqual(parser.textdata, 'prefix: value')
+
+    def test_callable_clears_textdata(self) -> None:
+        """Test callable output remains available after automatic close."""
+        parser = textlib.GetDataHTML(keeptags=['b'])
+
+        result = parser('<div>one <b>two</b></div>')
+
+        self.assertEqual(result, 'one <b>two</b>')
+        self.assertEqual(parser.textdata, '')
+
+
 class TestDisabledParts(DefaultSiteTestCase):
 
     """Test the removeDisabledParts function in textlib."""
