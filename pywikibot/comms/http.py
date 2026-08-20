@@ -376,8 +376,22 @@ def error_handling_callback(response: requests.Response | Exception) -> None:
 
     if isinstance(response, requests.ConnectionError):
         msg = str(response)
-        if ('NewConnectionError' in msg or 'NameResolutionError' in msg) \
-           and re.search(r'\[Errno (-2|8|11001)\]', msg):
+
+        is_known_connection_error = (
+            ('NewConnectionError' in msg or 'NameResolutionError' in msg)
+            and any(f'[Errno {errno}]' in msg for errno in (-2, 8, 11001))
+        )
+
+        is_socks_disconnect = all(
+            text in msg
+            for text in (
+                'NewConnectionError',
+                'SOCKSConnection',
+                'Connection closed unexpectedly',
+            )
+        )
+
+        if is_known_connection_error or is_socks_disconnect:
             raise ConnectionError(response)
 
     # catch requests.ReadTimeout and requests.ConnectTimeout and convert
