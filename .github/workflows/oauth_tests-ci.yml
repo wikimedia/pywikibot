@@ -40,11 +40,11 @@ jobs:
         domain: [test.wikipedia.org]
         include:
           - python-version: '3.9'
-            family: wpbeta
+            family: betawikipedia
             code: en
             domain: en.wikipedia.beta.wmcloud.org
           - python-version: '3.9'
-            family: wpbeta
+            family: betawikipedia
             code: zh
             domain: zh.wikipedia.beta.wmcloud.org
     steps:
@@ -90,15 +90,6 @@ jobs:
         with:
           ssh_user: ${{ secrets.WMCS_USER }}
           ssh_key: ${{ secrets.WMCS_SSH_KEY }}
-      - name: Generate family files
-        if: ${{ matrix.family == 'wpbeta' }}
-        env:
-          HTTP_PROXY: socks5h://127.0.0.1:1080
-          HTTPS_PROXY: socks5h://127.0.0.1:1080
-          ALL_PROXY: socks5h://127.0.0.1:1080
-          NO_PROXY: ""
-        run: |
-          python pwb.py generate_family_file https://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files  \

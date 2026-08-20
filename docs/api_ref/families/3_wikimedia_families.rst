@@ -1,9 +1,12 @@
-***************************************
-:mod:`families` --- Family Config Files
-***************************************
+*************************************************
+:mod:`families` --- Wikimedia Family Config Files
+*************************************************
 
-.. automodule:: families
-   :synopsis: Families package
+:mod:`families.abstract\_family` --- Abstract Wikipedia
+=======================================================
+
+.. automodule:: families.abstract_family
+   :synopsis: Family module for Abstract Wikipedia
 
 :mod:`families.commons\_family` --- Commons
 ===========================================
@@ -16,12 +19,6 @@
 
 .. automodule:: families.foundation_family
    :synopsis: Family module for Foundation Wiki
-
-:mod:`families.i18n\_family` --- Translate Wiki
-===============================================
-
-.. automodule:: families.i18n_family
-   :synopsis: Family module for Translate Wiki
 
 :mod:`families.incubator\_family` --- Incubator
 ===============================================
@@ -47,12 +44,6 @@
 .. automodule:: families.meta_family
    :synopsis: Family module for Meta Wiki
 
-:mod:`families.osm\_family` --- OpenStreetMap
-=============================================
-
-.. automodule:: families.osm_family
-   :synopsis: Family module for OpenStreetMap Wiki
-
 :mod:`families.outreach\_family` --- Outreach
 =============================================
 
@@ -64,12 +55,6 @@
 
 .. automodule:: families.species_family
    :synopsis: Family module for Wikimedia Species Wiki
-
-:mod:`families.vikidia\_family` --- Vikidia
-===========================================
-
-.. automodule:: families.vikidia_family
-   :synopsis: Family module for Vikidia Wiki
 
 :mod:`families.wikibooks\_family` --- Wikibooks
 ===============================================
@@ -88,18 +73,6 @@
 
 .. automodule:: families.wikifunctions_family
    :synopsis: Family module for Wikifunctions
-
-:mod:`families.abstract\_family` --- Abstract Wikipedia
-=======================================================
-
-.. automodule:: families.abstract_family
-   :synopsis: Family module for Abstract Wikipedia
-
-:mod:`families.wikihow\_family` --- Wikihow
-===========================================
-
-.. automodule:: families.wikihow_family
-   :synopsis: Family module for Wikihow Wiki
 
 :mod:`families.wikimania\_family` --- Wikimania
 ===============================================
@@ -166,9 +139,3 @@
 
 .. automodule:: families.wiktionary_family
    :synopsis: Family module for Wiktionary
-
-:mod:`families.wowwiki\_family` --- Fandom WOW
-==============================================
-
-.. automodule:: families.wowwiki_family
-   :synopsis: Family module for Fandom WOW Wiki

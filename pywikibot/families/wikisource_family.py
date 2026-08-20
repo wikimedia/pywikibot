@@ -37,6 +37,8 @@ class Family(family.WikimediaSubdomainFamily):
     }
 
     # Sites we want to edit but not count as real languages
+    # Note: wikisource:beta is deprecated since 11.8.0 in favour of
+    # betawikisource:en.
     test_codes = ['beta']
 
     category_redirect_templates = {

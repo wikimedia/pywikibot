@@ -10,10 +10,20 @@ from pywikibot import family
 
 
 # The Wikimedia Incubator family
-class Family(family.WikimediaOrgFamily):
+class Family(family.WikimediaFamily):
 
-    """Family class for Incubator Wiki."""
+    """Family class for Incubator Wiki.
+
+    .. version-changed:: 11.8
+       beta site code was added.
+    """
 
     name = 'incubator'
 
+    langs = {
+        'incubator': 'incubator.wikimedia.org',
+        'beta': 'incubator.wikimedia.beta.wmcloud.org',
+    }
+
+    test_codes = ['beta']
     interwiki_forward = 'wikipedia'

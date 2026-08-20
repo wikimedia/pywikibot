@@ -31,8 +31,7 @@ Table of contents
    pywikibot.site
    login
    logentries
-   family
-   pywikibot.families
+   families/*
    pywikibot.data
    pywikibot.comms
    exceptions

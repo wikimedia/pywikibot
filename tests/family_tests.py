@@ -34,13 +34,20 @@ class TestFamily(TestCase):
                 self.assertTrue(f.langs)
 
                 if name == 'wikinews':
-                    self.assertFalse(f.codes)
-                    self.assertTrue(f.closed_wikis)
+                    self.assertIsEmpty(f.codes)
+                    self.assertIsNotEmpty(f.closed_wikis)
                     self.assertTrue(iter(f.closed_wikis))
                     self.assertIsInstance(next(iter(f.closed_wikis)), str)
                     self.assertIsInstance(f.closed_wikis, list)
+                elif name.startswith('beta'):
+                    self.assertIsEmpty(f.codes)
+                    self.assertIsNotEmpty(f.test_codes)
+                    self.assertTrue(iter(f.test_codes))
+                    self.assertIsInstance(next(iter(f.test_codes)), str)
+                    self.assertIsInstance(f.test_codes, list)
+                    self.assertIn('en', f.test_codes)
                 else:
-                    self.assertTrue(f.codes)
+                    self.assertIsNotEmpty(f.codes)
                     self.assertTrue(iter(f.codes))
                     self.assertIsInstance(next(iter(f.codes)), str)
 

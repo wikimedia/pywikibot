@@ -1,9 +1,9 @@
-************************************
-:mod:`family` --- MediaWiki families
-************************************
+*************************************
+:mod:`family` --- Base Family classes
+*************************************
 
 .. automodule:: family
-   :synopsis: Objects representing MediaWiki families
+   :synopsis: Objects representing MediaWiki Base Familiy classes
    :exclude-members: Family
 
    .. autoclass:: Family

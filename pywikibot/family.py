@@ -1111,6 +1111,21 @@ class WikimediaSubdomainFamily(SubdomainFamily, WikimediaFamily):
     """
 
 
+class BetaSubdomainFamily(SubdomainFamily):
+
+    """Family class for Beta projects using subdomains.
+
+    .. version-added:: 11.8
+    """
+
+    codes = set()
+
+    @classproperty
+    def domain(cls) -> str:
+        """Return the parents domain with a subdomain prefix."""
+        return f"{cls.name.removeprefix('beta')}.beta.wmcloud.org"
+
+
 class WikibaseFamily(Family):
 
     """A base class for a Wikibase Family.

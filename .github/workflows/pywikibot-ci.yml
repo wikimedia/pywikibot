@@ -42,15 +42,11 @@ jobs:
           - python-version: '3.9'
             site: wikipedia:test
           - python-version: '3.9'
-            site: false
-            family: wpbeta
-            code: en
+            site: betawikipedia:en
           - python-version: '3.9'
-            site: false
-            family: wpbeta
-            code: zh
+            site: betawikipedia:zh
           - python-version: '3.10'
-            site: wikisource:beta
+            site: betawikisource:en
           - python-version: '3.9'
             site: wikidata:test
           - python-version: '3.11'
@@ -108,23 +104,9 @@ jobs:
         with:
           ssh_user: ${{ secrets.WMCS_USER }}
           ssh_key: ${{ secrets.WMCS_SSH_KEY }}
-      - name: Generate family files
-        env:
-          HTTP_PROXY: socks5h://127.0.0.1:1080
-          HTTPS_PROXY: socks5h://127.0.0.1:1080
-          ALL_PROXY: socks5h://127.0.0.1:1080
-          NO_PROXY: ""
-        run: |
-          if  [ ${{matrix.family || 0}} == wpbeta ]; then
-            python pwb.py generate_family_file https://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
-          fi
       - name: Generate user files
         run: |
-          if [ ${{matrix.site}} != false ]; then
-            python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-          else
-            python -Werror::UserWarning -m pwb generate_user_files -family:${{matrix.family}} -code:${{matrix.code}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
-          fi
+          python -Werror::UserWarning -m pwb generate_user_files -site:${{matrix.site}} -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
           echo "usernames['wikipedia']['en'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['wikisource']['zh'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
           echo "usernames['wikipedia']['test'] = '${{ env.PYWIKIBOT_USERNAME }}'" >> user-config.py
