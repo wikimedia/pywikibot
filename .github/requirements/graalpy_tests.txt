@@ -1,0 +1,12 @@
+beautifulsoup4
+mwparserfromhell
+packaging
+requests
+wikitextparser
+pytest >= 9.0.3
+pytest-attrib
+coverage
+
+# Workarounds for known GraalPy compatibility issues (SSL + charset detection)
+charset_normalizer <= 3.4.5
+urllib3 < 2.7
