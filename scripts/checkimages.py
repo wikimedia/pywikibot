@@ -1369,6 +1369,7 @@ class CheckImagesBot:
 
     def find_additional_problems(self) -> None:
         """Extract additional settings from configuration page."""
+        image_check_text_lower = self.image_check_text.lower()
         # In every tuple there's a setting configuration
         for tupla in self.settings_data:
             name = tupla[1]
@@ -1393,9 +1394,9 @@ class CheckImagesBot:
             for k in find_list:
                 if find_type.lower() == 'findonly':
                     search_results = re.findall(fr'{k.lower()}',
-                                                self.image_check_text.lower())
+                                                image_check_text_lower)
                     if search_results \
-                       and search_results[0] == self.image_check_text.lower():
+                       and search_results[0] == image_check_text_lower:
                         self.some_problem = True
                         self.text_used = text
                         self.head_used = head_2
@@ -1406,7 +1407,7 @@ class CheckImagesBot:
                         break
                 elif find_type.lower() == 'find' \
                     and re.findall(fr'{k.lower()}',
-                                   self.image_check_text.lower()):
+                                   image_check_text_lower):
                     self.some_problem = True
                     self.text_used = text
                     self.head_used = head_2
