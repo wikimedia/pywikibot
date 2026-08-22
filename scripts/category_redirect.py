@@ -408,7 +408,8 @@ class CategoryRedirectBot(
     def check_soft_redirect(self) -> None:
         """Check for soft-redirected categories."""
         cat = self.current_page
-        i18n_param = {'oldcat': cat.title(as_link=True, textlink=True)}
+        cat_link = cat.title(as_link=True, textlink=True)
+        i18n_param = {'oldcat': cat_link}
 
         try:
             if not cat.isCategoryRedirect():
@@ -438,7 +439,7 @@ class CategoryRedirectBot(
         if not dest.exists():
             message = i18n.twtranslate(
                 self.site, 'category_redirect-problem-redirects', {
-                    'oldcat': cat.title(as_link=True, textlink=True),
+                    'oldcat': cat_link,
                     'redpage': dest.title(as_link=True, textlink=True)
                 })
             self.problems.append(message)
@@ -459,7 +460,7 @@ class CategoryRedirectBot(
             else:
                 message = i18n.twtranslate(
                     self.site, 'category_redirect-log-double', {
-                        'oldcat': cat.title(as_link=True, textlink=True),
+                        'oldcat': cat_link,
                         'newcat': dest.title(as_link=True, textlink=True),
                         'targetcat': double.title(
                             as_link=True, textlink=True)
@@ -492,7 +493,7 @@ class CategoryRedirectBot(
             self.record[cat_title][self.today] = found
             message = i18n.twtranslate(
                 self.site, 'category_redirect-log-moved', {
-                    'oldcat': cat.title(as_link=True, textlink=True),
+                    'oldcat': cat_link,
                     'found': found,
                     'moved': moved
                 })
