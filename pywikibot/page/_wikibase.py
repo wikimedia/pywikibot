@@ -2114,10 +2114,11 @@ class Claim(Property):
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             qualifier.on_item = self.on_item
         qualifier.isQualifier = True
-        if qualifier.getID() in self.qualifiers:
-            self.qualifiers[qualifier.getID()].append(qualifier)
+        qualifier_id = qualifier.getID()
+        if qualifier_id in self.qualifiers:
+            self.qualifiers[qualifier_id].append(qualifier)
         else:
-            self.qualifiers[qualifier.getID()] = [qualifier]
+            self.qualifiers[qualifier_id] = [qualifier]
 
     def removeQualifier(self, qualifier, **kwargs) -> None:
         """Remove the qualifier. Call removeQualifiers().
