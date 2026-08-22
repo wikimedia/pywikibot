@@ -277,6 +277,7 @@ def main(*args: str) -> None:
 
     old_templates = [pywikibot.Page(site, template_name, ns=10)
                      for template_name in templates]
+    generator_specified = gen_factory.generator_specified
 
     if xmlfilename:
         builder = textlib.MultiTemplateMatchBuilder(site)
@@ -301,7 +302,7 @@ def main(*args: str) -> None:
                                                      max_revision_depth=100,
                                                      show_filtered=True)
 
-    if not gen_factory.gens:
+    if not generator_specified:
         # make sure that proper namespace filtering etc. is handled
         gen = gen_factory.getCombinedGenerator(gen)
 

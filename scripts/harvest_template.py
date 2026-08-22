@@ -579,7 +579,7 @@ def main(*args: str) -> None:
         pywikibot.error('No template parameters to harvest specified.')
         return
 
-    if not gen.gens:
+    if not gen.generator_specified:
         gen.handle_arg('-transcludes:' + template_title)
     generator = gen.getCombinedGenerator(preload=True)
 

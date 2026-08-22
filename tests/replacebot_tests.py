@@ -370,7 +370,7 @@ class TestReplaceHelpers(TestCase):
         exceptions = {key: [] for key in replace.EXC_KEYS.values()}
         exceptions['title'].append('Command line')
         generator_factory = MagicMock()
-        generator_factory.gens = []
+        generator_factory.generator_specified = False
 
         result = replace._load_fixes(
             ['no-msg-title-exceptions'], MagicMock(), generator_factory,
@@ -393,18 +393,36 @@ class TestReplaceHelpers(TestCase):
 
         with patch.dict(fixes.fixes, {'with-generator': fix}):
             generator_factory = MagicMock()
-            generator_factory.gens = [object()]
+            generator_factory.generator_specified = True
             replace._load_fixes(
                 ['with-generator'], MagicMock(), generator_factory,
                 exceptions)
             generator_factory.handle_arg.assert_not_called()
 
             generator_factory = MagicMock()
-            generator_factory.gens = []
+            generator_factory.generator_specified = False
             replace._load_fixes(
                 ['with-generator'], MagicMock(), generator_factory,
                 exceptions)
             generator_factory.handle_arg.assert_called_once_with('-page:Fix')
+
+    def test_fix_generator_state_is_snapshotted(self) -> None:
+        """Test that each fix generator is loaded without a CLI source."""
+        first = {'generator': '-page:First', 'replacements': [('1', '2')]}
+        second = {'generator': '-page:Second', 'replacements': [('3', '4')]}
+        exceptions = {key: [] for key in replace.EXC_KEYS.values()}
+        generator_factory = MagicMock()
+        generator_factory.generator_specified = False
+
+        with patch.dict(fixes.fixes, {'first': first, 'second': second}):
+            replace._load_fixes(
+                ['first', 'second'], MagicMock(), generator_factory,
+                exceptions)
+
+        self.assertEqual(generator_factory.handle_arg.call_args_list, [
+            call('-page:First'),
+            call('-page:Second'),
+        ])
 
     def test_build_generator(self) -> None:
         """Test XML, SQL, and combined generator construction."""

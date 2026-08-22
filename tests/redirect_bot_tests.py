@@ -12,9 +12,63 @@ from contextlib import suppress
 from unittest.mock import Mock, patch
 
 import pywikibot
-from pywikibot import Page
+from pywikibot import Page, pagegenerators
+from scripts import redirect
 from scripts.redirect import RedirectGenerator, RedirectRobot
-from tests.aspects import DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
+
+
+class TestRedirectMain(TestCase):
+
+    """Test :func:`redirect.main`."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_factory_generator(self) -> None:
+        """Test that a factory source suppresses RedirectGenerator."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        with (
+            patch.object(redirect.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(redirect.pagegenerators, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(redirect, 'suggest_help', return_value=False),
+            patch.object(redirect, 'RedirectGenerator') as redirect_gen,
+            patch.object(factory, 'getCombinedGenerator',
+                         wraps=factory.getCombinedGenerator) as combined,
+            patch.object(redirect, 'RedirectRobot') as bot,
+        ):
+            redirect.main('broken', '-page:Foo')
+
+        redirect_gen.assert_not_called()
+        combined.assert_called_once_with(gen=None)
+        bot.return_value.run.assert_called_once_with()
+
+    def test_local_start_uses_redirect_generator(self) -> None:
+        """Test that redirect's -start is not a factory source."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        default = [pywikibot.Page(self.site, 'Redirect')]
+        with (
+            patch.object(redirect.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(redirect.pagegenerators, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(redirect, 'suggest_help', return_value=False),
+            patch.object(redirect, 'RedirectGenerator',
+                         return_value=default) as redirect_gen,
+            patch.object(factory, 'getCombinedGenerator',
+                         wraps=factory.getCombinedGenerator) as combined,
+            patch.object(redirect, 'RedirectRobot') as bot,
+        ):
+            redirect.main('broken', '-start:Foo')
+
+        self.assertFalse(factory.generator_specified)
+        redirect_gen.assert_called_once_with('broken', start='Foo')
+        combined.assert_called_once_with(gen=default)
+        bot.return_value.run.assert_called_once_with()
 
 
 class RedirectTestRobot(RedirectRobot):

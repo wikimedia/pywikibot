@@ -8,12 +8,72 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import call, patch
 
 import pywikibot
+from pywikibot import pagegenerators
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 from pywikibot.textlib import MultiTemplateMatchBuilder
+from scripts import template
 from tests import join_xml_data_path
 from tests.aspects import TestCase
+
+
+class TestTemplateMain(TestCase):
+
+    """Test :func:`template.main`."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_filter_uses_fallback_generator(self) -> None:
+        """Test that filters do not suppress the fallback generator."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        fallback = [pywikibot.Page(self.site, 'Fallback')]
+        with (
+            patch.object(template.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(template.pywikibot, 'Site', return_value=self.site),
+            patch.object(template.pagegenerators, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(template.pywikibot.Page, 'getReferences',
+                         return_value=fallback) as references,
+            patch.object(factory, 'getCombinedGenerator',
+                         wraps=factory.getCombinedGenerator) as combined,
+            patch.object(template, 'TemplateRobot') as bot,
+        ):
+            template.main('-remove', '-namespace:0', 'Foo')
+
+        self.assertFalse(factory.generator_specified)
+        references.assert_called_once_with(
+            only_template_inclusion=True, follow_redirects=False)
+        self.assertEqual(combined.call_args_list[0], call())
+        self.assertLength(combined.call_args_list, 2)
+        bot.return_value.run.assert_called_once_with()
+
+    def test_explicit_generator_suppresses_fallback(self) -> None:
+        """Test that an explicit source suppresses the fallback."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        with (
+            patch.object(template.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(template.pywikibot, 'Site', return_value=self.site),
+            patch.object(template.pagegenerators, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(template.pywikibot.Page, 'getReferences')
+            as references,
+            patch.object(factory, 'getCombinedGenerator',
+                         wraps=factory.getCombinedGenerator) as combined,
+            patch.object(template, 'TemplateRobot') as bot,
+        ):
+            template.main('-remove', '-page:Bar', 'Foo')
+
+        self.assertTrue(factory.generator_specified)
+        references.assert_not_called()
+        combined.assert_called_once_with()
+        bot.return_value.run.assert_called_once_with()
 
 
 class TestXMLPageGenerator(TestCase):

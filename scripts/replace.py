@@ -1152,7 +1152,7 @@ def _load_fixes(
     """Load predefined fixes and collect their missing summaries."""
     replacements = []
     missing_summaries = []
-    generators_given = bool(generator_factory.gens)
+    generators_given = generator_factory.generator_specified
 
     for fix_name in fix_names:
         fix = _get_fix(fix_name)

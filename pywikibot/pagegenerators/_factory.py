@@ -100,6 +100,7 @@ class GeneratorFactory:
         """
         #: List of generators provided by :meth:`getCombinedGenerator`.
         self.gens: list[Iterable[pywikibot.page.BasePage]] = []
+        self._generator_specified = False
         self._namespaces: list[str] | frozenset[Namespace] = []
         self.limit: int | None = None
         self.qualityfilter_list: list[int] = []
@@ -199,6 +200,19 @@ class GeneratorFactory:
         """Deleter of namespaces property."""
         self._namespaces = frozenset()
 
+    @property
+    def generator_specified(self) -> bool:
+        """Whether a source generator option was specified.
+
+        The value is set when :meth:`handle_arg` or :meth:`handle_args`
+        accepts an option which produces a source generator. It is not set
+        by filter options or by the *gen* parameter of
+        :meth:`getCombinedGenerator`.
+
+        .. version-added:: next
+        """
+        return self._generator_specified
+
     def getCombinedGenerator(self,  # noqa: N802
                              gen: OPT_GENERATOR_TYPE = None,
                              preload: bool = False) -> OPT_GENERATOR_TYPE:
@@ -235,8 +249,10 @@ class GeneratorFactory:
         # Handle allpages where args are given by -start and -until
         if self._allpages_args is not None:
             apgen = self.site.allpages(**self._allpages_args)
-            if self.gens[0] is None:
-                self.gens[0] = apgen
+            for i, gen_item in enumerate(self.gens):
+                if gen_item is None:
+                    self.gens[i] = apgen
+                    break
             else:
                 self.gens.append(apgen)
 
@@ -773,10 +789,11 @@ class GeneratorFactory:
         self._allpages_args.setdefault('namespace', firstpagelink.namespace)
 
         if not self.gens:
-            # Placeholder to indicate that a generator was specified.
-            # The actual generator will be inserted later by
-            # getCombinedGenerator().
+            # Reserve this source's position until getCombinedGenerator()
+            # creates the actual generator.
             self.gens.append(None)
+
+        self._generator_specified = True
 
         return True
 
@@ -795,6 +812,8 @@ class GeneratorFactory:
         if not self.gens:
             # See comment in _handle_start.
             self.gens.append(None)
+
+        self._generator_specified = True
 
         return True
 
@@ -1083,6 +1102,7 @@ class GeneratorFactory:
             return handler_result
         if handler_result:
             self.gens.append(handler_result)
+            self._generator_specified = True
             return True
 
         return False

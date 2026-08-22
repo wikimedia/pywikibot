@@ -9,10 +9,58 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest.mock import call, patch
 
-from pywikibot import ItemPage, WbTime
+from pywikibot import ItemPage, WbTime, pagegenerators
+from scripts import harvest_template
 from scripts.harvest_template import HarvestRobot
-from tests.aspects import ScriptMainTestCase
+from tests.aspects import ScriptMainTestCase, TestCase
+
+
+class TestHarvestMain(TestCase):
+
+    """Test :func:`harvest_template.main`."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_default_generator_with_filter(self) -> None:
+        """Test that filters do not suppress the default generator."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        with (
+            patch.object(harvest_template.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(harvest_template.pg, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(factory, 'handle_arg',
+                         wraps=factory.handle_arg) as handle_arg,
+            patch.object(harvest_template, 'HarvestRobot') as bot,
+        ):
+            harvest_template.main(
+                '-template:Foo', '-namespace:0', 'field', 'P1')
+
+        self.assertIn(call('-transcludes:Foo'), handle_arg.call_args_list)
+        bot.return_value.run.assert_called_once_with()
+
+    def test_explicit_generator_suppresses_default(self) -> None:
+        """Test that a source option suppresses the default generator."""
+        factory = pagegenerators.GeneratorFactory(site=self.site)
+        with (
+            patch.object(harvest_template.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(harvest_template.pg, 'GeneratorFactory',
+                         return_value=factory),
+            patch.object(factory, 'handle_arg',
+                         wraps=factory.handle_arg) as handle_arg,
+            patch.object(harvest_template, 'HarvestRobot') as bot,
+        ):
+            harvest_template.main(
+                '-template:Foo', '-page:Bar', 'field', 'P1')
+
+        self.assertNotIn(call('-transcludes:Foo'), handle_arg.call_args_list)
+        bot.return_value.run.assert_called_once_with()
 
 
 class TestHarvestRobot(ScriptMainTestCase):

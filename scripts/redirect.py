@@ -787,13 +787,14 @@ def main(*args: str) -> None:
                     missing_action=not action):
         return
 
+    generator_specified = gen_factory.generator_specified
     gen = None
-    if not gen_factory.gens:
+    if not generator_specified:
         if gen_factory.namespaces:
             gen_options['namespaces'] = gen_factory.namespaces
         gen = RedirectGenerator(action, **gen_options)
 
-    if gen_factory.gens or action != 'both' \
+    if generator_specified or action != 'both' \
        and next(iter(source), None) not in ('-fullscan', '-xml'):
         gen = gen_factory.getCombinedGenerator(gen=gen)
 

@@ -1235,6 +1235,86 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self.assertEqual(pages.pop(), page)
 
 
+class TestFactoryState(TestCase):
+
+    """Test GeneratorFactory configuration state."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def setUp(self) -> None:
+        """Set up test site."""
+        super().setUp()
+        self.site = self.get_site()
+
+    def test_combined_generator(self) -> None:
+        """Test that an external generator does not change the state."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertFalse(gf.generator_specified)
+        gen = gf.getCombinedGenerator(gen='ABC')
+        self.assertEqual(tuple(gen), ('A', 'B', 'C'))
+        self.assertFalse(gf.generator_specified)
+
+    def test_generator_specified(self) -> None:
+        """Test whether a source generator option was specified."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertFalse(gf.generator_specified)
+
+        for arg in ('-ns:0', '-limit:10', '-titleregex:Main',
+                    '-redirect:true', '-intersect'):
+            with self.subTest(arg=arg):
+                self.assertTrue(gf.handle_arg(arg))
+                self.assertFalse(gf.generator_specified)
+
+        self.assertFalse(gf.handle_arg('-unknown'))
+        self.assertFalse(gf.generator_specified)
+        self.assertTrue(gf.handle_arg('-page:Main Page'))
+        self.assertTrue(gf.generator_specified)
+
+    def test_generator_specified_with_disabled_option(self) -> None:
+        """Test that a disabled source option is not specified."""
+        gf = pagegenerators.GeneratorFactory(
+            site=self.site, disabled_options=['page'])
+        self.assertFalse(gf.handle_arg('-page:Main Page'))
+        self.assertFalse(gf.generator_specified)
+
+    def test_generator_specified_with_positional_arg(self) -> None:
+        """Test that a positional source argument is specified."""
+        gf = pagegenerators.GeneratorFactory(
+            site=self.site, positional_arg_name='page')
+        self.assertTrue(gf.handle_arg('Main Page'))
+        self.assertTrue(gf.generator_specified)
+
+    def test_deferred_generator_specified(self) -> None:
+        """Test that each deferred allpages option is a source."""
+        for arg in ('-start:!', '-until:!'):
+            with self.subTest(arg=arg):
+                gf = pagegenerators.GeneratorFactory(site=self.site)
+                self.assertTrue(gf.handle_arg(arg))
+                self.assertTrue(gf.generator_specified)
+                self.assertEqual(gf.gens, [None])
+
+    def test_allpages_with_generator(self) -> None:
+        """Test deferred allpages with an additional generator."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        external_page = pywikibot.Page(self.site, 'External')
+        allpages_page = pywikibot.Page(self.site, 'Allpages')
+        external = [external_page]
+        allpages = [allpages_page]
+
+        self.assertTrue(gf.handle_arg('-start:!'))
+        with mock.patch.object(
+                self.site, 'allpages', return_value=allpages, create=True):
+            gen = gf.getCombinedGenerator(gen=external)
+
+        self.assertTrue(gf.generator_specified)
+        self.assertNotIn(None, gf.gens)
+        self.assertEqual(gf.gens, [external, allpages])
+        self.assertEqual(list(gen), [external_page, allpages_page])
+
+
 class TestFactoryGenerator(DefaultSiteTestCase):
 
     """Test pagegenerators.GeneratorFactory."""
@@ -1290,7 +1370,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_allpages_default(self) -> None:
         """Test allpages generator."""
         gf = pagegenerators.GeneratorFactory()
+        self.assertFalse(gf.generator_specified)
         self.assertTrue(gf.handle_arg('-start:!'))
+        self.assertTrue(gf.generator_specified)
         self.assertIsNotEmpty(gf.gens)
         self.assertIsNone(gf.gens[0])
         gf.handle_arg('-limit:10')
@@ -1308,6 +1390,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handle_arg('-start:Python'))
         self.assertTrue(gf.handle_arg('-until:Pywikibot'))
+        self.assertTrue(gf.generator_specified)
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         for page in gen:
