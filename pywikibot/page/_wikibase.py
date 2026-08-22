@@ -2198,27 +2198,29 @@ class Claim(Property):
 
         :return: JSON value
         """
+        target = self.getTarget()
+
         # TODO: eventually unify the following two groups
         if self.type in ('wikibase-item', 'wikibase-property'):
-            value = {'entity-type': self.getTarget().entity_type,
-                     'numeric-id': self.getTarget().getID(numeric=True)}
+            value = {'entity-type': target.entity_type,
+                     'numeric-id': target.getID(numeric=True)}
         elif self.type in (
                 'wikibase-lexeme', 'wikibase-form', 'wikibase-sense'):
-            value = {'entity-type': self.getTarget().entity_type,
-                     'id': self.getTarget().getID()}
+            value = {'entity-type': target.entity_type,
+                     'id': target.getID()}
         elif self.type in ('string', 'url', 'math', 'external-id',
                            'musical-notation'):
-            value = self.getTarget()
+            value = target
         elif self.type == 'commonsMedia':
-            value = self.getTarget().title(with_ns=False)
+            value = target.title(with_ns=False)
         elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
-            value = self.getTarget().toWikibase()
+            value = target.toWikibase()
         else:  # WbUnknown
             pywikibot.warning(
                 f'{self.type} datatype is not supported yet.')
-            value = self.getTarget().toWikibase()
+            value = target.toWikibase()
         return value
 
     def _formatDataValue(self) -> dict:
