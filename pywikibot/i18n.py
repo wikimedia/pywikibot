@@ -879,14 +879,17 @@ def bundles(stem: bool = False) -> Generator[Path | str]:
     >>> path = next(i18n.bundles())
     >>> path.is_dir()
     True
-    >>> path.parent.as_posix()
-    'scripts/i18n'
+    >>> path.is_absolute()
+    True
+    >>> path.parent.name
+    'i18n'
 
     .. version-added:: 7.0
 
     :param stem: Yield the Path.stem if True and the Path object otherwise
     """
-    for dirpath in Path(*_messages_package_name.split('.')).iterdir():
+    mod = __import__(_messages_package_name, fromlist=['__path__'])
+    for dirpath in Path(next(iter(mod.__path__))).iterdir():
         if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache
             if stem:
                 yield dirpath.stem

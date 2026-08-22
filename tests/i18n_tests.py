@@ -7,6 +7,8 @@
 """Test i18n module."""
 from __future__ import annotations
 
+import os
+import tempfile
 import unittest
 from contextlib import suppress
 
@@ -419,6 +421,23 @@ class PywikibotPackageTestCase(TestCase):
         summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)
         self.assertEqual(msg, summary + '; kosmetische Änderungen')
+
+
+class BundlesTestCase(TestCase):
+
+    """Test message bundle discovery."""
+
+    net = False
+
+    def test_different_working_directory(self) -> None:
+        """Test bundle discovery outside the package parent directory."""
+        old_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as directory:
+            try:
+                os.chdir(directory)
+                self.assertIn('pywikibot', i18n.bundles(stem=True))
+            finally:
+                os.chdir(old_cwd)
 
 
 class TestExtractPlural(TestCase):
