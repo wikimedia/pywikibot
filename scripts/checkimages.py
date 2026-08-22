@@ -884,6 +884,8 @@ class CheckImagesBot:
         if len(duplicates) <= 1:
             return bool(duplicates)
 
+        image_url_title = self.image.title(as_url=True)
+
         xdict = {'en':
                  '%(name)s has {{PLURAL:count'
                  '|a duplicate! Reporting it'
@@ -895,8 +897,8 @@ class CheckImagesBot:
             time_image_list = []
 
             for dup_page in duplicates:
-                if dup_page.title(as_url=True) != self.image.title(
-                        as_url=True) or self.timestamp is None:
+                if (dup_page.title(as_url=True) != image_url_title
+                        or self.timestamp is None):
                     try:
                         self.timestamp = dup_page.latest_file_info.timestamp
                     except PageRelatedError:
@@ -970,9 +972,10 @@ class CheckImagesBot:
             if images_to_tag_list and not only_report:
                 fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                 already_reported_in_past = fp.revision_count(self.bots)
-                image_title = re.escape(self.image.title(as_url=True))
+                escaped_image_title = re.escape(image_url_title)
                 from_regex = (
-                    rf'\n\*\[\[:{self.image_namespace}{image_title}\]\]')
+                    rf'\n\*\[\[:{self.image_namespace}'
+                    rf'{escaped_image_title}\]\]')
                 # Delete the image in the list where we're write on
                 text_for_the_report = re.sub(from_regex, '',
                                              text_for_the_report)
@@ -994,12 +997,11 @@ class CheckImagesBot:
                 self.site, 'checkimages-has-duplicates')
             forced_mode = ' ' + i18n.twtranslate(
                 self.site, 'checkimages-forced-mode') if only_report else ''
-            repme = self.list_entry % self.image.title(as_url=True)
+            repme = self.list_entry % image_url_title
             repme += has_duplicates % {'force': forced_mode}
 
             for dup_page in duplicates:
-                if dup_page.title(as_url=True) \
-                   == self.image.title(as_url=True):
+                if dup_page.title(as_url=True) == image_url_title:
                     # the image itself, not report also this as duplicate
                     continue
                 repme += (f'\n** [[:{self.image_namespace}'
