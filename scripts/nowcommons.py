@@ -290,28 +290,30 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
         commons_file_page = pywikibot.FilePage(self.commons,
                                                'File:' + file_on_commons)
-        if (local_file_page.title(with_ns=False)
-                != commons_file_page.title(with_ns=False)):
+        local_title = local_file_page.title(with_ns=False)
+        commons_title = commons_file_page.title(with_ns=False)
+
+        if local_title != commons_title:
             using_pages = list(local_file_page.using_pages())
 
             if using_pages and using_pages != [local_file_page]:
                 pywikibot.info(
-                    f'"<<lightred>>{local_file_page.title(with_ns=False)}'
+                    f'"<<lightred>>{local_title}'
                     f'<<default>>" is still used in {len(using_pages)} pages.'
                 )
 
                 if self.opt.replace:
                     pywikibot.info(
                         'Replacing "<<lightred>>'
-                        f'{local_file_page.title(with_ns=False)}'
+                        f'{local_title}'
                         '<<default>>" by "<<lightgreen>>'
-                        f'{commons_file_page.title(with_ns=False)}'
+                        f'{commons_title}'
                         '<<default>>".'
                     )
 
                     bot = ImageBot(local_file_page.using_pages(),
-                                   local_file_page.title(with_ns=False),
-                                   commons_file_page.title(with_ns=False),
+                                   local_title,
+                                   commons_title,
                                    always=self.opt.replacealways,
                                    loose=self.opt.replaceloose)
                     bot.run()
@@ -322,7 +324,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         bot = ImageBot(local_file_page.using_pages(),
                                        local_file_page.title(with_ns=False,
                                                              as_url=True),
-                                       commons_file_page.title(with_ns=False),
+                                       commons_title,
                                        always=self.opt.replacealways,
                                        loose=self.opt.replaceloose)
                         bot.run()
@@ -333,7 +335,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
             pywikibot.info(
                 'No page is using "<<lightgreen>>'
-                f'{local_file_page.title(with_ns=False)}<<default>>" anymore.'
+                f'{local_title}<<default>>" anymore.'
             )
 
         try:
