@@ -512,14 +512,14 @@ class UI(ABUIC):
     def input_list_choice(self, question: str, answers: Sequence[Any],
                           default: int | str | None = None,
                           force: bool = False) -> Any:
-        """Ask the user to select one entry from a list of entries.
+        """Ask the user to select an entry or accept the default.
 
         :param question: The question, without trailing whitespace.
         :param answers: A sequence of options to be chosen.
         :param default: The default answer if no was entered. None to
             require an answer.
         :param force: Automatically use the default.
-        :return: Return a single Sequence entry.
+        :return: Return a single sequence entry or the default.
         """
         # lock stream output
         with self.lock:
@@ -536,6 +536,8 @@ class UI(ABUIC):
                 except (TypeError, ValueError):
                     if choice in answers:
                         return choice
+                    if default is not None and choice == default:
+                        return default
                     parsedchoice = -1
 
                 # User typed choice number

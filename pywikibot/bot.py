@@ -662,7 +662,7 @@ def input_list_choice(question: str,
                       answers: AnswerType,
                       default: int | str | None = None,
                       force: bool = False) -> str:
-    """Ask the user the question and return one of the valid answers.
+    """Ask the user the question and return an answer or the default.
 
     :param question: The question asked without trailing spaces.
     :param answers: The valid answers each containing a full length
@@ -670,7 +670,7 @@ def input_list_choice(question: str,
     :param default: The result if no answer was entered. It must not be
         in the valid answers and can be disabled by setting it to None.
     :param force: Automatically use the default
-    :return: The selected answer.
+    :return: The selected answer or the default.
     """
     assert ui is not None
     return ui.input_list_choice(question, answers, default=default,
