@@ -120,11 +120,13 @@ class LanguageDict(BaseDataDict):
         """
         data = {}
         diffto = diffto or {}
-        for key in diffto.keys() - self.keys():
+        current_keys = self.keys()
+        diffto_keys = diffto.keys()
+        for key in diffto_keys - current_keys:
             data[key] = {'language': key, 'value': ''}
-        for key in self.keys() - diffto.keys():
+        for key in current_keys - diffto_keys:
             data[key] = {'language': key, 'value': self[key]}
-        for key in self.keys() & diffto.keys():
+        for key in current_keys & diffto_keys:
             if self[key] != diffto[key]['value']:
                 data[key] = {'language': key, 'value': self[key]}
         return data
@@ -183,16 +185,18 @@ class AliasesDict(BaseDataDict):
         """
         data = {}
         diffto = diffto or {}
-        for lang in diffto.keys() & self.keys():
+        current_keys = self.keys()
+        diffto_keys = diffto.keys()
+        for lang in diffto_keys & current_keys:
             if (sorted(val['value'] for val in diffto[lang])
                     != sorted(self[lang])):
                 data[lang] = [{'language': lang, 'value': i}
                               for i in self[lang]]
-        for lang in diffto.keys() - self.keys():
+        for lang in diffto_keys - current_keys:
             data[lang] = [
                 {'language': lang, 'value': i['value'], 'remove': ''}
                 for i in diffto[lang]]
-        for lang in self.keys() - diffto.keys():
+        for lang in current_keys - diffto_keys:
             data[lang] = [{'language': lang, 'value': i} for i in self[lang]]
         return data
 
