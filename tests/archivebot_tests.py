@@ -11,7 +11,7 @@ import unittest
 from contextlib import suppress
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot.exceptions import Error
@@ -82,6 +82,32 @@ class TestArchiveBotFunctions(TestCase):
     """Test functions in archivebot."""
 
     net = False
+
+    def _run_main(self, option: str) -> None:
+        """Run main with site-dependent work bypassed."""
+        with patch.object(archivebot.pywikibot, 'handle_args',
+                          return_value=[option]):
+            with patch.object(archivebot.pywikibot, 'Site'):
+                with patch.object(archivebot, 'show_md5_key',
+                                  return_value=True):
+                    archivebot.main(option)
+
+    def test_locale_option(self) -> None:
+        """Test that the locale option passes a string to setlocale."""
+        with patch.object(archivebot.locale, 'setlocale') as setlocale:
+            self._run_main('-locale:C')
+
+        setlocale.assert_called_once_with(archivebot.locale.LC_TIME, 'C')
+
+    def test_timezone_option(self) -> None:
+        """Test that the timezone option sets the TZ environment variable."""
+        environ = {}
+        with patch.object(archivebot.os, 'environ', environ):
+            with patch.object(archivebot.time, 'tzset', create=True) as tzset:
+                self._run_main('-timezone:UTC')
+
+        self.assertEqual(environ['TZ'], 'UTC')
+        tzset.assert_called_once_with()
 
     def test_get_params_reuses_isocalendar(self) -> None:
         """Test that the ISO calendar is calculated once."""

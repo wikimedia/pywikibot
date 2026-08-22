@@ -157,6 +157,8 @@ Options (may be omitted):
 
 -locale:LOCALE  Switch to locale LOCALE.
 
+-timezone:ZONE  Switch to timezone ZONE.
+
 -namespace:NS   Only archive pages from the given namespace.
 
 -page:PAGE      Archive a single PAGE. Default namespace is a user talk
@@ -1064,9 +1066,9 @@ def main(*args: str) -> None:
             filename = value
         elif option == 'locale':
             # Required for english month names
-            locale.setlocale(locale.LC_TIME, value.encode('utf8'))
+            locale.setlocale(locale.LC_TIME, value)
         elif option == 'timezone':
-            os.environ['TZ'] = value.timezone
+            os.environ['TZ'] = value
             # Or use the preset value
             if hasattr(time, 'tzset'):
                 time.tzset()
