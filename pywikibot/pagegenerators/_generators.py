@@ -1383,6 +1383,8 @@ class PetScanPageGenerator(GeneratorWrapper):
     .. version-added:: 3.0
     .. version-changed:: 7.6
        subclassed from :class:`tools.collections.GeneratorWrapper`
+    .. version-changed:: 11.8
+       The *depth* parameter was added.
     """
 
     def __init__(
@@ -1391,7 +1393,9 @@ class PetScanPageGenerator(GeneratorWrapper):
         subset_combination: bool = True,
         namespaces: Iterable[int | pywikibot.site.Namespace] | None = None,
         site: BaseSite | None = None,
-        extra_options: dict[Any, Any] | None = None
+        extra_options: dict[Any, Any] | None = None,
+        *,
+        depth: int = 0
     ) -> None:
         """Initializer.
 
@@ -1403,19 +1407,22 @@ class PetScanPageGenerator(GeneratorWrapper):
             None, meaning all namespaces)
         :param site: Site to operate on (default is the default site
             from the user config)
-        :param extra_options: Dictionary of extra options to use
-            (optional)
+        :param extra_options: Additional PetScan query parameters. These
+            options override values supplied by named parameters.
+        :param depth: Number of subcategory levels to include (default
+            is 0, meaning only direct category members)
         """
         if site is None:
             site = pywikibot.Site()
 
         self.site = site
         self.opts = self.buildQuery(categories, subset_combination,
-                                    namespaces, extra_options)
+                                    namespaces, extra_options, depth=depth)
 
     def buildQuery(self, categories: Sequence[str], subset_combination: bool,
                    namespaces: Iterable[int | pywikibot.site.Namespace] | None,
-                   extra_options: dict[Any, Any] | None) -> dict[str, Any]:
+                   extra_options: dict[Any, Any] | None, *,
+                   depth: int = 0) -> dict[str, Any]:
         """Get the querystring options to query PetScan.
 
         :param categories: List of categories (as strings)
@@ -1423,7 +1430,9 @@ class PetScanPageGenerator(GeneratorWrapper):
             the intersection of the results of the categories, else
             returns the union of the results of the categories
         :param namespaces: List of namespaces to search in
-        :param extra_options: Dictionary of extra options to use
+        :param extra_options: Additional PetScan query parameters. These
+            options override values supplied by named parameters.
+        :param depth: Number of subcategory levels to include
         :return: Dictionary of querystring parameters to use in the
             query
         """
@@ -1432,6 +1441,7 @@ class PetScanPageGenerator(GeneratorWrapper):
         query = {
             'language': self.site.code,
             'project': self.site.hostname().split('.')[-2],
+            'depth': depth,
             'combination': 'subset' if subset_combination else 'union',
             'categories': '\r\n'.join(categories),
             'format': 'json',

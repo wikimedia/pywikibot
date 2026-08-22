@@ -85,6 +85,24 @@ class TestDryPageGenerators(TestCase):
         """Test module import."""
         self.assertIn('pywikibot.pagegenerators', sys.modules)
 
+    def test_petscan_depth(self) -> None:
+        """Test the PetScan category depth option."""
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site)
+        self.assertEqual(gen.opts['depth'], 0)
+
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site, depth=1)
+        self.assertEqual(gen.opts['depth'], 1)
+        query = gen.buildQuery(
+            ['Pywikibot'], True, None, None, depth=2)
+        self.assertEqual(query['depth'], 2)
+
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site, extra_options={'depth': 2},
+            depth=1)
+        self.assertEqual(gen.opts['depth'], 2)
+
     def test_PagesFromTitlesGenerator(self) -> None:
         """Test PagesFromTitlesGenerator."""
         self.assertFunction('PagesFromTitlesGenerator')
