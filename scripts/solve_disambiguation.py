@@ -1131,6 +1131,8 @@ or press enter to quit:""")
             targets = i18n.twtranslate(self.site,
                                        'solve_disambiguation-unknown-page')
 
+        page_title = page.title()
+
         # first check whether user has customized the edit comment
         if (self.site.family.name in config.disambiguation_comment
                 and self.site.lang in config.disambiguation_comment[
@@ -1139,7 +1141,7 @@ or press enter to quit:""")
                 self.summary = i18n.translate(
                     self.site,
                     config.disambiguation_comment[self.site.family.name],
-                    fallback=True) % (page.title(), targets)
+                    fallback=True) % (page_title, targets)
 
             # Backwards compatibility, type error probably caused by too
             # many arguments for format string
@@ -1147,39 +1149,39 @@ or press enter to quit:""")
                 self.summary = i18n.translate(
                     self.site,
                     config.disambiguation_comment[self.site.family.name],
-                    fallback=True) % page.title()
+                    fallback=True) % page_title
         elif page.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink_counter and not new_targets:
                 self.summary = i18n.twtranslate(
                     self.site,
                     'solve_disambiguation-redirect-removed',
-                    {'from': page.title(),
+                    {'from': page_title,
                      'count': unlink_counter})
             elif dn and not new_targets:
                 self.summary = i18n.twtranslate(
                     self.site,
                     'solve_disambiguation-redirect-adding-dn-template',
-                    {'from': page.title()})
+                    {'from': page_title})
             else:
                 self.summary = i18n.twtranslate(
                     self.site, 'solve_disambiguation-redirect-resolved',
-                    {'from': page.title(),
+                    {'from': page_title,
                      'to': targets,
                      'count': len(new_targets)})
         elif unlink_counter and not new_targets:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-links-removed',
-                {'from': page.title(),
+                {'from': page_title,
                  'count': unlink_counter})
         elif dn and not new_targets:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-adding-dn-template',
-                {'from': page.title()})
+                {'from': page_title})
         else:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-links-resolved',
-                {'from': page.title(),
+                {'from': page_title,
                  'to': targets,
                  'count': len(new_targets)})
 
