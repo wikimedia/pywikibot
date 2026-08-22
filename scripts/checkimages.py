@@ -839,8 +839,8 @@ class CheckImagesBot:
                 # project.
                 return False
 
-            if re.findall(r'\bstemma\b',
-                          self.image_name.lower()) and self.site.code == 'it':
+            if self.site.code == 'it' and re.search(
+                    r'\bstemma\b', self.image_name.lower()):
                 pywikibot.info(f"{self.image_name} has 'stemma' inside, means "
                                f"that it's ok.")
                 return True
@@ -922,8 +922,8 @@ class CheckImagesBot:
                 except NoPageError:
                     continue
 
-                if not (re.findall(dup_regex, dup_page_text)
-                        or re.findall(dup_regex, older_page_text)):
+                if not (re.search(dup_regex, dup_page_text)
+                        or re.search(dup_regex, older_page_text)):
                     pywikibot.info(
                         f'{dup_page} is a duplicate and has to be tagged...')
                     images_to_tag_list.append(dup_page.title())
@@ -1205,7 +1205,7 @@ class CheckImagesBot:
             if not self.licenses_found and templates_in_the_image_raw:
                 # {{nameTemplate|something <- this is not a template, be sure
                 # that we haven't catch something like that.
-                licenses_test = regex_are_licenses.findall(
+                licenses_test = regex_are_licenses.search(
                     self.image_check_text)
                 if not self.licenses_found and licenses_test:
                     raise Error(
@@ -1361,8 +1361,7 @@ class CheckImagesBot:
                 regex_pattern = re.compile(
                     r'\{\{(?:template)?%s ?(?:\||\r?\n|\}|<|/) ?'
                     % i.split('{{')[1].replace(' ', '[ _]'), re.IGNORECASE)
-                result = regex_pattern.findall(self.image_check_text)
-                if result:
+                if regex_pattern.search(self.image_check_text):
                     return True
             elif i.lower() in self.image_check_text:
                 return True
@@ -1407,8 +1406,8 @@ class CheckImagesBot:
                         self.mex_used = mex_catched
                         break
                 elif find_type.lower() == 'find' \
-                    and re.findall(fr'{k.lower()}',
-                                   image_check_text_lower):
+                    and re.search(fr'{k.lower()}',
+                                  image_check_text_lower):
                     self.some_problem = True
                     self.text_used = text
                     self.head_used = head_2
