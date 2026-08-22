@@ -948,15 +948,18 @@ class Subject(interwiki_graph.Subject):
         if not self.origin:
             return (False, None)  # any page matches til we have an origin page
 
+        origin_disambig = self.origin.isDisambig()
+        page_disambig = page.isDisambig()
+
         if self.conf.autonomous:
-            if self.origin.isDisambig() and not page.isDisambig():
+            if origin_disambig and not page_disambig:
                 pywikibot.info(
                     'NOTE: Ignoring link from disambiguation page '
                     f'{self.origin} to non-disambiguation {page}'
                 )
                 return (True, None)
 
-            if not self.origin.isDisambig() and page.isDisambig():
+            if not origin_disambig and page_disambig:
                 pywikibot.info(
                     'NOTE: Ignoring link from non-disambiguation page '
                     f'{self.origin} to disambiguation {page}'
@@ -965,7 +968,7 @@ class Subject(interwiki_graph.Subject):
 
         else:
             choice = 'y'
-            if self.origin.isDisambig() and not page.isDisambig():
+            if origin_disambig and not page_disambig:
                 disambig = self.getFoundDisambig(page.site)
                 if disambig:
                     pywikibot.info(
@@ -983,7 +986,7 @@ class Subject(interwiki_graph.Subject):
                     automatic_quit=False
                 )
 
-            elif not self.origin.isDisambig() and page.isDisambig():
+            elif not origin_disambig and page_disambig:
                 nondisambig = self.getFoundNonDisambig(page.site)
                 if nondisambig:
                     pywikibot.info(
