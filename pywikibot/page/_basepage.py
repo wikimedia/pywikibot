@@ -972,8 +972,7 @@ class BasePage(ComparableMixin):
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 
-        If the title includes a section, return False if this section
-        isn't found.
+        A section in the title is ignored.
         """
         with suppress(AttributeError):
             return self.pageid > 0
