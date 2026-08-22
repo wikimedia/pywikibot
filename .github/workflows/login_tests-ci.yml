@@ -39,7 +39,7 @@ jobs:
     name: Run Login/Logout Tests
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     needs: wait_for_all
-    timeout-minutes: 45
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       max-parallel: 1
