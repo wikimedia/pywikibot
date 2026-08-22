@@ -114,6 +114,7 @@ import re
 import threading
 import time
 import urllib.parse as urlparse
+from collections import deque
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
@@ -455,7 +456,7 @@ class DeadLinkReportThread(threading.Thread):
         """Initializer."""
         super().__init__()
         self.semaphore = threading.Semaphore()
-        self.queue = []
+        self.queue = deque()
         self.finishing = False
         self.killed = False
 
@@ -484,8 +485,8 @@ class DeadLinkReportThread(threading.Thread):
                 continue
 
             with self.semaphore:
-                url, error_report, containing_page, archive_url = self.queue[0]
-                self.queue = self.queue[1:]
+                (url, error_report,
+                 containing_page, archive_url) = self.queue.popleft()
                 talk_page = containing_page.toggleTalkPage()
                 pywikibot.info(
                     f'<<lightaqua>>** Reporting dead link on {talk_page}...')
