@@ -111,53 +111,56 @@ class DownloadDumpBot(Bot, ConfigParserBot):
                     url = (f'https://dumps.wikimedia.org/{self.opt.wikiname}/'
                            f'{self.opt.dumpdate}/{download_filename}')
                     pywikibot.info('Downloading file from ' + url)
-                    response = fetch(url, stream=True)
+                    with fetch(url, stream=True) as response:
+                        if response.status_code != HTTPStatus.OK:
+                            if response.status_code == HTTPStatus.NOT_FOUND:
+                                pywikibot.info(
+                                    'File with name {filename!r}, from '
+                                    'dumpdate {dumpdate!r}, and wiki '
+                                    '{wikiname!r} ({url}) '
+                                    "isn't available in the Wikimedia Dumps"
+                                    .format(url=url, **self.opt))
+                            else:
+                                pywikibot.info(HTTPStatus(
+                                    response.status_code).description)
+                            return
 
-                    if response.status_code != HTTPStatus.OK:
-                        if response.status_code == HTTPStatus.NOT_FOUND:
-                            pywikibot.info(
-                                'File with name {filename!r}, from dumpdate '
-                                '{dumpdate!r}, and wiki {wikiname!r} ({url}) '
-                                "isn't available in the Wikimedia Dumps"
-                                .format(url=url, **self.opt))
-                        else:
-                            pywikibot.info(
-                                HTTPStatus(response.status_code).description)
-                        return
+                        with open(file_current_storepath,
+                                  'wb') as result_file:
+                            total = int(response.headers.get(
+                                'content-length', -1))
+                            if total == -1:
+                                pywikibot.warning(
+                                    "'content-length' missing in response "
+                                    'headers')
+                            downloaded = 0
+                            parts = 50
+                            display_string = ''
 
-                    with open(file_current_storepath, 'wb') as result_file:
-                        total = int(response.headers['content-length'])
-                        if total == -1:
-                            pywikibot.warning("'content-length' missing in "
-                                              'response headers')
-                        downloaded = 0
-                        parts = 50
-                        display_string = ''
+                            pywikibot.info()
+                            for data in response.iter_content(100 * 1024):
+                                result_file.write(data)
 
-                        pywikibot.info()
-                        for data in response.iter_content(100 * 1024):
-                            result_file.write(data)
+                                if total <= 0:
+                                    continue
 
-                            if total <= 0:
-                                continue
+                                downloaded += len(data)
+                                done = int(parts * downloaded / total)
+                                display = map(convert_from_bytes,
+                                              (downloaded, total))
+                                prior_display = display_string
+                                display_string = '\r|{}{}|{}{}/{}'.format(
+                                    '=' * done,
+                                    '-' * (parts - done),
+                                    ' ' * 5,
+                                    *display)
+                                # Add whitespace to cover up prior bar
+                                display_string += ' ' * (
+                                    len(prior_display.rstrip())
+                                    - len(display_string.rstrip()))
 
-                            downloaded += len(data)
-                            done = int(parts * downloaded / total)
-                            display = map(convert_from_bytes,
-                                          (downloaded, total))
-                            prior_display = display_string
-                            display_string = '\r|{}{}|{}{}/{}'.format(
-                                '=' * done,
-                                '-' * (parts - done),
-                                ' ' * 5,
-                                *display)
-                            # Add whitespace to cover up prior bar
-                            display_string += ' ' * (
-                                len(prior_display.rstrip())
-                                - len(display_string.rstrip()))
-
-                            pywikibot.info(display_string, newline=False)
-                        pywikibot.info()
+                                pywikibot.info(display_string, newline=False)
+                            pywikibot.info()
 
                 # Rename the temporary file to the target file
                 # if the download completes successfully

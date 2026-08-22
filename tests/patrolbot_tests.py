@@ -11,7 +11,7 @@ import unittest
 from contextlib import suppress
 
 from scripts.patrol import PatrolBot
-from tests.aspects import DefaultDrySiteTestCase
+from tests.aspects import DefaultSiteTestCase
 
 
 DUMMY_PAGE_TUPLES = """
@@ -30,9 +30,11 @@ This is some text above the entries:
 """
 
 
-class TestPatrolBot(DefaultDrySiteTestCase):
+class TestPatrolBot(DefaultSiteTestCase):
 
     """Test the PatrolBot class."""
+
+    dry = True
 
     def setUp(self) -> None:
         """Create a bot dummy instance."""

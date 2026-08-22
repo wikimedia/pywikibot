@@ -460,6 +460,7 @@ class Uploader:
 
             if result['result'] == 'Warning':
                 assert 'warnings' in result and not ignore_all_warnings
+                warnings = result['warnings']
 
                 if self.filename:
                     if 'filekey' in result:
@@ -487,13 +488,11 @@ class Uploader:
                                             offset=offset)
                     return False
 
-                if len(result['warnings']) > 1:
+                if len(warnings) > 1:
                     warn('The upload returned {} warnings: {}'
-                         .format(len(result['warnings']),
-                                 ', '.join(result['warnings'])),
+                         .format(len(warnings), ', '.join(warnings)),
                          UserWarning, 3)
-                warning = list(result['warnings'].keys())[0]
-                message = result['warnings'][warning]
+                warning, message = next(iter(warnings.items()))
                 warning = warning_keys.get(warning, warning)
                 raise UploadError(warning,
                                   self.upload_warnings[warning]

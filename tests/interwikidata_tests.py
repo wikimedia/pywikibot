@@ -14,7 +14,7 @@ from typing import Any
 import pywikibot
 from pywikibot import Link
 from scripts import interwikidata
-from tests.aspects import AlteredDefaultSiteTestCase, SiteAttributeTestCase
+from tests.aspects import SiteAttributeTestCase, SiteConfigTestCase
 from tests.utils import empty_sites
 
 
@@ -35,7 +35,7 @@ class DummyBot(interwikidata.IWBot):
         return
 
 
-class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
+class TestInterwikidataBot(SiteConfigTestCase, SiteAttributeTestCase):
 
     """Test Interwikidata."""
 
@@ -62,7 +62,7 @@ class TestInterwikidataBot(AlteredDefaultSiteTestCase, SiteAttributeTestCase):
 
         if site.has_data_repository:
             with empty_sites():
-                # The main function return None.
+                # The main function returns None.
                 self.assertIsNone(interwikidata.main())
         else:
             with empty_sites(), self.assertRaisesRegex(

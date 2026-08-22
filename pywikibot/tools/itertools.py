@@ -93,7 +93,7 @@ def union_generators(*iterables: Iterable[Any],
     :return: Generator yielding all unique items in sorted order.
     """
     merged = heapq.merge(*iterables, key=key, reverse=reverse)
-    return (list(group)[0] for _, group in itertools.groupby(merged, key=key))
+    return (next(group) for _, group in itertools.groupby(merged, key=key))
 
 
 def intersect_generators(*iterables, allow_duplicates: bool = False):

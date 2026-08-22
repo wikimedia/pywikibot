@@ -762,11 +762,12 @@ class PageArchiver:
     def get_params(self, timestamp, counter: int) -> dict:
         """Make params for archiving template."""
         lang = self.site.lang
+        iso_year, iso_week, _ = timestamp.isocalendar()
         params = {
             'counter': counter,
             'year': timestamp.year,
-            'isoyear': timestamp.isocalendar()[0],
-            'isoweek': timestamp.isocalendar()[1],
+            'isoyear': iso_year,
+            'isoweek': iso_week,
             'semester': int(ceil(timestamp.month / 6)),
             'quarter': int(ceil(timestamp.month / 3)),
             'month': timestamp.month,
@@ -787,7 +788,8 @@ class PageArchiver:
         for c in range(counter):
             params = self.get_params(thread.timestamp, c + 1)
             self.get_archive_page(pattern % params, params)
-        list(self.site.preloadpages(self.archives.values()))
+        for _ in self.site.preloadpages(self.archives.values()):
+            pass
 
     def analyze_page(self) -> set[tuple[str, str]]:
         """Analyze DiscussionPage."""
@@ -984,7 +986,6 @@ def process_page(page, *args: Any, asynchronous: bool = False) -> bool:
     .. version-changed:: 10.0
        *asynchronous* parameter was added.
     """
-    global outlock
     if not page.exists():
         pywikibot.info(f'{page} does not exist, skipping...')
         return True

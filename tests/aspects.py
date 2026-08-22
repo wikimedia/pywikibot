@@ -22,6 +22,8 @@ from collections.abc import Iterable, Iterator, Sized
 from contextlib import contextmanager, suppress
 from functools import wraps
 from http import HTTPStatus
+from itertools import chain
+from typing import TypeVar
 from unittest.util import safe_repr
 
 import pywikibot
@@ -39,6 +41,7 @@ from pywikibot.site import BaseSite
 from pywikibot.tools import (  # noqa: F401 (used by eval())
     PYTHON_VERSION,
     MediaWikiVersion,
+    classproperty,
     suppress_warnings,
 )
 from tests import (
@@ -51,12 +54,14 @@ from tests.utils import (
     AssertAPIErrorContextManager,
     DryRequest,
     DrySite,
+    ExecuteResult,
     WarningSourceSkipContextManager,
     execute_pwb,
     skipping,
 )
 
 
+T = TypeVar('T')
 OSWIN32 = (sys.platform == 'win32')
 SIZED_ERROR = 'seq argument is not a Sized class containing __len__'
 
@@ -211,25 +216,29 @@ class Python314AssertionsMixin:  # pragma: no cover
 
 class TestTimerMixin(unittest.TestCase):
 
-    """Time each test and report excessive durations."""
+    """Time each test and report excessive durations.
 
-    # Number of seconds each test may consume
-    # before a note is added after the test.
-    test_duration_warning_interval = 10
+    .. version-changed:: 11.7
+       Test durations are now measured in :meth:`run` using
+       :func:`time.perf_counter`.
+    """
 
-    def setUp(self) -> None:
-        """Set up test."""
-        self.test_start = time.time()
-        super().setUp()
+    #: Number of seconds each test may consume
+    #: before a note is added after the test.
+    test_duration_warning_interval = 10.0
 
-    def tearDown(self) -> None:
-        """Tear down test."""
-        super().tearDown()
-        self.test_completed = time.time()
-        duration = self.test_completed - self.test_start
-        if duration > self.test_duration_warning_interval:
-            unittest_print(f' {duration:.3f}s', end=' ')
-            sys.stdout.flush()
+    def run(
+        self,
+        result: unittest.TestResult | None = None
+    ) -> unittest.TestResult:
+        """Run the test and report its duration."""
+        start = time.perf_counter()
+        try:
+            return super().run(result)
+        finally:
+            duration = time.perf_counter() - start
+            if duration > self.test_duration_warning_interval:
+                unittest_print(f'{self._testMethodName}: {duration:.1f} s')
 
 
 # Add Python314AssertionsMixin on Python < 3.14
@@ -244,22 +253,32 @@ class TestCaseBase(*bases):
     """Base class for all tests."""
 
     def assertIsEmpty(self, seq, msg=None) -> None:
-        """Check that the sequence is empty."""
+        """Check that the sequence is empty.
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is not empty')
             self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None) -> None:
-        """Check that the sequence is not empty."""
+        """Check that the sequence is not empty.
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         if not seq:
             msg = self._formatMessage(msg, f'{safe_repr(seq)} is empty')
             self.fail(msg)
 
     def assertLength(self, seq, other, msg=None) -> None:
-        """Verify that a sequence seq has the length of other."""
-        # the other parameter may be given as a sequence too
+        """Verify that a sequence seq has the length of other.
+
+        The *other* parameter may be given as a sequence too
+
+        .. version-added:: 3.0.20200703
+        """
         self.assertIsInstance(seq, Sized, SIZED_ERROR)
         first_len = len(seq)
         try:
@@ -271,6 +290,37 @@ class TestCaseBase(*bases):
             msg = self._formatMessage(
                 msg, f'len({safe_repr(seq)}): {first_len} != {second_len}')
             self.fail(msg)
+
+    def assertHasItems(
+        self,
+        iterable: Iterable[T],
+        msg: str | None = None,
+    ) -> Iterator[T]:
+        """Assert that an iterable yields at least one item.
+
+        Return an iterator yielding all items from *iterable*, including
+        the first one.
+
+        .. note::
+           If *iterable* is an iterator, use the returned iterator
+           instead of the original one.
+
+        .. version-added:: 11.7
+
+        :param iterable: Iterable to check.
+        :param msg: The message to be shown on failure.
+        :return: An iterator yielding all items from *iterable*.
+        """
+        missing = sentinel('MISSING')
+        iterator = iter(iterable)
+        first = next(iterator, missing)
+
+        if first is missing:
+            msg = self._formatMessage(
+                msg, f'{safe_repr(iterable)} yields no items')
+            self.fail(msg)
+
+        return chain((first,), iterator)
 
     def assertPageInNamespaces(self, page, namespaces: int | set[int]) -> None:
         """Assert that Pages is in namespaces.
@@ -296,7 +346,7 @@ class TestCaseBase(*bases):
            the *count* parameter was dropped; all pages from *gen* are
            tested.
 
-        :param gen: Page generator
+        :param gen: Page iterable
         :param site: Site of expected pages
         :meta public:
         """
@@ -1059,6 +1109,8 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
 
     """Run tests on pre-defined sites."""
 
+    is_defaultsite_test = False
+
     @classmethod
     def setUpClass(cls) -> None:
         """Set up the test class.
@@ -1067,6 +1119,9 @@ class TestCase(TestCaseBase, metaclass=MetaTestCaseClass):
         has declared are needed.
         """
         super().setUpClass()
+        if (os.getenv('PYWIKIBOT_TEST_DEFAULT_ONLY', '0') == '1'
+                and not cls.is_defaultsite_test):
+            raise unittest.SkipTest('Only default site tests are enabled.')
 
         if not hasattr(cls, 'sites'):
             return
@@ -1265,10 +1320,15 @@ class SiteAttributeTestCase(TestCase):
 
 class DefaultSiteTestCase(TestCase):
 
-    """Run tests against the config specified site."""
+    """Run tests using the config specified site.
+
+    Set :attr:`dry` to ``True`` to run tests using the site in offline
+    (dry) mode.
+    """
 
     family = config.family
     code = config.mylang
+    is_defaultsite_test = True
 
     @classmethod
     def override_default_site(cls, site) -> None:
@@ -1293,7 +1353,7 @@ class DefaultSiteTestCase(TestCase):
         }
 
 
-class AlteredDefaultSiteTestCase(TestCase):
+class SiteConfigTestCase(TestCase):
 
     """Save and restore the config.mylang and config.family."""
 
@@ -1310,7 +1370,7 @@ class AlteredDefaultSiteTestCase(TestCase):
         super().tearDown()
 
 
-class ScriptMainTestCase(AlteredDefaultSiteTestCase):
+class ScriptMainTestCase(SiteConfigTestCase):
 
     """Tests that depend on the default site being set to the test site."""
 
@@ -1320,13 +1380,6 @@ class ScriptMainTestCase(AlteredDefaultSiteTestCase):
         site = self.get_site()
         pywikibot.config.family = site.family
         pywikibot.config.mylang = site.code
-
-
-class DefaultDrySiteTestCase(DefaultSiteTestCase):
-
-    """Run tests using the config specified site in offline mode."""
-
-    dry = True
 
 
 class WikimediaDefaultSiteTestCase(DefaultSiteTestCase):
@@ -1497,15 +1550,18 @@ class PwbTestCase(TestCase):
         if self.orig_pywikibot_dir:  # pragma: no cover
             os.environ['PYWIKIBOT_DIR'] = self.orig_pywikibot_dir
 
-    def execute(self, args: list[str], **kwargs):
+    def execute(self, args: list[str], **kwargs) -> ExecuteResult:
         """Run :func:`tests.utils.execute_pwb` with default site.
 
         .. version-changed:: 9.1
            pass all arguments to :func:`tests.utils.execute_pwb`; make
            this method public.
+        .. version-changed:: 11.7
+           Return timeout information.
 
         :param args: :mod:`pwb` warapper script arguments
         :param kwargs: keyword arguments of :func:`tests.utils.execute_pwb`
+        :return: Result of :func:`tests.utils.execute_pwb`.
         """
         site = self.get_site()
         args.append(f'-site:{site.sitename}')
@@ -1734,15 +1790,13 @@ class HttpbinTestCase(TestCase):
 
     hostname = 'httpbin.org'
 
-    def get_httpbin_url(self, path=''):
-        """Return url of httpbin."""
-        return 'http://httpbin.org' + path
+    @classproperty
+    def httpbin(cls) -> str:
+        """Return URL of httpbin."""
+        return f'http://{cls.hostname}'
 
-    def get_httpbin_hostname(self) -> str:
-        """Return httpbin hostname."""
-        return 'httpbin.org'
-
-    def fetch(self, *args, **kwargs):
+    @staticmethod
+    def fetch(*args, **kwargs):
         """Delegate http request to http.fetch but skip on ServerError."""
         with skipping(ServerError):
             return http.fetch(*args, **kwargs)

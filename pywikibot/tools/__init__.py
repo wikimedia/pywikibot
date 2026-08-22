@@ -746,6 +746,8 @@ def open_archive(filename: str, /,
     .. version-changed:: 11.4
        *filename* parameter is positional only, *use_extension* is
        keyword only. Uses :class:`SevenZipFile` to open 7zip-files.
+    .. version-changed:: 11.7
+       Honor *mode* for uncompressed archives.
 
     :param filename: The filename.
     :param mode: The mode in which the file should be opened. It may
@@ -816,7 +818,7 @@ def open_archive(filename: str, /,
         binary = lzma.open(filename, mode, format=lzma_fmts[extension])
 
     else:  # assume it's an uncompressed file
-        binary = open(filename, 'rb')
+        binary = open(filename, mode)
 
     return binary
 
@@ -830,11 +832,10 @@ def merge_unique_dicts(*args, **kwargs):
 
     .. version-added:: 3.0
     """
-    args = [*list(args), dict(kwargs)]
     conflicts = set()
     result = {}
-    for arg in args:
-        conflicts |= set(arg.keys()) & set(result.keys())
+    for arg in (*args, kwargs):
+        conflicts.update(key for key in arg if key in result)
         result.update(arg)
     if conflicts:
         raise ValueError('Multiple dicts contain the same keys: {}'

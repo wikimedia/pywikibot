@@ -38,11 +38,13 @@ class TokenWallet(Container):
 
     def __getitem__(self, key: str) -> str:
         """Get token value for the given key."""
-        if self.site.user() is None and key != 'login':
+        current_user = self.site.user()
+        if current_user is None and key != 'login':
             self.site.login()
+            current_user = self.site.user()
 
-        if self.site.user() != self._currentuser:
-            self._currentuser = self.site.user()
+        if current_user != self._currentuser:
+            self._currentuser = current_user
             self.clear()
 
         if not self._tokens:

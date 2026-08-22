@@ -12,10 +12,10 @@ import unittest
 import pywikibot
 from pywikibot.comms.http import user_agent, user_agent_username
 from pywikibot.tools import suppress_warnings
-from tests.aspects import DefaultDrySiteTestCase
+from tests.aspects import DefaultSiteTestCase
 
 
-class TestDrySite(DefaultDrySiteTestCase):
+class TestDrySite(DefaultSiteTestCase):
 
     """Tests against a fake Site object."""
 

@@ -110,7 +110,9 @@ class TestEventStreamsStreamsTests(DefaultSiteTestCase):
 
     def test_url_missing_streams(self) -> None:
         """Test EventStreams with url from site with missing streams."""
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegex(
+                NotImplementedError,
+                'No streams specified for class'):
             EventStreams()
 
 
@@ -160,7 +162,9 @@ class TestEventStreamsSettingTests(TestCase):
 
     def test_filter_function_settings_fail(self) -> None:
         """Test EventStreams failing filter function settings."""
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+                TypeError,
+                'is not a callable'):
             self.es.register_filter('test')
 
     def test_filter_settings(self) -> None:

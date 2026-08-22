@@ -1101,9 +1101,8 @@ class IndexPage(pywikibot.Page):
 
         .. note:: This method is called by initializer and should not be used.
 
-        .. seealso::
-           `ProofreadPage Index Pagination API
-           <https://www.mediawiki.org/wiki/Extension:ProofreadPage/Index_pagination_API>`_
+        .. seealso:: :ext:`ProofreadPage Index Pagination API
+           <ProofreadPage/Index_pagination_API>`
 
         :meta public:
         """

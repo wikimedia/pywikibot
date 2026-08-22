@@ -170,6 +170,7 @@ from __future__ import annotations
 import re
 from collections.abc import Generator, Sequence
 from contextlib import suppress
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -800,8 +801,7 @@ def prepareRegexForMySQL(pattern: str) -> str:
     pattern = pattern.replace(r'\s', '[:space:]')
     pattern = pattern.replace(r'\d', '[:digit:]')
     pattern = pattern.replace(r'\w', '[:alnum:]')
-    pattern = pattern.replace("'", '\\' + "'")
-    return pattern
+    return pattern.replace("'", '\\' + "'")
 
 
 EXC_KEYS = {
@@ -817,7 +817,41 @@ EXC_KEYS = {
 """
 
 
-def handle_exceptions(*args: str) -> tuple[list[str], dict[str, str]]:
+@dataclass
+class _ReplaceConfig:
+
+    """Configuration parsed from the command line."""
+
+    bot_options: dict[str, Any]
+    replacement_args: list[str]
+    fix_names: list[str]
+    exceptions: dict[str, list[str]]
+    edit_summary: str | bool
+    preload: bool
+    regex: bool
+    flags: int
+    xml_filename: str | None
+    xml_start: str | None
+    sql_query: str | None
+
+
+_SCRIPT_OPTION_VALUES = {
+    '-regex': ('regex', True),
+    '-manualinput': ('manual_input', True),
+    '-nopreload': ('preload', False),
+}
+_BOT_VALUE_OPTIONS = {
+    '-sleep': ('sleep', float),
+    '-addcat': ('addcat', str),
+}
+_REGEX_FLAGS = {
+    '-nocase': re.IGNORECASE,
+    '-dotall': re.DOTALL,
+    '-multiline': re.MULTILINE,
+}
+
+
+def handle_exceptions(*args: str) -> tuple[list[str], dict[str, list[str]]]:
     """Handle exceptions args to ignore pages which contain certain texts.
 
     .. version-added:: 7.0
@@ -910,6 +944,312 @@ LIMIT 200"""
     return pagegenerators.MySQLPageGenerator(sql)
 
 
+def _parse_args(
+    args: Sequence[str],
+    generator_factory: pagegenerators.GeneratorFactory,
+) -> _ReplaceConfig | None:
+    """Parse command-line arguments for the replace script."""
+    bot_options = {}
+    edit_summary = ''
+    replacement_args = []
+    file_replacements: list[str] | None = []
+    fix_names = []
+    sql_query: str | None = None
+    flags = 0
+    script_options = {
+        'regex': False,
+        'manual_input': False,
+        'preload': True,
+    }
+    xml_options = {
+        '-xml': (
+            'xml_filename', i18n.input, 'pywikibot-enter-xml-filename'),
+        '-xmlstart': (
+            'xml_start', pywikibot.input,
+            'Please enter the dumped article to start with:'),
+    }
+    xml_values: dict[str, str | None] = {
+        'xml_filename': None,
+        'xml_start': None,
+    }
+
+    local_args = pywikibot.handle_args(args)
+    local_args = generator_factory.handle_args(local_args)
+    local_args, exceptions = handle_exceptions(*local_args)
+
+    for arg in local_args:
+        option, _, value = arg.partition(':')
+        if option in _SCRIPT_OPTION_VALUES:
+            name, option_value = _SCRIPT_OPTION_VALUES[option]
+            script_options[name] = option_value
+        elif option in xml_options:
+            name, input_function, prompt = xml_options[option]
+            xml_values[name] = value or input_function(prompt)
+        elif option == '-mysqlquery':
+            sql_query = value
+        elif option == '-fix':
+            fix_names.append(value)
+        elif option in _BOT_VALUE_OPTIONS:
+            name, converter = _BOT_VALUE_OPTIONS[option]
+            bot_options[name] = converter(value)
+        elif option in ('-allowoverlap', '-always', '-quiet', '-recursive'):
+            bot_options[option[1:]] = True
+        elif option in _REGEX_FLAGS:
+            flags |= _REGEX_FLAGS[option]
+        elif option == '-summary':
+            edit_summary = value
+        elif option == '-automaticsummary':
+            edit_summary = True
+        elif option == '-pairsfile':
+            file_replacements = handle_pairsfile(value)
+        else:
+            replacement_args.append(arg)
+
+    if file_replacements is None:
+        return None
+
+    if len(replacement_args) % 2:
+        pywikibot.error('Incomplete command line pattern replacement pair:\n'
+                        f'{replacement_args}')
+        return None
+
+    replacement_args += file_replacements
+    if (not (replacement_args or fix_names)
+            or script_options['manual_input']):
+        replacement_args += handle_manual()
+
+    return _ReplaceConfig(
+        bot_options=bot_options,
+        replacement_args=replacement_args,
+        fix_names=fix_names,
+        exceptions=exceptions,
+        edit_summary=edit_summary,
+        preload=script_options['preload'],
+        regex=script_options['regex'],
+        flags=flags,
+        xml_filename=xml_values['xml_filename'],
+        xml_start=xml_values['xml_start'],
+        sql_query=sql_query,
+    )
+
+
+def _build_commandline_replacements(
+    replacement_args: list[str],
+    site,
+    edit_summary: str | bool,
+) -> tuple[list[Replacement], str | None]:
+    """Create replacements and an example summary from command-line pairs."""
+    replacements = []
+    single_summary = None
+    automatic_summary = not edit_summary or edit_summary is True
+
+    for old, new in batched(replacement_args, 2):
+        replacement = Replacement(old, new)
+        if automatic_summary and not single_summary:
+            single_summary = i18n.twtranslate(
+                site,
+                'replace-replacing',
+                {'description': f' (-{replacement.old} +{replacement.new})'}
+            )
+        replacements.append(replacement)
+
+    return replacements, single_summary
+
+
+def _get_fix(fix_name: str) -> dict[str, Any] | None:
+    """Return a validated predefined fix or ``None`` on error."""
+    try:
+        fix = fixes.fixes[fix_name]
+    except KeyError:
+        pywikibot.info('Available predefined fixes are: {}'
+                       .format(', '.join(fixes.fixes.keys())))
+        if not fixes.user_fixes_loaded:
+            pywikibot.info(f'The user fixes file could not be found: '
+                           f'{fixes.filename}')
+        return None
+
+    if not isinstance(fix, dict):
+        pywikibot.error(
+            f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
+        if type(fix) is tuple:
+            pywikibot.info('Maybe a trailing comma in your user-fixes.py?')
+        pywikibot.debug(fix)
+        return None
+
+    return fix
+
+
+def _get_fix_summary(fix: dict[str, Any], site) -> str | None:
+    """Return the translated summary for a predefined fix."""
+    if 'msg' not in fix:
+        return None
+    if isinstance(fix['msg'], str):
+        return i18n.twtranslate(site, str(fix['msg']))
+    return i18n.translate(site, fix['msg'], fallback=True)
+
+
+def _build_fix_set(
+    fix_name: str,
+    fix: dict[str, Any],
+    set_summary: str | None,
+) -> tuple[ReplacementList, list[str]]:
+    """Create a replacement set and collect its missing summaries."""
+    replacement_set = ReplacementList(
+        fix.get('regex'),
+        fix.get('exceptions'),
+        fix.get('nocase'),
+        set_summary,
+        name=fix_name,
+    )
+    missing_summaries = []
+
+    for index, replacement in enumerate(fix['replacements'], start=1):
+        summary = None if len(replacement) < 3 else replacement[2]
+        if not set_summary and not summary:
+            missing_summaries.append(
+                f'"{fix_name}" (replacement #{index})')
+        if chars.contains_invisible(replacement[0]):
+            pywikibot.warning(
+                'The old string '
+                f'"{chars.replace_invisible(replacement[0])}"'
+                ' contains formatting characters like U+200E'
+            )
+        if (not callable(replacement[1])
+                and chars.contains_invisible(replacement[1])):
+            pywikibot.warning(
+                'The new string '
+                f'"{chars.replace_invisible(replacement[1])}"'
+                ' contains formatting characters like U+200E')
+        replacement_set.append(ReplacementListEntry(
+            old=replacement[0],
+            new=replacement[1],
+            fix_set=replacement_set,
+            edit_summary=summary,
+        ))
+
+    return replacement_set, missing_summaries
+
+
+def _merge_exceptions(
+    replacement_set: ReplacementList,
+    exceptions: dict[str, list[str]],
+) -> None:
+    """Merge exceptions from a predefined fix into script exceptions."""
+    if replacement_set._exceptions is None:
+        return
+
+    for key, values in replacement_set._exceptions.items():
+        if key in exceptions:
+            exceptions[key] = list(set(exceptions[key]) | set(values))
+        else:
+            exceptions[key] = values
+
+
+def _load_fixes(
+    fix_names: list[str],
+    site,
+    generator_factory: pagegenerators.GeneratorFactory,
+    exceptions: dict[str, list[str]],
+) -> tuple[list[ReplacementListEntry], list[str]] | None:
+    """Load predefined fixes and collect their missing summaries."""
+    replacements = []
+    missing_summaries = []
+    generators_given = bool(generator_factory.gens)
+
+    for fix_name in fix_names:
+        fix = _get_fix(fix_name)
+        if fix is None:
+            return None
+        if not fix['replacements']:
+            pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
+            continue
+
+        set_summary = _get_fix_summary(fix, site)
+        if not generators_given and 'generator' in fix:
+            generator_args = fix['generator']
+            if isinstance(generator_args, str):
+                generator_factory.handle_arg(generator_args)
+            else:
+                generator_factory.handle_args(generator_args)
+
+        replacement_set, missing_fix_summaries = _build_fix_set(
+            fix_name, fix, set_summary)
+        if replacement_set:
+            replacements.extend(replacement_set)
+            _merge_exceptions(replacement_set, exceptions)
+
+        if len(fix['replacements']) == len(missing_fix_summaries):
+            missing_summaries.append(f'"{fix_name}" (all replacements)')
+        else:
+            missing_summaries += missing_fix_summaries
+
+    return replacements, missing_summaries
+
+
+def _resolve_summary(
+    edit_summary: str | bool,
+    single_summary: str | None,
+    missing_fix_summaries: list[str],
+) -> str | bool:
+    """Display summary information and return the edit summary to use."""
+    if ((not edit_summary or edit_summary is True)
+            and (missing_fix_summaries or single_summary)):
+        if single_summary:
+            pywikibot.info('The summary message for the command line '
+                           'replacements will be something like: '
+                           + single_summary)
+        if missing_fix_summaries:
+            pywikibot.info('The summary will not be used when the fix has '
+                           'one defined but the following fix(es) do(es) '
+                           'not have a summary defined: {}'
+                           .format(', '.join(missing_fix_summaries)))
+        if edit_summary is not True:
+            return pywikibot.input(
+                'Press Enter to use this automatic message, or enter a '
+                'description of the\nchanges your bot will make:')
+        return ''
+
+    return edit_summary
+
+
+def _compile_replacements(
+    replacements: list[ReplacementBase],
+    exceptions: dict[str, Any],
+    regex: bool,
+    flags: int,
+) -> None:
+    """Compile replacements and exceptions before generator creation."""
+    for replacement in replacements:
+        replacement.compile(regex, flags)
+    precompile_exceptions(exceptions, regex, flags)
+
+
+def _build_generator(
+    generator_factory: pagegenerators.GeneratorFactory,
+    replacements: list[ReplacementBase],
+    exceptions: dict[str, Any],
+    site,
+    *,
+    xml_filename: str | None,
+    xml_start: str | None,
+    sql_query: str | None,
+    preload: bool,
+):
+    """Create and combine the configured page generators."""
+    generator = None
+    if xml_filename:
+        generator = XmlDumpReplacePageGenerator(
+            xml_filename, xml_start, replacements, exceptions, site)
+    elif sql_query is not None:
+        # Only -excepttext option is considered by the query. Other
+        # exceptions are taken into account by the ReplaceRobot.
+        generator = handle_sql(
+            sql_query, replacements, exceptions['text-contains'])
+
+    return generator_factory.getCombinedGenerator(
+        generator, preload=preload)
+
+
 def main(*args: str) -> None:
     """Process command line arguments and invoke bot.
 
@@ -920,226 +1260,41 @@ def main(*args: str) -> None:
 
     :param args: command line arguments
     """
-    options = {}
-    gen = None
-    # summary message
-    edit_summary = ''
-    # Array which will collect commandline parameters.
-    # First element is original text, second element is replacement text.
-    preload = True  # preload pages
-    commandline_replacements = []
-    file_replacements = []
-    # A list of 2-tuples of original text and replacement text.
-    replacements = []
-
-    # Should the elements of 'replacements' and 'exceptions' be interpreted
-    # as regular expressions?
-    regex = False
-    # Predefined fixes from dictionary 'fixes' (see above).
-    fixes_set = []
-    # the dump's path, either absolute or relative, which will be used
-    # if -xml flag is present
-    xmlFilename = None
-    xmlStart = None
-    sql_query: str | None = None
-    # Set the default regular expression flags
-    flags = 0
-    # Request manual replacements even if replacements are already defined
-    manual_input = False
-
-    # Read commandline parameters.
-    genFactory = pagegenerators.GeneratorFactory(
+    generator_factory = pagegenerators.GeneratorFactory(
         disabled_options=['mysqlquery'])
-    local_args = pywikibot.handle_args(args)
-    local_args = genFactory.handle_args(local_args)
-    local_args, exceptions = handle_exceptions(*local_args)
-
-    for arg in local_args:
-        opt, _, value = arg.partition(':')
-        if opt == '-regex':
-            regex = True
-        elif opt == '-xmlstart':
-            xmlStart = value or pywikibot.input(
-                'Please enter the dumped article to start with:')
-        elif opt == '-xml':
-            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
-        elif opt == '-mysqlquery':
-            sql_query = value
-        elif opt == '-fix':
-            fixes_set.append(value)
-        elif opt == '-sleep':
-            options['sleep'] = float(value)
-        elif opt in ('-allowoverlap', '-always', '-quiet', '-recursive'):
-            options[opt[1:]] = True
-        elif opt == '-nocase':
-            flags |= re.IGNORECASE
-        elif opt == '-dotall':
-            flags |= re.DOTALL
-        elif opt == '-multiline':
-            flags |= re.MULTILINE
-        elif opt == '-addcat':
-            options['addcat'] = value
-        elif opt == '-summary':
-            edit_summary = value
-        elif opt == '-automaticsummary':
-            edit_summary = True
-        elif opt == '-manualinput':
-            manual_input = True
-        elif opt == '-pairsfile':
-            file_replacements = handle_pairsfile(value)
-        elif opt == '-nopreload':
-            preload = False
-        else:
-            commandline_replacements.append(arg)
-
-    if file_replacements is None:
+    config = _parse_args(args, generator_factory)
+    if config is None:
         return
 
-    if len(commandline_replacements) % 2:
-        pywikibot.error('Incomplete command line pattern replacement pair:\n'
-                        f'{commandline_replacements}')
-        return
-
-    commandline_replacements += file_replacements
-    if not (commandline_replacements or fixes_set) or manual_input:
-        commandline_replacements += handle_manual()
-
-    # The summary stored here won't be actually used but is only an example
     site = pywikibot.Site()
-    single_summary = (
-        'Not needed' if edit_summary and edit_summary is not True else None
+    replacements, single_summary = _build_commandline_replacements(
+        config.replacement_args, site, config.edit_summary)
+
+    fix_result = _load_fixes(
+        config.fix_names, site, generator_factory, config.exceptions)
+    if fix_result is None:
+        return
+    fix_replacements, missing_fix_summaries = fix_result
+    replacements.extend(fix_replacements)
+
+    edit_summary = _resolve_summary(
+        config.edit_summary, single_summary, missing_fix_summaries)
+    _compile_replacements(
+        replacements, config.exceptions, config.regex, config.flags)
+    generator = _build_generator(
+        generator_factory,
+        replacements,
+        config.exceptions,
+        site,
+        xml_filename=config.xml_filename,
+        xml_start=config.xml_start,
+        sql_query=config.sql_query,
+        preload=config.preload,
     )
-    for old, new in batched(commandline_replacements, 2):
-        replacement = Replacement(old, new)
-        if not single_summary:
-            single_summary = i18n.twtranslate(
-                site,
-                'replace-replacing',
-                {'description': f' (-{replacement.old} +{replacement.new})'}
-            )
-        replacements.append(replacement)
 
-    # Perform one of the predefined actions.
-    missing_fixes_summaries = []  # which a fixes/replacements miss a summary
-    generators_given = bool(genFactory.gens)
-    for fix_name in fixes_set:
-        try:
-            fix = fixes.fixes[fix_name]
-        except KeyError:
-            pywikibot.info('Available predefined fixes are: {}'
-                           .format(', '.join(fixes.fixes.keys())))
-            if not fixes.user_fixes_loaded:
-                pywikibot.info(f'The user fixes file could not be found: '
-                               f'{fixes.filename}')
-            return
-
-        if not isinstance(fix, dict):
-            pywikibot.error(
-                f'fixes[{fix_name!r}] is a {type(fix).__name__}, not a dict')
-            if type(fix) is tuple:
-                pywikibot.info('Maybe a trailing comma in your user-fixes.py?')
-            pywikibot.debug(fix)
-            return
-
-        if not fix['replacements']:
-            pywikibot.warning(f'No replacements defined for fix {fix_name!r}')
-            continue
-        if 'msg' in fix:
-            if isinstance(fix['msg'], str):
-                set_summary = i18n.twtranslate(site, str(fix['msg']))
-            else:
-                set_summary = i18n.translate(site, fix['msg'], fallback=True)
-        else:
-            set_summary = None
-        if not generators_given and 'generator' in fix:
-            gen_args = fix['generator']
-            if isinstance(gen_args, str):
-                genFactory.handle_arg(gen_args)
-            else:
-                genFactory.handle_args(gen_args)
-        replacement_set = ReplacementList(fix.get('regex'),
-                                          fix.get('exceptions'),
-                                          fix.get('nocase'),
-                                          set_summary,
-                                          name=fix_name)
-        # Whether some replacements have a summary, if so only show which
-        # have none, otherwise just mention the complete fix
-        missing_fix_summaries = []
-        for index, replacement in enumerate(fix['replacements'], start=1):
-            summary = None if len(replacement) < 3 else replacement[2]
-            if not set_summary and not summary:
-                missing_fix_summaries.append(
-                    f'"{fix_name}" (replacement #{index})')
-            if chars.contains_invisible(replacement[0]):
-                pywikibot.warning(
-                    'The old string '
-                    f'"{chars.replace_invisible(replacement[0])}"'
-                    ' contains formatting characters like U+200E'
-                )
-            if (not callable(replacement[1])
-                    and chars.contains_invisible(replacement[1])):
-                pywikibot.warning(
-                    'The new string '
-                    f'"{chars.replace_invisible(replacement[1])}"'
-                    ' contains formatting characters like U+200E')
-            replacement_set.append(ReplacementListEntry(
-                old=replacement[0],
-                new=replacement[1],
-                fix_set=replacement_set,
-                edit_summary=summary,
-            ))
-
-        # Exceptions specified via 'fix' shall be merged to those via CLI.
-        if replacement_set:
-            replacements.extend(replacement_set)
-            if replacement_set._exceptions is not None:
-                for k, v in replacement_set._exceptions.items():
-                    if k in exceptions:
-                        exceptions[k] = list(set(exceptions[k]) | set(v))
-                    else:
-                        exceptions[k] = v
-
-        if len(fix['replacements']) == len(missing_fix_summaries):
-            missing_fixes_summaries.append(
-                f'"{fix_name}" (all replacements)')
-        else:
-            missing_fixes_summaries += missing_fix_summaries
-
-    if ((not edit_summary or edit_summary is True)
-            and (missing_fixes_summaries or single_summary)):
-        if single_summary:
-            pywikibot.info('The summary message for the command line '
-                           'replacements will be something like: '
-                           + single_summary)
-        if missing_fixes_summaries:
-            pywikibot.info('The summary will not be used when the fix has '
-                           'one defined but the following fix(es) do(es) '
-                           'not have a summary defined: {}'
-                           .format(', '.join(missing_fixes_summaries)))
-        if edit_summary is not True:
-            edit_summary = pywikibot.input(
-                'Press Enter to use this automatic message, or enter a '
-                'description of the\nchanges your bot will make:')
-        else:
-            edit_summary = ''
-
-    # Pre-compile all regular expressions here to save time later
-    for replacement in replacements:
-        replacement.compile(regex, flags)
-
-    precompile_exceptions(exceptions, regex, flags)
-
-    if xmlFilename:
-        gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
-                                          replacements, exceptions, site)
-    elif sql_query is not None:
-        # Only -excepttext option is considered by the query. Other
-        # exceptions are taken into account by the ReplaceRobot
-        gen = handle_sql(sql_query, replacements, exceptions['text-contains'])
-
-    gen = genFactory.getCombinedGenerator(gen, preload=preload)
-    bot = ReplaceRobot(gen, replacements, exceptions, site=site,
-                       summary=edit_summary, **options)
+    bot = ReplaceRobot(
+        generator, replacements, config.exceptions, site=site,
+        summary=edit_summary, **config.bot_options)
     site.login()
     bot.run()
 

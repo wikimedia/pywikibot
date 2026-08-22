@@ -176,7 +176,13 @@ class _UserAgentFormatter(Formatter):
             if key == 'revision':
                 return revision
 
-        if key in ('code', 'lang', 'family', 'script_product', 'version'):
+        if key in (
+            'code',
+            'lang',
+            'family',
+            'script_product',
+            'version'
+        ):  # pragma: no cover
             repl = replacements[key]
             issue_deprecation_warning(
                 f'{{{key}}} value for user_agent',
@@ -283,7 +289,7 @@ def user_agent(site: pywikibot.site.BaseSite | None = None,
     return formatted.replace('()', '').replace('  ', ' ').strip()
 
 
-def fake_user_agent() -> str:
+def fake_user_agent() -> str:  # pragma: no cover
     """Return a fake user agent."""
     try:
         from fake_useragent import UserAgent
@@ -370,8 +376,22 @@ def error_handling_callback(response: requests.Response | Exception) -> None:
 
     if isinstance(response, requests.ConnectionError):
         msg = str(response)
-        if ('NewConnectionError' in msg or 'NameResolutionError' in msg) \
-           and re.search(r'\[Errno (-2|8|11001)\]', msg):
+
+        is_known_connection_error = (
+            ('NewConnectionError' in msg or 'NameResolutionError' in msg)
+            and any(f'[Errno {errno}]' in msg for errno in (-2, 8, 11001))
+        )
+
+        is_socks_disconnect = all(
+            text in msg
+            for text in (
+                'NewConnectionError',
+                'SOCKSConnection',
+                'Connection closed unexpectedly',
+            )
+        )
+
+        if is_known_connection_error or is_socks_disconnect:
             raise ConnectionError(response)
 
     # catch requests.ReadTimeout and requests.ConnectTimeout and convert
@@ -535,7 +555,7 @@ def get_charset_from_content_type(content_type: str) -> str | None:
         # fix cp encodings (T304830, T307760, T312230)
         # remove delimiter in front of the code number
         # replace win/windows with cp
-        # remove language code in font of win/windows
+        # remove language code in front of win/windows
         charset = re.sub(
             r'\A(?:cp[ _\-]|(?:[a-z]+[_\-]?)?win(?:dows)?[_\-]?)(\d{3,4})',
             r'cp\1', charset)

@@ -247,7 +247,8 @@ class DataSite(APISite):
 
         :raises NoWikibaseEntityError: *prop* does not exist
         """
-        params = {'action': 'wbgetentities', 'ids': prop.getID(),
+        prop_id = prop.getID()
+        params = {'action': 'wbgetentities', 'ids': prop_id,
                   'props': 'datatype'}
         expiry = datetime.timedelta(days=365 * 100)
         # Store it for 100 years
@@ -257,14 +258,14 @@ class DataSite(APISite):
         # the IDs returned from the API can be upper or lowercase, depending
         # on the version. See bug T55894 for more information.
         try:
-            entity = data['entities'][prop.getID()]
+            entity = data['entities'][prop_id]
         except KeyError:
-            entity = data['entities'][prop.getID().lower()]
+            entity = data['entities'][prop_id.lower()]
 
         if 'missing' in entity:
             raise NoWikibaseEntityError(
                 prop if isinstance(prop, pywikibot.page.WikibaseEntity)
-                else pywikibot.page.WikibaseEntity(self, prop.getID())
+                else pywikibot.page.WikibaseEntity(self, prop_id)
             )
 
         return entity['datatype']
@@ -381,10 +382,11 @@ class DataSite(APISite):
         req = self.simple_request(**params)
         data = req.submit()
         # Update the item
-        if claim.getID() in entity.claims:
-            entity.claims[claim.getID()].append(claim)
+        claim_id = claim.getID()
+        if claim_id in entity.claims:
+            entity.claims[claim_id].append(claim)
         else:
-            entity.claims[claim.getID()] = [claim]
+            entity.claims[claim_id] = [claim]
         entity.latest_revision_id = data['pageinfo']['lastrevid']
 
     @need_right('edit')
@@ -445,7 +447,7 @@ class DataSite(APISite):
         :param summary: Edit summary
         :param bot: Whether to mark the edit as a bot edit
         :param tags: Change tags to apply to the revision
-        :raises NoPageError: missing the the snak value
+        :raises NoPageError: missing the snak value
         :raises NotImplementedError: ``claim.isReference`` or
             ``claim.isQualifier`` is given
         """
@@ -514,14 +516,15 @@ class DataSite(APISite):
         snak = {}
         for sourceclaim in sources:
             datavalue = sourceclaim._formatDataValue()
-            valuesnaks = snak.get(sourceclaim.getID(), [])
+            sourceclaim_id = sourceclaim.getID()
+            valuesnaks = snak.get(sourceclaim_id, [])
             valuesnaks.append({
                 'snaktype': 'value',
-                'property': sourceclaim.getID(),
+                'property': sourceclaim_id,
                 'datavalue': datavalue,
             })
 
-            snak[sourceclaim.getID()] = valuesnaks
+            snak[sourceclaim_id] = valuesnaks
             # set the hash if the source should be changed.
             # if present, all claims of one source have the same hash
             if not new and hasattr(sourceclaim, 'hash'):
@@ -573,10 +576,11 @@ class DataSite(APISite):
             params['snakhash'] = qualifier.hash
 
         # build up the snak
-        if qualifier.getSnakType() == 'value':
+        snaktype = qualifier.getSnakType()
+        if snaktype == 'value':
             params['value'] = json.dumps(qualifier._formatValue())
 
-        params['snaktype'] = qualifier.getSnakType()
+        params['snaktype'] = snaktype
         params['property'] = qualifier.getID()
 
         req = self.simple_request(**params)

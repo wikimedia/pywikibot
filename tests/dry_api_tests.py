@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import datetime
+import unittest
 from pathlib import Path
 from unittest.mock import patch
 
@@ -23,12 +24,7 @@ from pywikibot.family import Family
 from pywikibot.login import LoginStatus
 from pywikibot.tools import suppress_warnings
 from tests import join_images_path
-from tests.aspects import (
-    DefaultDrySiteTestCase,
-    SiteAttributeTestCase,
-    TestCase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 
 
 class DryCachedRequestTests(SiteAttributeTestCase):
@@ -221,9 +217,11 @@ class MockCachedRequestKeyTests(TestCase):
         self.assertEqual(en_user_path, ar_user_path)
 
 
-class DryWriteAssertTests(DefaultDrySiteTestCase):
+class DryWriteAssertTests(DefaultSiteTestCase):
 
     """Test client site write assert."""
+
+    dry = True
 
     def test_no_user(self) -> None:
         """Test Request object when not a user."""
@@ -287,9 +285,11 @@ class DryMimeTests(TestCase):
         self.assertNotEqual(body.find(file_content), -1)
 
 
-class ParamInfoDictTests(DefaultDrySiteTestCase):
+class ParamInfoDictTests(DefaultSiteTestCase):
 
     """Test extracting data from the ParamInfo."""
+
+    dry = True
 
     # https://en.wikipedia.org/w/api.php?action=paraminfo&modules=query+info|query+tokens
     paraminfodata = {
@@ -410,9 +410,11 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         self.assertIn('login', param['type'])
 
 
-class QueryGenTests(DefaultDrySiteTestCase):
+class QueryGenTests(DefaultSiteTestCase):
 
     """Test QueryGenerator with a real site."""
+
+    dry = True
 
     def test_query_constructor(self) -> None:
         """Test QueryGenerator constructor."""

@@ -23,6 +23,7 @@ from pywikibot.backports import NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,
+    InconsistentTitleError,
     InvalidPageError,
     IsNotRedirectPageError,
     IsRedirectPageError,
@@ -253,8 +254,8 @@ class BasePage(ComparableMixin):
         """
         title = self._link.canonical_title()
         label = self._link.title
-        if with_section and self.section():
-            section = '#' + self.section()
+        if with_section and (page_section := self.section()):
+            section = '#' + page_section
         else:
             section = ''
         if as_link:
@@ -379,7 +380,7 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 9.2
            :exc:`exceptions.SectionError` is raised if the
-           :meth:`section` does not exists
+           :meth:`section` does not exist
         .. seealso:: :attr:`text` property
 
         :param force: Reload all page attributes, including errors.
@@ -458,23 +459,34 @@ class BasePage(ComparableMixin):
         """Return an old revision of this page.
 
         .. version-added:: 9.6
-        .. seealso:: :meth:`getOldVersion`
-
+        .. version-changed:: 11.7
+           Validate the *oldid* parameter.
 
         :param oldid: The revid of the revision desired.
-        :param content: If True, retrieve the content of the revision
-            (default False)
+        :param force:  If ``True``, reload revision information from the
+            live site.
+        :param content: If ``True``, retrieve the content of the
+            revision.
+        :raises ValueError: Invalid revision id *oldid*.
+        :raises InconsistentTitleError: The *oldid* does not belong to
+            the current :class:`BasePage`.
         """
+        if type(oldid) is not int or oldid <= 0:
+            raise ValueError(f'Invalid revision id {oldid!r}')
+
         if force or oldid not in self._revisions \
            or (content and self._revisions[oldid].text is None):
             self.site.loadrevisions(self, content=content, revids=oldid)
         return self._revisions[oldid]
 
-    def getOldVersion(self, oldid, force: bool = False) -> str:
+    @deprecated('get_revision(oldid, content=True).text', since='11.7.0')
+    def getOldVersion(self, oldid: int, force: bool = False) -> str:
         """Return text of an old revision of this page.
 
         .. version-changed:: 10.0
            The unused parameter *get_redirect* was removed.
+        .. version-deprecated:: 11.7
+           Use ``get_revision(oldid, content=True).text`` instead.
         .. seealso:: :meth:`get_revision`
 
         :param oldid: The revid of the revision desired.
@@ -550,7 +562,9 @@ class BasePage(ComparableMixin):
         >>> type(edit_time)
         <class 'pywikibot.time.Timestamp'>
 
-        .. seealso:: :attr:`oldest_revision`
+        .. seealso::
+           - :attr:`stable_revision`
+           - :attr:`oldest_revision`
         """
         rev = self._latest_cached_revision()
         if rev is not None:
@@ -559,6 +573,167 @@ class BasePage(ComparableMixin):
         with suppress(StopIteration):
             return next(self.revisions(content=True, total=1))
         raise InvalidPageError(self)
+
+    @property
+    @cached
+    def stable_revision_id(self) -> int | None:
+        """Return the current stable (reviewed) revision id for this page.
+
+        .. version-added:: 11.7
+        .. seealso:
+           - :attr:`stable_revision`
+           - :attr:`latest_revision_id`
+
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        return self.site.stable_revid(self)
+
+    @stable_revision_id.deleter
+    def stable_revision_id(self) -> None:
+        """Remove the cached latest stable revision id set for this Page."""
+        with suppress(AttributeError):
+            del self._stable_revision_id
+
+    @property
+    def stable_revision(self) -> pywikibot.page.Revision | None:
+        """Return the latest stable (reviewed) revision for this page, if any.
+
+        Uses the site’s
+        :class:`FlaggedRevsMixin<pywikibot.site._extensions.FlaggedRevsMixin>`
+        mixin to obtain a stable revid.
+
+        **Example:**
+
+        >>> site = pywikibot.Site('wikipedia:fi')
+        >>> page = pywikibot.Page(site, 'Main Page')
+        ... # get the stable revision timestamp of that page
+        >>> edit_time = page.stable_revision.timestamp
+        >>> type(edit_time)
+        <class 'pywikibot.time.Timestamp'>
+        >>> page.stable_revision.revid == site.stable_revid(page)
+        True
+        >>> # delete cache to force reloading the latest stable id
+        >>> del page.stable_revision_id
+        >>> page.stable_revision.revid == page.stable_revision_id
+        True
+
+        .. version-added:: 11.7
+        .. seealso::
+           - :attr:`stable_revision_id`
+           - :attr:`latest_revision`
+           - :attr:`oldest_revision`
+           - :attr:`APISite.stable_revid
+             <pywikibot.site._extensions.FlaggedRevsMixin.stable_revid>`
+
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        revid = self.stable_revision_id
+        if revid is not None:
+            return self.get_revision(revid, content=True)
+
+        return None
+
+    def _check_revision(self, revid: int, refresh: bool) -> None:
+        """Check whether the *revid* is valid and belongs to this page."""
+        try:
+            self.get_revision(revid, force=refresh)
+        except InconsistentTitleError as e:
+            raise ValueError(
+                f'Revision {revid} does not belong to {self}'
+            ) from e
+
+    def review(
+        self,
+        *,
+        summary: str | None = None,
+        revid: int | None = None,
+        flag: int | None = None,
+        refresh: bool = False,
+    ) -> None:
+        """Review a revision of this page.
+
+        .. version-added:: 11.7
+
+        .. seealso::
+           - :meth:`unreview`
+           - :attr:`stable_revision_id`
+           - :attr:`latest_revision_id`
+           - :attr:`APISite.review_revision
+             <pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+
+        :param summary: Optional review comment.
+        :param revid: Revision ID to review. If None, review the latest
+            revision.
+        :param flag: Set the review flag value.
+        :param refresh: If ``True``, reload revision information from
+            the live site.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Invalid *revid* or unsupported *flag* parameter.
+        """
+        if revid is None:
+            if refresh:
+                del self.latest_revision_id
+            revid = self.latest_revision_id
+        else:
+            self._check_revision(revid, refresh)
+
+        self.site.review_revision(
+            revid,
+            summary=summary,
+            flag=flag,
+        )
+
+        # The stable revision may have changed.
+        del self.stable_revision_id
+
+    def unreview(
+        self,
+        *,
+        summary: str | None = None,
+        revid: int | None = None,
+        refresh: bool = False,
+    ) -> None:
+        """Unreview a revision of this page.
+
+        .. version-added:: 11.7
+
+        .. seealso::
+           - :meth:`review`
+           - :attr:`stable_revision_id`
+           - :attr:`APISite.review_revision
+             <pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+
+        :param summary: Optional review comment.
+        :param revid: Revision ID to unreview. If None, unreview the
+            latest **stable** revision.
+        :param refresh: If ``True``, reload revision information from
+            the live site.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Invalid *revid* parameter.
+        """
+        if revid is None:
+            if refresh:
+                del self.stable_revision_id
+            revid = self.stable_revision_id
+            if revid is None:
+                return
+        else:
+            self._check_revision(revid, refresh)
+
+        self.site.review_revision(
+            revid,
+            summary=summary,
+            unapprove=True,
+        )
+
+        # The stable revision may have changed.
+        del self.stable_revision_id
 
     @property
     def text(self) -> str:
@@ -993,6 +1168,10 @@ class BasePage(ComparableMixin):
         If you need a full list of referring pages, use
         ``pages = list(s.getReferences())``
 
+        .. version-changed:: 11.7
+           Duplicate pages are no longer yielded when backlinks and template
+           inclusions overlap.
+
         :param follow_redirects: If True, also iterate pages that link to a
             redirect pointing to the page.
         :param with_template_inclusion: If True, also iterate pages where self
@@ -1001,7 +1180,7 @@ class BasePage(ComparableMixin):
             is used as a template.
         :param filter_redirects: If True, only iterate redirects to self.
         :param namespaces: Only iterate pages in these namespaces
-        :param total: Iterate no more than this number of pages in total
+        :param total: Iterate no more than this number of unique pages in total
         :param content: If True, retrieve the content of the current version
             of each referring page (default False)
         """

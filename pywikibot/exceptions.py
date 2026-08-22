@@ -9,70 +9,71 @@ This module contains all exception and warning classes used throughout
 the framework::
 
     Exception
-     +-- Error
-          +-- APIError
-          |    +-- APIMWError
-          |    +-- UploadError
-          +-- AutoblockUserError
-          +-- CaptchaError
-          +-- ClientError
-          |    +-- Client414Error
-          +-- InvalidTitleError
-          +-- NoUsernameError
-          +-- PageInUseError
-          +-- PageRelatedError
-          |    +-- CircularRedirectError
-          |    +-- InterwikiRedirectPageError
-          |    +-- IsNotRedirectPageError
-          |    +-- IsRedirectPageError
-          |    +-- NoMoveTargetError
-          |    +-- NoPageError
-          |    +-- NoRenameTargetError
-          |    +-- NotEmailableError
-          |    +-- PageLoadRelatedError
-          |    |    +-- InconsistentTitleError
-          |    |    +-- InvalidPageError
-          |    |    +-- NoSiteLinkError
-          |    +-- PageSaveRelatedError
-          |    |    +-- EditConflictError
-          |    |    |    +-- ArticleExistsConflictError
-          |    |    |    +-- PageCreatedConflictError
-          |    |    |    +-- PageDeletedConflictError
-          |    |    +-- LockedPageError
-          |    |    |    +-- LockedNoPageError
-          |    |    |    +-- CascadeLockedPageError
-          |    |    +-- NoCreateError
-          |    |    +-- OtherPageSaveError
-          |    |    +-- SpamblacklistError
-          |    |    +-- TitleblacklistError
-          |    |    +-- AbuseFilterDisallowedError
-          |    +-- UnsupportedPageError
-          +-- SectionError
-          +-- ServerError
-          |    +-- FatalServerError
-          |    +-- Server504Error
-          +-- SiteDefinitionError
-          |    +-- UnknownFamilyError
-          |    +-- UnknownSiteError
-          +-- ApiTimeoutError
-          |    +-- MaxlagTimeoutError
-          +-- TranslationError
-          +-- UnexpectedAPIDataError (ValueError)
-          +-- UnknownExtensionError (NotImplementedError)
-          +-- UserRightsError
-          |    +-- HiddenKeyError (KeyError)
-          +-- VersionParseError
-          +-- WikiBaseError
-               +-- CoordinateGlobeUnknownError (NotImplementedError)
-               +-- EntityTypeUnknownError
-               +-- NoWikibaseEntityError
+     └── Error
+          ├── APIError
+          |    ├── APIMWError
+          |    └── UploadError
+          ├── AutoblockUserError
+          ├── CaptchaError
+          ├── CitoidError
+          ├── ClientError
+          |    └── Client414Error
+          ├── InvalidTitleError
+          ├── NoUsernameError
+          ├── PageInUseError
+          ├── PageRelatedError
+          |    ├── CircularRedirectError
+          |    ├── InterwikiRedirectPageError
+          |    ├── IsNotRedirectPageError
+          |    ├── IsRedirectPageError
+          |    ├── NoMoveTargetError
+          |    ├── NoPageError
+          |    ├── NoRenameTargetError
+          |    ├── NotEmailableError
+          |    ├── PageLoadRelatedError
+          |    |    ├── InconsistentTitleError
+          |    |    ├── InvalidPageError
+          |    |    └── NoSiteLinkError
+          |    ├── PageSaveRelatedError
+          |    |    ├── EditConflictError
+          |    |    |    ├── ArticleExistsConflictError
+          |    |    |    ├── PageCreatedConflictError
+          |    |    |    └── PageDeletedConflictError
+          |    |    ├── LockedPageError
+          |    |    |    ├── LockedNoPageError
+          |    |    |    └── CascadeLockedPageError
+          |    |    ├── NoCreateError
+          |    |    ├── OtherPageSaveError
+          |    |    ├── SpamblacklistError
+          |    |    ├── TitleblacklistError
+          |    |    └── AbuseFilterDisallowedError
+          |    └── UnsupportedPageError
+          ├── SectionError
+          ├── ServerError
+          |    ├── FatalServerError
+          |    └── Server504Error
+          ├── SiteDefinitionError
+          |    ├── UnknownFamilyError
+          |    └── UnknownSiteError
+          ├── ApiTimeoutError
+          |    └── MaxlagTimeoutError
+          ├── TranslationError
+          ├── UnexpectedAPIDataError (ValueError)
+          ├── UnknownExtensionError (NotImplementedError)
+          ├── UserRightsError
+          |    └── HiddenKeyError (KeyError)
+          ├── VersionParseError
+          └── WikiBaseError
+               ├── CoordinateGlobeUnknownError (NotImplementedError)
+               ├── EntityTypeUnknownError
+               └── NoWikibaseEntityError
 
     UserWarning
-     +-- ArgumentDeprecationWarning (FutureWarning)
-     +-- FamilyMaintenanceWarning
+     ├── ArgumentDeprecationWarning (FutureWarning)
+     └── FamilyMaintenanceWarning
 
     RuntimeWarning
-     +-- NotImplementedWarning
+     └── NotImplementedWarning
 
 
 Error: Base class, all exceptions should the subclass of this class.
@@ -287,6 +288,14 @@ class UploadError(APIError):
     def message(self) -> str:
         """Return warning message."""
         return self.info
+
+
+class CitoidError(Error):
+
+    """The Citoid service returned an error.
+
+    .. version-added:: 11.7
+    """
 
 
 class PageRelatedError(Error):
@@ -740,7 +749,40 @@ class EntityTypeUnknownError(WikiBaseError):
 
 class ApiTimeoutError(Error):
 
-    """Request failed with a timeout error."""
+    """Request failed with a timeout error.
+
+    .. version-changed:: 11.5
+       :exc:`TimeoutError` was renamed to :exc:`ApiTimeoutError`
+    .. version-changed:: 11.7
+       The *site* and *uri* attributes and parameters were added.
+
+    :param args: Arguments passed to the base exception.
+    :param site: Site associated with the failed request, if available.
+    :param uri: URI associated with the failed request, if available.
+    """
+
+    def __init__(
+        self,
+        *args: Exception | str,
+        site: pywikibot.site.BaseSite | None = None,
+        uri: str | None = None
+    ) -> None:
+        """Initializer."""
+        super().__init__(*args)
+
+        #: Site associated with the failed request.
+        self.site = site
+        #: URI associated with the failed request.
+        self.uri = uri
+
+    def __repr__(self) -> str:
+        """Return a detailed representation of the exception."""
+        args = ', '.join(repr(arg) for arg in self.args)
+        if self.site is not None:
+            args += f', site={self.site!r}'
+        if self.uri is not None:
+            args += f', uri={self.uri!r}'
+        return f'{type(self).__name__}({args})'
 
 
 class MaxlagTimeoutError(ApiTimeoutError):

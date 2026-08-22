@@ -197,7 +197,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     f'{self.current_page.title(as_link=True)}, skipping...')
             return False
 
-        item = list(wd_data).pop()
+        item = next(iter(wd_data))
         if self.current_page.site.dbName() in item.sitelinks:
             warning(f'Interwiki conflict in {item}, skipping...')
             return False
@@ -218,7 +218,7 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
             warning(f'Interwiki conflict in {self.current_page}, skipping...')
             return False
 
-        target_item = list(wd_data).pop()
+        target_item = next(iter(wd_data))
         try:
             item.mergeInto(target_item)
         except APIError:

@@ -1,24 +1,52 @@
-Release 11.6
+Release 11.7
 ============
 
-* Add support for bolwiki (:phab:`T429953`)
-* The *top_only* parameter of :meth:`page.User.contributions` and :meth:`APISite.usercontribs
-  <pywikibot.site._generators.GeneratorsMixin.usercontribs>` was renamed to *top*. Its behavior has
-  changed, and `False` can now be used as an argument. (:phab:`T308961`)
-* Add a new collection class :class:`page.Contribution` to hold results from
-  :meth:`page.User.contribs` (:phab:`T308961`)
-* Add a new method :meth:`page.User.contribs` to retrieve user contributions.
-  This method supports all ``prop`` items from :api:`Usercontribs` (:phab:`T308961`)
-* Add a new exception :exc:`exceptions.UnexpectedAPIDataError` (:phab:`T308961`)
-* Add a new collection class :class:`tools.collections.DataRecord` and derive
-  :class:`page.Revision` from it (:phab:`T432464`)
-* Make :func:`i18n.altlang` a public function (:phab:`T432543`)
-* Use :exc:`requests.exceptions.JSONDecodeError` instead of :exc:`ValueError` in
-  :meth:`data.api.Request._json_loads`
-* Provide a :class:`backports.sentinel` implementation backported from Python 3.15
+* Yield non-strict unconnected pages in :meth:`APISite.unconnected_pages()
+  <pywikibot.site._extensions.WikibaseClientMixin.unconnected_pages>` and fix the
+  regression introduced in :ref:`10.4.0`.
+* :meth:`api.Request.wait()<data.api.Request.wait>` and :meth:`data.WaitingMixin.wait`
+  accept *kwargs* to be passed to :exc:`exceptions.ApiTimeoutError`. (:phab:`T434974`)
+* :exc:`exceptions.ApiTimeoutError` supports *site* and *uri* attributes passed
+  as parameters. (:phab:`T434974`)
 * Update translations (i18n)
-* Fix :meth:`WikiStats.get()<data.wikistats.WikiStats.get>` to propagate HTTP fetch exceptions
-  instead of raising `AttributeError`
+* Honor *mode* for uncompressed archives in :func:`tools.open_archive`.
+* Remove minimum retry limit from maxlag wait cycle in :meth:`data.api.Request.submit`.
+  (:phab:`T434566`)
+* Fix upload counter in :class:`specialbots.UploadRobot`.
+* Avoid unnecessary :class:`pywikibot.Site` creation in :class:`specialbots.UploadRobot`.
+* Add :meth:`page.BasePage.review` and :meth:`page.BasePage.unreview`, which call
+  :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`.
+  (:phab:`T408389`)
+* Add :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
+  for the :ext:`FlaggedRevs` extension. (:phab:`T408389`)
+* Add ``show`` filters to :meth:`APISite.blocks()
+  <pywikibot.site._generators.GeneratorsMixin.blocks>`; they can be set by the new *account*, *ip*,
+  *ip_range* and *temp* parameters. (:phab:`T433531`)
+* Duplicate pages are no longer yielded in :meth:`page.BasePage.getReferences` and
+  :meth:`APISite.pagereferences()<pywikibot.site._generators.GeneratorsMixin.pagereferences>` when
+  backlinks and template inclusions overlap. (:phab:`T405551`)
+* :meth:`page.BasePage.getOldVersion` is only a convenience wrapper around
+  :meth:`page.BasePage.get_revision`. It is deprecated now in favour of
+  ``get_revision(oldid, content=True).text``.  (:phab:`T433799`)
+* HTML comments spanning multiple lines are now recognized with :class:`textlib.Timestripper`.
+  (:phab:`T432541`)
+* The *lang* parameter of the :func:`i18n.altlang` function is now positional-only. The *lang* value
+  is no longer included in the returned fallback sequence; the fallback sequence was changed from a
+  list to a tuple.
+* Raise the newly implemented :exc:`exceptions.CitoidError` when the Citoid service of the
+  :mod:`data.citoid` module returns an error response. (:phab:`T433230`)
+* Improvements for :meth:`APISite.assert_valid_iter_params()
+  <pywikibot.site._apisite.APISite.assert_valid_iter_params>`: the *msg_prefix* parameter is now
+  positional-only and the *is_ts* parameter is now keyword-only. If *start* and *end* parameters are
+  ``datetime`` objects, the *is_ts* parameter is always treated as ``True``. A ``ValueError`` is
+  raised instead of ``AssertionError`` when *start* and *end* parameters are in the wrong order.
+* All ``ucshow`` parameters of :api:`Usercontribs` are supported by
+  :meth:`APSite.usercontribs()<pywikibot.site._generators.GeneratorsMixin.usercontribs>`,
+  :meth:`pywikibot.User.contributions` and :meth:`pywikibot.User.contribs`.
+* :ext:`FlaggedRevs` support was added. The :meth:`APSite.stable_revid()
+  <pywikibot.site._extensions.FlaggedRevsMixin.stable_revid>` site method
+  and the :attr:`page.BasePage.stable_revision_id` and :attr:`page.BasePage.stable_revision`
+  properties were added to retrieve the stable revision and its ID. (:phab:`T409848`)
 
 
 Deprecations
@@ -121,6 +149,14 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.7.0: :meth:`page.BasePage.getOldVersion` is now deprecated in favour of
+  :meth:`get_revision(oldid, content=True).text<page.BasePage.get_revision>`. (:phab:`T433799`)
+* 11.7.0: The *lang* parameter of the :func:`i18n.altlang` function is positional-only. Passing
+  *lang* as a keyword argument is deprecated.
+* 11.7.0: The interface of :meth:`APISite.assert_valid_iter_params()
+  <pywikibot.site._apisite.APISite.assert_valid_iter_params>` was changed. The *msg_prefix*
+  parameter is now positional-only and the *is_ts* parameter is now keyword-only. The previous
+  interface is deprecated.
 * 11.6.0: The *top_only* parameter of :meth:`APISite.usercontribs
   <pywikibot.site._generators.GeneratorsMixin.usercontribs>` has been deprecated; use *top* instead
   (:phab:`T308961`)

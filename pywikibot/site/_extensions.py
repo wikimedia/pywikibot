@@ -18,8 +18,9 @@ from pywikibot.exceptions import (
     InconsistentTitleError,
     NoPageError,
     SiteDefinitionError,
+    UnexpectedAPIDataError,
 )
-from pywikibot.site._decorators import need_extension
+from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import merge_unique_dicts
 
 
@@ -314,7 +315,8 @@ class WikibaseClientMixin:
             return
 
         if not strict:
-            return self.querypage('UnconnectedPages', total)
+            yield from self.querypage('UnconnectedPages', total)
+            return
 
         count = 0
         for page in self.querypage('UnconnectedPages'):
@@ -343,7 +345,7 @@ class LinterMixin:
     ) -> Iterable[pywikibot.Page]:
         """Return a generator to pages containing linter errors.
 
-        .. seealso:: https://www.mediawiki.org/wiki/Extension:Linter
+        .. seealso:: :ext:`Linter`
 
         :param lint_categories: Categories of lint errors. Must be an
             iterable of lint categories, or a pipe-separated string of
@@ -446,10 +448,8 @@ class TextExtractsMixin:
         :return: The extract of the page.
 
         .. seealso::
-
-           - https://www.mediawiki.org/wiki/Extension:TextExtracts
-
-           - :meth:`page.BasePage.extract`.
+           - :ext:`TextExtracts`
+           - :meth:`page.BasePage.extract`
         """
         if not page.exists():
             raise NoPageError(page)
@@ -467,3 +467,97 @@ class TextExtractsMixin:
             raise Error(msg)
 
         return data[str(page.pageid)]['extract']
+
+
+class FlaggedRevsMixin:
+
+    """APISite mixin for the FlaggesRevs extension.
+
+    .. version-added:: 11.7
+    .. seealso:: :ext:`FlaggedRevs`
+    """
+
+    @need_extension('FlaggedRevs')
+    def stable_revid(self: BaseSiteProtocol,
+                     page: pywikibot.Page) -> int | None:
+        """Return the stable (reviewed) revision id for a page, if any.
+
+        :param page: The page to inspect.
+        :return: The stable revision id or None if not available.
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        req = self.simple_request(
+            action='query',
+            prop='flagged',
+            titles=page.title(with_section=False),
+            formatversion=2
+        )
+        data = req.submit()
+
+        pages = data.get('query', {}).get('pages', [])
+        if not pages:
+            return None
+
+        return pages[0].get('flagged', {}).get('stable_revid')
+
+    @need_extension('FlaggedRevs')
+    @need_right('review')
+    def review_revision(
+        self,
+        revid: int,
+        *,
+        comment: str | None = None,
+        unapprove: bool = False,
+        flag: int | None = None,
+    ) -> None:
+        """Review a revision using the FlaggedRevs ``action=review`` API.
+
+        .. note::
+           Reviewing or unapproving a revision may change the stable
+           revision of the associated page. Cached
+           :attr:`BasePage.stable_revision_id
+           <page.BasePage.stable_revision_id>` values are not
+           invalidated automatically.
+
+        :param revid: Revision ID to review.
+        :param comment: Optional review comment.
+        :param unapprove: If True, the revision will be *unapproved*.
+        :param flag: Set the review flag value.
+        :raises APIError: On API failure.
+        :raises UnexpectedAPIDataError: Unexpected API data for review
+            parameters or review result.
+        :raises UnknownExtensionError: FlaggedRevs not available.
+        :raises UserRightsError: User has insufficient rights.
+        :raises ValueError: Unsupported *flag* parameter.
+        """
+        try:
+            review_params = self._paraminfo['review']['parameters']
+        except KeyError as e:
+            raise UnexpectedAPIDataError(
+                'Unexpected API data: no param info found') from e
+
+        names = {item['name'] for item in review_params}
+        flag_param = next((p for p in names if p.startswith('flag_')), None)
+
+        params = {
+            'action': 'review',
+            'token': self.tokens['csrf'],
+            'revid': revid,
+            'comment': comment,
+        }
+
+        if flag is not None:
+            if flag_param is None:
+                raise ValueError(
+                    "The 'flag' parameter is not supported by this wiki")
+            params[flag_param] = flag
+
+        if unapprove:
+            params['unapprove'] = '1'
+
+        request = self.simple_request(**params, formatversion=2)
+        data = request.submit()
+
+        if data.get('review', {}).get('result') != 'Success':
+            raise UnexpectedAPIDataError(
+                f'Unexpected review result:\n{data!r}')

@@ -131,17 +131,19 @@ class UploadRobot(BaseBot):
         self.filename_prefix = filename_prefix
         self.force_if_shared = force_if_shared
 
-        if config.upload_to_commons:
-            default_site = pywikibot.Site('commons')
+        if target_site:
+            self.target_site = target_site
+        elif config.upload_to_commons:
+            self.target_site = pywikibot.Site('commons')
         else:
-            default_site = pywikibot.Site()
-        self.target_site = target_site or default_site
+            self.target_site = pywikibot.Site()
 
     def read_file_content(self, file_url: str):
         """Return name of temp file in which remote file is saved."""
         pywikibot.info('Reading file ' + file_url)
 
-        handle, tempname = tempfile.mkstemp()
+        temp_fd, tempname = tempfile.mkstemp()
+        os.close(temp_fd)
         path = Path(tempname)
         size = 0
 
@@ -154,8 +156,7 @@ class UploadRobot(BaseBot):
             else:
                 headers = {}
 
-            with open(path, 'ab') as fd:
-                os.lseek(handle, file_len, 0)
+            with path.open('ab') as fd:
                 try:
                     response = http.fetch(file_url, stream=True,
                                           headers=headers)
@@ -483,8 +484,6 @@ class UploadRobot(BaseBot):
             for file_url in self.url:
                 filename = self.upload_file(file_url)
                 self.counter['read'] += 1
-                if filename:
-                    self.counter['upload'] += 1
                 if callable(self.post_processor):
                     self.post_processor(file_url, filename)
         except QuitKeyboardInterrupt:

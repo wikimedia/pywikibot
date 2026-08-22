@@ -768,7 +768,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
            raise :exc:`exceptions.TranslationError` if script is not
            localized for the current site.
 
-        :param oldText: page text that is going to be be amended
+        :param oldText: page text that is going to be amended
         :param index: the index of oldText where the reference section
             should be inserted at
         :param ident: symbols to be inserted before and after reference

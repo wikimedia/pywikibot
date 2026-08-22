@@ -7,13 +7,16 @@
 """Tests for the replace script and ReplaceRobot class."""
 from __future__ import annotations
 
+import re
 import unittest
 from contextlib import suppress
+from unittest.mock import MagicMock, call, patch
 
 import pywikibot
 from pywikibot import fixes
 from scripts import replace
 from tests import join_data_path
+from tests.aspects import TestCase
 from tests.bot_tests import TWNBotTestCase
 from tests.utils import empty_sites
 
@@ -302,6 +305,151 @@ class TestReplacementsMain(TWNBotTestCase):
             'the following fix(es) do(es) not have a summary defined: '
             '"no-msg-callable" (all replacements)',
         ], pywikibot.bot.ui.pop_output())
+
+
+class TestReplaceHelpers(TestCase):
+
+    """Test helpers used by :func:`replace.main`."""
+
+    net = False
+
+    def setUp(self) -> None:
+        """Clear output from previous helper tests."""
+        super().setUp()
+        pywikibot.bot.ui.clear()
+
+    @patch.object(replace.pywikibot, 'handle_args',
+                  side_effect=lambda args: args)
+    def test_parse_args(self, handle_args) -> None:
+        """Test parsing script-specific arguments."""
+        generator_factory = MagicMock()
+        generator_factory.handle_args.side_effect = lambda args: args
+
+        options = replace._parse_args((
+            '-regex', '-nocase', '-dotall', '-multiline', '-sleep:1.5',
+            '-always', '-quiet', '-recursive', '-allowoverlap',
+            '-addcat:Test', '-summary:summary', '-nopreload',
+            '-xml:dump.xml', '-xmlstart:Start', '-mysqlquery:query',
+            '-fix:no-msg', '-excepttitle:Skip', '1', '2',
+        ), generator_factory)
+
+        self.assertIsNotNone(options)
+        self.assertEqual(options.bot_options, {
+            'sleep': 1.5,
+            'always': True,
+            'quiet': True,
+            'recursive': True,
+            'allowoverlap': True,
+            'addcat': 'Test',
+        })
+        self.assertEqual(options.replacement_args, ['1', '2'])
+        self.assertEqual(options.fix_names, ['no-msg'])
+        self.assertEqual(options.exceptions['title'], ['Skip'])
+        self.assertEqual(options.edit_summary, 'summary')
+        self.assertFalse(options.preload)
+        self.assertTrue(options.regex)
+        self.assertEqual(
+            options.flags, re.IGNORECASE | re.DOTALL | re.MULTILINE)
+        self.assertEqual(options.xml_filename, 'dump.xml')
+        self.assertEqual(options.xml_start, 'Start')
+        self.assertEqual(options.sql_query, 'query')
+        handle_args.assert_called_once()
+
+    def test_manual_summary_skips_translation(self) -> None:
+        """Test that an explicit summary does not load i18n messages."""
+        with patch.object(replace.i18n, 'twtranslate') as twtranslate:
+            replacements, summary = replace._build_commandline_replacements(
+                ['1', '2'], MagicMock(), 'summary')
+
+        self.assertLength(replacements, 1)
+        self.assertIsNone(summary)
+        twtranslate.assert_not_called()
+
+    def test_fix_exceptions_are_merged(self) -> None:
+        """Test merging command-line and fix exceptions."""
+        exceptions = {key: [] for key in replace.EXC_KEYS.values()}
+        exceptions['title'].append('Command line')
+        generator_factory = MagicMock()
+        generator_factory.gens = []
+
+        result = replace._load_fixes(
+            ['no-msg-title-exceptions'], MagicMock(), generator_factory,
+            exceptions)
+
+        self.assertIsNotNone(result)
+        replacements, missing_summaries = result
+        self.assertLength(replacements, 1)
+        self.assertEqual(set(exceptions['title']),
+                         {'Command line', 'Declined'})
+        self.assertEqual(exceptions['require-title'], ['Allowed'])
+        self.assertEqual(missing_summaries, [
+            '"no-msg-title-exceptions" (all replacements)',
+        ])
+
+    def test_fix_generator_precedence(self) -> None:
+        """Test that a command-line generator suppresses fix generators."""
+        fix = {'generator': '-page:Fix', 'replacements': [('1', '2')]}
+        exceptions = {key: [] for key in replace.EXC_KEYS.values()}
+
+        with patch.dict(fixes.fixes, {'with-generator': fix}):
+            generator_factory = MagicMock()
+            generator_factory.gens = [object()]
+            replace._load_fixes(
+                ['with-generator'], MagicMock(), generator_factory,
+                exceptions)
+            generator_factory.handle_arg.assert_not_called()
+
+            generator_factory = MagicMock()
+            generator_factory.gens = []
+            replace._load_fixes(
+                ['with-generator'], MagicMock(), generator_factory,
+                exceptions)
+            generator_factory.handle_arg.assert_called_once_with('-page:Fix')
+
+    def test_build_generator(self) -> None:
+        """Test XML, SQL, and combined generator construction."""
+        generator_factory = MagicMock()
+        generator_factory.getCombinedGenerator.side_effect = (
+            lambda generator, preload: generator)
+        replacements = [MagicMock()]
+        exceptions = {key: [] for key in replace.EXC_KEYS.values()}
+        xml_generator = object()
+        sql_generator = object()
+
+        with (
+            patch.object(replace, 'XmlDumpReplacePageGenerator',
+                         return_value=xml_generator) as xml,
+            patch.object(replace, 'handle_sql',
+                         return_value=sql_generator) as sql,
+        ):
+            result = replace._build_generator(
+                generator_factory, replacements, exceptions, MagicMock(),
+                xml_filename='dump.xml', xml_start='Start',
+                sql_query='query', preload=False)
+            self.assertIs(result, xml_generator)
+            xml.assert_called_once()
+            sql.assert_not_called()
+
+            result = replace._build_generator(
+                generator_factory, replacements, exceptions, MagicMock(),
+                xml_filename=None, xml_start=None, sql_query='query',
+                preload=True)
+            self.assertIs(result, sql_generator)
+            sql.assert_called_once_with(
+                'query', replacements, exceptions['text-contains'])
+
+            result = replace._build_generator(
+                generator_factory, replacements, exceptions, MagicMock(),
+                xml_filename=None, xml_start=None, sql_query=None,
+                preload=True)
+            self.assertIsNone(result)
+
+        self.assertEqual(
+            generator_factory.getCombinedGenerator.call_args_list, [
+                call(xml_generator, preload=False),
+                call(sql_generator, preload=True),
+                call(None, preload=True),
+            ])
 
     def test_pairs_file(self) -> None:
         """Test handle_pairsfile."""

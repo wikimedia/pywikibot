@@ -420,22 +420,22 @@ class FilePage(Page):
         # adjust user path
         path = path.expanduser()
         # use read throttle per Wikitech robot policy for download (T418672)
-        # multiply minthrottle by 25 to get an functional delay
+        # multiply minthrottle by 25 to get a functional delay
         self.site.throttle.set_delays(delay=25 * self.site.throttle.delay)
         self.site.throttle()
         self.site.throttle.set_delays()
 
-        req = http.fetch(url, stream=True)
-        if req.status_code == HTTPStatus.OK:
-            with open(path, 'wb') as f:
-                for chunk in req.iter_content(chunk_size):
-                    f.write(chunk)
+        with http.fetch(url, stream=True) as response:
+            if response.status_code != HTTPStatus.OK:
+                pywikibot.warning(
+                    f'Unsuccessful request ({response.status_code}): '
+                    f'{response.url}')
+                return False
 
-            return thumb or compute_file_hash(path) == revision.sha1
+            with path.open('wb') as f:
+                f.writelines(response.iter_content(chunk_size))
 
-        pywikibot.warning(
-            f'Unsuccessful request ({req.status_code}): {req.url}')
-        return False
+        return thumb or compute_file_hash(path) == revision.sha1
 
     def globalusage(self, total=None):
         """Iterate all global usage for this page.

@@ -371,8 +371,8 @@ class ClientLoginManager(LoginManager):
     .. version-changed:: 10.2
        Secondary authentication via email was enabled.
     .. seealso::
-       - https://www.mediawiki.org/wiki/Extension:OATHAuth
-       - https://www.mediawiki.org/wiki/Extension:EmailAuth
+       - :ext:`OATHAuth`
+       - :ext:`EmailAuth`
     """
 
     _waituntil: datetime.datetime
@@ -435,8 +435,8 @@ class ClientLoginManager(LoginManager):
         :raises APIError: API login error
         """
         if hasattr(self, '_waituntil') \
-           and datetime.datetime.now() < self._waituntil:
-            diff = self._waituntil - datetime.datetime.now()
+           and (now := datetime.datetime.now()) < self._waituntil:
+            diff = self._waituntil - now
             pywikibot.warning(f'Too many tries, waiting {diff.seconds}'
                               ' seconds before retrying.')
             pywikibot.sleep(diff.seconds)

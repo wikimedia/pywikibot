@@ -21,7 +21,7 @@ from pywikibot.data import api
 from pywikibot.exceptions import APIError, NoUsernameError
 from pywikibot.throttle import Throttle
 from pywikibot.tools import suppress_warnings
-from tests.aspects import DefaultDrySiteTestCase, DefaultSiteTestCase, TestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 from tests.utils import FakeLoginManager
 
 
@@ -45,9 +45,11 @@ class TestApiFunctions(DefaultSiteTestCase):
         self.assertEqual(req.site, self.get_site())
 
 
-class TestDryApiFunctions(DefaultDrySiteTestCase):
+class TestDryApiFunctions(DefaultSiteTestCase):
 
     """API Request object test class."""
+
+    dry = True
 
     def testObjectCreation(self) -> None:
         """Test api.Request() constructor."""
@@ -68,11 +70,25 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
         for item in req.items():
             self.assertLength(item, 2)
 
+    def test_wait_context(self) -> None:
+        """Test passing request context to the timeout exception."""
+        uri = 'https://yo.wikipedia.org/w/api.php'
+        req = api.Request(site=self.site, parameters={'action': 'query'},
+                          max_retries=0)
+        req.last_error = {'code': 'error', 'info': 'error'}
+
+        with self.assertRaises(pywikibot.exceptions.ApiTimeoutError) as cm:
+            req.wait(site=self.site, uri=uri)
+
+        self.assertIs(cm.exception.site, self.site)
+        self.assertEqual(cm.exception.uri, uri)
+        self.assertEqual(req.last_error, {'code': None, 'info': None})
+
     @suppress_warnings(
         'Instead of using kwargs |Both kwargs and parameters are set',
         DeprecationWarning)
     def test_mixed_mode(self) -> None:
-        """Test if parameters is used with kwargs."""
+        """Test using parameters with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')
         self.assertIn('parameters', req1._params)
 
@@ -346,9 +362,11 @@ class TestOptionSet(TestCase):
             options._set_site(self.get_site(), 'recentchanges', 'show')
 
 
-class TestDryOptionSet(DefaultDrySiteTestCase):
+class TestDryOptionSet(DefaultSiteTestCase):
 
     """OptionSet class test class."""
+
+    dry = True
 
     def test_mutable_mapping(self) -> None:
         """Test keys, values and items from MutableMapping."""

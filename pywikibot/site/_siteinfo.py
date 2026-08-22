@@ -274,7 +274,7 @@ class Siteinfo(Container):
         .. seealso:: :py:obj:`_get_siteinfo`
 
         :param key: The name of the siteinfo property.
-        :param get_default: Whether to throw an KeyError if the key is invalid.
+        :param get_default: Whether to throw a KeyError if the key is invalid.
         :param cache: Caches the result internally so that future accesses via
             this method won't query the server.
         :param expiry: If the cache is older than the expiry it ignores the

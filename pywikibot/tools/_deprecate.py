@@ -736,10 +736,9 @@ def redirect_func(target, *,
         source_module = target_module
     elif source_module and source_module[-1] != '.':
         source_module += '.'
-    elif PYTHON_VERSION >= (3, 12):
-        source_module = sys._getframemodulename(  # type: ignore[attr-defined]
-            1) + '.'
-    else:
+    elif hasattr(sys, '_getframemodulename'):
+        source_module = sys._getframemodulename(1) + '.'
+    else:  # Python < 3.12 or GraalPy
         source_module = sys._getframe(1).f_globals['__name__'] + '.'
     if class_name:
         target_module += class_name + '.'

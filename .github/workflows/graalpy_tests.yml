@@ -21,19 +21,12 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 35
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - python-version: graalpy-24.1
-            os: macOS-latest
-            experimental: true
-          - python-version: graalpy-24.1
-          - python-version: graalpy-25.0
-            os: macOS-latest
-          - python-version: graalpy-25.0
-            experimental: true
+        python-version: [graalpy-23.1, graalpy-24.2, graalpy-25.0]
+        os: [macOS-latest, ubuntu-latest]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
@@ -41,7 +34,7 @@ jobs:
           submodules: true
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
@@ -60,7 +53,7 @@ jobs:
           pip install "charset_normalizer<=3.4.5"
           pip install "urllib3<2.7"
       - name: Install setuptools
-        if: matrix.python-version == 'graalpy-25.0'
+        if: ${{ startsWith(matrix.python-version, 'graalpy-25') }}
         run: pip install setuptools
       - name: Generate user files
         run: |
@@ -68,7 +61,6 @@ jobs:
       - name: Test with pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 25
         env:
           PYTHONWARNINGS: ignore:urllib3 v2 only supports OpenSSL
           PYTHONIOENCODING: utf-8
@@ -83,10 +75,12 @@ jobs:
             coverage run -m pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
           fi
       - name: Show coverage statistics
+        if: matrix.python-version != 'graalpy-25.0' || matrix.os != 'ubuntu-latest'
         run: |
           coverage combine || true
           coverage report
       - name: Upload coverage to Codecov
+        if: matrix.python-version != 'graalpy-25.0' || matrix.os != 'ubuntu-latest'
         uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

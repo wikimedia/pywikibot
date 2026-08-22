@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from datetime import timedelta
 from unittest.mock import patch
 
 import pywikibot
@@ -35,6 +36,95 @@ global_expected_params = {
     'inprop': ['protection'],
     'prop': ['info', 'imageinfo', 'categoryinfo'],
 }
+
+
+class TestPageReferences(TestCase):
+
+    """Offline tests for Site.pagereferences."""
+
+    family = 'wikipedia'
+    code = 'en'
+    dry = True
+
+    def setUp(self) -> None:
+        """Initialize the test site."""
+        super().setUp()
+        self.site = self.get_site()
+        self.target = pywikibot.Page(self.site, 'Target')
+
+    def _page(self, title: str, pageid: int) -> pywikibot.Page:
+        """Create a page with a known page ID."""
+        page = pywikibot.Page(self.site, title)
+        page._pageid = pageid
+        return page
+
+    def test_pagereferences_unique(self) -> None:
+        """Test overlapping sorted generators only yield unique pages."""
+        page_a = self._page('A', 1)
+        backlink_b = self._page('B', 3)
+        embedded_b = self._page('B', 3)
+        page_c = self._page('C', 4)
+
+        with (
+            patch.object(self.site, 'pagebacklinks',
+                         return_value=iter((page_a, backlink_b))),
+            patch.object(self.site, 'page_embeddedin',
+                         return_value=iter((embedded_b, page_c))),
+        ):
+            references = list(self.site.pagereferences(self.target, total=3))
+
+        self.assertEqual(references, [page_a, backlink_b, page_c])
+        self.assertIs(references[1], backlink_b)
+
+    def test_pagereferences_follow_redirects_unique(self) -> None:
+        """Test unsorted redirect backlinks only yield unique pages."""
+        backlink_c = self._page('C', 3)
+        backlink_a = self._page('A', 1)
+        embedded_a = self._page('A', 1)
+        embedded_b = self._page('B', 2)
+
+        with (
+            patch.object(self.site, 'pagebacklinks',
+                         return_value=iter((backlink_c, backlink_a))),
+            patch.object(self.site, 'page_embeddedin',
+                         return_value=iter((embedded_a, embedded_b))),
+        ):
+            references = list(self.site.pagereferences(
+                self.target, follow_redirects=True))
+
+        self.assertEqual(references, [backlink_c, backlink_a, embedded_b])
+
+
+class TestDrySiteGenerators(DefaultSiteTestCase):
+
+    """Offline tests for site generators."""
+
+    dry = True
+
+    def test_unconnected_non_strict(self) -> None:
+        """Test that the non-strict generator yields query pages."""
+        pages = [pywikibot.Page(self.site, title) for title in ('A', 'B')]
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site, 'querypage', return_value=iter(pages))
+            as querypage,
+        ):
+            result = list(self.site.unconnected_pages(total=2))
+
+        self.assertEqual(result, pages)
+        querypage.assert_called_once_with('UnconnectedPages', 2)
+
+    def test_reuses_namespace(self) -> None:
+        """Test that watchlist filtering retrieves the namespace once."""
+        page = pywikibot.Page(self.site, 'Test page')
+        gen = self.site.watched_pages(with_talkpage=False)
+
+        with patch.object(page, 'namespace',
+                          wraps=page.namespace) as namespace:
+            result = gen._check_result_namespace(page)
+
+        self.assertTrue(result)
+        namespace.assert_called_once_with()
 
 
 class TestSiteGenerators(DefaultSiteTestCase):
@@ -68,11 +158,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
         with skipping(ApiTimeoutError):
             embedded = set(self.site.page_embeddedin(self.mainpage,
                                                      namespaces=[0]))
-        refs = set(self.site.pagereferences(self.mainpage, namespaces=[0]))
+        refs = list(self.site.pagereferences(self.mainpage, namespaces=[0]))
+        unique_refs = set(refs)
 
-        self.assertLessEqual(backlinks, refs)
-        self.assertLessEqual(embedded, refs)
-        self.assertEqual(refs, backlinks | embedded)
+        self.assertLength(refs, len(unique_refs))
+        self.assertLessEqual(backlinks, unique_refs)
+        self.assertLessEqual(embedded, unique_refs)
+        self.assertEqual(unique_refs, backlinks | embedded)
 
     def test_backlinks(self) -> None:
         """Test Site.pagebacklinks."""
@@ -529,13 +621,28 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # starttime earlier than endtime
         with self.subTest(starttime=low, endtime=high, reverse=False), \
-                self.assertRaises(AssertionError):
+                self.assertRaises(ValueError):
             mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
         with self.subTest(starttime=high, endtime=low, reverse=True), \
-                self.assertRaises(AssertionError):
+                self.assertRaises(ValueError):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
+
+    def test_blocks_show(self) -> None:
+        """Test the site.blocks() show filter."""
+        mysite = self.get_site()
+
+        for filters, expected in (
+            ({}, []),
+            ({'ip': True, 'temp': False}, ['ip', '!temp']),
+            ({'account': False, 'ip_range': True}, ['!account', 'range']),
+        ):
+            with self.subTest(filters=filters):
+                generator = mysite.blocks(**filters)
+                options = generator.request['bkshow']
+                self.assertIsInstance(options, api.OptionSet)
+                self.assertCountEqual(options.api_iter(), expected)
 
     def test_exturlusage(self) -> None:
         """Test the site.exturlusage() method."""
@@ -622,24 +729,24 @@ class TestSiteGenerators(DefaultSiteTestCase):
         func = self.site.assert_valid_iter_params
 
         # reverse=False, is_ts=False
-        self.assertIsNone(func('m', 1, 2, False, False))
-        with self.assertRaises(AssertionError):
-            func('m', 2, 1, False, False)
+        self.assertIsNone(func('m', 1, 2, False, is_ts=False))
+        with self.assertRaises(ValueError):
+            func('m', 2, 1, False, is_ts=False)
 
         # reverse=False, is_ts=True
-        self.assertIsNone(func('m', 2, 1, False, True))
-        with self.assertRaises(AssertionError):
-            func('m', 1, 2, False, True)
+        self.assertIsNone(func('m', 2, 1, False, is_ts=True))
+        with self.assertRaises(ValueError):
+            func('m', 1, 2, False, is_ts=True)
 
         # reverse=True, is_ts=False
-        self.assertIsNone(func('m', 2, 1, True, False))
-        with self.assertRaises(AssertionError):
-            func('m', 1, 2, True, False)
+        self.assertIsNone(func('m', 2, 1, True, is_ts=False))
+        with self.assertRaises(ValueError):
+            func('m', 1, 2, True, is_ts=False)
 
         # reverse=True, is_ts=True
-        self.assertIsNone(func('m', 1, 2, True, True))
-        with self.assertRaises(AssertionError):
-            func('m', 2, 1, True, True)
+        self.assertIsNone(func('m', 1, 2, True, is_ts=True))
+        with self.assertRaises(ValueError):
+            func('m', 2, 1, True, is_ts=True)
 
 
 class TestUnconnectedPages(DefaultSiteTestCase):
@@ -871,13 +978,13 @@ class TestLogEvents(DefaultSiteTestCase):
                 '2008-02-03T00:00:01Z' <= str(entry.timestamp())
                 <= '2008-02-03T23:59:59Z')
         # starttime earlier than endtime
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.logevents(start=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T00:00:01Z'),
                              end=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T23:59:59Z'), total=5)
         # reverse: endtime earlier than starttime
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.logevents(start=pywikibot.Timestamp.fromISOformat(
                              '2008-02-03T23:59:59Z'),
                              end=pywikibot.Timestamp.fromISOformat(
@@ -900,54 +1007,43 @@ class TestRecentChanges(DefaultSiteTestCase):
     def test_time_range(self) -> None:
         """Test the site.recentchanges() method with start/end."""
         mysite = self.site
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-01T01:02:03Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertLessEqual(change['timestamp'], '2008-10-01T01:02:03Z')
-        for change in mysite.recentchanges(
-                end=pywikibot.Timestamp.fromISOformat('2008-04-01T02:03:04Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertGreaterEqual(change['timestamp'],
-                                    '2008-10-01T02:03:04Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-01T03:05:07Z'),
-                total=5, reverse=True):
-            self.assertIsInstance(change, dict)
-            self.assertGreaterEqual(change['timestamp'],
-                                    '2008-10-01T03:05:07Z')
-        for change in mysite.recentchanges(
-                end=pywikibot.Timestamp.fromISOformat('2008-10-01T04:06:08Z'),
-                total=5, reverse=True):
-            self.assertIsInstance(change, dict)
-            self.assertLessEqual(change['timestamp'], '2008-10-01T04:06:08Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-03T11:59:59Z'),
-                end=pywikibot.Timestamp.fromISOformat('2008-10-03T00:00:01Z'),
-                total=5):
-            self.assertIsInstance(change, dict)
-            self.assertTrue(
-                '2008-10-03T00:00:01Z' <= change['timestamp']
-                <= '2008-10-03T11:59:59Z')
-        for change in mysite.recentchanges(
-                start=pywikibot.Timestamp.fromISOformat(
-                    '2008-10-05T06:00:01Z'),
-                end=pywikibot.Timestamp.fromISOformat('2008-10-05T23:59:59Z'),
-                reverse=True, total=5):
-            self.assertIsInstance(change, dict)
-            self.assertTrue(
-                '2008-10-05T06:00:01Z' <= change['timestamp']
-                <= '2008-10-05T23:59:59Z')
+        recent_changes = list(mysite.recentchanges(total=1))
+        self.assertLength(recent_changes, 1)
+        anchor = pywikibot.Timestamp.fromISOformat(
+            recent_changes[0]['timestamp'])
+        older = anchor - timedelta(seconds=1)
+        newer = anchor + timedelta(seconds=1)
+
+        cases = (
+            ('newest-first start', {'start': newer}, None, newer),
+            ('newest-first end', {'end': older}, older, None),
+            ('newest-first range', {'start': newer, 'end': older},
+             older, newer),
+            ('oldest-first start', {'start': older, 'reverse': True},
+             older, None),
+            ('oldest-first end', {'end': newer, 'reverse': True},
+             None, newer),
+            ('oldest-first range',
+             {'start': older, 'end': newer, 'reverse': True}, older, newer),
+        )
+        for name, params, lower, upper in cases:
+            with self.subTest(name=name):
+                changes = list(mysite.recentchanges(total=1, **params))
+                self.assertLength(changes, 1)
+                self.assertIsInstance(changes[0], dict)
+                timestamp = pywikibot.Timestamp.fromISOformat(
+                    changes[0]['timestamp'])
+                if lower is not None:
+                    self.assertGreaterEqual(timestamp, lower)
+                if upper is not None:
+                    self.assertLessEqual(timestamp, upper)
+
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.recentchanges(start='2008-02-03T00:00:01Z',
                                  end='2008-02-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat(
                                  '2008-02-03T23:59:59Z'),
                                  end=pywikibot.Timestamp.fromISOformat(
@@ -1177,6 +1273,32 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
             self.assertIsInstance(contrib, dict)
             self.assertNotIn('minor', contrib)
 
+    def test_show_new(self) -> None:
+        """Test the site.usercontribs() method using showMinor."""
+        mysite = self.get_site()
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           new=True, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertIn('new', contrib)
+
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           new=False, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertNotIn('new', contrib)
+
+    def test_show_top(self) -> None:
+        """Test the site.usercontribs() method using showMinor."""
+        mysite = self.get_site()
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           top=True, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertIn('top', contrib)
+
+        for contrib in mysite.usercontribs(user=mysite.user(),
+                                           top=False, total=5):
+            self.assertIsInstance(contrib, dict)
+            self.assertNotIn('top', contrib)
+
 
 class TestUserContribsWithoutUser(DefaultSiteTestCase):
 
@@ -1252,12 +1374,12 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
         """Test the site.usercontribs() method with invalid parameters."""
         mysite = self.get_site()
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.usercontribs(userprefix='Jim',
                                 start='2008-10-03T00:00:01Z',
                                 end='2008-10-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.usercontribs(userprefix='Jim',
                                 start='2008-10-03T23:59:59Z',
                                 end='2008-10-03T00:00:01Z',
@@ -1409,14 +1531,14 @@ class TestAlldeletedrevisionsAsUser(DefaultSiteTestCase):
         """Test site.alldeletedrevisions() method with invalid range."""
         mysite = self.get_site()
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             adrgen = mysite.alldeletedrevisions(user=mysite.user(),
                                                 start='2008-10-03T00:00:01Z',
                                                 end='2008-10-03T23:59:59Z',
                                                 total=5)
             next(adrgen)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             adrgen = mysite.alldeletedrevisions(user=mysite.user(),
                                                 start='2008-10-03T23:59:59Z',
                                                 end='2008-10-03T00:00:01Z',
@@ -1491,11 +1613,11 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
                 '2008-10-15T06:00:01Z' <= rev['timestamp']
                 <= '2008-10-15T23:59:59Z')
         # start earlier than end
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.watchlist_revs(start='2008-09-03T00:00:01Z',
                                   end='2008-09-03T23:59:59Z', total=5)
         # reverse: end earlier than start
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             mysite.watchlist_revs(start='2008-09-03T23:59:59Z',
                                   end='2008-09-03T00:00:01Z',
                                   reverse=True, total=5)

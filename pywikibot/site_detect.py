@@ -61,6 +61,7 @@ class MWSite:
         self.server = wp.server
         self.scriptpath = wp.scriptpath
         self.articlepath = None
+        self.private_wiki = None
 
         if self.api:
             try:
@@ -69,6 +70,7 @@ class MWSite:
                 raise
             except Exception as e:
                 pywikibot.log(f'MW detection failed: {e!r}')
+                self.private_wiki = e
 
             if not self.version:
                 self._fetch_old_version()
@@ -80,6 +82,9 @@ class MWSite:
             raise RuntimeError(f'Unsupported version: {self.version}')
 
         if not self.articlepath:
+            if isinstance(self.private_wiki, Exception):
+                raise self.private_wiki
+
             if not self.private_wiki:
                 raise RuntimeError(
                     f'Unable to determine articlepath: {self.fromurl}')
@@ -121,10 +126,11 @@ class MWSite:
                     # Fallback for old versions which didn't wrap help in json
                     d = {'error': {'*': r.text}}
 
-                self.version = list(filter(
-                    lambda x: x.startswith('MediaWiki'),
-                    (line.strip()
-                     for line in d['error']['*'].split('\n'))))[0].split()[1]
+                lines = (line.strip()
+                         for line in d['error']['*'].split('\n'))
+                self.version = next(
+                    line.split()[1] for line in lines
+                    if line.startswith('MediaWiki'))
             except Exception:
                 pass
             else:

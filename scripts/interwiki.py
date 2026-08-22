@@ -1017,7 +1017,7 @@ class Subject(interwiki_graph.Subject):
         return (False, None)
 
     def isIgnored(self, page) -> bool:
-        """Return True if pages is to be ignored."""
+        """Return True if page is to be ignored."""
         code = page.site.code
 
         if code in self.conf.neverlink:
@@ -1469,6 +1469,9 @@ class Subject(interwiki_graph.Subject):
             return
 
         if self.forcedStop:  # autonomous with problem
+            if config.interwiki_graph:
+                graphDrawer = interwiki_graph.GraphDrawer(self)
+                graphDrawer.createGraph()
             pywikibot.info(f'======Aborted processing {self.origin}======')
             return
 
@@ -1659,7 +1662,7 @@ class Subject(interwiki_graph.Subject):
         del new[page.site]
         # Do not add interwiki links to foreign families that page.site() does
         # not forward to
-        for stmp in new:
+        for stmp in list(new):
             if stmp.family != page.site.family \
                and stmp.family.name != page.site.family.interwiki_forward:
                 del new[stmp]

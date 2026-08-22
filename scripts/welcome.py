@@ -538,6 +538,7 @@ class WelcomeBot(SingleSiteBot):
         super().__init__(**kwargs)
         self.bname: dict[str, str] = {}
 
+        self._BAQueue: list[str] = []
         self.welcomed_users: list[str] = []
         self.log_name = i18n.translate(self.site, LOGBOOK)
 
@@ -655,13 +656,10 @@ class WelcomeBot(SingleSiteBot):
             self.show_status()
             pywikibot.info(f'{name} is possibly an unwanted username. It will'
                            ' be reported.')
-            if hasattr(self, '_BAQueue'):
-                self._BAQueue.append(name)
-            else:
-                self._BAQueue = [name]
+            self._BAQueue.append(name)
 
-        if len(self._BAQueue) >= globalvar.dump_to_log:
-            self.report_bad_account()
+            if len(self._BAQueue) >= globalvar.dump_to_log:
+                self.report_bad_account()
 
     def report_bad_account(self) -> None:
         """Report bad account."""
@@ -696,7 +694,7 @@ class WelcomeBot(SingleSiteBot):
                          minor=True)
             self.show_status(Msg.DONE)
             pywikibot.info('Reported')
-        self.BAQueue = []
+        self._BAQueue.clear()
 
     def makelogpage(self) -> None:
         """Make log page."""
@@ -794,8 +792,8 @@ class WelcomeBot(SingleSiteBot):
                 pywikibot.error('No fileName!')
                 raise FilenameNotSet('No signature filename specified.')
 
-            sign_text = f.read()
-            f.close()
+            with f:
+                sign_text = f.read()
         else:
             # Read from wiki page
             sign_page_name = i18n.translate(self.site, RANDOM_SIGN)
@@ -837,10 +835,10 @@ class WelcomeBot(SingleSiteBot):
             self.show_status(Msg.SKIP)
             pywikibot.info(f'{user.username} might be a global bot!')
 
-        elif user.editCount() < globalvar.attach_edit_count:
-            if user.editCount() != 0:
+        elif (edit_count := user.editCount()) < globalvar.attach_edit_count:
+            if edit_count != 0:
                 self.show_status(Msg.IGNORE)
-                pywikibot.info(f'{user.username} has only {user.editCount()}'
+                pywikibot.info(f'{user.username} has only {edit_count}'
                                ' contributions.')
             elif not globalvar.quiet:
                 self.show_status(Msg.IGNORE)
@@ -905,7 +903,7 @@ class WelcomeBot(SingleSiteBot):
                     f'Putting the log of the latest {welcomed_count} users...')
             self.makelogpage()
 
-        if hasattr(self, '_BAQueue'):
+        if self._BAQueue:
             self.show_status()
             pywikibot.info('Putting bad name to report page...')
             self.report_bad_account()

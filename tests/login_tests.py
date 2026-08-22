@@ -11,17 +11,19 @@ e.g. used to test password-file based login.
 from __future__ import annotations
 
 import builtins
+import datetime
 import unittest
 import uuid
 from collections import defaultdict
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 from pywikibot.exceptions import NoUsernameError
-from pywikibot.login import LoginManager
+from pywikibot.login import ClientLoginManager, LoginManager
 from pywikibot.tools import PYTHON_VERSION
-from tests.aspects import DefaultDrySiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
 
 
 class FakeFamily:
@@ -52,7 +54,7 @@ class FakeConfig:
 
 @mock.patch('pywikibot.Site', FakeSite)
 @mock.patch('pywikibot.login.config', FakeConfig)
-class TestOfflineLoginManager(DefaultDrySiteTestCase):
+class TestOfflineLoginManager(DefaultSiteTestCase):
 
     """Test offline operation of login.LoginManager."""
 
@@ -88,10 +90,51 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
         self.assertEqual(lm.username, FakeUsername)
 
 
+class TestClientLoginManager(TestCase):
+
+    """Test offline ClientLoginManager behavior."""
+
+    net = False
+
+    def test_reuses_retry_time(self) -> None:
+        """Test that retry calculation uses one time snapshot."""
+        now = datetime.datetime(2026, 1, 1, 12)
+        manager = object.__new__(ClientLoginManager)
+        manager.site = SimpleNamespace()
+        manager.login_name = None
+        manager.password = None
+        manager._waituntil = now + datetime.timedelta(seconds=10)
+        clock = mock.Mock(side_effect=[
+            now,
+            now + datetime.timedelta(seconds=4),
+        ])
+        # Replacing datetime.datetime mutates the shared datetime module and
+        # breaks PyPy's datetime comparison type check.
+        datetime_module = SimpleNamespace(
+            datetime=SimpleNamespace(now=clock),
+            timedelta=datetime.timedelta,
+        )
+
+        with (
+            mock.patch('pywikibot.login.datetime', datetime_module),
+            mock.patch('pywikibot.login.pywikibot.sleep') as sleep,
+            mock.patch('pywikibot.login.pywikibot.warning') as warning,
+            self.assertRaisesRegex(RuntimeError, 'login_name'),
+        ):
+            manager.login_to_site()
+
+        clock.assert_called_once_with()
+        sleep.assert_called_once_with(10)
+        warning.assert_called_once_with(
+            'Too many tries, waiting 10 seconds before retrying.')
+
+
 @mock.patch('pywikibot.Site', FakeSite)
-class TestPasswordFile(DefaultDrySiteTestCase):
+class TestPasswordFile(DefaultSiteTestCase):
 
     """Test parsing password files."""
+
+    dry = True
 
     def patch(self, name):
         """Patch up <name> in self.setUp."""

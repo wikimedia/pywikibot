@@ -640,7 +640,7 @@ class InteractiveReplace:
     (The boolean values are the default values)
 
     It has also a ``context`` attribute which must be a non-negative
-    integer. If it is greater 0 it shows that many characters before and
+    integer. If it is greater than 0 it shows that many characters before and
     after the link in question. The ``context_delta`` attribute can be
     defined too and adds an option to increase ``context`` by the given
     amount each time the option is selected.

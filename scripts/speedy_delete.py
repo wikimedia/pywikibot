@@ -328,10 +328,13 @@ class SpeedyBot(SingleSiteBot, ExistingPageBot):
 
     def guess_reason_for_deletion(self, page):
         """Find a default reason for speedy deletion."""
-        # TODO: The following check loads the page 2 times.
-        # Find a better way to do it.
-        if page.isTalkPage() and (page.toggleTalkPage().isRedirectPage()
-                                  or not page.toggleTalkPage().exists()):
+        subject_page = None
+        if page.isTalkPage():
+            subject_page = page.toggleTalkPage()
+
+        if (subject_page is not None
+                and (subject_page.isRedirectPage()
+                     or not subject_page.exists())):
             # This is probably a talk page that is orphaned because we
             # just deleted the associated article.
             reason = i18n.translate(self.site, self.talk_deletion_msg,

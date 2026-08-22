@@ -88,10 +88,7 @@ class TrackingParamRemoverBot(
             return urllib.parse.urlunparse(url)
 
         new_query = urllib.parse.urlencode(filtered_params)
-
-        new_url = urllib.parse.urlunparse(url._replace(query=new_query))
-
-        return new_url
+        return urllib.parse.urlunparse(url._replace(query=new_query))
 
     def treat_page(self) -> None:
         """Treat a page."""

@@ -165,7 +165,7 @@ def Site(code: str | None = None,  # noqa: N802
 
         site = pywikibot.Site('wikisource:fr')
 
-    .. note:: An already created site is cached an a new variable points
+    .. note:: An already created site is cached and a new variable points
        to the same object if interface, family, code and user are equal:
 
     >>> import pywikibot

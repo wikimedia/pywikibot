@@ -148,6 +148,8 @@ class CategoryRedirectBot(
             'newCatTitle': new_cat_title,
         }
         summary = edit_summary % param
+        old_cat_link = old_cat.title(as_link=True, textlink=True)
+        new_cat_link = new_cat.title(as_link=True, textlink=True)
 
         # Move articles
         found, moved = 0, 0
@@ -158,8 +160,8 @@ class CategoryRedirectBot(
             else:
                 self.edit_requests.append({
                     'title': article.title(as_link=True, textlink=True),
-                    'oldcat': old_cat.title(as_link=True, textlink=True),
-                    'newcat': new_cat.title(as_link=True, textlink=True)}
+                    'oldcat': old_cat_link,
+                    'newcat': new_cat_link}
                 )
 
             if article.namespace() != 10:
@@ -179,8 +181,8 @@ class CategoryRedirectBot(
                 else:
                     self.edit_requests.append({
                         'title': doc.title(as_link=True, textlink=True),
-                        'oldcat': old_cat.title(as_link=True, textlink=True),
-                        'newcat': new_cat.title(as_link=True, textlink=True)}
+                        'oldcat': old_cat_link,
+                        'newcat': new_cat_link}
                     )
 
         if found:

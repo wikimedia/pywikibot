@@ -34,7 +34,7 @@ from pywikibot.tools import (
     deprecated_signature,
     is_ip_address,
 )
-from pywikibot.tools.itertools import filter_unique
+from pywikibot.tools.itertools import filter_unique, union_generators
 
 
 if typing.TYPE_CHECKING:
@@ -400,8 +400,13 @@ class GeneratorsMixin:
     ) -> Iterable[pywikibot.Page]:
         """Convenience method combining pagebacklinks and page_embeddedin.
 
+        .. version-changed:: 11.7
+           Duplicate pages are no longer yielded when backlinks and template
+           inclusions overlap.
+
         :param namespaces: If present, only return links from the
             namespaces in this list.
+        :param total: Maximum number of unique pages to retrieve in total.
         :raises KeyError: A namespace identifier was not resolved
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -416,16 +421,24 @@ class GeneratorsMixin:
                                       filter_redirects=filter_redirects,
                                       namespaces=namespaces, total=total,
                                       content=content)
-        return itertools.islice(
-            itertools.chain(
-                self.pagebacklinks(
-                    page, follow_redirects=follow_redirects,
-                    filter_redirects=filter_redirects,
-                    namespaces=namespaces, content=content),
-                self.page_embeddedin(
-                    page, filter_redirects=filter_redirects,
-                    namespaces=namespaces, content=content)
-            ), total)
+        generators = (
+            self.pagebacklinks(
+                page, follow_redirects=follow_redirects,
+                filter_redirects=filter_redirects,
+                namespaces=namespaces, content=content),
+            self.page_embeddedin(
+                page, filter_redirects=filter_redirects,
+                namespaces=namespaces, content=content),
+        )
+        if follow_redirects:
+            # Following redirects chains multiple sorted backlink generators,
+            # so the resulting iterable itself is not necessarily sorted.
+            references = filter_unique(
+                itertools.chain(*generators), key=lambda item: item.pageid)
+        else:
+            references = union_generators(
+                *generators, key=lambda item: item.pageid)
+        return itertools.islice(references, total)
 
     def pagelinks(
         self,
@@ -1251,6 +1264,11 @@ class GeneratorsMixin:
         users: str | Iterable[str] | None = None,
         iprange: str | None = None,
         total: int | None = None,
+        *,
+        account: bool | None = None,
+        ip: bool | None = None,
+        ip_range: bool | None = None,
+        temp: bool | None = None,
     ) -> Iterable[dict[str, Any]]:
         """Iterate all current blocks, in order of creation.
 
@@ -1265,6 +1283,9 @@ class GeneratorsMixin:
         .. warning::
            ``iprange`` parameter cannot be used together with ``users``.
 
+        .. version-changed:: 11.7
+           The *account*, *ip*, *ip_range* and *temp* parameters were added.
+
         :param starttime: Start iterating at this Timestamp
         :param endtime: Stop iterating at this Timestamp
         :param reverse: If True, iterate oldest blocks first (default: newest)
@@ -1274,6 +1295,14 @@ class GeneratorsMixin:
         :param iprange: A single IP or an IP range. Ranges broader than
             IPv4/16 or IPv6/19 are not accepted.
         :param total: Total amount of block entries
+        :param account: If ``True``, only iterate account blocks; if ``False``,
+            only iterate non-account blocks; if ``None``, iterate both.
+        :param ip: If ``True``, only iterate IP blocks; if ``False``, only
+            iterate non-IP blocks; if ``None``, iterate both.
+        :param ip_range: If ``True``, only iterate range blocks; if ``False``,
+            only iterate non-range blocks; if ``None``, iterate both.
+        :param temp: If ``True``, only iterate temporary blocks; if ``False``,
+            only iterate permanent blocks; if ``None``, iterate both.
         """
         if starttime and endtime:
             self.assert_valid_iter_params('blocks', starttime, endtime,
@@ -1301,6 +1330,14 @@ class GeneratorsMixin:
             bkgen.request['bkusers'] = users
         elif iprange:
             bkgen.request['bkip'] = iprange
+        filters = {
+            'account': account,
+            'ip': ip,
+            'range': ip_range,
+            'temp': temp,
+        }
+        bkgen.request['bkshow'] = api.OptionSet(self, 'blocks', 'show',
+                                                filters)
         return bkgen
 
     def exturlusage(
@@ -1471,12 +1508,11 @@ class GeneratorsMixin:
         if start and end:
             self.assert_valid_iter_params('abuselog', start, end, reverse)
 
-        gen = self._generator(api.ListGenerator, type_arg='abuselog',
-                              afluser=user, total=total,
-                              aflstart=start, aflend=end,
-                              afldir=('newer' if reverse else 'older'),
-                              **kwargs)
-        return gen
+        return self._generator(api.ListGenerator, type_arg='abuselog',
+                               afluser=user, total=total,
+                               aflstart=start, aflend=end,
+                               afldir=('newer' if reverse else 'older'),
+                               **kwargs)
 
     def recentchanges(
         self,
@@ -1638,8 +1674,10 @@ class GeneratorsMixin:
                                parameters=parameters)
 
     @deprecated_args(top_only='top')  # since 11.6.0
+    @deprecated_signature(since='10.7.0')
     def usercontribs(
         self,
+        *,
         user: str | None = None,
         userprefix: str | None = None,
         start: pywikibot.time.Timestamp | datetime | str | None = None,
@@ -1649,7 +1687,10 @@ class GeneratorsMixin:
         minor: bool | None = None,
         total: int | None = None,
         top: bool | None = None,
-        *,
+        # old kw args below
+        new: bool | None = None,
+        patrolled: bool | None = None,
+        autopatrolled: bool | None = None,
         prop: Iterable[str] | str | None = None,
         formatversion: int = 1
     ) -> Iterable[dict[str, Any]]:
@@ -1659,36 +1700,55 @@ class GeneratorsMixin:
 
         .. seealso::
            - :api:`Usercontribs`
+           - :meth:`pywikibot.User.contribs`
            - :meth:`pywikibot.User.contributions`
 
         .. version-changed:: 3.0.20200609
            The *showMinor* parameter was renamed to *minor*.
+
         .. version-changed:: 11.6
-           The *prop* and *formatversion* parameter were added. The
+           The *prop* and *formatversion* parameters were added. The
            *top_only* was renamed to *top*. This parameter now accepts
            ``None`` to iterate both latest and non-latest contributions.
            ``False`` now iterates only non-latest contributions. Default
            is ``None``. The ``size`` property is included by default.
 
-        :param user: Iterate contributions by this user (name or IP)
+        .. version-changed:: 11.7
+           All parameters are keyword-only now. The *new*, *patrolled*,
+           and *autopatrolled* parameters were added.
+
+        :param user: Iterate contributions by this user (name or IP).
         :param userprefix: Iterate contributions by all users whose
-            names or IPs start with this substring
-        :param start: Iterate contributions starting at this Timestamp
-        :param end: Iterate contributions ending at this Timestamp
+            names or IPs start with this substring.
+        :param start: Iterate contributions starting at this Timestamp.
+        :param end: Iterate contributions ending at this Timestamp.
         :param reverse: Iterate oldest contributions first (default:
-            newest)
-        :param namespaces: Only iterate pages in these namespaces
+            newest).
+        :param namespaces: Only iterate pages in these namespaces.
         :param minor: If ``True``, iterate only minor edits; if ``False``
             and not ``None``, iterate only non-minor edits (default:
-            iterate both)
-        :param total: Limit result to this number of pages
+            iterate both).
+        :param total: Limit result to this number of pages.
         :param top: if ``True``, iterate only edits which are the latest
             revision; if ``False``, do not iterate last revision edits;
-            ``None`` to iterate both (default: ``None``)
+            ``None`` to iterate both (default: ``None``).
+        :param new: If ``True``, iterate only edits creating new pages;
+            if ``False``, iterate only edits to existing pages; if
+            ``None``, iterate both.
+        :param patrolled: If ``True``, iterate only edits that have been
+            patrolled (either manually or automatically; use the
+            *autopatrolled* parameter to control how); if ``False``,
+            iterate only edits that haven't been patrolled yet; if
+            ``None``, iterate both; both ``True`` or ``False`` exclude
+            edits older than ``$wgRCMaxAge``.
+        :param autopatrolled: If ``True``, iterate only autopatrolled
+            edits; if ``False``, iterate only edits that weren't
+            autopatrolled; if ``None``, iterate both; both ``True`` or
+            ``False`` exclude edits older than ``$wgRCMaxAge``.
         :param prop: Include additional pieces of information. Refer
             :api:`Usercontribs` for the elements and the default setting.
         :param formatversion: The API format version to use for the
-            response. (``1`` by deault)
+            response. (``1`` by default)
         :raises pywikibot.exceptions.Error: either user or userprefix
             must be non-empty
         :raises KeyError: A namespace identifier was not resolved
@@ -1718,9 +1778,15 @@ class GeneratorsMixin:
             ucgen.request['ucuserprefix'] = userprefix
         if reverse:
             ucgen.request['ucdir'] = 'newer'
-        option_set = api.OptionSet(self, 'usercontribs', 'show')
-        option_set['minor'] = minor
-        option_set['top'] = top
+
+        filters = {
+            'minor': minor,
+            'top': top,
+            'new': new,
+            'patrolled': patrolled,
+            'autopatrolled': autopatrolled,
+        }
+        option_set = api.OptionSet(self, 'usercontribs', 'show', filters)
         ucgen.request['ucshow'] = option_set
         return ucgen
 
@@ -2033,7 +2099,7 @@ class GeneratorsMixin:
             to be patrolled.
         :param revid: An int/string/iterable/iterator providing revid of pages
             to be patrolled.
-        :param revision: An Revision/iterable/iterator providing Revision
+        :param revision: A Revision/iterable/iterator providing Revision
             object of pages to be patrolled.
         """
         # If patrol is not enabled, attr will be set the first time a
@@ -2483,7 +2549,7 @@ class GeneratorsMixin:
         def ignore_talkpages(page: pywikibot.page.BasePage) -> bool:
             """Ignore talk pages and special pages."""
             ns = page.namespace()
-            return ns >= 0 and not page.namespace() % 2
+            return ns >= 0 and not ns % 2
 
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',

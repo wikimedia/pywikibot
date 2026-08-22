@@ -16,17 +16,19 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.page import Link, Page, SiteLink
 from pywikibot.site import Namespace
 from tests.aspects import (
-    AlteredDefaultSiteTestCase,
-    DefaultDrySiteTestCase,
+    DefaultSiteTestCase,
+    SiteConfigTestCase,
     TestCase,
     WikimediaDefaultSiteTestCase,
     unittest,
 )
 
 
-class TestCreateSeparated(DefaultDrySiteTestCase):
+class TestCreateSeparated(DefaultSiteTestCase):
 
     """Test ``Link.create_separated``."""
+
+    dry = True
 
     def _test_link(self, link, page, section, label) -> None:
         """Test the separate contents of the link."""
@@ -57,7 +59,7 @@ class TestCreateSeparated(DefaultDrySiteTestCase):
 # ---- Tests checking if the parser does (not) accept (in)valid titles
 
 
-class TestLink(DefaultDrySiteTestCase):
+class TestLink(DefaultSiteTestCase):
 
     """Test parsing links with DrySite.
 
@@ -66,6 +68,8 @@ class TestLink(DefaultDrySiteTestCase):
     when the actual default site is using completely different
     namespaces.
     """
+
+    dry = True
 
     def replaced(self, iterable):
         """Replace family specific title delimiter."""
@@ -213,9 +217,11 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(abs_link.title, '/bar')
 
 
-class Issue10254TestCase(DefaultDrySiteTestCase):
+class Issue10254TestCase(DefaultSiteTestCase):
 
     """Test T102461 (Python issue 10254)."""
+
+    dry = True
 
     def test_no_change(self) -> None:
         """Test T102461 (Python issue 10254) is not encountered."""
@@ -226,7 +232,7 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
-class LinkTestCase(AlteredDefaultSiteTestCase):
+class LinkTestCase(SiteConfigTestCase):
 
     """Cached API test for link tests."""
 
@@ -859,7 +865,7 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         self.assertTrue(link._is_interwiki)
 
     def test_other_wiki_prefix(self) -> None:
-        """Test that Link fails if the interwiki prefix is a unknown family.
+        """Test that Link fails if the interwiki prefix is an unknown family.
 
         Sometimes *bulba* does not return a json content but a security
         script. api.Request._json_loads raises a

@@ -190,7 +190,8 @@ class WikiBlameMixin:
 
             pywikibot.sleep(pywikibot.config.retry_wait)
         else:
-            raise pywikibot.exceptions.ApiTimeoutError('WikiHistory Timeout')
+            raise pywikibot.exceptions.ApiTimeoutError(
+                'WikiHistory Timeout', site=self.site, uri=url)
 
         length = len(self.text)
         result: list[list[str]] = []
@@ -265,9 +266,8 @@ class WikiWhoMixin:
         article_title = self.title(with_ns=False, with_section=False)
         encoded_title = urllib.parse.quote(article_title, safe='')
         base_url = 'https://wikiwho-api.wmcloud.org'
-        url = (f'{base_url}/{self.site.code}/api/v1.0.0-beta/{endpoint}/'
-               f'{encoded_title}/')
-        return url
+        return (f'{base_url}/{self.site.code}/api/v1.0.0-beta/{endpoint}/'
+                f'{encoded_title}/')
 
     def get_annotations(self, *, use_cache: bool = True) -> dict[str, Any]:
         """Get WikiWho annotations for article revisions.
@@ -377,6 +377,4 @@ class WikiWhoMixin:
         subdirectory = (page_id // 1000) * 1000
 
         # Construct path: cache_dir/lang/subdirectory/page_id.p
-        pickle_path = cache_dir / lang / str(subdirectory) / f'{page_id}.p'
-
-        return pickle_path
+        return cache_dir / lang / str(subdirectory) / f'{page_id}.p'

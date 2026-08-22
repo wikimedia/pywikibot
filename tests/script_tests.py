@@ -147,8 +147,7 @@ skip_on_results = {
 
 def collector() -> Iterator[str]:
     """Generate test fully qualified names from test classes."""
-    test_cls = TestScriptHelp, TestScriptSimulate, TestScriptGenerator
-    for cls in test_cls[:1]:  # ignore tests on unittest due to T414170
+    for cls in TestScriptHelp, TestScriptSimulate, TestScriptGenerator:
         for name in cls._script_list:
             name = '_' + name if name == 'login' else name
             yield f'tests.script_tests.{cls.__name__}.test_{name}'
@@ -207,6 +206,7 @@ class ScriptTestMeta(MetaTestCaseClass):
 
             is_autorun = ('-help' not in args
                           and script_name in auto_run_script_set)
+            has_generator = '-always' in args
 
             def test_script(self) -> None:
                 global_args_msg = \
@@ -215,11 +215,13 @@ class ScriptTestMeta(MetaTestCaseClass):
 
                 cmd = [*global_args, script_name, *args]
                 data_in = script_input.get(script_name)
-                if isinstance(self._timeout, bool):
-                    do_timeout = self._timeout
+
+                if type(self._timeout) in (int, float):
+                    timeout = self._timeout
+                elif isinstance(self._timeout, bool):
+                    timeout = 10 if self._timeout else None
                 else:
-                    do_timeout = script_name in self._timeout
-                timeout = 10 if do_timeout else None
+                    timeout = 10 if script_name in self._timeout else None
 
                 stdout, error = None, None
                 if self._results:
@@ -235,12 +237,22 @@ class ScriptTestMeta(MetaTestCaseClass):
                     test_overrides['pywikibot.Site'] = 'lambda *a, **k: None'
 
                 # run the script
-                result = execute_pwb(cmd, data_in=data_in, timeout=timeout,
-                                     overrides=test_overrides)
+                result = execute_pwb(
+                    cmd,
+                    data_in=data_in,
+                    timeout=timeout,
+                    overrides=test_overrides,
+                )
 
                 err_result = result['stderr']
                 out_result = result['stdout']
                 stderr_other = err_result.splitlines()
+
+                if timeout_error := result['timeout']:
+                    unittest_print(
+                        f' timeout after {timeout_error.timeout} s',
+                        end='  '
+                    )
 
                 if result['exit_code'] == -9:
                     unittest_print(' killed', end='  ')
@@ -250,6 +262,8 @@ class ScriptTestMeta(MetaTestCaseClass):
                     self.skipTest(skip_result)
 
                 if error:
+                    if has_generator and timeout_error:
+                        self.skipTest(timeout_error)
                     self.assertIn(error, err_result)
                     exit_codes = [0, 1, 2, -9]
 
@@ -361,8 +375,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
     scripts run in pwb can automatically login using the saved cookies.
     """
 
-    __test__ = False  # Ignore this test on pytest due to T414170
-
     login = True
 
     _expected_failures = {
@@ -405,8 +417,6 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
                           metaclass=ScriptTestMeta):
 
     """Test cases for running scripts with a generator."""
-
-    __test__ = False  # Ignore this test on pytest due to T414170
 
     login = True
 
@@ -465,7 +475,7 @@ class TestScriptGenerator(DefaultSiteTestCase, PwbTestCase,
     _arguments = '-simulate -page:Foobar -always -site:wikipedia:en'
     _results = ("Working on 'Foobar'", 'Script terminated successfully')
     _skip_results = {}
-    _timeout = True
+    _timeout = 15
     _script_list = filter_scripts(_allowed_failures, exclude_auto_run=True)
 
 

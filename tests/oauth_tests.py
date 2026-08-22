@@ -9,18 +9,14 @@ from __future__ import annotations
 
 import os
 import time
+import unittest
 from contextlib import suppress
 
 import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import EditConflictError
 from pywikibot.login import OauthLoginManager
-from tests.aspects import (
-    DefaultSiteTestCase,
-    TestCase,
-    require_modules,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, TestCase, require_modules
 
 
 @require_modules('mwoauth')

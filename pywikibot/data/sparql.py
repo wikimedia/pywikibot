@@ -92,7 +92,7 @@ class SparqlQuery(WaitingMixin):
                query: str,
                full_data: bool = False,
                headers: dict[str, str] | None = None
-               ) -> list[dict[str, str]] | None:
+               ) -> list[dict[str, Any]] | None:
         """Run SPARQL query and return the result.
 
         The response is assumed to be in format defined by:
@@ -157,7 +157,7 @@ class SparqlQuery(WaitingMixin):
                     raise
             else:
                 break
-            self.wait()
+            self.wait(uri=url)
 
         try:
             return self.last_response.json()

@@ -34,6 +34,7 @@ from pywikibot.tools.itertools import (
     intersect_generators,
     islice_with_ellipsis,
     roundrobin_generators,
+    union_generators,
 )
 from tests import join_xml_data_path
 from tests.aspects import TestCase
@@ -218,6 +219,22 @@ class OpenArchiveWriteTestCase(TestCase):
         with tools.open_archive(self.base_file, 'r') as f:
             self.assertEqual(f.mode, 'rb')
             self.assertIsInstance(f.read(), bytes)
+
+    def test_write_archive_uncompressed(self) -> None:
+        """Test writing an uncompressed file."""
+        content = self._write_content('')
+        self.assertEqual(content, self.original_content)
+
+    def test_append_archive_uncompressed(self) -> None:
+        """Test appending to an uncompressed file."""
+        with tempfile.TemporaryDirectory() as directory:
+            filename = os.path.join(directory, 'archive')
+            with open(filename, 'wb') as f:
+                f.write(b'foo')
+            with tools.open_archive(filename, 'ab') as f:
+                f.write(b'bar')
+            with open(filename, 'rb') as f:
+                self.assertEqual(f.read(), b'foobar')
 
     def test_write_archive_bz2(self) -> None:
         """Test writing a bz2 archive."""
@@ -829,6 +846,14 @@ class TestMergeGenerator(TestCase):
         self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
         result = ''.join(roundrobin_generators('HlWrd', 'e', 'lool'))
         self.assertEqual(result, 'HelloWorld')
+
+    def test_union_generators_is_lazy(self) -> None:
+        """Test that duplicate groups are processed lazily."""
+        source = iter([1, 1, 1, 2])
+        generator = union_generators(source)
+
+        self.assertEqual(next(generator), 1)
+        self.assertEqual(next(source), 1)
 
 
 class TestIsIpAddress(TestCase):

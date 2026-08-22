@@ -496,6 +496,8 @@ html_css_files = [
 extlinks = {
     # MediaWiki API
     'api': ('https://www.mediawiki.org/wiki/API:%s', 'API:%s'),
+    # MediaWiki Extension
+    'ext': ('https://www.mediawiki.org/wiki/Extension:%s', 'Extension:%s'),
     # Python bug tracker
     'issue': ('https://github.com/python/cpython/issues/%s',
               'Python issue %s'),

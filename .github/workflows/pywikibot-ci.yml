@@ -23,7 +23,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 90
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -81,7 +81,7 @@ jobs:
           submodules: true
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
@@ -116,7 +116,7 @@ jobs:
           NO_PROXY: ""
         run: |
           if  [ ${{matrix.family || 0}} == wpbeta ]; then
-            python pwb.py generate_family_file http://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
+            python pwb.py generate_family_file https://${{matrix.code}}.wikipedia.beta.wmcloud.org/ wpbeta y
           fi
       - name: Generate user files
         run: |
@@ -141,9 +141,9 @@ jobs:
       - name: Test with unittest or pytest
         id: ci_test
         continue-on-error: true
-        timeout-minutes: 60
         env:
           PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
+          PYWIKIBOT_TEST_DEFAULT_ONLY: ${{ (matrix.site == 'wikisource:zh' || matrix.test_default_only) && 1 || 0 }}
           # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
           PYTHON_GIL: ${{ endsWith(matrix.python-version, 't') && '0' || '1' }}
           HTTP_PROXY: socks5h://127.0.0.1:1080

@@ -45,7 +45,7 @@ class Win32UI(terminal_interface_base.UI):
         """Set the new color."""
         fg, bg = self.divide_color(color)
         windows_color = windowsColors[fg]
-        # Merge foreground/backgroung color if needed.
+        # Merge foreground/background color if needed.
         if bg is not None:
             windows_color = windowsColors[bg] << 4 | windows_color
 

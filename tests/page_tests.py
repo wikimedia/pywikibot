@@ -10,6 +10,7 @@ from __future__ import annotations
 import pickle
 import re
 import time
+import unittest
 from contextlib import suppress
 from datetime import timedelta
 from unittest import mock
@@ -30,13 +31,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
-from tests.aspects import (
-    DefaultDrySiteTestCase,
-    DefaultSiteTestCase,
-    SiteAttributeTestCase,
-    TestCase,
-    unittest,
-)
+from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 from tests.utils import skipping
 
 
@@ -174,6 +169,23 @@ class TestLinkObject(SiteAttributeTestCase):
             l3.ns_title(onsite=self.itws)
 
 
+class TestPageTitle(DefaultSiteTestCase):
+
+    """Test Page title formatting."""
+
+    dry = True
+
+    def test_reuses_section(self) -> None:
+        """Test that title formatting retrieves the section once."""
+        page = pywikibot.Page(self.site, 'Help:Test page#Testing')
+
+        with mock.patch.object(page, 'section', wraps=page.section) as section:
+            title = page.title()
+
+        self.assertEqual(title, 'Help:Test page#Testing')
+        section.assert_called_once_with()
+
+
 class TestPageObjectEnglish(TestCase):
 
     """Test Page Object using English Wikipedia."""
@@ -300,13 +312,13 @@ class TestPageObjectEnglish(TestCase):
         self.assertIsInstance(mainpage.oldest_revision.timestamp,
                               pywikibot.Timestamp)
 
-    def test_old_version(self) -> None:
-        """Test page.getOldVersion()."""
+    def test_get_revision_content(self) -> None:
+        """Test page.get_revision() with content."""
         mainpage = self.get_mainpage()
         revid = mainpage.oldest_revision.revid
         self.assertIsNone(mainpage.oldest_revision.text)
         self.assertIsNone(mainpage._revisions[revid].text)
-        text = mainpage.getOldVersion(revid)
+        text = mainpage.get_revision(revid, content=True).text
         self.assertEqual(
             text[:53], "'''[[Welcome, newcomers|Welcome]] to [[Wikipedia]]'''")
         self.assertEqual(text, mainpage._revisions[revid].text)
@@ -673,9 +685,11 @@ class TestPageCoordinates(TestCase):
             self.assertTrue(coord.primary)
 
 
-class TestPageGetFileHistory(DefaultDrySiteTestCase):
+class TestPageGetFileHistory(DefaultSiteTestCase):
 
     """Test the get_file_history method of the FilePage class."""
+
+    dry = True
 
     def test_get_file_history_cache(self) -> None:
         """Test the cache mechanism of get_file_history."""
@@ -691,9 +705,11 @@ class TestPageGetFileHistory(DefaultDrySiteTestCase):
             self.site.loadimageinfo.assert_called_once_with(page, history=True)
 
 
-class TestPageRepr(DefaultDrySiteTestCase):
+class TestPageRepr(DefaultSiteTestCase):
 
     """Test for Page's repr implementation."""
+
+    dry = True
 
     @classmethod
     def setUpClass(cls) -> None:

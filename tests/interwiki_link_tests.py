@@ -13,11 +13,10 @@ from contextlib import suppress
 from pywikibot import config
 from pywikibot.exceptions import InvalidTitleError
 from pywikibot.page import Link
-from tests.aspects import AlteredDefaultSiteTestCase as LinkTestCase
-from tests.aspects import TestCase
+from tests.aspects import SiteConfigTestCase, TestCase
 
 
-class TestPartiallyQualifiedLinkDifferentCodeParser(LinkTestCase):
+class TestPartiallyQualifiedLinkDifferentCodeParser(SiteConfigTestCase):
 
     """Tests for interwiki links to local sites."""
 

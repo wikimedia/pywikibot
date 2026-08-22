@@ -191,8 +191,8 @@ class BlockEntry(LogEntry):
         :return: datetime.timedelta, or None if block is indefinite.
         """
         # Doing the difference is easier than parsing the string
-        return (self.expiry() - self.timestamp()
-                if self.expiry() is not None else None)
+        expiry = self.expiry()
+        return expiry - self.timestamp() if expiry is not None else None
 
     @cached
     def expiry(self) -> pywikibot.Timestamp | None:
@@ -212,7 +212,7 @@ class RightsEntry(LogEntry):
         """Return old rights groups.
 
         .. version-changed:: 7.5
-           No longer raise KeyError if `oldgroups` does not exists or
+           No longer raise KeyError if `oldgroups` does not exist or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """
@@ -223,7 +223,7 @@ class RightsEntry(LogEntry):
         """Return new rights groups.
 
         .. version-changed:: 7.5
-           No longer raise KeyError if `oldgroups` does not exists or
+           No longer raise KeyError if `newgroups` does not exist or
            LogEntry has no additional data e.g. due to hidden data and
            insufficient rights.
         """

@@ -8,11 +8,38 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from pywikibot.diff import PatchManager, cherry_pick, html_comparator
+from pywikibot.diff import (
+    PatchManager,
+    cherry_pick,
+    get_close_matches_ratio,
+    html_comparator,
+)
 from tests import join_html_data_path
 from tests.aspects import TestCase, require_modules
+
+
+class TestCloseMatchesRatio(TestCase):
+
+    """Test get_close_matches_ratio function."""
+
+    net = False
+
+    def test_ratio_called_once_per_match(self) -> None:
+        """Test that the final similarity ratio is reused."""
+        matcher = Mock()
+        matcher.real_quick_ratio.return_value = 1
+        matcher.quick_ratio.return_value = 1
+        matcher.ratio.return_value = 0.75
+        possibilities = ['one', 'two', 'three']
+
+        with patch('pywikibot.diff.SequenceMatcher', return_value=matcher):
+            result = get_close_matches_ratio(
+                'word', possibilities, cutoff=0.5)
+
+        self.assertLength(result, len(possibilities))
+        self.assertEqual(matcher.ratio.call_count, len(possibilities))
 
 
 @require_modules('bs4')

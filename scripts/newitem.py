@@ -64,10 +64,9 @@ class NewItemRobot(WikidataBot):
         """Setup ages."""
         super().setup()
 
-        self.pageAgeBefore = self.repo.server_time() - timedelta(
-            days=self.opt.pageage)
-        self.lastEditBefore = self.repo.server_time() - timedelta(
-            days=self.opt.lastedit)
+        server_time = self.repo.server_time()
+        self.pageAgeBefore = server_time - timedelta(days=self.opt.pageage)
+        self.lastEditBefore = server_time - timedelta(days=self.opt.lastedit)
         pywikibot.info(
             f'Page age is set to {self.opt.pageage} days so only pages created'
             f'\nbefore {self.pageAgeBefore.isoformat()} will be considered.\n'

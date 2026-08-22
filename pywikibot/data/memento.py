@@ -308,8 +308,9 @@ class MementoClient(OldMementoClient):
         except (InvalidSchema, MissingSchema):
             raise ValueError(
                 f'Only HTTP URIs are supported, URI {uri} unrecognized.')
-        if session_set:
-            session.close()
+        finally:
+            if session_set:
+                session.close()
 
         return response
 

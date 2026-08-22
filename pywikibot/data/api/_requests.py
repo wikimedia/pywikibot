@@ -70,13 +70,15 @@ WRITE_ACTIONS = {
     'strikevote', 'tag', 'thank', 'threadaction', 'transcodereset',
     'translationreview', 'unblock', 'undelete', 'unlinkaccount', 'upload',
     'userrights', 'watch', 'wikilove',
+    # FlaggedRevs extension
+    'review',
     # wikibase actions, see https://www.mediawiki.org/wiki/Wikibase/API
     'wbcreateclaim', 'wbcreateredirect', 'wbeditentity', 'wblinktitles',
     'wbmergeitems', 'wbremoveclaims', 'wbremovequalifiers',
     'wbremovereferences', 'wbsetaliases', 'wbsetclaim', 'wbsetclaimvalue',
     'wbsetdescription', 'wbsetlabel', 'wbsetqualifier', 'wbsetreference',
     'wbsetsitelink',
-    # lexeme (internal) actions
+    # WikibaseLexeme (internal) actions
     'wbladdform', 'wbladdsense', 'wbleditformelements', 'wbleditsenseelements',
     'wblmergelexemes', 'wblremoveform', 'wblremovesense',
 }
@@ -770,7 +772,7 @@ class Request(MutableMapping, WaitingMixin):
         else:
             return response, use_get
 
-        self.wait()
+        self.wait(site=self.site, uri=uri)
         return None, use_get
 
     def _json_loads(self, response: requests.Response) -> dict | None:
@@ -857,10 +859,11 @@ The text message is:
             # that we are logged in as the correct user. If this is not the
             # case, force a re-login.
             username = result['query']['userinfo']['name']
-            if (self.site.user() is not None and self.site.user() != username
+            current_user = self.site.user()
+            if (current_user is not None and current_user != username
                     and self.site._loginstatus != LoginStatus.IN_PROGRESS):
                 self._relogin(f'Logged in as {username!r} instead of '
-                              f'{self.site.user()!r}.')
+                              f'{current_user!r}.')
                 return True
         return False
 
@@ -1028,19 +1031,23 @@ The text message is:
         self._params['token'] = tokens
         return True
 
-    def wait(self, delay: int | None = None) -> None:
+    def wait(self, delay: int | None = None, **kwargs) -> None:
         """Determine how long to wait after a failed request.
 
         Also reset last API error with wait cycles.
 
         .. version-added:: 9.0
+        .. version-changed:: 11.7
+           The *kwargs* parameter was added.
 
         :param delay: Minimum time in seconds to wait. Overwrites
             ``retry_wait`` variable if given. The delay doubles each
             retry until ``retry_max`` seconds is reached.
+        :param kwargs: Additional keyword arguments passed to
+            :meth:`WaitingMixin.wait`.
         """
         self.last_error = dict.fromkeys(['code', 'info'])
-        super().wait(delay)
+        super().wait(delay, **kwargs)
 
     def submit(self) -> dict:
         """Submit a query and parse the response.
@@ -1118,8 +1125,9 @@ The text message is:
 
             if code == 'maxlag':
                 retries += 1
-                if retries > max(5, pywikibot.config.max_retries):
+                if retries > pywikibot.config.max_retries:
                     break
+
                 pywikibot.log('Pausing due to database lag: ' + info)
 
                 try:

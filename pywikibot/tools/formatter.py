@@ -44,7 +44,7 @@ class SequenceOutputter:
     def out(self):
         """Create the text with one item on each line."""
         if self.sequence:
-            # Width is only defined when the length is greater 0
+            # Width is only defined when the length is greater than 0
             width = int(math.log10(len(self.sequence))) + 1
             content = self.separator.join(
                 self.format_string.format(index=i, item=item, width=width)

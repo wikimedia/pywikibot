@@ -246,7 +246,7 @@ def get_module_filename(module) -> str | None:
 
     It uses the __file__ attribute of the module. If it's file extension
     ends with py and another character the last character is discarded
-    when the py file exist.
+    when the py file exists.
 
     :param module: The module instance.
     :type module: module

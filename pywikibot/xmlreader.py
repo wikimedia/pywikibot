@@ -26,7 +26,7 @@ from xml.etree.ElementTree import Element
 try:
     from defusedxml.ElementTree import ParseError, iterparse
 except ImportError:
-    from xml.etree.ElementTree import iterparse, ParseError
+    from xml.etree.ElementTree import ParseError, iterparse
 
 from collections.abc import Callable, Iterator
 

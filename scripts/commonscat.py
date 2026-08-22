@@ -350,27 +350,25 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         if '3=S' in (oldcat, linktitle):
             return  # TODO: handle additional param on de-wiki
 
-        if not linktitle and (page.title().lower() in oldcat.lower()
-                              or oldcat.lower() in page.title().lower()):
-            linktitle = oldcat
+        if not linktitle:
+            page_title_lower = page.title().lower()
+            oldcat_lower = oldcat.lower()
+            if (page_title_lower in oldcat_lower
+                    or oldcat_lower in page_title_lower):
+                linktitle = oldcat
 
-        if linktitle and newcat != page.title(with_ns=False):
-            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
-                             % oldtemplate,
-                             f'{{{{{newtemplate}|{newcat}|{linktitle}}}}}',
-                             page.get())
-        elif newcat == page.title(with_ns=False):
-            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
-                             % oldtemplate,
-                             '{{%s}}' % newtemplate,
-                             page.get())
+        page_title = page.title(with_ns=False)
+        if linktitle and newcat != page_title:
+            replacement = f'{{{{{newtemplate}|{newcat}|{linktitle}}}}}'
+        elif newcat == page_title:
+            replacement = '{{%s}}' % newtemplate
         elif oldcat.strip() != newcat:  # strip trailing white space
-            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
-                             % oldtemplate,
-                             f'{{{{{newtemplate}|{newcat}}}}}',
-                             page.get())
+            replacement = f'{{{{{newtemplate}|{newcat}}}}}'
         else:  # nothing left to do
             return
+
+        newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+                         % oldtemplate, replacement, page.get())
 
         comment = self.opt.summary or i18n.twtranslate(
             page.site, 'commonscat-msg_change', {'oldcat': oldcat,
@@ -462,7 +460,7 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         """Return the name of a valid commons category.
 
         If the page is a redirect this function tries to follow it. If
-        the page doesn't exists the function will return an empty string
+        the page doesn't exist the function will return an empty string
         """
         if not name:  # target name is empty
             return ''

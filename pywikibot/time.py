@@ -503,7 +503,7 @@ def parse_duration(string: str) -> tuple[str, int]:
         2w - 2 weeks (14 days)
         1y - 1 year
 
-    :return: Key and duration extracted form the string
+    :return: Key and duration extracted from the string
     """
     if len(string) < 2:
         raise ValueError('Time period should be a numeric value followed by '

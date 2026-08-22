@@ -10,6 +10,7 @@ from __future__ import annotations
 import unittest
 from contextlib import suppress
 from datetime import datetime
+from unittest.mock import patch
 from urllib.parse import urlparse
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -35,6 +36,27 @@ class MementoTestCase(TestCase):
         with skipping(ReadTimeout, RequestsConnectionError,
                       MementoClientException):
             return get_closest_memento_url(url, when, self.timegate_uri)
+
+
+@require_modules('memento_client')
+class TestMementoRequestHead(TestCase):
+
+    """Test Memento HEAD requests."""
+
+    net = False
+
+    @patch('pywikibot.data.memento.requests.Session')
+    def test_closes_created_session_on_error(self, session_class) -> None:
+        """Test that a created session is closed after a request error."""
+        from pywikibot.data.memento import MementoClient
+
+        session = session_class.return_value
+        session.head.side_effect = RequestsConnectionError
+
+        with self.assertRaises(RequestsConnectionError):
+            MementoClient.request_head('https://example.org')
+
+        session.close.assert_called_once_with()
 
 
 class TestMementoArchive(MementoTestCase):

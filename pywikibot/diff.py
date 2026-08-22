@@ -497,15 +497,13 @@ class PatchManager:
                                  + str(int(math.log10(len(super_hunks)) + 1))
                                  + '}: {3: <' + str(rng_width) + '} {4}{5}')
                 # the last entry is the first changed line which usually ends
-                # with a \n (only the last may not, which is covered by the
-                # if-condition following this block)
+                # with a \n; only the last may not
                 hunk_list_str = ''.join(
                     line_template.format(
                         '*' if hunk_entry[1] == position + 1 else
                         ' ', *hunk_entry)
                     for hunk_entry in hunk_list)
-                if hunk_list_str.endswith('\n'):
-                    hunk_list_str = hunk_list_str[:-1]
+                hunk_list_str = hunk_list_str.removesuffix('\n')
                 pywikibot.info(hunk_list_str)
                 next_hunk = pywikibot.input('Go to which hunk?')
                 try:
@@ -686,8 +684,8 @@ def get_close_matches_ratio(
         s.set_seq1(x.lower() if ignorecase else x)
         if s.real_quick_ratio() >= cutoff and \
            s.quick_ratio() >= cutoff and \
-           s.ratio() >= cutoff:
-            result.append((s.ratio(), x))
+           (ratio := s.ratio()) >= cutoff:
+            result.append((ratio, x))
 
     # Move the best scorers to head of list
     return nlargest(n, result)

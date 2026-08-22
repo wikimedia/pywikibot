@@ -91,6 +91,34 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         self.assertPageTitlesEqual(gen, self.titles)
 
+    def test_wikidata_page_generator_reuses_dbname(self) -> None:
+        """Test that the site database name is resolved once."""
+        site = mock.Mock()
+        site.dbName.return_value = 'enwiki'
+        repo = site.data_repository.return_value
+        requests = [mock.Mock(), mock.Mock()]
+        requests[0].submit.return_value = {
+            'entities': {
+                'Q1': {'sitelinks': {'enwiki': {'title': 'First'}}},
+            },
+        }
+        requests[1].submit.return_value = {
+            'entities': {
+                'Q51': {'sitelinks': {'enwiki': {'title': 'Second'}}},
+            },
+        }
+        repo.simple_request.side_effect = requests
+        items = [mock.Mock(id=f'Q{i}') for i in range(1, 52)]
+
+        with mock.patch.object(pywikibot, 'Page',
+                               side_effect=lambda _, title: title):
+            pages = list(pagegenerators.WikidataPageFromItemGenerator(
+                items, site))
+
+        self.assertEqual(pages, ['First', 'Second'])
+        self.assertEqual(repo.simple_request.call_count, 2)
+        site.dbName.assert_called_once_with()
+
     def test_NamespaceFilterPageGenerator(self) -> None:
         """Test NamespaceFilterPageGenerator."""
         self.assertFunction('NamespaceFilterPageGenerator')
@@ -820,7 +848,7 @@ class DryFactoryGeneratorTest(TestCase):
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
-    """Test item claim filter page generator generator."""
+    """Test item claim filter page generator."""
 
     def _simple_claim_test(self, prop, claim, qualifiers, valid,
                            negate: bool = False) -> None:

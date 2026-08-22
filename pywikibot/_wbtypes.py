@@ -300,8 +300,8 @@ class Coordinate(WbRepresentation):
 
         .. code-block:: python
 
-           dim = int(round(math.radians(
-               precision)*radius*math.cos(math.radians(self.lat))))
+           dim = round(math.radians(
+               precision) * radius * math.cos(math.radians(self.lat)))
 
         :return: Dimension in meters
         :raises ValueError: If neither *dim* nor *precision* is set
@@ -313,11 +313,9 @@ class Coordinate(WbRepresentation):
             raise ValueError('No values set for dim or precision')
 
         radius = 6378137
-        self._dim = int(
-            round(
-                math.radians(self._precision) * radius * math.cos(
-                    math.radians(self.lat))
-            )
+        self._dim = round(
+            math.radians(self._precision) * radius * math.cos(
+                math.radians(self.lat))
         )
         return self._dim
 
@@ -1199,8 +1197,8 @@ class WbDataPage(WbRepresentation):
         # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.tab$/u' for tabular-data
         # As we have already checked for existence the following simplified
         # check should be enough.
-        if not page.title().startswith('Data:') \
-           or not page.title().endswith(ending):
+        title = page.title()
+        if not title.startswith('Data:') or not title.endswith(ending):
             raise ValueError(f"Page must be in 'Data:' namespace and end in "
                              f"'{ending}' for {label}.")
 

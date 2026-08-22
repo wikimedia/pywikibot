@@ -186,7 +186,7 @@ class FamilyFileGenerator:
             self.langs = []
             self.show(e, '; continuing...')
 
-        if len([lang for lang in self.langs if lang['url'] == w.iwpath]) == 0:
+        if not any(lang['url'] == w.iwpath for lang in self.langs):
             if w.private_wiki:
                 w.lang = self.name
             self.langs.append({'language': w.lang,

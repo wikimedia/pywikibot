@@ -203,8 +203,7 @@ class DjVuFile:
         # unit separator (\037=\x1f): replace with \n
         txt = txt.replace('\x1f', '\n')
         # feed char (\f=\x0c), \n and trailing spaces: strip
-        txt = txt.strip('\x0c\n ')
-        return txt
+        return txt.strip('\x0c\n ')
 
     @check_page_number
     @check_cache

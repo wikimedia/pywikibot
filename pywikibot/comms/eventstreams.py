@@ -343,10 +343,13 @@ class EventStreams(GeneratorWrapper):
 
         See the description of register_filter() how it works.
 
+        .. version-changed:: 8.6
+           Handle canary events coming from the Event Platform.
+
         :param data: Event data dict used by filter functions
         """
         if not self._canary and data.get('meta', {}).get('domain') == 'canary':
-            return False  # T266798
+            return False  # pragma: no cover
 
         if any(function(data) for function in self.filter['none']):
             return False
@@ -375,7 +378,11 @@ class EventStreams(GeneratorWrapper):
 
             try:
                 event = next(self.source)
-            except (ProtocolError, OSError, httplib.IncompleteRead) as e:
+            except (
+                ProtocolError,
+                OSError,
+                httplib.IncompleteRead
+            ) as e:  # pragma: no cover
                 warning(
                     f'Connection error: {e}.\nTry to re-establish connection.')
                 self.source.close()
@@ -388,16 +395,16 @@ class EventStreams(GeneratorWrapper):
                 if event.data:
                     try:
                         element = json.loads(event.data)
-                    except ValueError as e:
+                    except ValueError as e:  # pragma: no cover
                         warning(f'Could not load json data from\n{event}\n{e}')
                     else:
                         if self.streamfilter(element):
                             n += 1
                             yield element
                 # else: ignore empty message
-            elif event.type == 'error':
+            elif event.type == 'error':  # pragma: no cover
                 warning(f'Encountered error: {event.data}')
-            else:
+            else:  # pragma: no cover
                 warning(f'Unknown event {event.type} occurred.')
 
         debug(f'{type(self).__name__}: Stopped iterating due to exceeding item'

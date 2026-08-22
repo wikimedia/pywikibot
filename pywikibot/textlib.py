@@ -1947,7 +1947,7 @@ def categoryFormat(categories, insite=None) -> str:
     :param categories: A list of Category or Page objects or strings which can
         be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
     :type categories: Iterable
-    :param insite: Used to to localise the category namespace.
+    :param insite: Used to localise the category namespace.
     :type insite: pywikibot.Site
     :return: String of categories
     """
@@ -2229,6 +2229,9 @@ class TimeStripper:
        *patterns* is a :class:`TimeStripperPatterns` namedtuple instead
        of a list.
 
+    .. versionchanged:: 11.7
+       HTML comments spanning multiple lines are now recognized.
+
     **Example**:
 
     >>> site = pywikibot.Site('wikipedia:fr')
@@ -2293,7 +2296,7 @@ class TimeStripper:
         )
 
         self._hyperlink_pat = re.compile(r'\[\s*?http[s]?://[^\]]*?\]')
-        self._comment_pat = re.compile(r'<!--(.*?)-->')
+        self._comment_pat = re.compile(r'<!--(.*?)-->', re.DOTALL)
         self._wikilink_pat = re.compile(
             r'\[\[(?P<link>[^\]\|]*?)(?P<anchor>\|[^\]]*)?\]\]')
 

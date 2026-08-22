@@ -203,7 +203,7 @@ class TestNeedVersion(DeprecationTestCase):
     @need_version('1.24')
     def too_new(self) -> bool:
         """Method which is to new."""
-        return True
+        return True  # pragma: no cover
 
     @need_version('1.23')
     def old_enough(self) -> bool:
@@ -219,13 +219,13 @@ class TestNeedVersion(DeprecationTestCase):
     @deprecated
     def deprecated_unavailable_method(self) -> bool:
         """Method which is to new and then deprecated."""
-        return True
+        return True  # pragma: no cover
 
     @deprecated
     @need_version('1.24')
     def deprecated_unavailable_method2(self) -> bool:
         """Method which is deprecated first and then to new."""
-        return True
+        return True  # pragma: no cover
 
     @need_version('1.22')
     @deprecated
