@@ -78,8 +78,8 @@ class TextEditor:
             # or to jump to the line of the first occurrence.
             # TODO: Find a better solution than hardcoding these, e.g. a config
             # option.
-            line = text[:jump_index].count('\n')
-            column = jump_index - (text[:jump_index].rfind('\n') + 1)
+            line = text.count('\n', 0, jump_index)
+            column = jump_index - (text.rfind('\n', 0, jump_index) + 1)
         else:
             line = column = 0
 

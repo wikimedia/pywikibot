@@ -402,8 +402,8 @@ class EditBoxWindow(Frame):
             self.find_all(highlight)
         if jumpIndex:
             # lines are indexed starting at 1
-            line = text[:jumpIndex].count('\n') + 1
-            column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
+            line = text.count('\n', 0, jumpIndex) + 1
+            column = jumpIndex - (text.rfind('\n', 0, jumpIndex) + 1)
             # don't know how to place the caret, but scrolling to the right
             # line should already be helpful.
             self.editbox.see(f'{line}.{column}')
