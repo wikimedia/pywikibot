@@ -428,11 +428,10 @@ class MediaInfo(WikibaseEntity):
 
             # avoid recursion with self.getID()
             page_id = int(self.id[1:])
-            result = list(self.repo.load_pages_from_pageids([page_id]))
-            if not result:
+            page = next(self.repo.load_pages_from_pageids([page_id]), None)
+            if page is None:
                 raise Error(f'There is no existing page with id "{page_id}"')
 
-            page = result.pop()
             if page.namespace() != page.site.namespaces.FILE:
                 raise Error(f'Page with id "{page_id}" is not a file')
 

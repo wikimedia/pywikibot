@@ -2320,7 +2320,7 @@ class BasePage(ComparableMixin):
         """
         if not hasattr(self, '_has_deleted_revisions'):
             gen = self.site.deletedrevs(self, total=1, prop=['ids'])
-            self._has_deleted_revisions = bool(list(gen))
+            self._has_deleted_revisions = next(gen, None) is not None
         return self._has_deleted_revisions
 
     def loadDeletedRevisions(self, total: int | None = None, **kwargs):

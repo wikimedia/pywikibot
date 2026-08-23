@@ -283,7 +283,7 @@ class FilePage(Page):
 
         .. version-added:: 7.1
         """
-        return bool(list(self.using_pages(total=1)))
+        return next(self.using_pages(total=1), None) is not None
 
     def upload(self, source: str, **kwargs) -> bool:
         """Upload this file to the wiki.
