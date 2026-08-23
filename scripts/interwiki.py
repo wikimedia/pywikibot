@@ -751,7 +751,7 @@ class Subject(interwiki_graph.Subject):
         """Add the given translation hints to the todo collection."""
         if self.conf.same and self.origin:
             if hints:
-                hints += ['all:']
+                hints.append('all:')
             else:
                 hints = ['all:']
 

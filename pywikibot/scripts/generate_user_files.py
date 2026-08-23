@@ -370,8 +370,8 @@ def create_user_config(
             userlist = [_UserItem(main_family, main_code, main_username)]
     else:
         while True:
-            userlist += [_UserItem(*get_site_and_lang(
-                main_family, main_code, main_username, force=force))]
+            userlist.append(_UserItem(*get_site_and_lang(
+                main_family, main_code, main_username, force=force)))
             if not pywikibot.input_yn('Do you want to add any other projects?',
                                       force=force,
                                       default=False, automatic_quit=False):

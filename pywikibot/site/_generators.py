@@ -1595,7 +1595,7 @@ class GeneratorsMixin:
                    }
         if patrolled is not None and (
                 self.has_right('patrol') or self.has_right('patrolmarks')):
-            rcgen.request['rcprop'] += ['patrolled']
+            rcgen.request['rcprop'].append('patrolled')
             filters['patrolled'] = patrolled
         rcgen.request['rcshow'] = api.OptionSet(self, 'recentchanges', 'show',
                                                 filters)

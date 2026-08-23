@@ -867,13 +867,14 @@ class DisambiguationRobot(SingleSiteBot):
 
                 if self.dn_template_str:
                     # '?', '/' for old choice
-                    options += [AliasOption(
+                    options.append(AliasOption(
                         f'tag template {self.dn_template_str}',
-                        ['t', '?', '/'])]
-                options += [context_option]
+                        ['t', '?', '/']))
+                options.append(context_option)
                 if not edited:
-                    options += [ShowPageOption('show disambiguation page', 'd',
-                                               m.start(), disamb_page)]
+                    options.append(ShowPageOption(
+                        'show disambiguation page', 'd', m.start(),
+                        disamb_page))
 
                 options += [
                     OutputProxyOption('list', 'l',
@@ -881,7 +882,7 @@ class DisambiguationRobot(SingleSiteBot):
                     AddAlternativeOption('add new', 'a',
                                          SequenceOutputter(self.opt.pos))]
                 if edited:
-                    options += [StandardOption('save in this form', 'x')]
+                    options.append(StandardOption('save in this form', 'x'))
 
                 # TODO: Output context on each question
                 answer = pywikibot.input_choice('Option', options,
