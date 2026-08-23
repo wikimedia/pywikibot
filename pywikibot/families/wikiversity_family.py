@@ -10,8 +10,7 @@ from pywikibot import family
 from pywikibot.tools import classproperty
 
 
-# The Wikimedia family that is known as Wikiversity
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for Wikiversity."""
 

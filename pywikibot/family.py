@@ -1103,6 +1103,14 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
         return f'{cls.name}.wikimedia.org'
 
 
+class WikimediaSubdomainFamily(SubdomainFamily, WikimediaFamily):
+
+    """Family class for Wikimedia projects using subdomains.
+
+    .. version-added:: 11.8
+    """
+
+
 class WikibaseFamily(Family):
 
     """A base class for a Wikibase Family.

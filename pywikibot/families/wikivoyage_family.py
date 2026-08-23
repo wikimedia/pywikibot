@@ -6,11 +6,10 @@
 """Family module for Wikivoyage."""
 from __future__ import annotations
 
-# The new Wikivoyage family that is hosted at Wikimedia
 from pywikibot import family
 
 
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for Wikivoyage."""
 
