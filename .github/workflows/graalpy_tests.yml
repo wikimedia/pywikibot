@@ -21,7 +21,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 45
+    timeout-minutes: 55
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +47,11 @@ jobs:
       - name: Install setuptools
         if: ${{ startsWith(matrix.python-version, 'graalpy-25') }}
         run: pip install setuptools
+      - name: Configure and start WMCS SOCKS tunnel
+        uses: ./.github/actions/wmcs-socks
+        with:
+          ssh_user: ${{ secrets.WMCS_USER }}
+          ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate user files
         run: |
           python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -v -debug;
@@ -57,6 +62,10 @@ jobs:
           PYTHONWARNINGS: ignore:urllib3 v2 only supports OpenSSL
           PYTHONIOENCODING: utf-8
           PYWIKIBOT_TEST_NO_RC: 1
+          HTTP_PROXY: socks5h://127.0.0.1:1080
+          HTTPS_PROXY: socks5h://127.0.0.1:1080
+          ALL_PROXY: socks5h://127.0.0.1:1080
+          NO_PROXY: ""
         run: |
           python pwb.py version
           echo "Running tests with GraalPy native coverage"
@@ -66,8 +75,19 @@ jobs:
             --coverage.OutputFile=graalpy.info \
             -m pytest \
             -k "not TestDate" \
-            -a "not net" \
             --ignore=tests/script_tests.py
+      - name: Close WMCS SOCKS tunnel
+        if: always()
+        shell: bash
+        run: |-
+          if [ -f ssh.pid ]; then
+            PID=$(cat ssh.pid)
+            kill "$PID" || true
+            echo "SSH tunnel closed (PID $PID)"
+            rm -f ssh.pid
+          else
+            echo "No SSH tunnel PID found"
+          fi
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7
         with:
