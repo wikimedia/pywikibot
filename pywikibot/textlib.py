@@ -9,7 +9,7 @@ from __future__ import annotations
 import itertools
 import re
 import sys
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
@@ -1929,7 +1929,7 @@ def replaceCategoryLinks(oldtext: str,
 
     if under_categories:
         category = get_regexes('category', site)[0]
-        last_category = list(category.finditer(newtext))[-1]
+        last_category = deque(category.finditer(newtext), maxlen=1)[0]
         for reg in under_categories:
             special = reg.search(newtext)
             if special and not isDisabled(newtext, special.start()):
