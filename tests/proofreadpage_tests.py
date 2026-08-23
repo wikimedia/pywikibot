@@ -11,6 +11,7 @@ import difflib
 import json
 import unittest
 from contextlib import suppress
+from platform import python_implementation
 
 import pywikibot
 from pywikibot.data import api
@@ -21,11 +22,15 @@ from pywikibot.proofreadpage import (
     ProofreadPage,
     TagAttr,
 )
+from pywikibot.tools import PYTHON_VERSION
 from tests.aspects import TestCase, require_modules
 from tests.basepage import (
     BasePageLoadRevisionsCachingTestBase,
     BasePageMethodsTestBase,
 )
+
+
+PYTHON_310 = PYTHON_VERSION[:2] == (3, 10)
 
 
 class TestPagesTagParser(TestCase):
@@ -726,6 +731,10 @@ class TestLoadRevisionsCachingIndexPage(BS4TestCase,
             references='<references/>', div_end=div)
 
 
+@unittest.skipIf(
+    python_implementation() == 'GraalVM' and PYTHON_310,
+    'Fails with GraalPy 23.1 due to T435718'
+)
 class TestIndexPageMappings(BS4TestCase):
 
     """Test IndexPage class."""
@@ -917,12 +926,20 @@ class TestIndexPageMappingsRedlinks(BS4TestCase):
         """Test index property with redlink."""
         self.assertEqual(self.missing.index, self.index)
 
+    @unittest.skipIf(
+        python_implementation() == 'GraalVM' and PYTHON_310,
+        'Fails with GraalPy 23.1 due to T435718'
+    )
     def test_get_page_and_number_redlink(self) -> None:
         """Test IndexPage page get_page_number functions with redlinks."""
         for page in self.pages:
             n = self.index.get_number(page)
             self.assertEqual(self.index.get_page(n), page)
 
+    @unittest.skipIf(
+        python_implementation() == 'GraalVM' and PYTHON_310,
+        'Fails with GraalPy 23.1 due to T435718'
+    )
     def test_page_gen_redlink(self) -> None:
         """Test Index page generator with redlinks."""
         # Check start/end limits.
