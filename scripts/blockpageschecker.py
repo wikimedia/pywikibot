@@ -268,21 +268,18 @@ class CheckerBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
                     continue
 
                 for catch_regex in template:
-                    result_catch = re.findall(catch_regex, text)
-                    if result_catch:
+                    if re.search(catch_regex, text):
                         return _ParsedTemplate(
                             results[index], catch_regex, 'modifying')
 
             if tsmp and ttmp and ttp != ttmp and tsp != tsmp:
                 for catch_regex in ttmp:
-                    result_catch = re.findall(catch_regex, text)
-                    if result_catch:
+                    if re.search(catch_regex, text):
                         return _ParsedTemplate(
                             'sysop-move', catch_regex, 'modifying')
 
                 for catch_regex in tsmp:
-                    result_catch = re.findall(catch_regex, text)
-                    if result_catch:
+                    if re.search(catch_regex, text):
                         return _ParsedTemplate(
                             'autoconfirmed-move', catch_regex, 'modifying')
 
