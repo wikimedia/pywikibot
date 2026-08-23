@@ -59,21 +59,19 @@ jobs:
           PYWIKIBOT_TEST_NO_RC: 1
         run: |
           python pwb.py version
-          if [[  "${{ matrix.python-version }}" == "graalpy-25.0" && "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            echo "Running tests without coverage"
-            pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
-          else
-            echo "Running tests with coverage"
-            coverage run -m pytest -k "not TestDate" -a "not net" --ignore=tests/script_tests.py
-          fi
-      - name: Show coverage statistics
-        if: matrix.python-version != 'graalpy-25.0' || matrix.os != 'ubuntu-latest'
-        run: |
-          coverage combine || true
-          coverage report
+          echo "Running tests with GraalPy native coverage"
+          graalpy \
+            --coverage \
+            --coverage.Output=lcov \
+            --coverage.OutputFile=graalpy.info \
+            -m pytest \
+            -k "not TestDate" \
+            -a "not net" \
+            --ignore=tests/script_tests.py
       - name: Upload coverage to Codecov
-        if: matrix.python-version != 'graalpy-25.0' || matrix.os != 'ubuntu-latest'
         uses: codecov/codecov-action@v7
+        with:
+          files: graalpy.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Check on failure
