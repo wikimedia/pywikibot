@@ -349,9 +349,18 @@ def CategoryFilterPageGenerator(
     :param generator: A generator object
     :param category_list: Categories used to filter generated pages
     """
+    required_categories: set[pywikibot.page.BasePage] = set(category_list)
     for page in generator:
-        if all(x in page.categories() for x in category_list):
+        remaining_categories = required_categories.copy()
+        if not remaining_categories:
             yield page
+            continue
+
+        for category in page.categories():
+            remaining_categories.discard(category)
+            if not remaining_categories:
+                yield page
+                break
 
 
 # name the generator methods

@@ -140,6 +140,33 @@ class TestDryPageGenerators(TestCase):
             gen, ('Talk', 'Template'), site)
         self.assertLength(tuple(gen), 10)
 
+    def test_category_filter_enumerates_once(self) -> None:
+        """Test that categories are enumerated once for multiple filters."""
+        categories = [
+            pywikibot.Category(self.site, f'Category:{name}')
+            for name in ('First', 'Second')
+        ]
+        matching_page = mock.Mock()
+        matching_page.categories.side_effect = lambda: iter(categories)
+        missing_page = mock.Mock()
+        missing_page.categories.side_effect = lambda: iter(categories[:1])
+
+        pages = list(pagegenerators.CategoryFilterPageGenerator(
+            [matching_page, missing_page], categories))
+
+        self.assertLength(pages, 1)
+        self.assertIs(pages[0], matching_page)
+        matching_page.categories.assert_called_once_with()
+        missing_page.categories.assert_called_once_with()
+
+        unfiltered_page = mock.Mock()
+        pages = list(pagegenerators.CategoryFilterPageGenerator(
+            [unfiltered_page], []))
+
+        self.assertLength(pages, 1)
+        self.assertIs(pages[0], unfiltered_page)
+        unfiltered_page.categories.assert_not_called()
+
     def test_RegexFilterPageGenerator(self) -> None:
         """Test RegexFilterPageGenerator."""
         self.assertFunction('RegexFilterPageGenerator')
