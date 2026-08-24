@@ -198,6 +198,7 @@ script_test_modules = {
     'redirect_bot',
     'reflinks',
     'replacebot',
+    'revertbot',
     'script',
     'speedy_delete',
     'template_bot',
