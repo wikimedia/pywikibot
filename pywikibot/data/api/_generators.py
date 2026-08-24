@@ -306,6 +306,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         for modtype in ('generator', 'list', 'prop', 'meta'):
             if modtype in parameters:
                 self.modules = parameters[modtype].split('|')
+                self._module_keys = frozenset(self.modules)
                 break
         else:
             raise Error(f'{type(self).__name__}: No query module name found'
@@ -655,7 +656,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
             yield result
 
-            modules_item_intersection = set(self.modules) & set(item)
+            modules_item_intersection = self._module_keys.intersection(item)
             if isinstance(item, dict) and modules_item_intersection:
                 # Count elements contained in sub-items.
                 # If we need to count elements contained in items in
