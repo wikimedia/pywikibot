@@ -10,7 +10,7 @@ import datetime
 import re
 import time
 import webbrowser
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
@@ -992,7 +992,7 @@ class APISite(
         self,
         keys: Iterable[str],
         lang: str | None = None
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         """Fetch the text of a set of MediaWiki messages.
 
         The returned dict uses each key to store the associated message.
@@ -1003,30 +1003,33 @@ class APISite(
         :param lang: A language code, default is self.lang
         """
         amlang = lang or self.lang
-        if not all(amlang in _mw_msg_cache
-                   and _key in _mw_msg_cache[amlang] for _key in keys):
+        keys = list(keys)
+        messages = _mw_msg_cache.get(amlang, {})
+        missing_keys = [key for key in keys if key not in messages]
+
+        if missing_keys:
             parameters = {'meta': 'allmessages',
-                          'ammessages': keys,
+                          'ammessages': missing_keys,
                           'amlang': amlang,
+                          'formatversion': 2,
                           }
             msg_query = api.QueryGenerator(site=self, parameters=parameters)
 
             for msg in msg_query:
                 if 'missing' not in msg:
-                    _mw_msg_cache[amlang][msg['name']] = msg['*']
+                    messages[msg['name']] = msg['content']
+                    _mw_msg_cache[amlang] = messages
 
-            # Check requested keys
-            result = OrderedDict()
-            for key in keys:
-                try:
-                    result[key] = _mw_msg_cache[amlang][key]
-                except KeyError:
-                    raise KeyError(
-                        f"No message '{key}' found for lang '{amlang}'")
+        # Check requested keys
+        result = {}
+        for key in keys:
+            try:
+                result[key] = messages[key]
+            except KeyError:
+                raise KeyError(
+                    f"No message '{key}' found for lang '{amlang}'")
 
-            return result
-
-        return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
+        return result
 
     def mediawiki_message(
         self,

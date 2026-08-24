@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot.comms.http import user_agent, user_agent_username
@@ -20,6 +21,31 @@ class TestDrySite(DefaultSiteTestCase):
     """Tests against a fake Site object."""
 
     dry = True
+
+    def test_mediawiki_messages_generator(self) -> None:
+        """Test fetching uncached messages from a one-shot iterable."""
+        cache = {'zz-test': {'cached': 'cached value'}}
+        response = ({'name': 'missing', 'content': 'missing value'},)
+        with patch.dict('pywikibot.site._apisite._mw_msg_cache', cache,
+                        clear=True), \
+                patch('pywikibot.site._apisite.api.QueryGenerator',
+                      return_value=response) as query:
+            keys = (key for key in ('cached', 'missing'))
+            result = self.site.mediawiki_messages(keys, lang='zz-test')
+
+        self.assertEqual(list(result.items()), [
+            ('cached', 'cached value'),
+            ('missing', 'missing value'),
+        ])
+        query.assert_called_once_with(
+            site=self.site,
+            parameters={
+                'meta': 'allmessages',
+                'ammessages': ['missing'],
+                'amlang': 'zz-test',
+                'formatversion': 2,
+            },
+        )
 
     def test_logged_in(self) -> None:
         """Test logged_in() method."""
