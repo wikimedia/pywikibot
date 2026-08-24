@@ -285,6 +285,15 @@ class TestNamespacesDictLookupName(TestCase):
                     # test __getitem__
                     self.assertEqual(self.namespaces[name].id, ns_id)
 
+    def test_resolve(self) -> None:
+        """Test resolving namespace names."""
+        for ns_id, values in self.tests.items():
+            with self.subTest(ns_id=ns_id):
+                self.assertEqual(
+                    self.namespaces.resolve(values),
+                    [self.namespaces[ns_id]] * len(values),
+                )
+
     def test_getattr(self) -> None:
         """Test NamespacesDict.__getattr__."""
         for ns_id, values in self.tests.items():

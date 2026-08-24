@@ -444,7 +444,7 @@ class NamespacesDict(Mapping):
         # int(None) raises TypeError; however, bool needs special handling.
         namespaces = self._namespaces
         result = [NotImplemented if isinstance(ns, bool)
-                  else self._lookup_name(ns)
+                  else self.lookup_name(ns)
                   if isinstance(ns, str) and not ns.lstrip('-').isdigit()
                   else namespaces.get(int(ns))
                   for ns in identifiers]
@@ -463,15 +463,3 @@ class NamespacesDict(Mapping):
                                  if ns is None)))
 
         return result
-
-    def _lookup_name(self, name):
-        name = Namespace.normalize_name(name)
-        if name is False:
-            return None
-        name = name.lower()
-
-        for namespace in self._namespaces.values():
-            if namespace._contains_lowercase_name(name):
-                return namespace
-
-        return None
