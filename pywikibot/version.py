@@ -167,11 +167,11 @@ def getversion_git(path=None):
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
-    dp = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
+    dp = subprocess.Popen([cmd, 'rev-list', '--count', 'HEAD'],
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
-    rev, stderr = dp.communicate()
-    rev = f'g{len(rev.splitlines())}'
+    rev, _ = dp.communicate()
+    rev = f'g{int(rev)}'
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
