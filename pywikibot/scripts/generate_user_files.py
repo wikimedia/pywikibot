@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import os
 import re
-import sys
 from collections.abc import Callable
 from pathlib import Path
 from textwrap import fill
@@ -49,16 +48,6 @@ SCRIPT_SECTIONS = {
 pywikibot = _import_with_no_user_config('pywikibot')
 config, __url__ = pywikibot.config, pywikibot.__url__
 base_dir = pywikibot.config.base_dir
-
-console_encoding: str | None
-try:
-    console_encoding = sys.stdout.encoding
-# unittests fails with "StringIO instance has no attribute 'encoding'"
-except AttributeError:
-    console_encoding = None
-
-if console_encoding is None or sys.platform == 'cygwin':
-    console_encoding = 'iso-8859-1'
 
 USER_BASENAME = 'user-config.py'
 PASS_BASENAME = 'user-password.cfg'
