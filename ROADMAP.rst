@@ -4,6 +4,9 @@ Release 11.8
 * Update translations (i18n)
 * Add new :class:`family.WikimediaSubdomainFamily`
 * Update documentation for :meth:`page.BasePage.exists`. (:phab:`T334341`)
+* :meth:`page.BasePage.get` no longer validates section fragments or raises
+  :exc:`exceptions.SectionError` for them (:phab:`T422856`,
+  :phab:`T422859`).
 
 Deprecations
 ============

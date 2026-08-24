@@ -23,6 +23,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPageError,
     IsRedirectPageError,
     NoPageError,
+    SectionError,
     UnknownExtensionError,
 )
 from pywikibot.page._basepage import BasePage
@@ -44,6 +45,28 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
             raise ValueError('Title must be specified and not empty '
                              'if source is a Site.')
         super().__init__(source, title, ns)
+
+    def _check_section(self) -> None:
+        """Check the title section against headings in the raw wikitext.
+
+        This best-effort check supports strict redirect-target handling; it
+        does not reproduce MediaWiki's parser-generated anchors.
+
+        :raises SectionError: The section does not match an extracted heading.
+        """
+        page_section = self.section()
+        if not page_section:
+            return
+
+        try:
+            text = self.get(get_redirect=True)
+        except NoPageError:
+            return
+
+        content = textlib.extract_sections(text, self.site)
+        if page_section not in content.sections:
+            raise SectionError(f'{page_section!r} is not a valid section '
+                               f'of {self.title(with_section=False)}')
 
     @property
     @cached

@@ -379,8 +379,10 @@ class BasePage(ComparableMixin):
         pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
 
         .. version-changed:: 9.2
-           :exc:`exceptions.SectionError` is raised if the
-           :meth:`section` does not exist
+           Added validation for the section in the page title.
+        .. version-changed:: 11.8
+           A title fragment neither selects nor validates a section; the
+           complete page text is returned.
         .. seealso:: :attr:`text` property
 
         :param force: Reload all page attributes, including errors.
@@ -388,8 +390,6 @@ class BasePage(ComparableMixin):
             redirect, do not raise an exception.
         :raises NoPageError: The page does not exist.
         :raises IsRedirectPageError: The page is a redirect.
-        :raises SectionError: The section does not exist on a page with
-            a # link.
         """
         if force:
             del self.latest_revision_id
@@ -401,17 +401,7 @@ class BasePage(ComparableMixin):
             if not get_redirect:
                 raise
 
-        text = self.latest_revision.text
-
-        # check for valid section in title
-        page_section = self.section()
-        if page_section:
-            content = textlib.extract_sections(text, self.site)
-            if page_section not in content.sections:
-                raise SectionError(f'{page_section!r} is not a valid section '
-                                   f'of {self.title(with_section=False)}')
-
-        return text
+        return self.latest_revision.text
 
     def has_content(self) -> bool:
         """Page has been loaded.
@@ -2026,16 +2016,16 @@ class BasePage(ComparableMixin):
              <pywikibot.site._apisite.APISite.getredirtarget>`
            * :meth:`moved_target`
 
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
 
         :raises CircularRedirectError: Page is a circular redirect
         :raises InterwikiRedirectPageError: The redirect target is on
             another site
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         return self.site.getredirtarget(self, ignore_section=ignore_section)
 

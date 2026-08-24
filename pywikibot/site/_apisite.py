@@ -1633,8 +1633,8 @@ class APISite(
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
 
         :param page: Page to search redirects for
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
         :return: Redirect target of page
 
         :raises CircularRedirectError: Page is a circular redirect
@@ -1642,8 +1642,8 @@ class APISite(
             another site
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         if not self.page_isredirect(page):
             raise IsNotRedirectPageError(page)
@@ -1726,8 +1726,7 @@ class APISite(
             target = pywikibot.Category(target)
 
         if not ignore_section:
-            # get the content; this raises SectionError if section is not found
-            target.text
+            target._check_section()
 
         page._redirtarget = target
         return page._redirtarget

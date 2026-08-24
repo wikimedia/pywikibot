@@ -186,6 +186,95 @@ class TestPageTitle(DefaultSiteTestCase):
         section.assert_called_once_with()
 
 
+class TestPageGet(DefaultSiteTestCase):
+
+    """Test retrieving page text."""
+
+    dry = True
+
+    def _page_with_text(self, title: str, text: str) -> pywikibot.Page:
+        """Return a page with cached *text*."""
+        page = pywikibot.Page(self.site, title)
+        page._revid = 1
+        page._isredir = False
+        page._revisions[1] = pywikibot.page.Revision(
+            revid=1, slots={'main': {'*': text}})
+        return page
+
+    def test_get_does_not_validate_section(self) -> None:
+        """Test that get does not inspect a title section."""
+        text = '== Existing ==\nText'
+        page = self._page_with_text('Test#Missing', text)
+
+        with mock.patch.object(page, 'section') as section:
+            self.assertEqual(page.get(), text)
+        section.assert_not_called()
+
+    def test_text_section_regressions(self) -> None:
+        """Test parser-normalized headings do not affect page text."""
+        cases = (
+            (
+                'T422856',
+                'Test#Radio stations in India by state',
+                '==== Radio stations  in India by state ====\nContent',
+            ),
+            (
+                'T411307',
+                'Test#Japanese superhero films by decade',
+                '==== Japanese superhero films\u200e by decade ====\nContent',
+            ),
+        )
+
+        for task, title, text in cases:
+            with self.subTest(task=task):
+                page = self._page_with_text(title, text)
+                self.assertEqual(page.text, text)
+
+    def test_check_section(self) -> None:
+        """Test explicit section validation."""
+        page = self._page_with_text('Test#Existing', '== Existing ==\nText')
+        page._check_section()
+
+        page = self._page_with_text('Test#Missing', '== Existing ==\nText')
+
+        with self.assertRaisesRegex(SectionError,
+                                    "'Missing' is not a valid section"):
+            page._check_section()
+
+    def test_check_section_missing_page(self) -> None:
+        """Test strict redirect checking preserves a missing target."""
+        page = pywikibot.Page(self.site, 'Missing#Section')
+        page._getexception = NoPageError(page)
+
+        page._check_section()
+
+    def test_redirect_target_checks_section(self) -> None:
+        """Test explicit redirect section validation is preserved."""
+        page = pywikibot.Page(self.site, 'Redirect')
+        page._isredir = True
+        data = {
+            'query': {
+                'redirects': [{
+                    'from': 'Redirect',
+                    'to': 'Target',
+                    'tofragment': 'Section',
+                }],
+                'pages': {'1': {'title': 'Target'}},
+            },
+        }
+        request = mock.Mock()
+        request.submit.return_value = data
+
+        with mock.patch.object(self.site, 'simple_request',
+                               return_value=request):
+            with mock.patch.object(
+                    pywikibot.Page, '_check_section') as check_section:
+                target = page.getRedirectTarget(ignore_section=False)
+
+        self.assertEqual(target.title(), 'Target#Section')
+        check_section.assert_called_once_with()
+
+
 class TestPageObjectEnglish(TestCase):
 
     """Test Page Object using English Wikipedia."""
@@ -1052,9 +1141,7 @@ class TestPageRedirects(TestCase):
             p3.get()
 
         page = pywikibot.Page(site, 'User:Legoktm/R2#Section')
-        with self.assertRaisesRegex(SectionError,
-                                    "'Section' is not a valid section"):
-            page.get()
+        self.assertEqual(page.get(), text)
 
         site = pywikibot.Site('mediawiki')
         page = pywikibot.Page(site, 'Manual:Pywikibot/2.0 #See_also')

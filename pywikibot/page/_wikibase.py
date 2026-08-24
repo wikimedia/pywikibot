@@ -1165,8 +1165,8 @@ class ItemPage(WikibasePage):
 
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
 
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
 
         :raises CircularRedirectError: Page is a circular redirect
         :raises InterwikiRedirectPageError: The redirect target is on
@@ -1174,8 +1174,8 @@ class ItemPage(WikibasePage):
         :raises Error: Target page has wrong content model
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         target = super().getRedirectTarget(ignore_section=ignore_section)
         cmodel = target.content_model
