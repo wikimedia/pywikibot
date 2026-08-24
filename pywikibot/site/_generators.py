@@ -90,7 +90,7 @@ class GeneratorsMixin:
             pageids = [p.strip() for p in pageids]
 
         # Validate pageids.
-        gen = (str(int(p)) for p in pageids if int(p) > 0)
+        gen = (str(p) for p in map(int, pageids) if p > 0)
 
         for batch in batched(filter_unique(gen), self.maxlimit):
             # Store the order of the input data.
