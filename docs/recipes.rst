@@ -17,7 +17,7 @@ How to get links from summary section of page
 =============================================
 
 >>> import pywikibot
->>> from pwikibot import textlib
+>>> from pywikibot import textlib
 >>> site = pywikibot.Site('wikipedia:en')  # create a Site object
 >>> page = pywikibot.Page(site, 'Deep learning')  # create a Page object
 >>> sect = textlib.extract_sections(page.text, site)  # divide content into sections

@@ -115,7 +115,7 @@ Pywikibot provides bot classes to develop your own script easily:
             text += '\n' + self.opt.text
             self.put_current(text, summary=self.opt.summary)
 
-    def main():
+    def main(*args: str) -> None:
         """Parse command line arguments and invoke bot."""
         options = {}
         gen_factory = pagegenerators.GeneratorFactory()
