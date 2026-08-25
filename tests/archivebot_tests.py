@@ -340,6 +340,24 @@ class TestPageArchiverObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    def test_attributes_order(self) -> None:
+        """Test order when attributes are added or updated."""
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot-01')
+        template = pywikibot.Page(site, 'Template:Pywikibot_archivebot')
+        archiver = archivebot.PageArchiver(page, template, '')
+
+        archiver.set_attr('minthreadsleft', '3')
+        archiver.set_attr('algo', 'old(60d)')
+
+        self.assertEqual(
+            list(archiver.attributes),
+            ['archive', 'algo', 'counter', 'maxarchivesize',
+             'minthreadsleft'])
+        self.assertEqual(
+            archiver.saveables(),
+            ['archive', 'algo', 'minthreadsleft'])
+
     def testLoadConfigInTemplateNamespace(self) -> None:
         """Test loading of config with TEMPLATE_PAGE in Template ns.
 
@@ -358,9 +376,15 @@ class TestPageArchiverObject(TestCase):
         tmpl_without_ns = pywikibot.Page(site, 'Pywikibot_archivebot', ns=10)
 
         try:
-            archivebot.PageArchiver(page, tmpl_with_ns, '')
+            archiver = archivebot.PageArchiver(page, tmpl_with_ns, '')
         except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
+
+        self.assertIs(type(archiver.attributes), dict)
+        self.assertEqual(
+            list(archiver.attributes),
+            ['archive', 'algo', 'counter', 'maxarchivesize'])
+        self.assertEqual(archiver.saveables(), ['archive', 'algo'])
 
         try:
             archivebot.PageArchiver(page, tmpl_without_ns, '')

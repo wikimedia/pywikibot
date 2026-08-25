@@ -203,7 +203,7 @@ import re
 import signal
 import threading
 import time
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
@@ -615,12 +615,12 @@ class PageArchiver:
         :param force: override security value
         :param asynchronous: asynchronous processing activated
         """
-        self.attributes = OrderedDict([
-            ('archive', ['', False]),
-            ('algo', ['old(24h)', False]),
-            ('counter', ['1', False]),
-            ('maxarchivesize', ['200K', False]),
-        ])
+        self.attributes = {
+            'archive': ['', False],
+            'algo': ['old(24h)', False],
+            'counter': ['1', False],
+            'maxarchivesize': ['200K', False],
+        }
         self.salt = salt
         self.force = force
         self.sort = sort
