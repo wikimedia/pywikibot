@@ -548,7 +548,7 @@ class WelcomeBot(SingleSiteBot):
             self.define_sign()
         get_welcome_text(self.site)  # check whether the script is localized
 
-    def bad_name_filer(self, name, force: bool = False) -> bool:
+    def bad_name_filer(self, name: str, force: bool = False) -> bool:
         """Check for bad names."""
         if not globalvar.filt_bad_name:
             return False
@@ -627,14 +627,17 @@ class WelcomeBot(SingleSiteBot):
             self._whitelist = list_white + whitelist_default
 
         with suppress(UnicodeEncodeError):
+            lower_name = name.lower()
             for wname in self._whitelist:
-                if wname.lower() in str(name).lower():
-                    name = name.lower().replace(wname.lower(), '')
+                lower_wname = wname.lower()
+                if lower_wname in lower_name:
+                    lower_name = lower_name.replace(lower_wname, '')
+                    name = lower_name
                     for bname in self._blacklist:
                         self.bname[name] = bname
-                        return bname.lower() in name.lower()
+                        return bname.lower() in lower_name
             for bname in self._blacklist:
-                if bname.lower() in str(name).lower():  # bad name positive
+                if bname.lower() in lower_name:  # bad name positive
                     self.bname[name] = bname
                     return True
         return False
