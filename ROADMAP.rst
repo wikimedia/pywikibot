@@ -1,7 +1,9 @@
 Release 11.8
 ============
 
-* (no changes yet)
+* Update translations (i18n)
+* Add new :class:`family.WikimediaSubdomainFamily`
+* Update documentation for :meth:`page.BasePage.exists`. (:phab:`T334341`)
 
 Deprecations
 ============

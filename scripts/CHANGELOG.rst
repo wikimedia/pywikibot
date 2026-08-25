@@ -1,6 +1,15 @@
 Scripts Changelog
 =================
 
+11.8.0
+------
+
+archivebot
+^^^^^^^^^^
+
+* Fix ``-locale`` and ``-timezone`` options.
+
+
 11.7.0
 ------
 
