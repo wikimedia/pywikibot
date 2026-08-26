@@ -308,6 +308,7 @@ def set_interface(module_name: str) -> None:
 
 
 _handlers_initialized = []  # we can have a script and the script wrapper
+_handlers_initializing = False
 
 
 def handler_namer(name: str) -> str:
@@ -372,6 +373,21 @@ def init_handlers() -> None:
        Different logfiles are used if multiple processes of the same
        script are running.
     """
+    global _handlers_initializing
+
+    # Throttle logs during setup and can invoke this pending routine again.
+    if _handlers_initializing:
+        return
+
+    _handlers_initializing = True
+    try:
+        _init_handlers()
+    finally:
+        _handlers_initializing = False
+
+
+def _init_handlers() -> None:
+    """Initialize logging handlers without a re-entrancy check."""
     module_name = calledModuleName()
     if not module_name:
         module_name = 'terminal-interface'

@@ -10,11 +10,58 @@ from __future__ import annotations
 import sys
 import unittest
 from contextlib import suppress
+from tempfile import TemporaryDirectory
+from textwrap import dedent
 
 import pywikibot
 import pywikibot.bot
 from pywikibot import i18n
 from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
+from tests.utils import execute
+
+
+class LoggingTestCase(TestCase):
+
+    """Test logging initialization."""
+
+    net = False
+
+    def test_file_handler_initialized_once(self) -> None:
+        """Test that logging options create one rotating file handler."""
+        code = dedent("""
+            import logging.handlers
+            import os
+            import sys
+
+            os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
+            import pywikibot
+
+            pywikibot.argvu = ['logging_test', sys.argv[2]]
+            pywikibot.config.base_dir = sys.argv[1]
+            pywikibot.Site = lambda: None
+            pywikibot.bot.writeToCommandLogFile = lambda: None
+            headers = []
+            pywikibot.bot.writelogheader = lambda: headers.append(None)
+            pywikibot.handle_args([sys.argv[2]], do_help=False)
+
+            handlers = [
+                handler
+                for handler in logging.getLogger('pywiki').handlers
+                if isinstance(handler, logging.handlers.RotatingFileHandler)
+            ]
+            print(len(handlers), len(headers))
+        """)
+
+        with TemporaryDirectory() as directory:
+            for option in ('-log', '-debug'):
+                with self.subTest(option=option):
+                    result = execute(
+                        [sys.executable, '-c', code, directory, option],
+                        timeout=10)
+                    self.assertIsNone(result['timeout'])
+                    self.assertEqual(result['exit_code'], 0,
+                                     result['stderr'])
+                    self.assertEqual(result['stdout'].strip(), '1 1')
 
 
 class TWNBotTestCase(TestCase):
