@@ -205,8 +205,7 @@ def user_agent_username(username=None) -> str:
     To achieve that, this function:
 
     - replaces spaces (' ') with '_'
-    - encodes the username as 'utf-8' and if the username is not ASCII
-    - URL encodes the username if it is not ASCII, or contains '%'
+    - URL encodes the username if it is not ASCII or contains '%'
 
     .. version-changed:: 11.0
        If *username* is not given, get it from environment variables
@@ -219,17 +218,12 @@ def user_agent_username(username=None) -> str:
         return ''
 
     username = username.replace(' ', '_')  # Avoid spaces or %20.
-    try:
-        username.encode('ascii')  # just test, but not actually use it
-    except UnicodeEncodeError:
-        username = quote(username.encode('utf-8'))
-    else:
-        # % is legal in the default $wgLegalTitleChars
-        # This is so that ops know the real pywikibot will not
-        # allow a useragent in the username to allow through a hand-coded
-        # percent-encoded value.
-        if '%' in username:
-            username = quote(username)
+    # % is legal in the default $wgLegalTitleChars
+    # This is so that ops know the real pywikibot will not
+    # allow a useragent in the username to allow through a hand-coded
+    # percent-encoded value.
+    if '%' in username or not username.isascii():
+        username = quote(username)
     return username
 
 
