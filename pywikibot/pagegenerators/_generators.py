@@ -1148,14 +1148,14 @@ def SupersetPageGenerator(query: str,
         if not schema_name:
             raise TypeError('Schema name or site must be provided.')
 
-        wikidb = re.sub('_p$', '', schema_name)
+        wikidb = schema_name.removesuffix('_p')
         site = pywikibot.site.APISite.fromDBName(wikidb)
 
     for row in rows:
         # If page_wikidb column in SQL result then use it to retrieve site
         if 'page_wikidb' in row:
             # remove "_p" suffix
-            wikidb = re.sub('_p$', '', row['page_wikidb'])
+            wikidb = row['page_wikidb'].removesuffix('_p')
 
             # Caching sites
             if wikidb not in sites:
