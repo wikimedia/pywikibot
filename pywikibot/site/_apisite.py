@@ -1499,7 +1499,7 @@ class APISite(
 
         query = self._generator(api.PropertyGenerator,
                                 type_arg='info',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 inprop=inprop)
         self._update_page(page, query)
 
@@ -1508,7 +1508,7 @@ class APISite(
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg='pageprops',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 )
         self._update_page(page, query)
 
@@ -1861,7 +1861,7 @@ class APISite(
         cititle = category.title(with_section=False)
         ciquery = self._generator(api.PropertyGenerator,
                                   type_arg='categoryinfo',
-                                  titles=cititle.encode(self.encoding()))
+                                  titles=cititle)
         self._update_page(category, ciquery)
 
     def categoryinfo(

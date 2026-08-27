@@ -1111,7 +1111,7 @@ class IndexPage(pywikibot.Page):
         if hasattr(self, '_pageid'):
             ppi_args['prppiipageid'] = str(self._pageid)
         else:
-            ppi_args['prppiititle'] = self.title().encode(site.encoding())
+            ppi_args['prppiititle'] = self.title()
 
         ppi_gen = site._generator(ListGenerator, 'proofreadpagesinindex',
                                   **ppi_args)

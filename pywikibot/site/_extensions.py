@@ -195,7 +195,7 @@ class ProofreadPageMixin:
 
         query = self._generator(api.PropertyGenerator,
                                 type_arg='imageforpage',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 prppifpprop=prppifpprop)
         self._update_page(page, query)
 
@@ -210,7 +210,7 @@ class GeoDataMixin:
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg='coordinates',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 coprop=['type', 'name', 'dim',
                                         'country', 'region',
                                         'globe'],
@@ -233,7 +233,7 @@ class PageImagesMixin:
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg='pageimages',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 piprop=['name'])
         self._update_page(page, query)
 

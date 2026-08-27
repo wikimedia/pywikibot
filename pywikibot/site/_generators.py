@@ -290,7 +290,7 @@ class GeneratorsMixin:
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        bltitle = page.title(with_section=False).encode(self.encoding())
+        bltitle = page.title(with_section=False)
         blargs: dict[str, Any] = {'gbltitle': bltitle}
         if filter_redirects is not None:
             blargs['gblfilterredir'] = ('redirects' if filter_redirects
@@ -358,7 +358,7 @@ class GeneratorsMixin:
             type such as NoneType or bool
         """
         eiargs: dict[str, Any] = {
-            'geititle': page.title(with_section=False).encode(self.encoding()),
+            'geititle': page.title(with_section=False),
         }
         if filter_redirects is not None:
             eiargs['geifilterredir'] = ('redirects' if filter_redirects
@@ -391,7 +391,7 @@ class GeneratorsMixin:
         :param content: Load the current content of each redirect
         """
         rdargs: dict[str, Any] = {
-            'titles': page.title(with_section=False).encode(self.encoding()),
+            'titles': page.title(with_section=False),
         }
         if filter_fragments is not None:
             rdargs['grdshow'] = ('' if filter_fragments else '!') + 'fragment'
@@ -481,7 +481,7 @@ class GeneratorsMixin:
         if hasattr(page, '_pageid'):
             plargs['pageids'] = str(page._pageid)
         else:
-            pltitle = page.title(with_section=False).encode(self.encoding())
+            pltitle = page.title(with_section=False)
             plargs['titles'] = pltitle
         return self._generator(api.PageGenerator, type_arg='links',
                                namespaces=namespaces, total=total,
@@ -519,8 +519,7 @@ class GeneratorsMixin:
         if hasattr(page, '_pageid'):
             clargs['pageids'] = str(page._pageid)
         else:
-            clargs['titles'] = page.title(
-                with_section=False).encode(self.encoding())
+            clargs['titles'] = page.title(with_section=False)
 
         if with_sort_key:
             page_dict = next(iter(self._generator(
@@ -558,7 +557,7 @@ class GeneratorsMixin:
             (default False); note that this means the content of the image
             description page, not the image itself
         """
-        imtitle = page.title(with_section=False).encode(self.encoding())
+        imtitle = page.title(with_section=False)
         return self._generator(api.PageGenerator, type_arg='images',
                                titles=imtitle, total=total,
                                g_content=content)
@@ -591,7 +590,7 @@ class GeneratorsMixin:
         :raises UnsupportedPageError: A Page object is not supported due
             to namespace restriction
         """
-        tltitle = page.title(with_section=False).encode(self.encoding())
+        tltitle = page.title(with_section=False)
         return self._generator(api.PageGenerator, type_arg='templates',
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
@@ -661,7 +660,7 @@ class GeneratorsMixin:
             raise TypeError(
                 f'categorymembers: non-Category page {category!r} specified')
 
-        cmtitle = category.title(with_section=False).encode(self.encoding())
+        cmtitle = category.title(with_section=False)
         cmargs: dict[str, Any] = {
             'type_arg': 'categorymembers',
             'gcmtitle': cmtitle,
@@ -857,7 +856,7 @@ class GeneratorsMixin:
             rvargs['rvsection'] = str(section)
 
         if revids is None:
-            rvtitle = page.title(with_section=False).encode(self.encoding())
+            rvtitle = page.title(with_section=False)
             rvargs['titles'] = rvtitle
         else:
             if isinstance(revids, (int, str)):
@@ -926,7 +925,7 @@ class GeneratorsMixin:
         lltitle = page.title(with_section=False)
         llquery = self._generator(api.PropertyGenerator,
                                   type_arg='langlinks',
-                                  titles=lltitle.encode(self.encoding()),
+                                  titles=lltitle,
                                   total=total)
         for pageitem in llquery:
             if not self.sametitle(pageitem['title'], lltitle):
@@ -955,7 +954,7 @@ class GeneratorsMixin:
         """
         eltitle = page.title(with_section=False)
         elquery = self._generator(api.PropertyGenerator, type_arg='extlinks',
-                                  titles=eltitle.encode(self.encoding()),
+                                  titles=eltitle,
                                   total=total)
         for pageitem in elquery:
             if not self.sametitle(pageitem['title'], eltitle):
