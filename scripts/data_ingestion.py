@@ -294,7 +294,7 @@ def main(*args: str) -> None:
     local_args = gen_factory.handle_args(local_args)
     for arg in local_args:
         opt, _, value = arg.partition(':')
-        if opt == '-csvdir:':
+        if opt == '-csvdir':
             csv_dir = value
         else:
             unknown.append(arg)

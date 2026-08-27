@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import MagicMock, patch
 
 from scripts import data_ingestion
 from tests import join_data_path, join_images_path
@@ -128,6 +129,37 @@ class TestDataIngestionBot(ScriptMainTestCase):
             data_ingestion.main(
                 '-csvdir:tests/data',
                 '-page:User:John_Vandenberg/data_ingestion_test_template')
+
+
+class TestDataIngestionMain(TestCase):
+
+    """Test :func:`data_ingestion.main`."""
+
+    net = False
+
+    def test_csvdir_option(self) -> None:
+        """Test the -csvdir option is accepted."""
+        generator_factory = MagicMock()
+        generator_factory.handle_args.return_value = [
+            '-csvdir:tests/data']
+        generator_factory.getCombinedGenerator.return_value = object()
+
+        with (
+            patch.object(data_ingestion.pywikibot, 'handle_args',
+                         side_effect=lambda args: args),
+            patch.object(data_ingestion.pagegenerators, 'GeneratorFactory',
+                         return_value=generator_factory),
+            patch.object(data_ingestion.pywikibot.bot, 'suggest_help',
+                         return_value=True) as suggest_help,
+        ):
+            data_ingestion.main('-csvdir:tests/data', '-page:Config')
+
+        generator_factory.handle_args.assert_called_once_with(
+            ('-csvdir:tests/data', '-page:Config'))
+        suggest_help.assert_called_once_with(
+            missing_parameters=None,
+            missing_generator=False,
+            unknown_parameters=[])
 
 
 if __name__ == '__main__':
