@@ -321,14 +321,18 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
                     # If the image is used with the urlname
                     # the previous function won't work
-                    if local_file_page.file_is_used and self.opt.replaceloose:
-                        bot = ImageBot(local_file_page.using_pages(),
-                                       local_file_page.title(with_ns=False,
-                                                             as_url=True),
-                                       commons_title,
-                                       always=self.opt.replacealways,
-                                       loose=self.opt.replaceloose)
-                        bot.run()
+                    if self.opt.replaceloose:
+                        remaining_pages = list(
+                            local_file_page.using_pages())
+                        if remaining_pages:
+                            bot = ImageBot(
+                                remaining_pages,
+                                local_file_page.title(with_ns=False,
+                                                      as_url=True),
+                                commons_title,
+                                always=self.opt.replacealways,
+                                loose=self.opt.replaceloose)
+                            bot.run()
                     self.counter['replace'] += 1
                 else:
                     pywikibot.info('Please change them manually.')
