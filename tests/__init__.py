@@ -96,6 +96,7 @@ library_test_modules = {
     'bot',
     'category',
     'collections',
+    'config',
     'cosmetic_changes',
     'date',
     'datasite',

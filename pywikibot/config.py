@@ -913,9 +913,16 @@ def datafilepath(*filename: str, create: bool = True) -> str:
 
 
 def shortpath(path: str) -> str:
-    """Return a file path relative to config.base_dir."""
-    if path.startswith(base_dir):
-        return path[len(base_dir) + len(os.path.sep):]
+    """Return a file path relative to config.base_dir.
+
+    .. version-changed:: 11.8
+       Path components are used to determine whether *path* is inside
+       :data:`base_dir`.
+    """
+    path_obj = Path(path)
+    if path_obj.is_relative_to(base_dir):
+        relative_path = path_obj.relative_to(base_dir)
+        return '' if relative_path == Path('.') else str(relative_path)
     return path
 
 

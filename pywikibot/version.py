@@ -251,14 +251,18 @@ def get_module_filename(module) -> str | None:
     :param module: The module instance.
     :type module: module
     :return: The filename if it's a pywikibot module otherwise None.
+
+    .. version-changed:: 11.8
+       Path components are used to determine whether the module is
+       inside the Pywikibot program directory.
     """
     if hasattr(module, '__file__'):
         filename = module.__file__
         if not filename or not os.path.exists(filename):
             return None
 
-        program_dir = _get_program_dir()
-        if filename.startswith(program_dir):
+        program_dir = Path(_get_program_dir())
+        if Path(filename).is_relative_to(program_dir):
             return filename
     return None
 
