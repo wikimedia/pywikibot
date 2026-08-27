@@ -676,7 +676,7 @@ class CheckImagesBot:
         # advise...
         try:
             curr_text = self.talk_page.get()
-            history = list(self.talk_page.revisions(total=10))
+            history = list(self.talk_page.revisions(total=2))
             latest_user = history[0]['user']
             pywikibot.info(
                 'The latest user that has written something is: '
