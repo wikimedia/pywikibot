@@ -158,7 +158,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     ones = collections.Counter(range(n_gen))
     active_iterables = set(range(n_gen))
-    seen = set()
+    seen: set[Hashable] = set()
 
     # Get items from iterables in a round-robin way.
     sentinel = object()
@@ -169,7 +169,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 active_iterables.discard(index)
                 continue
 
-            if not allow_duplicates and hash(item) in seen:
+            if not allow_duplicates and item in seen:
                 continue
 
             # Each cache entry is a Counter of iterables' index
@@ -181,7 +181,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 # Remove item from cache if possible or decrease Counter entry
                 if not allow_duplicates:
                     del cache[item]
-                    seen.add(hash(item))
+                    seen.add(item)
                 elif cache[item] == ones:
                     del cache[item]
                 else:

@@ -823,6 +823,19 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
         """Test basic intersect with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
 
+    def test_intersect_hash_collision(self) -> None:
+        """Test unequal items with the same hash are not deduplicated."""
+        class CollidingInt(int):
+
+            """Integer whose instances all share one hash value."""
+
+            def __hash__(self) -> int:
+                """Return a constant hash."""
+                return 1
+
+        values = [CollidingInt(1), CollidingInt(2)]
+        self.assertEqualItertools([values, values])
+
     def test_intersect_with_accepted_dups(self) -> None:
         """Test intersect with duplicates accepted."""
         self.assertEqualItertoolsWithDuplicates(['abc', 'db', 'ba'])
