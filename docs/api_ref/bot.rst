@@ -27,7 +27,7 @@
       .. attribute:: generator
          :type: Iterable
 
-         Instance variable to hold the Iterbale processed by :meth:`run`
+         Instance variable to hold the Iterable processed by :meth:`run`
          method. The is added to the class with *generator* keyword
          argument and the proposed type is a ``Generator``. If not,
          :meth:`run` upcast the generator attribute to become a

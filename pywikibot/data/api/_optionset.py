@@ -21,7 +21,7 @@ class OptionSet(MutableMapping):
 
     If it is instantiated with the associated site, module and parameter
     it will only allow valid names as options. If instantiated 'lazy
-    loaded' it won't checks if the names are valid until the site has
+    loaded' it won't check if the names are valid until the site has
     been set (which isn't required, but recommended). The site can only
     be set once if it's not None and after setting it, any site (even
     None) will fail.

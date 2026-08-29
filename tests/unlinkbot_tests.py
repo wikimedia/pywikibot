@@ -33,7 +33,7 @@ class TestChoiceOptions(TestCase):
 
     net = False
 
-    def test_edit_replacement_excepton(self) -> None:
+    def test_edit_replacement_exception(self) -> None:
         """Test ChoiceException."""
         option = EditReplacementError()
         self.assertTrue(option.stop)

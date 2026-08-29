@@ -90,7 +90,7 @@ Explanation
       :mod:`pywikibot.pagegenerators` are parsed here using
       :meth:`GeneratorFactory.handle_args()
       <pagegenerators.GeneratorFactory.handle_args>`.
-:25:  Local options which are are available for the current bot are
+:25:  Local options which are available for the current bot are
       parsed in this loop.
 :29:  Create the bot passing keyword only parameters and run it.
 

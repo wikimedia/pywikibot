@@ -49,10 +49,10 @@ set /A ENDTIME=(%ENDTIME:~0,2%)*3600 + (1%ENDTIME:~3,2%-100)*60 + (1%ENDTIME:~6,
 rem calculating the duration is easy
 set /A DURATION=%ENDTIME%-%STARTTIME%
 
-rem we might have measured the time inbetween days
+rem we might have measured the time between days
 if %ENDTIME% LSS %STARTTIME% set set /A DURATION=%STARTTIME%-%ENDTIME%
 
-rem now break the seconds down to hors, minutes, seconds
+rem now break the seconds down to hours, minutes, seconds
 set /A DURATIONH=%DURATION% / 3600
 set /A DURATIONM=(%DURATION% - %DURATIONH%*3600) / 60
 set /A DURATIONS=(%DURATION% - %DURATIONH%*3600 - %DURATIONM%*60)

@@ -317,7 +317,7 @@ class User(Page):
         return self.site.is_locked(self.username, force)
 
     def isEmailable(self, force: bool = False) -> bool:  # noqa: N802
-        """Determine whether emails may be send to this user through MediaWiki.
+        """Determine whether emails may be sent to this user through MediaWiki.
 
         :param force: If True, forces reloading the data from API
         """

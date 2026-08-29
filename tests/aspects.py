@@ -1559,7 +1559,7 @@ class PwbTestCase(TestCase):
         .. version-changed:: 11.7
            Return timeout information.
 
-        :param args: :mod:`pwb` warapper script arguments
+        :param args: :mod:`pwb` wrapper script arguments
         :param kwargs: keyword arguments of :func:`tests.utils.execute_pwb`
         :return: Result of :func:`tests.utils.execute_pwb`.
         """
