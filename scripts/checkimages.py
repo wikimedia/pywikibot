@@ -1656,7 +1656,7 @@ def main(*args: str) -> bool:
             pywikibot.info(
                 f'Retrieving the latest {limit} files for checking...')
     while True:
-        # Defing the Main Class.
+        # Defining the Main Class.
         bot = CheckImagesBot(site, sendemail_active=sendemail_active,
                              duplicates_report=duplicates_report,
                              log_full_error=log_full_error,

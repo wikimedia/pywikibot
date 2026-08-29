@@ -373,7 +373,7 @@ class CategoryDatabase:
                 self.rebuild()
 
     def rebuild(self) -> None:
-        """Rebuild the dabatase."""
+        """Rebuild the database."""
         self.cat_content_db = {}
         self.superclass_db = {}
 

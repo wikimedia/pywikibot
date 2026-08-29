@@ -43,7 +43,7 @@ performs them.
 commons\_category\_redirect script
 ----------------------------------
 
-**Script to clean up non-empty catecory redirect category on Commons**
+**Script to clean up non-empty category redirect category on Commons**
 
 Moves all images, pages and categories in redirect categories to the
 target category.

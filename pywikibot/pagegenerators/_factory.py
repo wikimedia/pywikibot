@@ -216,7 +216,7 @@ class GeneratorFactory:
            set the instance variable :attr:`is_preloading` to True or False.
         .. version-changed:: 8.0
            if ``limit`` option is set and multiple generators are given,
-           pages are yieded in a :func:`roundrobin
+           pages are yielded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
         .. version-changed:: 11.3
            If *preload* option is set, the preloading generators

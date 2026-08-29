@@ -264,7 +264,7 @@ class RedirectGenerator(OptionHandler):
 
         :[2]: target page title of the redirect, or chain (may not exist)
         :[3]: target page of the redirect, or end of chain, or page title
-              where chain or loop detecton was halted, or None if unknown
+              where chain or loop detection was halted, or None if unknown
         """
         for apiQ in self._next_redirect_group():
             gen = pywikibot.data.api.Request(

@@ -85,7 +85,7 @@ seem to be feasible.)
 If the target page already exists, the target page will be overwritten
 if ``-overwrite`` is set or skipped otherwise.
 
-The list of pages to be imported can be generated outside of the pywikbot:
+The list of pages to be imported can be generated outside of Pywikibot:
 
     for i in {1..10} ; do python3 pwb.py transwikiimport \
 -interwikisource:mul -page:"Page:How to become famous.djvu/$i" \
@@ -110,7 +110,7 @@ skipped).*
 
 The global option ``-simulate`` disables the import and the bot prints
 the names of the pages that would be imported. Since the import of pages
-is a quite exceptionell process and potentially dangerous it should be
+is a quite exceptional process and potentially dangerous it should be
 made carefully and tested in advance.
 
 The ``-simulate`` option can help to find out which pages would be moved
