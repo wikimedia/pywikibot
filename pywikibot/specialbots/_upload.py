@@ -138,7 +138,16 @@ class UploadRobot(BaseBot):
         else:
             self.target_site = pywikibot.Site()
 
-    def read_file_content(self, file_url: str):
+    @staticmethod
+    def _remove_temp_file(path: Path) -> None:
+        """Remove a temporary file without masking an earlier error."""
+        try:
+            path.unlink(missing_ok=True)
+        except OSError as e:
+            pywikibot.warning(
+                f'Unable to remove temporary file {path}: {e}')
+
+    def read_file_content(self, file_url: str) -> str:
         """Return name of temp file in which remote file is saved."""
         pywikibot.info('Reading file ' + file_url)
 
@@ -146,61 +155,78 @@ class UploadRobot(BaseBot):
         os.close(temp_fd)
         path = Path(tempname)
         size = 0
+        complete = False
 
-        dt_gen = (el for el in (15, 30, 45, 60, 120, 180, 240, 300))
-        while True:
-            file_len = path.stat().st_size
-            if file_len:
-                pywikibot.info('Download resumed.')
-                headers = {'Range': f'bytes={file_len}-'}
-            else:
-                headers = {}
+        try:
+            dt_gen = (el for el in (15, 30, 45, 60, 120, 180, 240, 300))
+            while True:
+                file_len = path.stat().st_size
+                if file_len:
+                    pywikibot.info('Download resumed.')
+                    headers = {'Range': f'bytes={file_len}-'}
+                else:
+                    headers = {}
 
-            with path.open('ab') as fd:
+                with path.open('ab') as fd:
+                    try:
+                        with http.fetch(file_url, stream=True,
+                                        headers=headers) as response:
+                            try:
+                                response.raise_for_status()
+                            except requests.HTTPError as e:
+                                # exit criteria if size is not available
+                                # error on last iteration is OK, we're
+                                # requesting {'Range': 'bytes=file_len-'}
+                                err = (
+                                    HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE
+                                )
+                                if response.status_code == err \
+                                        and path.stat().st_size:
+                                    break
+                                raise FatalServerError(str(e)) from e
+
+                            # get download info, if available
+                            # Note: this is not enough to exclude pages
+                            #       e.g. 'application/json' is also not a media
+                            content_type = response.headers.get(
+                                'Content-Type', '')
+                            if 'text/' in content_type:
+                                raise FatalServerError(
+                                    'The requested URL was not found on '
+                                    'server.')
+                            size = max(
+                                size,
+                                int(response.headers.get('Content-Length', 0))
+                            )
+
+                            # stream content to temp file (in chunks of 1Mb)
+                            for chunk in response.iter_content(
+                                    chunk_size=1024 * 1024):
+                                fd.write(chunk)
+
+                    # raised from connection lost during iter_content()
+                    except requests.ConnectionError:
+                        fd.flush()
+                        pywikibot.info(
+                            'Connection closed at byte '
+                            f'{path.stat().st_size}')
+
+                if size and size == path.stat().st_size:
+                    break
                 try:
-                    response = http.fetch(file_url, stream=True,
-                                          headers=headers)
-                    response.raise_for_status()
+                    dt = next(dt_gen)
+                    pywikibot.info(f'Sleeping for {dt} seconds ...')
+                    pywikibot.sleep(dt)
+                except StopIteration:
+                    raise FatalServerError(
+                        'Download failed, too many retries!')
 
-                    # get download info, if available
-                    # Note: this is not enough to exclude pages
-                    #       e.g. 'application/json' is also not a media
-                    if 'text/' in response.headers['Content-Type']:
-                        raise FatalServerError('The requested URL was not '
-                                               'found on server.')
-                    size = max(size,
-                               int(response.headers.get('Content-Length', 0)))
-
-                    # stream content to temp file (in chunks of 1Mb)
-                    for chunk in response.iter_content(chunk_size=1024 * 1024):
-                        fd.write(chunk)
-
-                # raised from connection lost during response.iter_content()
-                except requests.ConnectionError:
-                    fd.flush()
-                    pywikibot.info(
-                        f'Connection closed at byte {path.stat().st_size}')
-                # raised from response.raise_for_status()
-                except requests.HTTPError as e:
-                    # exit criteria if size is not available
-                    # error on last iteration is OK, we're requesting
-                    #    {'Range': 'bytes=file_len-'}
-                    err = HTTPStatus.REQUESTED_RANGE_NOT_SATISFIABLE
-                    if response.status_code == err and path.stat().st_size:
-                        break
-                    raise FatalServerError(str(e)) from e
-
-            if size and size == path.stat().st_size:
-                break
-            try:
-                dt = next(dt_gen)
-                pywikibot.info(f'Sleeping for {dt} seconds ...')
-                pywikibot.sleep(dt)
-            except StopIteration:
-                raise FatalServerError('Download failed, too many retries!')
-
-        pywikibot.info(f'Downloaded {path.stat().st_size} bytes')
-        return tempname
+            pywikibot.info(f'Downloaded {path.stat().st_size} bytes')
+            complete = True
+            return tempname
+        finally:
+            if not complete:
+                self._remove_temp_file(path)
 
     def _handle_warning(self, warning: str) -> bool | None:
         """Return whether the warning cause an abort or be ignored.
@@ -414,45 +440,53 @@ class UploadRobot(BaseBot):
         ignore_warnings = self.ignore_warning is True or self._handle_warnings
 
         download = False
-        while True:
-            if '://' in file_url \
-               and (not site.has_right('upload_by_url') or download):
+        temp_filename: str | None = None
+        try:
+            while True:
+                if '://' in file_url \
+                   and (not site.has_right('upload_by_url') or download):
+                    try:
+                        temp_filename = self.read_file_content(file_url)
+                        file_url = temp_filename
+                    except FatalServerError as e:
+                        pywikibot.error(e)
+                        return None
+
                 try:
-                    file_url = self.read_file_content(file_url)
-                except FatalServerError as e:
-                    pywikibot.error(e)
-                    return None
-
-            try:
-                success = imagepage.upload(file_url,
-                                           ignore_warnings=ignore_warnings,
-                                           chunk_size=self.chunk_size,
-                                           asynchronous=self.asynchronous,
-                                           comment=self.summary)
-            except APIError as error:
-                if error.code == 'uploaddisabled':
-                    pywikibot.error(f'Upload error: Local file uploads are '
-                                    f'disabled on {site}.')
-                elif error.code == 'copyuploadbaddomain' and not download \
-                        and '://' in file_url:
-                    pywikibot.error(error)
-                    pywikibot.info('Downloading the file and retry...')
-                    download = True
-                    continue
-                else:
+                    success = imagepage.upload(
+                        file_url,
+                        ignore_warnings=ignore_warnings,
+                        chunk_size=self.chunk_size,
+                        asynchronous=self.asynchronous,
+                        comment=self.summary)
+                except APIError as error:
+                    if error.code == 'uploaddisabled':
+                        pywikibot.error(
+                            f'Upload error: Local file uploads are disabled '
+                            f'on {site}.')
+                    elif error.code == 'copyuploadbaddomain' and not download \
+                            and '://' in file_url:
+                        pywikibot.error(error)
+                        pywikibot.info('Downloading the file and retry...')
+                        download = True
+                        continue
+                    else:
+                        pywikibot.exception('Upload error: ')
+                except Exception:
                     pywikibot.exception('Upload error: ')
-            except Exception:
-                pywikibot.exception('Upload error: ')
-            else:
-                if success:
-                    # No warning, upload complete.
-                    pywikibot.info(f'Upload of {filename} successful.')
-                    self.counter['upload'] += 1
-                    return filename  # data['filename']
-                pywikibot.info('Upload aborted.')
-            break
+                else:
+                    if success:
+                        # No warning, upload complete.
+                        pywikibot.info(f'Upload of {filename} successful.')
+                        self.counter['upload'] += 1
+                        return filename  # data['filename']
+                    pywikibot.info('Upload aborted.')
+                break
 
-        return None
+            return None
+        finally:
+            if temp_filename is not None:
+                self._remove_temp_file(Path(temp_filename))
 
     def skip_run(self) -> bool:
         """Check whether processing is to be skipped."""
