@@ -17,6 +17,20 @@ from tests.aspects import DefaultSiteTestCase, ScriptMainTestCase
 from tests.utils import empty_sites
 
 
+class TestPageWithRefs(DefaultSiteTestCase):
+
+    """Test PageWithRefs."""
+
+    dry = True
+
+    def test_clear_ref_table_cache(self) -> None:
+        """Test that the reference table is cleared."""
+        page = delete.PageWithRefs(self.site, 'Main Page')
+        page._ref_table = {}
+        page.clear_cache()
+        self.assertNotHasAttr(page, '_ref_table')
+
+
 class TestDeletionBotWrite(ScriptMainTestCase):
 
     """Test deletionbot script."""

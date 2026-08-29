@@ -82,11 +82,7 @@ class PageWithRefs(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    def __init__(self, source, title: str = '', ns=0) -> None:
-        """Initializer."""
-        super().__init__(source, title, ns)
-        _cache_attrs = list(super()._cache_attrs)
-        _cache_attrs = tuple(_cache_attrs + ['_ref_table'])
+    _cache_attrs = (*Page._cache_attrs, '_ref_table')
 
     def get_ref_table(self, *args, **kwargs) -> RefTable:
         """Build mapping table with pages which links the current page."""
