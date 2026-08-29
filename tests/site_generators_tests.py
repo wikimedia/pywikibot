@@ -126,6 +126,18 @@ class TestDrySiteGenerators(DefaultSiteTestCase):
         self.assertTrue(result)
         namespace.assert_called_once_with()
 
+    def test_loadrevisions_step(self) -> None:
+        """Test that loadrevisions sets its API query increment."""
+        page = pywikibot.Page(self.site, 'Main Page')
+        with patch.object(self.site, '_generator') as generator:
+            rvgen = generator.return_value
+            set_query_increment = rvgen.set_query_increment
+            rvgen.request = {}
+            rvgen.__iter__.return_value = ()
+            self.site.loadrevisions(page, step=5)
+
+        set_query_increment.assert_called_once_with(5)
+
 
 class TestSiteGenerators(DefaultSiteTestCase):
 

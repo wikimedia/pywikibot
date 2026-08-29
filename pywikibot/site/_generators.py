@@ -878,7 +878,7 @@ class GeneratorsMixin:
                                 total=kwargs.get('total'), **rvargs)
 
         if step:
-            rvgen.set_query_increment = step
+            rvgen.set_query_increment(step)
 
         if latest or 'revids' in rvgen.request:
             rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
