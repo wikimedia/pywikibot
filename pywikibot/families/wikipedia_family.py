@@ -11,7 +11,7 @@ from pywikibot import family
 
 class Family(family.WikimediaSubdomainFamily):
 
-    """Family module for Wikipedia."""
+    """Family class for Wikipedia."""
 
     name = 'wikipedia'
 
