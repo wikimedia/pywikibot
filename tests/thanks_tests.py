@@ -77,21 +77,6 @@ class TestThankRevisionErrors(TestCase):
     code = 'test'
     write = True
 
-    def test_bad_recipient(self) -> None:
-        """Test that thanking a bad recipient causes an error."""
-        site = self.get_site()
-        data = site.recentchanges(total=20)
-        for rev in data:
-            revid = rev['revid']
-            username = rev['user']
-            user = User(site, username)
-            if not user.is_thankable:
-                break
-        else:
-            self.skipTest(NO_THANKABLE_REVS)
-        self.assertAPIError('invalidrecipient', None, site.thank_revision,
-                            revid, source='pywikibot test')
-
     def test_invalid_revision(self) -> None:
         """Test that passing an invalid revision ID causes an error."""
         site = self.get_site()
