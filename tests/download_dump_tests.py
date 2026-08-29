@@ -17,6 +17,23 @@ from scripts import download_dump
 from tests.aspects import TestCase
 
 
+class DownloadDumpMainTestCase(TestCase):
+
+    """Test :func:`download_dump.main`."""
+
+    net = False
+
+    @patch.object(download_dump.pywikibot, 'input',
+                  return_value='prompted-path')
+    @patch.object(download_dump.pywikibot, 'handle_args',
+                  side_effect=lambda args: args)
+    def test_empty_storepath_prompts(self, _, input_mock) -> None:
+        """Test that an empty store path prompts for a value."""
+        download_dump.main('-storepath:')
+
+        input_mock.assert_called_once_with('Enter the store path: ')
+
+
 class DownloadDumpBotTestCase(TestCase):
 
     """Test :class:`download_dump.DownloadDumpBot`."""
