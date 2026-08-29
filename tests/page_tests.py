@@ -207,6 +207,26 @@ class TestPageGet(DefaultSiteTestCase):
             revid=1, slots={'main': {'*': text}})
         return page
 
+    def test_latest_revision_id_loads_current_revision(self) -> None:
+        """Test loading and caching the latest revision ID."""
+        page = pywikibot.Page(self.site, 'Test page')
+        revision = pywikibot.page.Revision(revid=123)
+
+        def loadrevisions(loaded_page) -> None:
+            loaded_page._revisions[revision.revid] = revision
+            loaded_page.latest_revision_id = revision.revid
+
+        with mock.patch.object(
+                self.site, 'loadrevisions',
+                side_effect=loadrevisions) as loadrevisions:
+            self.assertEqual(page.latest_revision_id, revision.revid)
+            self.assertEqual(page.latest_revision_id, revision.revid)
+
+        loadrevisions.assert_called_once_with(page)
+        self.assertEqual(list(page._revisions), [revision.revid])
+        self.assertIs(page._revisions[revision.revid], revision)
+        self.assertIsNone(revision.text)
+
     def test_get_does_not_validate_section(self) -> None:
         """Test that get does not inspect a title section."""
         text = '== Existing ==\nText'

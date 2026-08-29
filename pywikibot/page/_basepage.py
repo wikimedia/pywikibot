@@ -508,7 +508,7 @@ class BasePage(ComparableMixin):
     def latest_revision_id(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
-            self.revisions()
+            self.site.loadrevisions(self)
         return self._revid
 
     @latest_revision_id.deleter
