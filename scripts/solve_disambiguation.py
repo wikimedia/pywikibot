@@ -472,8 +472,10 @@ class PrimaryIgnoreManager:
 
         # The file is stored in the disambiguation/ subdir.
         # Create if necessary.
-        with suppress(IOError):
+        try:
             text = filepath.read_text(encoding='utf-8')
+        except OSError:
+            return
 
         # skip empty lines
         self.ignorelist = {line for line in text.splitlines() if line}
