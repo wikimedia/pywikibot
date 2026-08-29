@@ -578,7 +578,7 @@ def main(*args: str) -> None:
             continue
 
         opt = opt[1:]
-        if opt == 'delay:':
+        if opt == 'delay':
             options[opt] = int(value)
         elif opt == 'category':
             options[opt] = value
