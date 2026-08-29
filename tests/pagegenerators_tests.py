@@ -634,6 +634,34 @@ class TestDayPageGenerator(DefaultSiteTestCase):
             self._run_test(12, 13)
 
 
+class TestDryPreloadingGenerator(TestCase):
+
+    """Dry tests for PreloadingGenerator."""
+
+    net = False
+
+    def test_groupsize_per_site(self) -> None:
+        """Test that each site keeps its own preload group size."""
+        low_site = mock.Mock(maxlimit=2)
+        high_site = mock.Mock(maxlimit=5)
+        low_site.preloadpages.side_effect = (
+            lambda pages, **kwargs: iter(pages))
+        high_site.preloadpages.side_effect = (
+            lambda pages, **kwargs: iter(pages))
+
+        low_pages = [mock.Mock(site=low_site) for _ in range(2)]
+        high_pages = [mock.Mock(site=high_site) for _ in range(3)]
+        pages = [low_pages[0], high_pages[0], low_pages[1],
+                 *high_pages[1:]]
+
+        list(PreloadingGenerator(pages, groupsize=5))
+
+        low_site.preloadpages.assert_called_once_with(
+            low_pages, groupsize=2, quiet=False)
+        high_site.preloadpages.assert_called_once_with(
+            high_pages, groupsize=5, quiet=False)
+
+
 class TestPreloadingGenerator(DefaultSiteTestCase):
 
     """Test preloading generator on lists."""

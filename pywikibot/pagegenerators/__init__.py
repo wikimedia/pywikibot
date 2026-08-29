@@ -689,16 +689,18 @@ def PreloadingGenerator(generator: Iterable[pywikibot.page.Page],
         site = page.site
         sites.setdefault(site, []).append(page)
 
-        groupsize = min(groupsize, site.maxlimit)
-        if len(sites[site]) >= groupsize:
+        site_groupsize = min(groupsize, site.maxlimit)
+        if len(sites[site]) >= site_groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            yield from site.preloadpages(group, groupsize=groupsize,
+            yield from site.preloadpages(group, groupsize=site_groupsize,
                                          quiet=quiet)
 
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        yield from site.preloadpages(pages, groupsize=groupsize, quiet=quiet)
+        site_groupsize = min(groupsize, site.maxlimit)
+        yield from site.preloadpages(pages, groupsize=site_groupsize,
+                                     quiet=quiet)
 
 
 def DequePreloadingGenerator(
