@@ -345,7 +345,7 @@ def main(*args: str) -> None:
             with open(textfile_opt, encoding='utf-8') as textfile:
                 opts['text'] = textfile.read()
         except OSError as e:
-            pywikibot.error(f'Error loading {opts["textfile"]}: {e}')
+            pywikibot.error(f'Error loading {textfile_opt}: {e}')
             return
 
     generator = gen_factory.getCombinedGenerator()
