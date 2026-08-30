@@ -359,6 +359,7 @@ def set_messages_package(package_name: str) -> None:
     global _messages_available
     _messages_package_name = package_name
     _messages_available = None
+    _get_bundle.cache_clear()
 
 
 def messages_available() -> bool:

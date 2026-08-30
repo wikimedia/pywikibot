@@ -274,6 +274,17 @@ class TestTWTranslate(TWNTestCaseBase):
     net = False
     message_package = 'tests.i18n'
 
+    def testSwitchMessagesPackage(self) -> None:
+        """Test that switching packages clears cached translations."""
+        self.addCleanup(i18n._get_bundle.cache_clear)
+        i18n._get_bundle.cache_clear()
+        self.assertEqual(i18n.twtranslate('en', 'test-localized'),
+                         'test-localized EN')
+
+        i18n.set_messages_package('pywikibot.scripts.i18n')
+        with self.assertRaises(TranslationError):
+            i18n.twtranslate('en', 'test-localized', fallback=False)
+
     def testLocalized(self) -> None:
         """Test fully localized entry."""
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
