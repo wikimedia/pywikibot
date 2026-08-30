@@ -290,7 +290,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    @unittest.expectedFailure  # T367326
     def test_Coordinate_edit(self) -> None:
         """Attempt adding a Coordinate with globe set via item."""
         testsite = self.get_repo()
@@ -300,7 +299,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = pywikibot.page.Claim(testsite, 'P20480',
                                      datatype='globe-coordinate')
         target = pywikibot.Coordinate(site=testsite, lat=12.0, lon=13.0,
-                                      globe_item=item)
+                                      precision=0.1, globe_item=item)
         claim.setTarget(target)
         item.addClaim(claim)
 
