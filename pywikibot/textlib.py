@@ -15,6 +15,7 @@ from contextlib import closing, suppress
 from dataclasses import dataclass
 from html.parser import HTMLParser
 from typing import NamedTuple
+from urllib.parse import quote
 
 import pywikibot
 from pywikibot.backports import pairwise
@@ -2190,15 +2191,33 @@ def does_text_contain_section(pagetext: str, section: str) -> bool:
     section with or without a preceding colon which is required for a
     text link e.g. for categories and files.
 
+    Legacy dot-escaped titles are matched literally against encoded
+    heading wikitext, treating spaces and underscores alike.
+
+    .. version-changed:: 11.9
+       Legacy dot-escaped section titles are supported.
+
     :param pagetext: The wikitext of a page
     :param section: A section of a page including wikitext markups
     """
     # match preceding colon for text links
-    section = re.sub(r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
+    section_regex = re.sub(
+        r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
-    section = re.sub(r'\\?[ _]', '[ _]', section)
-    m = re.search(f"=+[ ']*{section}[ ']*=+", pagetext)
-    return bool(m)
+    section_regex = re.sub(r'\\?[ _]', '[ _]', section_regex)
+    if re.search(f"=+[ ']*{section_regex}[ ']*=+", pagetext):
+        return True
+
+    # Encode headings instead of decoding ambiguous literal dot sequences.
+    section = section.replace(' ', '_')
+    for match in get_regexes('header')[0].finditer(pagetext):
+        heading = Section(match[1], '').heading.replace(' ', '_')
+        # Legacy anchors escape '~', which quote() always leaves safe.
+        encoded = quote(heading, safe=':').replace('~', '%7E')
+        if encoded.replace('%', '.') == section:
+            return True
+
+    return False
 
 
 def reformat_ISBNs(text: str, match_func) -> str:
