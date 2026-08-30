@@ -300,19 +300,23 @@ class TestUpload(TestCase):
 
     def _init_upload(self, chunk_size) -> None:
         """Do an initial upload causing an abort because of warnings."""
+        required_warns = {'exists'} if chunk_size else {'duplicate', 'exists'}
+        # The persistent test file may have further duplicate/history warnings.
+        allowed_warns = required_warns | {
+            'duplicate-archive', 'duplicateversions', 'nochange'}
+
         def warn_callback(warnings) -> None:
             """A simple callback not automatically finishing the upload."""
-            self.assertCountEqual([w.code for w in warnings], expected_warns)
-            # by now we know there are only two but just make sure
-            self.assertLength(warnings, expected_warns)
-            self.assertIn(len(expected_warns), [1, 2])
-            if len(expected_warns) == 2:
-                self.assertEqual(warnings[0].file_key, warnings[1].file_key)
-                self.assertEqual(warnings[0].offset, warnings[1].offset)
+            self.assertTrue(warnings)
+            warning_codes = {warning.code for warning in warnings}
+            self.assertLessEqual(required_warns, warning_codes)
+            self.assertLessEqual(warning_codes, allowed_warns)
+            self.assertTrue(all(warning.file_key == warnings[0].file_key
+                                for warning in warnings))
+            self.assertTrue(all(warning.offset == warnings[0].offset
+                                for warning in warnings))
             self._file_key = warnings[0].file_key
             self._offset = warnings[0].offset
-
-        expected_warns = ['exists'] if chunk_size else ['duplicate', 'exists']
 
         # First upload the warning with warnings enabled
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
@@ -348,14 +352,21 @@ class TestUpload(TestCase):
     def _test_continue_filekey(self, chunk_size) -> None:
         """Test uploading a chunk first and finish in a separate upload."""
         self._init_upload(chunk_size)
-        self._finish_upload(chunk_size, self.sounds_png)
+        page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
+        uploader = Uploader(
+            self.site, page, source_filename=self.sounds_png,
+            comment='pywikibot test', text=page.text,
+            chunk_size=chunk_size,
+            ignore_warnings=True, report_success=False)
+        self.assertTrue(uploader._upload(
+            ignore_warnings=True, report_success=False,
+            file_key=self._file_key, offset=self._offset))
 
         # Check if it's still cached
         with self.assertAPIError('siiinvalidsessiondata') as cm:
             self.site.stash_info(self._file_key)
         self.assertStartsWith(cm.exception.info, 'File not found')
 
-    @unittest.expectedFailure  # T367314
     def test_continue_filekey_once(self) -> None:
         """Test continuing to upload a file without using chunked mode."""
         self._test_continue_filekey(0)
