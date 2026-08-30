@@ -317,9 +317,10 @@ class TestUpload(TestCase):
         # First upload the warning with warnings enabled
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
         self.assertNotHasAttr(self, '_file_key')
-        self.site.upload(page, source_filename=self.sounds_png,
-                         comment='pywikibot test', chunk_size=chunk_size,
-                         ignore_warnings=warn_callback)
+        self.assertFalse(
+            self.site.upload(page, source_filename=self.sounds_png,
+                             comment='pywikibot test', chunk_size=chunk_size,
+                             ignore_warnings=warn_callback))
 
         # Check that the warning happened and it's cached
         self.assertHasAttr(self, '_file_key')
@@ -359,10 +360,9 @@ class TestUpload(TestCase):
         """Test continuing to upload a file without using chunked mode."""
         self._test_continue_filekey(0)
 
-    @unittest.expectedFailure  # T133288
-    def test_continue_filekey_chunked(self) -> None:
-        """Test continuing to upload a file with using chunked mode."""
-        self._test_continue_filekey(1024)
+    def test_first_chunk_warning_stash(self) -> None:
+        """Test a first chunk is stashed after an upload warning."""
+        self._init_upload(1024)
 
     @unittest.expectedFailure  # T367321
     def test_sha1_mismatch(self) -> None:
