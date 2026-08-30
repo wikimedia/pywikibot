@@ -922,14 +922,16 @@ class TestReplaceLinks(TestCase):
                                   self.get_site('wt')),
             '[[Bar]] and [[Bar|bar]]')
 
-    @unittest.expectedFailure  # T396719
     def test_label_diff_namespace(self) -> None:
         """Test that it uses the old label when the new doesn't match."""
         # These tests require to get the actual part which is before the title
         # (interwiki and namespace prefixes) which could be then compared
         # case insensitive.
         tests = [
+            ('[[file:Foobar]]', '[[file:Foo]]bar'),
             ('[[Image:Foobar]]', '[[File:Foo|Image:Foobar]]'),
+            ('[[Image:Foobar#Part]]',
+             '[[File:Foo#Part|Image:Foobar]]'),
             ('[[en:File:Foobar]]', '[[File:Foo|en:File:Foobar]]'),
         ]
         for link, result in tests:

@@ -1039,11 +1039,14 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             # compare title, but only with parts if linktrail works
             if not linktrail.sub('',
                                  parsed_link_title[len(new_link_title):]):
-                # TODO: This must also compare everything that was used as a
-                #       prefix (in case insensitive)
+                label_prefix = new_label[:-len(parsed_link_title)]
+                link_prefix = new_link.canonical_title()[:-len(new_link.title)]
+                if new_link.site != site:
+                    link_prefix = f':{new_link.site.code}:{link_prefix}'
                 must_piped = (
                     not parsed_link_title.startswith(new_link_title)
-                    or parsed_new_label.namespace != new_link.namespace)
+                    or parsed_new_label.namespace != new_link.namespace
+                    or label_prefix.lower() != link_prefix.lower())
 
         if must_piped:
             new_text = f'[[{new_title}|{new_label}]]'
