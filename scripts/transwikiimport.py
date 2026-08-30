@@ -172,7 +172,7 @@ def main(*args: str) -> None:
     correspondingnamespace = 'all'
     rootpage = ''
     tags = ''
-    summary = 'Importing page from '
+    summary = None
     overwrite = False
     target = False
     fullhistory = False
@@ -183,7 +183,6 @@ def main(*args: str) -> None:
     for arg in local_args:
         if arg.startswith('-interwikisource'):
             interwikisource = arg[len('-interwikisource:'):]
-            summary += interwikisource
         elif arg.startswith('-correspondingnamespace'):
             correspondingnamespace = arg[len('-correspondingnamespace:'):]
         elif arg.startswith('-rootpage'):
@@ -204,6 +203,9 @@ def main(*args: str) -> None:
             assignknownusers = True
         else:
             gen_args.append(arg)
+
+    if summary is None:
+        summary = f'Importing page from {interwikisource}'
 
     tosite = pywikibot.Site()
     csrf = tosite.tokens['csrf']
