@@ -58,7 +58,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.extlinks',
     'sphinx.ext.linkcode',
-    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
     'sphinx_tabs.tabs',
@@ -473,15 +472,8 @@ autodoc_typehints = 'description'
 # autosectionlabel_prefix_document = True
 suppress_warnings = [
     'autosectionlabel.*',
-    'sphinx.ext.napoleon.RemovedInSphinx11Warning',
 ]
 toc_object_entries_show_parents = 'hide'
-
-# Napoleon settings
-napoleon_use_admonition_for_examples = True
-napoleon_use_admonition_for_notes = True
-napoleon_use_admonition_for_references = True
-napoleon_custom_sections = ['Advice', 'Hints', 'Rights']
 
 python_use_unqualified_type_names = True
 modindex_common_prefix = ['pywikibot.scripts.']

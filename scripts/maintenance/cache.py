@@ -26,29 +26,29 @@ The following parameters are supported:
 -o                Output command which is output when the filter evaluated to
                   True. If it returns None it won't output anything.
 
-Examples
---------
+.. admonition:: Examples
 
-  Print the filename of any entry with 'wikidata' in the key:
+   Print the filename of any entry with 'wikidata' in the key:
 
-    -c "wikidata" in entry._uniquedescriptionstr()
+     -c "wikidata" in entry._uniquedescriptionstr()
 
-  Customised output if the site code is 'ar':
+   Customised output if the site code is 'ar':
 
-    -c entry.site.code == "ar"
-    -o uniquedesc(entry)
+     -c entry.site.code == "ar"
+     -o uniquedesc(entry)
 
-  Or the state of the login:
+   Or the state of the login:
 
-    -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
-    -o uniquedesc(entry)
+     -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
+     -o uniquedesc(entry)
 
-  If the function only uses one parameter for the entry it can be omitted:
+   If the function only uses one parameter for the entry it can be
+   omitted:
 
-    -c has_password
-    -o uniquedesc
+     -c has_password
+     -o uniquedesc
 
-Available filter commands:
+Available filter commands::
 
     has_password(entry)
     is_logout(entry)
@@ -58,12 +58,12 @@ Available filter commands:
     older_than_one_day(entry)
     recent(entry)
 
-There are helper functions which can be part of a command:
+There are helper functions which can be part of a command::
 
     older_than(entry, interval)
     newer_than(entry, interval)
 
-Available output commands:
+Available output commands::
 
     uniquedesc(entry)
 """

@@ -29,18 +29,18 @@ Command line options:
            image galleries. However, it can also make more mistakes.
            This only works with image replacement, not image removal.
 
-Examples
---------
+.. admonition:: Examples
 
-The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first
-remove it from everything that displays it:
+   The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first
+   remove it from everything that displays it:
 
-    python pwb.py image FlagrantCopyvio.jpg
+       python pwb.py image FlagrantCopyvio.jpg
 
-The image "Flag.svg" has been uploaded, making the old "Flag.jpg"
-obsolete:
+   The image "Flag.svg" has been uploaded, making the old "Flag.jpg"
+   obsolete:
 
-    python pwb.py image Flag.jpg Flag.svg
+       python pwb.py image Flag.jpg Flag.svg
+
 """
 from __future__ import annotations
 

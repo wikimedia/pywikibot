@@ -45,20 +45,21 @@ by default::
                   relative and absolute, is acceptable. See:
                   :api:`Protect#Parameters`
 
-Usage:
+**Usage:**
 
     python pwb.py protect <OPTIONS>
 
-Examples
---------
+**Examples:**
 
 Protect everything in the category 'To protect' prompting:
 
     python pwb.py protect -cat:"To protect"
 
-Unprotect all pages listed in text file 'unprotect.txt' without prompting:
+Unprotect all pages listed in text file 'unprotect.txt' without
+prompting:
 
     python pwb.py protect -file:unprotect.txt -unprotect -always
+
 """
 from __future__ import annotations
 

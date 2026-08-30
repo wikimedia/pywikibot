@@ -42,39 +42,38 @@ Pages to work on can be specified using any of:
 
 &params;
 
-Examples
---------
+
+**Examples:**
 
 Transfer all pages in category "Query service" from the English
 Wikipedia to the home Wikipedia, adding "Wikipedia:Import enwp/" as
 prefix:
 
-    python pwb.py transwikiimport -interwikisource:en -cat:"Query service" \
--prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
+   python pwb.py transwikiimport -interwikisource:en -cat:"Query service" \
+   -prefix:"Wikipedia:Import enwp/" -fullhistory -assignknownusers
 
 Copy the template "Query service" from the English Wikipedia to the home
 Wiktionary:
 
-    python pwb.py transferbot -interwikisource:w:en \
--page:"Template:Query service" -fullhistory -assignknownusers
+   python pwb.py transwikiimport -interwikisource:w:en \
+   -page:"Template:Query service" -fullhistory -assignknownusers
 
 Copy 10 wanted templates of the home Wikipedia from English Wikipedia to
 the home Wikipedia:
 
-    python pwb.py transferbot -interwikisource:en -wantedtemplates:10 \
--target -fullhistory -assignknownusers
+   python pwb.py transwikiimport -interwikisource:en -wantedtemplates:10 \
+   -target -fullhistory -assignknownusers
 
 
-Advice
-------
+**Advice:**
 
 The module gives access to all parameters of the API (and special page)
-and is compatible to the :mod:`scripts.transferbot` script.
-However for most scenarios the parameters ``-overwrite``, ``-target`` and
+and is compatible to the :mod:`scripts.transferbot` script. However for
+most scenarios the parameters ``-overwrite``, ``-target`` and
 ``-includealltemplates`` should be avoided; by default they are set to
-False.
+``False``.
 
-The correspondingnamespace is used only if the namespaces on both wikis
+The corresponding namespace is used only if the namespaces on both wikis
 do not correspond one with another.
 
 Correspondingnamespace and rootpage are mutually exclusive.
@@ -87,26 +86,26 @@ if ``-overwrite`` is set or skipped otherwise.
 
 The list of pages to be imported can be generated outside of Pywikibot:
 
-    for i in {1..10} ; do python3 pwb.py transwikiimport \
--interwikisource:mul -page:"Page:How to become famous.djvu/$i" \
--fullhistory -assignknownusers ; done
+   for i in {1..10} ; do python3 pwb.py transwikiimport \
+   -interwikisource:mul -page:"Page:How to become famous.djvu/$i" \
+   -fullhistory -assignknownusers ; done
 
-*The pages *``Page:How to become famous.djvu/1``*,
+The pages *``Page:How to become famous.djvu/1``*,
 *``Page:How to become famous.djvu/2``* ..
 *``Page:How to become famous.djvu/10``* will be copied from wikisource
 (mul) to the home-wikisource, all versions will be imported and the
-usernames will be identified (existing pages will be skipped).*
+usernames will be identified (existing pages will be skipped).
 
 Or generated using the usual pywikibot generators:
 
-    python3 pwb.py transwikiimport -interwikisource:mul \
--prefixindex:"Page:How to become famous.djvu" -fullhistory \
--assignknownusers -summary:"Book copied from oldwiki."
+   python3 pwb.py transwikiimport -interwikisource:mul \
+   -prefixindex:"Page:How to become famous.djvu" -fullhistory \
+   -assignknownusers -summary:"Book copied from oldwiki."
 
-*All pages like *``Page:How to become famous.djvu``*... will be copied
+All pages like *``Page:How to become famous.djvu``*... will be copied
 from wikisource (mul) to the home-wikisource, all versions will be
 imported and the usernames will be identified (existing pages will be
-skipped).*
+skipped).
 
 The global option ``-simulate`` disables the import and the bot prints
 the names of the pages that would be imported. Since the import of pages
@@ -120,21 +119,19 @@ the titles of the transcluded pages (e.g. templates) if
 
 This option is quite *dangerous*. If the title of an existing page on
 home wiki clashes with the title of one of the linked pages it would be
-*overwritten*. The histories would be merged. (If the imported version is
-newer.) Even if ``-overwrite`` is not set the linked page *can be
+*overwritten*. The histories would be merged. (If the imported version
+is newer.) Even if ``-overwrite`` is not set the linked page *can be
 overwritten*.
 
 
-Hints
------
+**Hints:**
 
 The list of wikis that can be used as an interwiki source is defined in
 the variable ``$wgImportSources``. It can be viewed on the
 ``Special:Import`` page.
 
 
-Rights
-------
+**Rights:**
 
 For transwikiimport script and even to access the ``Special:Import``
 page the appropriate flag on the account must be set, usually

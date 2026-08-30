@@ -34,19 +34,21 @@ optional arguments:
 .. seealso:: https://graphviz.org/doc/info/attrs.html
    for graphviz style definitions.
 
-Example
--------
+.. admonition:: Examples
 
-Visualizes main category:
+   Visualizes main category:
 
-    pwb.py -v category_graph -from
+   .. code-block:: bash
 
-Extended example with style settings:
+      pwb.py -v category_graph -from
 
-    pwb.py category_graph -from Life -downsize 1.5 \\
-    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \\
-    fillcolor=green] edge[style=dashed penwidth=3]'
+   Extended example with style settings:
 
+   .. code-block:: bash
+
+      pwb.py category_graph -from Life -downsize 1.5 \\
+      -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \\
+      fillcolor=green] edge[style=dashed penwidth=3]'
 
 .. version-added:: 8.0
 """

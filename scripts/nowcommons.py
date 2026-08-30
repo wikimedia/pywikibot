@@ -18,33 +18,34 @@ this script to work properly.
 
 This script understands various command-line arguments:
 
-    -always         run automatically, do not ask any questions. All files
-                    that qualify for deletion are deleted. Reduced screen
-                    output.
+-always         run automatically, do not ask any questions. All files
+                that qualify for deletion are deleted. Reduced screen
+                output.
 
-    -replace        replace links if the files are equal and the file names
-                    differ
+-replace        replace links if the files are equal and the file names
+                differ
 
-    -replacealways  replace links if the files are equal and the file names
-                    differ without asking for confirmation
+-replacealways  replace links if the files are equal and the file names
+                differ without asking for confirmation
 
-    -replaceloose   Do loose replacements. This will replace all occurrences
-                    of the name of the file (and not just explicit file
-                    syntax).  This should work to catch all instances of the
-                    file, including where it is used as a template parameter
-                    or in galleries. However, it can also make more mistakes.
+-replaceloose   Do loose replacements. This will replace all occurrences
+                of the name of the file (and not just explicit file
+                syntax).  This should work to catch all instances of the
+                file, including where it is used as a template parameter
+                or in galleries. However, it can also make more mistakes.
 
-    -replaceonly    Use this if you do not have a local sysop rights, but do
-                    wish to replace links from the NowCommons template.
+-replaceonly    Use this if you do not have a local sysop rights, but do
+                wish to replace links from the NowCommons template.
 
-Example
--------
+.. admonition:: Example
 
-    python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
+   ::
+
+       pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+   :class:`ConfigParserBot <bot.ConfigParserBot>`. All options can be
+   set within a settings file which is scripts.ini by default.
 """
 from __future__ import annotations
 

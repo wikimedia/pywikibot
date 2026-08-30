@@ -267,8 +267,7 @@ class Timestamp(datetime.datetime):
            the *strict* parameter was added which discards missing
            element tolerance.
 
-        Example
-        -------
+        **Example:**
 
         >>> Timestamp.fromtimestampformat('20220705082234')
         Timestamp(2022, 7, 5, 8, 22, 34)

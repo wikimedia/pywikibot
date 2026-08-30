@@ -130,36 +130,34 @@ Furthermore, the following command line parameters are supported:
    for all replace options and arguments following this delimiter and
    enables empty strings.
 
-Examples
---------
+.. admonition:: **Examples**
 
-If you want to change templates from the old syntax, e.g.
-``{{msg:Stub}}``, to the new syntax, e.g. ``{{Stub}}``, download an XML
-dump file (pages-articles) from https://dumps.wikimedia.org, then use
-this command:
+   If you want to change templates from the old syntax, e.g.
+   ``{{msg:Stub}}``, to the new syntax, e.g. ``{{Stub}}``, download an
+   XML dump file (pages-articles) from https://dumps.wikimedia.org, then
+   use this command:
 
-    python pwb.py replace -xml -regex "{{msg:(.*?)}}" "{{\1}}"
+       python pwb.py replace -xml -regex "{{msg:(.*?)}}" "{{\1}}"
 
-If you have a dump called ``foobar.xml`` and want to fix typos in
-articles, e.g. Errror -> Error, use this:
+   If you have a dump called ``foobar.xml`` and want to fix typos in
+   articles, e.g. Errror -> Error, use this:
 
-    python pwb.py replace -xml:foobar.xml "Errror" "Error" -namespace:0
+       python pwb.py replace -xml:foobar.xml "Errror" "Error" -namespace:0
 
-If you want to do more than one replacement at a time, use this:
+   If you want to do more than one replacement at a time, use this:
 
-    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \\
-    -namespace:0
+       python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \\
+       -namespace:0
 
-If you have a page called 'John Doe' and want to fix the format of ISBNs,
-use:
+   If you have a page called 'John Doe' and want to fix the format of
+   ISBNs, use:
 
-    python pwb.py replace -page:John_Doe -fix:isbn
+       python pwb.py replace -page:John_Doe -fix:isbn
 
-This command will change 'referer' to 'referrer', but not in pages which
-talk about HTTP, where the typo has become part of the standard:
+   This command will change 'referer' to 'referrer', but not in pages
+   which talk about HTTP, where the typo has become part of the standard:
 
-    python pwb.py replace referer referrer -file:typos.txt -excepttext:HTTP
-
+       python pwb.py replace referer referrer -file:typos.txt -excepttext:HTTP
 
 .. seealso:: :mod:`scripts.template` to modify or remove templates.
 .. Please type "python pwb.py replace -help | more" if you can't read

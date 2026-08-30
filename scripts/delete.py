@@ -45,12 +45,11 @@ Furthermore, the following command line parameters are supported:
                   -orphansonly:0,1
                   -orphansonly:,Talk
 
-Usage:
+**Usage:**
 
     python pwb.py delete [-category categoryName]
 
-Examples
---------
+**Examples:**
 
 Delete everything in the category "To delete" without prompting:
 

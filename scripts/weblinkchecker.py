@@ -82,30 +82,30 @@ The following config variables are supported:
  weblink_dead_days          sets the timespan (default: one week) after which
                             a dead link will be reported
 
-Examples
---------
+.. admonition:: Examples
 
-Loads all wiki pages in alphabetical order using the Special:Allpages
-feature:
+   Loads all wiki pages in alphabetical order using the
+   ``Special:Allpages`` feature:
 
-    python pwb.py weblinkchecker -start:!
+       python pwb.py weblinkchecker -start:!
 
-Loads all wiki pages using the Special:Allpages feature, starting at
-"Example page":
+   Loads all wiki pages using the Special:Allpages feature, starting at
+   "Example page":
 
-    python pwb.py weblinkchecker -start:Example_page
+       python pwb.py weblinkchecker -start:Example_page
 
-Loads all wiki pages that link to www.example.org:
+   Loads all wiki pages that link to www.example.org:
 
-    python pwb.py weblinkchecker -weblink:www.example.org
+       python pwb.py weblinkchecker -weblink:www.example.org
 
-Only checks links found in the wiki page "Example page":
+   Only checks links found in the wiki page "Example page":
 
-    python pwb.py weblinkchecker Example page
+       python pwb.py weblinkchecker Example page
 
-Loads all wiki pages where dead links were found during a prior run:
+   Loads all wiki pages where dead links were found during a prior run:
 
-    python pwb.py weblinkchecker -repeat
+       python pwb.py weblinkchecker -repeat
+
 """
 from __future__ import annotations
 

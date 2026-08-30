@@ -91,8 +91,9 @@ This script understands the following command-line arguments:
 
 -quiet           Prevents users without contributions are displayed
 
+
 GUIDE
------
+^^^^^
 
 **Report, Bad and white list guide**
 
@@ -161,7 +162,7 @@ willing to receive some of these messages from newbies.
       required but it is recommended you to use them.
 
 Badwords
---------
+^^^^^^^^
 
 The list of Badwords of the code is opened. If you think that a word is
 international and it must be blocked in all the projects feel free to

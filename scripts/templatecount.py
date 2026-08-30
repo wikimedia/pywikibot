@@ -24,16 +24,17 @@ Command line options:
 -namespace:   Filters the search to a given namespace. If this is specified
               multiple times it will search all given namespaces
 
-Examples
---------
+.. admonition:: Examples
 
-Counts how many times {{ref}} and {{note}} are transcluded in articles:
+   Counts how many times {{ref}} and {{note}} are transcluded in
+   articles:
 
-    python pwb.py templatecount -count -namespace:0 ref note
+       python pwb.py templatecount -count -namespace:0 ref note
 
-Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
+   Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
-    python pwb.py templatecount -list -namespace:14 cfd cfdu
+       python pwb.py templatecount -list -namespace:14 cfd cfdu
+
 """
 from __future__ import annotations
 
