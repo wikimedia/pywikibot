@@ -291,7 +291,7 @@ class ParamInfoDictTests(DefaultSiteTestCase):
 
     dry = True
 
-    # https://en.wikipedia.org/w/api.php?action=paraminfo&modules=query+info|query+tokens
+    # ParamInfo data for the query+info, query+tokens, and edit modules.
     paraminfodata = {
         'paraminfo': {
             'modules': [
@@ -355,6 +355,10 @@ class ParamInfoDictTests(DefaultSiteTestCase):
                             'highlimit': 500
                         }
                     ]
+                },
+                {
+                    'name': 'edit',
+                    'path': 'edit',
                 }
             ]
         }
@@ -369,18 +373,21 @@ class ParamInfoDictTests(DefaultSiteTestCase):
         for mod in site._paraminfo.init_modules:
             site._paraminfo._paraminfo[mod] = {}
         site._paraminfo._action_modules = frozenset(['edit'])
-        site._paraminfo._modules = {'query': frozenset(['info'])}
+        site._paraminfo._modules = {'query': frozenset(['info', 'tokens'])}
         data = site._paraminfo.normalize_paraminfo(self.paraminfodata)
         site._paraminfo._paraminfo.update(data)
 
     def test_format(self) -> None:
         """Test using a dummy formatted in the new modules-only mode."""
         pi = self.get_site()._paraminfo
-        self.assertIn('query+info', pi._paraminfo)
-        self.assertIn('query+tokens', pi._paraminfo)
-        self.assertIn('edit', pi)
-        self.assertIn('info', pi)
-        self.assertIn('tokens', pi)
+        with patch.object(pi.site, '_request') as request:
+            self.assertIn('query+info', pi._paraminfo)
+            self.assertIn('query+tokens', pi._paraminfo)
+            self.assertIn('edit', pi._paraminfo)
+            self.assertIn('edit', pi)
+            self.assertIn('info', pi)
+            self.assertIn('tokens', pi)
+        request.assert_not_called()
 
     def test_attribute(self) -> None:
         """Test using __getitem__."""
