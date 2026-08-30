@@ -132,14 +132,14 @@ class i18nBot:  # noqa: N801
         if not self.dict:
             self.run(quiet)
         json_dir = Path(config.base_dir, 'scripts/i18n', self.scriptname)
-        json_dir.mkdir(exist_ok=True)
+        json_dir.mkdir(parents=True, exist_ok=True)
 
         for lang in self.dict:
             new_dict = {}
 
             file_path = json_dir / f'{lang}.json'
             if file_path.is_file():
-                new_dict = json.load(file_path.read_text(encoding='utf-8'))
+                new_dict = json.loads(file_path.read_text(encoding='utf-8'))
 
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
             new_dict.update(self.dict[lang])
