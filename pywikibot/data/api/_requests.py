@@ -1417,6 +1417,6 @@ def encode_url(query) -> str:
 
     # parameters ending on 'token' should go last
     # wpEditToken should go very last
-    query.sort(key=lambda x: x[0].lower().endswith('token')
-               + (x[0] == 'wpEditToken'))
+    query = sorted(query, key=lambda x: x[0].lower().endswith('token')
+                   + (x[0] == 'wpEditToken'))
     return urlencode(query)
