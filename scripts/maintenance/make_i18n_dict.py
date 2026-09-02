@@ -52,7 +52,7 @@ class i18nBot:  # noqa: N801
         modules = script.split('.')
         self.scriptname = modules[0]
         self.script = import_module('scripts.' + self.scriptname)
-        for m in modules:
+        for m in modules[1:]:
             self.script = getattr(self.script, m)
         self.messages = {}
         # setup the message dict
