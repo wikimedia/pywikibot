@@ -284,6 +284,15 @@ class GeneratorFactory:
             combine = roundrobin_generators if self.limit else itertools.chain
             dupfiltergen = _filter_unique_pages(combine(*self.gens))
 
+        # Apply title-only filters before filters which may load page data.
+        if self.titlefilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlefilter_list)
+
+        if self.titlenotfilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlenotfilter_list, 'none')
+
         # Add on subpage filter generator
         if self.subpage_max_depth is not None:
             dupfiltergen = SubpageFilterGenerator(
@@ -304,14 +313,6 @@ class GeneratorFactory:
         if self.qualityfilter_list:
             dupfiltergen = QualityFilterPageGenerator(
                 dupfiltergen, self.qualityfilter_list)
-
-        if self.titlefilter_list:
-            dupfiltergen = RegexFilterPageGenerator(
-                dupfiltergen, self.titlefilter_list)
-
-        if self.titlenotfilter_list:
-            dupfiltergen = RegexFilterPageGenerator(
-                dupfiltergen, self.titlenotfilter_list, 'none')
 
         if self.catfilter_list:
             dupfiltergen = CategoryFilterPageGenerator(
