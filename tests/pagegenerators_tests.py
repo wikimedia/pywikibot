@@ -679,6 +679,20 @@ class TestDryPreloadingGenerator(TestCase):
         high_site.preloadpages.assert_called_once_with(
             high_pages, groupsize=5, quiet=False)
 
+    def test_preload_options(self) -> None:
+        """Test that preload options are passed to the site."""
+        site = mock.Mock(maxlimit=5)
+        site.preloadpages.side_effect = lambda pages, **kwargs: iter(pages)
+        page = mock.Mock(site=site)
+
+        pages = list(PreloadingGenerator(
+            [page], content=False, coordinates=True, pageprops=True))
+
+        self.assertEqual(pages, [page])
+        site.preloadpages.assert_called_once_with(
+            [page], groupsize=5, quiet=False, pageprops=True,
+            content=False, coordinates=True)
+
 
 class TestPreloadingGenerator(DefaultSiteTestCase):
 

@@ -1122,11 +1122,13 @@ def update_page(page: pywikibot.Page,
 
     props = props or []
 
-    # test for pagedict content only and call updater function
-    for element in ('coordinates', 'revisions'):
-        if element in pagedict:
-            updater = globals()['_update_' + element]
-            updater(page, pagedict[element])
+    if 'coordinates' in pagedict:
+        _update_coordinates(page, pagedict['coordinates'])
+    elif 'coordinates' in props:
+        page._coords = []
+
+    if 'revisions' in pagedict:
+        _update_revisions(page, pagedict['revisions'])
 
     # test for pagedict and props contents, call updater or set attribute
     for element in ('categories', 'langlinks', 'templates'):

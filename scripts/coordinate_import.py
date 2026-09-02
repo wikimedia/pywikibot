@@ -167,9 +167,10 @@ def main(*args: str) -> None:
         if arg == '-create':
             create_new = True
 
-    # FIXME: this preloading preloads neither coordinates nor Wikibase items
-    # but preloads wikitext which we don't need
-    generator = generator_factory.getCombinedGenerator(preload=True)
+    generator = generator_factory.getCombinedGenerator()
+    if generator is not None and not generator_factory.nopreload:
+        generator = pagegenerators.PreloadingGenerator(
+            generator, quiet=True, content=False, coordinates=True)
     coordbot = CoordImportRobot(generator=generator, create=create_new)
     coordbot.run()
 

@@ -132,6 +132,7 @@ class GeneratorsMixin:
         pageprops: bool = False,
         categories: bool = False,
         content: bool = True,
+        coordinates: bool = False,
         quiet: bool = True,
     ) -> Generator[pywikibot.Page]:
         """Return a generator to a list of preloaded pages.
@@ -148,6 +149,8 @@ class GeneratorsMixin:
            *groupsize* is maxlimit by default. *quiet* parameter was
            added. No longer show the "Retrieving pages from site"
            message by default.
+        .. version-changed:: 11.8
+           *coordinates* parameter was added.
 
         :param pagelist: An iterable that returns Page objects
         :param groupsize: How many Pages to query at a time. If None
@@ -161,6 +164,8 @@ class GeneratorsMixin:
             content
         :param categories: Preload page categories
         :param content: Preload page content
+        :param coordinates: Preload page coordinates when the GeoData
+            extension is available
         :param quiet: If True (default), do not show the "Retrieving
             pages" message
         """
@@ -173,6 +178,9 @@ class GeneratorsMixin:
             props += '|pageprops'
         if categories:
             props += '|categories'
+        coordinates = coordinates and self.has_extension('GeoData')
+        if coordinates:
+            props += '|coordinates'
 
         groupsize_ = min(groupsize or self.maxlimit, self.maxlimit)
         for batch in batched(pagelist, groupsize_):
@@ -200,6 +208,10 @@ class GeneratorsMixin:
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = self._rvprops(content=content)
+            if coordinates:
+                rvgen.request['coprop'] = [
+                    'type', 'name', 'dim', 'country', 'region', 'globe']
+                rvgen.request['coprimary'] = 'all'
             if not quiet:
                 pywikibot.info(f'Retrieving {len(cache)} pages from {self}.')
 

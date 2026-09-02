@@ -101,7 +101,11 @@ def main(*args: str) -> None:
         else:
             generator_factory.handle_arg(arg)
 
-    options['generator'] = generator_factory.getCombinedGenerator(preload=True)
+    generator = generator_factory.getCombinedGenerator()
+    if generator is not None and not generator_factory.nopreload:
+        generator = pagegenerators.PreloadingGenerator(
+            generator, quiet=True, content=False, pageprops=True)
+    options['generator'] = generator
     bot = IllustrateRobot(**options)
     bot.run()
 

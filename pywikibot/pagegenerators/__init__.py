@@ -670,17 +670,49 @@ def RepeatingGenerator(
         yield from reversed(list(filtered_generator()))
 
 
-def PreloadingGenerator(generator: Iterable[pywikibot.page.Page],
-                        groupsize: int = 50,
-                        quiet: bool = False
-                        ) -> Generator[pywikibot.page.Page]:
+def PreloadingGenerator(
+    generator: Iterable[pywikibot.page.Page],
+    groupsize: int = 50,
+    quiet: bool = False,
+    *,
+    templates: bool = False,
+    langlinks: bool = False,
+    pageprops: bool = False,
+    categories: bool = False,
+    content: bool = True,
+    coordinates: bool = False,
+) -> Generator[pywikibot.page.Page]:
     """Yield preloaded pages taken from another generator.
+
+    .. version-changed:: 11.8
+       Optional page properties can be selected for preloading.
 
     :param generator: Pages to iterate over
     :param groupsize: How many pages to preload at once
     :param quiet: If False (default), show the "Retrieving pages"
         message
+    :param templates: Preload transcluded pages
+    :param langlinks: Preload language links
+    :param pageprops: Preload page properties
+    :param categories: Preload page categories
+    :param content: Preload page content
+    :param coordinates: Preload page coordinates when the GeoData
+        extension is available
     """
+    preload_options = {}
+    if templates:
+        preload_options['templates'] = True
+    if langlinks:
+        preload_options['langlinks'] = True
+    if pageprops:
+        preload_options['pageprops'] = True
+    if categories:
+        preload_options['categories'] = True
+    if not content:
+        preload_options['content'] = False
+    if coordinates:
+        preload_options['coordinates'] = True
+
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
     sites: PRELOAD_SITE_TYPE = {}
@@ -694,26 +726,43 @@ def PreloadingGenerator(generator: Iterable[pywikibot.page.Page],
             # if this site is at the groupsize, process it
             group = sites.pop(site)
             yield from site.preloadpages(group, groupsize=site_groupsize,
-                                         quiet=quiet)
+                                         quiet=quiet, **preload_options)
 
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
         site_groupsize = min(groupsize, site.maxlimit)
         yield from site.preloadpages(pages, groupsize=site_groupsize,
-                                     quiet=quiet)
+                                     quiet=quiet, **preload_options)
 
 
 def DequePreloadingGenerator(
     generator: DequeGenerator,
     groupsize: int = 50,
     quiet: bool = False,
+    *,
+    templates: bool = False,
+    langlinks: bool = False,
+    pageprops: bool = False,
+    categories: bool = False,
+    content: bool = True,
+    coordinates: bool = False,
 ) -> Generator[pywikibot.page.Page]:
     """Preload generator of type DequeGenerator.
+
+    .. version-changed:: 11.8
+       Optional page properties can be selected for preloading.
 
     :param generator: Pages to iterate over
     :param groupsize: How many pages to preload at once
     :param quiet: If False (default), show the "Retrieving pages"
         message
+    :param templates: Preload transcluded pages
+    :param langlinks: Preload language links
+    :param pageprops: Preload page properties
+    :param categories: Preload page categories
+    :param content: Preload page content
+    :param coordinates: Preload page coordinates when the GeoData
+        extension is available
     """
     assert isinstance(generator, DequeGenerator), \
         'generator must be a DequeGenerator object'
@@ -723,7 +772,17 @@ def DequePreloadingGenerator(
         if not page_count:
             return
 
-        yield from PreloadingGenerator(generator, page_count, quiet)
+        yield from PreloadingGenerator(
+            generator,
+            page_count,
+            quiet,
+            templates=templates,
+            langlinks=langlinks,
+            pageprops=pageprops,
+            categories=categories,
+            content=content,
+            coordinates=coordinates,
+        )
 
 
 def PreloadingEntityGenerator(
