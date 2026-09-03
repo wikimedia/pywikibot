@@ -311,7 +311,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                         '<<default>>".'
                     )
 
-                    bot = ImageBot(local_file_page.using_pages(),
+                    bot = ImageBot(using_pages,
                                    local_title,
                                    commons_title,
                                    always=self.opt.replacealways,
