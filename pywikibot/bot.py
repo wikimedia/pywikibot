@@ -233,9 +233,11 @@ GLOBAL OPTIONS
 -nolog            Disable the log file (if it is enabled by default).
                   Also disable command.log.
 
--maxlag           Sets a new maxlag parameter to a number of seconds.
-                  Defer bot edits during periods of database server lag.
-                  Default is set by config.py
+-maxlag           Sets write_maxlag to a number of seconds and increases
+                  read_maxlag to at least this value. If read_maxlag is
+                  set to None, it remains unchanged. Defer bot requests
+                  during periods of database server lag. Defaults are
+                  set by config.py.
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait
 -pt:n             between saving pages.
@@ -855,9 +857,14 @@ def handle_args(args: Iterable[str] | None = None,
         elif option == '-daemonize':
             redirect_std = value or None
             daemonize.daemonize(redirect_std=redirect_std)
+        elif option == '-maxlag':
+            maxlag = int(value)
+            if config.read_maxlag is not None:
+                config.read_maxlag = max(config.read_maxlag, maxlag)
+            config.write_maxlag = maxlag
         else:
             # the argument depends on numerical config settings
-            # e.g. -maxlag and -step:
+            # e.g. -read_maxlag, -write_maxlag or -step:
             try:
                 _arg = option[1:]
                 # explicitly check for int (so bool doesn't match)

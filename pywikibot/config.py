@@ -38,6 +38,9 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 .. version-added:: 11.4
    The 7-zip executable variable *cmd_7zip* was added.
+.. version-added:: 11.8
+   The *read_maxlag* config variable was added; The *maxlag* config
+   variable was renamed to *write_maxlag*.
 """
 from __future__ import annotations
 
@@ -103,10 +106,11 @@ _private_values = {'authenticate', 'db_password'}
 # no longer used. The values of this dict is the Pywikibot version of
 # the deprecation but unused.
 _deprecated_variables = {
-    'absolute_import': '10.0.0 ',
-    'division': '10.0.0',
-    'unicode_literals': '10.0.0',
-    'textfile_encoding': '11.5.0',
+    'absolute_import': ('10.0.0', None),
+    'division': ('10.0.0', None),
+    'unicode_literals': ('10.0.0', None),
+    'textfile_encoding': ('11.5.0', None),
+    'maxlag': ('11.8.0', 'write_maxlag'),
 }
 
 # ############# ACCOUNT SETTINGS ##############
@@ -706,7 +710,8 @@ upload_to_commons = False
 # time is increased accordingly. The default setting is 0.1 seconds per
 # https://wikitech.wikimedia.org/wiki/Robot_policy.
 #
-# 'maxlag' is used to control the rate of server access (see below).
+# 'read_maxlag' and 'write_maxlag' are used to control the rate of server
+# access (see below).
 # Set minthrottle to non-zero to use a throttle on read access.
 minthrottle = 0.1
 maxthrottle = 60
@@ -721,13 +726,14 @@ noisysleep = 3.0
 
 # Defer bot edits during periods of database server lag. For details, see
 # https://www.mediawiki.org/wiki/Manual:Maxlag_parameter
-# You can set this variable to a number of seconds, or to None (or 0) to
+# You can set these variables to a number of seconds, or to None (or 0) to
 # disable this behavior. Higher values are more aggressive in seeking
 # access to the wiki.
 # Non-Wikimedia wikis may or may not support this feature; for families
 # that do not use it, it is recommended to set minthrottle (above) to
 # at least 1 second.
-maxlag = 5
+read_maxlag = 30
+write_maxlag = 5
 
 # Maximum of pages which can be retrieved at one time from wiki server.
 # -1 indicates limit by api restriction
@@ -1002,7 +1008,7 @@ DEPRECATED_VARIABLE = (
     '"{name}" present in your '
     f'{user_config_file} is deprecated since'
     ' {since} and no longer a supported configuration variable and should be'
-    ' removed. Please inform the maintainers if you depend on it.'
+    ' removed{instead}. Please inform the maintainers if you depend on it.'
 )
 
 
@@ -1012,7 +1018,7 @@ def _check_user_config_types(
     skipped: frozenset[str],
 ) -> None:
     """Check the types compared to the default values."""
-    for name, value in user_config.items():
+    for name, value in list(user_config.items()):
         if name in default_values:
             try:
                 if name == 'socket_timeout':
@@ -1026,12 +1032,19 @@ def _check_user_config_types(
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
             if name in _deprecated_variables:
+                since, instead = _deprecated_variables[name]
                 msg = DEPRECATED_VARIABLE.format(
                     name=name,
-                    since=_deprecated_variables[name]
+                    since=since,
+                    instead=f'; use {instead} instead' if instead else '',
                 )
                 warn('\n' + fill(msg),
                      _ConfigurationDeprecationWarning, stacklevel=2)
+
+                if instead is not None:
+                    user_config[instead] = user_config[name]
+                    del user_config[name]
+
             else:
                 warn('\n' + fill(f'Configuration variable "{name}" is defined '
                                  f'in your {user_config_file} but unknown. It'

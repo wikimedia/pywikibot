@@ -423,6 +423,7 @@ class Request(MutableMapping, WaitingMixin):
 
         .. version-changed:: 11.8
            Disable maxlag for meta queries and paraminfo action.
+           Use a new ``read_maxlag`` parameter for read requests.
         """
         if hasattr(self, '__defaulted'):
             return
@@ -432,7 +433,7 @@ class Request(MutableMapping, WaitingMixin):
             raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
-        maxlag = config.maxlag
+        maxlag = config.write_maxlag if self.write else config.read_maxlag
 
         if self.action == 'query':
             meta = self._params.get('meta', [])
