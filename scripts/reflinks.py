@@ -704,7 +704,7 @@ class ReferencesRobot(SingleSiteBot, ConfigParserBot, ExistingPageBot):
             new_text = new_text.replace(match.group(), repl)
 
         # Add <references/> when needed, but ignore templates !
-        if page.namespace != 10 and self.norefbot.lacksReferences(new_text):
+        if page.namespace() != 10 and self.norefbot.lacksReferences(new_text):
             new_text = self.norefbot.addReferences(new_text)
 
         new_text = self.deduplicator.process(new_text)

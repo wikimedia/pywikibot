@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from scripts.reflinks import ReferencesRobot, XmlDumpPageGenerator, main
 from tests import join_xml_data_path
@@ -39,6 +39,26 @@ class TestPDFTitle(TestCase):
         run.assert_called_once_with(
             ['pdfinfo', '-'], input=content,
             capture_output=True, check=False)
+
+
+class TestReferencesRobot(TestCase):
+
+    """Tests for the reflinks bot."""
+
+    net = False
+
+    def test_template_does_not_add_references(self) -> None:
+        """Test that references are not added to template pages."""
+        bot = object.__new__(ReferencesRobot)
+        bot.norefbot = Mock()
+        bot.norefbot.lacksReferences.return_value = False
+        bot.deduplicator = Mock()
+        bot.deduplicator.process.side_effect = lambda text: text
+        page = SimpleNamespace(text='', namespace=lambda: 10)
+
+        bot.treat(page)
+
+        bot.norefbot.lacksReferences.assert_not_called()
 
 
 class TestXMLPageGenerator(TestCase):
