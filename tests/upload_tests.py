@@ -336,13 +336,28 @@ class TestUpload(TestCase):
     sounds_png = join_images_path('MP_sounds.png')
     arrow_png = join_images_path('1rightarrow.png')
 
-    @unittest.expectedFailure  # T367319
     def test_png(self) -> None:
         """Test uploading a png using Site.upload."""
         page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
-        self.site.upload(page, source_filename=self.sounds_png,
-                         summary='pywikibot test',
-                         ignore_warnings=True)
+        current_sha1 = None
+        with suppress(pywikibot.exceptions.PageRelatedError):
+            self.site.loadimageinfo(page)
+            current_sha1 = page.latest_file_info.sha1
+
+        # MediaWiki rejects publishing an exact copy of the current revision,
+        # even when upload warnings are ignored. Alternate between two test
+        # images so repeated test runs still exercise a successful upload.
+        sounds_sha1 = compute_file_hash(self.sounds_png)
+        source_filename = (self.arrow_png
+                           if current_sha1 == sounds_sha1
+                           else self.sounds_png)
+        source_sha1 = compute_file_hash(source_filename)
+
+        self.assertNotEqual(current_sha1, source_sha1)
+        self.assertTrue(
+            self.site.upload(page, source_filename=source_filename,
+                             summary='pywikibot test',
+                             ignore_warnings=True))
 
     def test_png_chunked(self) -> None:
         """Test uploading a png in chunks using Site.upload."""
