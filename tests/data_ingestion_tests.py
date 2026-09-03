@@ -122,6 +122,7 @@ class TestDataIngestionBot(ScriptMainTestCase):
 
     family = 'wikipedia'
     code = 'test'
+    login = True
 
     def test_existing_file(self) -> None:
         """Test uploading a file that already exists."""
