@@ -2246,13 +2246,11 @@ class TestPagePreloading(DefaultSiteTestCase):
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
-        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        links = list(mysite.pagelinks(mainpage, total=10))
+        link_count = len(links)
         if link_count < 2:
             self.skipTest('insufficient links on main page')
 
-        # get a fresh generator; we now know how many results it will have,
-        # if it is less than 10.
-        links = mysite.pagelinks(mainpage, total=10)
         count = 0
         for count, page in enumerate(
                 mysite.preloadpages(links, groupsize=50), start=1):
@@ -2271,13 +2269,11 @@ class TestPagePreloading(DefaultSiteTestCase):
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
-        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        links = list(mysite.pagelinks(mainpage, total=10))
+        link_count = len(links)
         if link_count < 2:
             self.skipTest('insufficient links on main page')
 
-        # get a fresh generator; we now know how many results it will have,
-        # if it is less than 10.
-        links = mysite.pagelinks(mainpage, total=10)
         count = 0
         for count, page in enumerate(
                 mysite.preloadpages(links, groupsize=5), start=1):
