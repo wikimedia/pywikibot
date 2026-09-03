@@ -444,13 +444,21 @@ class TestUpload(TestCase):
         """Test a first chunk is stashed after an upload warning."""
         self._init_upload(1024)
 
-    @unittest.expectedFailure  # T367316
     def test_offset_mismatch(self) -> None:
         """Test trying to continue with a different offset."""
         self._init_upload(1024)
         self._offset = 0
+        # Resume the captured stash instead of starting a fresh upload.
+        page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
+        uploader = Uploader(
+            self.site, page, source_filename=self.sounds_png,
+            comment='pywikibot test', text=page.text,
+            chunk_size=1024, ignore_warnings=True,
+            report_success=False)
         with self.assertRaises(ValueError) as cm:
-            self._finish_upload(1024, self.sounds_png)
+            uploader._upload(
+                ignore_warnings=True, report_success=False,
+                file_key=self._file_key, offset=self._offset)
         self.assertEqual(
             str(cm.exception),
             f'For the file key "{self._file_key}" the server reported a size'
