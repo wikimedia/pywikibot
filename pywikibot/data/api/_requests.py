@@ -1226,7 +1226,10 @@ The text message is:
             except TypeError:
                 raise RuntimeError(result)
 
-        msg = 'Maximum retries attempted due to maxlag without success.'
+        msg = (
+            f'Maximum retries attempted due to maxlag on {self.site} without'
+            ' success.'
+        )
         if TEST_RUNNING:
             raise unittest.SkipTest(msg)
 
