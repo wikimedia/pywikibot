@@ -390,7 +390,7 @@ def main(*args: str) -> None:
         elif opt == '-tosite':
             options['target'] = value
         elif opt == '-chunk_size':
-            options['chunk_size'] = value
+            options['chunk_size'] = int(value)
         else:
             generator_factory.handle_arg(arg)
 
