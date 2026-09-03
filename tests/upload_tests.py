@@ -466,13 +466,21 @@ class TestUpload(TestCase):
         )
         self._verify_stash()
 
-    @unittest.expectedFailure  # T367317
     def test_offset_oversize(self) -> None:
         """Test trying to continue with an offset which is to large."""
         self._init_upload(1024)
         self._offset = 2000
+        # Resume the captured stash instead of starting a fresh upload.
+        page = pywikibot.FilePage(self.site, 'MP_sounds-pwb.png')
+        uploader = Uploader(
+            self.site, page, source_filename=self.sounds_png,
+            comment='pywikibot test', text=page.text,
+            chunk_size=1024, ignore_warnings=True,
+            report_success=False)
         with self.assertRaises(ValueError) as cm:
-            self._finish_upload(1024, self.sounds_png)
+            uploader._upload(
+                ignore_warnings=True, report_success=False,
+                file_key=self._file_key, offset=self._offset)
         self.assertEqual(
             str(cm.exception),
             f'For the file key "{self._file_key}" the offset was set to 2000'
