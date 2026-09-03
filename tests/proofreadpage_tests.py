@@ -294,10 +294,10 @@ class TestProofreadPageValidSite(TestCase):
         'header': "{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
         'footer': '\n{{smallrefs}}',
         'url_image': (
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/'
+            'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/'
             'Popular_Science_Monthly_Volume_1.djvu/'
             'page12-2012px-Popular_Science_Monthly_Volume_1.djvu.jpg',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/'
+            'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/'
             'Popular_Science_Monthly_Volume_1.djvu/'
             'page12-1920px-Popular_Science_Monthly_Volume_1.djvu.jpg',
         )
