@@ -1178,8 +1178,9 @@ class TestPageUserAction(DefaultSiteTestCase):
     def test_purge(self) -> None:
         """Test purging the mainpage."""
         mainpage = self.get_mainpage()
-        self.assertIsInstance(mainpage.purge(), bool)
-        self.assertEqual(mainpage.purge(),
+        result = mainpage.purge()
+        self.assertIsInstance(result, bool)
+        self.assertEqual(result,
                          mainpage.purge(forcelinkupdate=None))
 
     def test_watch(self) -> None:
