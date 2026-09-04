@@ -264,7 +264,7 @@ class BoundedPoolExecutor(futures.Executor):
 
         try:
             f = super().submit(fn, *args, **kwargs)
-        except futures.BrokenExecutor:
+        except BaseException:
             self._bound_semaphore.release()
             raise
 

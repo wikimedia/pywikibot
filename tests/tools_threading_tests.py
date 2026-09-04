@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from concurrent.futures import (
+    BrokenExecutor,
     Executor,
     Future,
     ProcessPoolExecutor,
@@ -16,6 +17,7 @@ from concurrent.futures import (
 )
 from contextlib import suppress
 from threading import Condition, Event, Thread
+from unittest.mock import patch
 
 from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.threading import BoundedPoolExecutor, ThreadedGenerator
@@ -135,6 +137,38 @@ class BoundedThreadPoolTests(TestCase):
         for bound in (2, 5, 7):
             with self.subTest(bound=bound):
                 self._check_bound(bound)
+
+    def test_submit_after_shutdown(self) -> None:
+        """Test failed submissions after shutdown release their capacity."""
+        for executor in (ThreadPoolExecutor, ProcessPoolExecutor):
+            with self.subTest(executor=executor):
+                pool = BoundedPoolExecutor(executor, max_bound=1,
+                                           max_workers=1)
+                pool.shutdown()
+                with self.assertRaises(RuntimeError):
+                    pool.submit(pow, 2, 3)
+                self.assertTrue(
+                    pool._bound_semaphore.acquire(blocking=False)
+                )
+                pool._bound_semaphore.release()
+
+    def test_submit_failure(self) -> None:
+        """Test submission errors propagate and leave capacity reusable."""
+        for error in (BrokenExecutor, RuntimeError, KeyboardInterrupt):
+            with self.subTest(error=error), BoundedPoolExecutor(
+                ThreadPoolExecutor, max_bound=1, max_workers=1
+            ) as pool:
+                failure = error('submission failed')
+                with patch.object(ThreadPoolExecutor, 'submit',
+                                  side_effect=failure):
+                    with self.assertRaises(error) as caught:
+                        pool.submit(pow, 2, 3)
+                self.assertIs(caught.exception, failure)
+                self.assertTrue(
+                    pool._bound_semaphore.acquire(blocking=False)
+                )
+                pool._bound_semaphore.release()
+                self.assertEqual(pool.submit(pow, 2, 3).result(timeout=5), 8)
 
     def test_exceptions(self) -> None:
         """Test exceptions when creating a bounded executor."""
