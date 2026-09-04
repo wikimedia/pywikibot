@@ -108,6 +108,10 @@ class CategoryGraphBot(SingleSiteBot):
         self.rev = defaultdict(list)
         self.fw = defaultdict(list)
         self.leaves = set()
+        self._subcat_cache: dict[
+            tuple[pywikibot.site.BaseSite, str],
+            list[pywikibot.Category],
+        ] = {}
         self.counter = 0
         font = 'fontname="Helvetica,Arial,sans-serif"'
         style = f'graph [rankdir=LR ranksep=2 concentrate=true {font}] ' \
@@ -126,7 +130,12 @@ class CategoryGraphBot(SingleSiteBot):
         """
         title = cat.title(with_ns=False)
         size = float(self.args.downsize) ** level
-        subcats = sorted(cat.subcategories())
+        cache_key = cat.site, title
+        try:
+            subcats = self._subcat_cache[cache_key]
+        except KeyError:
+            subcats = sorted(cat.subcategories())
+            self._subcat_cache[cache_key] = subcats
 
         def node():
             subs = ', '.join([c.title(with_ns=False).replace(' ', '&nbsp;')
