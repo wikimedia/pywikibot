@@ -50,6 +50,52 @@ class BasicThreadedGeneratorTestCase(TestCase):
         thd_gen.start()
         self.assertEqual(list(thd_gen), list(iterable))
 
+    def test_producer_failure(self) -> None:
+        """Test producer failures reach consumers after queued results."""
+        values = (1, 2, 3)
+        failure = ValueError('producer failed')
+
+        def generate():
+            yield from values
+            raise failure
+
+        self._check_failure(generate, values, failure)
+
+    def test_target_failure(self) -> None:
+        """Test failure while creating the iterable reaches the consumer."""
+        failure = RuntimeError('target failed')
+
+        def target():
+            raise failure
+
+        self._check_failure(target, (), failure)
+
+    def _check_failure(self, target, values, failure) -> None:
+        """Consume with a timeout so a broken producer cannot hang tests."""
+        generator = ThreadedGenerator(target=target, qsize=1)
+        received = []
+        errors = []
+
+        def consume() -> None:
+            try:
+                received.extend(generator)
+            except type(failure) as e:
+                errors.append(e)
+
+        consumer = Thread(target=consume, daemon=True)
+        consumer.start()
+        try:
+            consumer.join(3)
+            self.assertFalse(consumer.is_alive())
+            self.assertEqual(received, list(values))
+            self.assertEqual(errors, [failure])
+            self.assertIs(errors[0], failure)
+        finally:
+            generator.stop()
+            consumer.join(3)
+            generator.join(3)
+        self.assertFalse(generator.is_alive())
+
 
 class BoundedThreadPoolTests(TestCase):
 
