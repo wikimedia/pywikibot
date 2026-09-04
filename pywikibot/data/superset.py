@@ -203,6 +203,10 @@ class SupersetQuery:
             elif self.site:
                 schema_name = f'{self.site.dbName()}_p'
 
+        # Ensure either site or schema_name is provided
+        if not (self.site or schema_name):
+            raise TypeError('Either site or schema_name must be provided')
+
         # Determine database_id
         if not database_id:
             if self.database_id:
@@ -214,10 +218,6 @@ class SupersetQuery:
         if not isinstance(database_id, int):
             msg = f'database_id should be integer, but got "{database_id}"'
             raise TypeError(msg)
-
-        # Ensure either site or schema_name is provided
-        if not (self.site or schema_name):
-            raise TypeError('Either site or schema_name must be provided')
 
         return database_id, schema_name
 

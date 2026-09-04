@@ -12,12 +12,30 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest.mock import patch
 
 import pywikibot
 from pywikibot.data.superset import SupersetQuery
 from pywikibot.exceptions import NoUsernameError
 from pywikibot.pagegenerators import SupersetPageGenerator
 from tests.aspects import TestCase
+
+
+class TestSupersetArguments(TestCase):
+
+    """Test Superset argument validation without network access."""
+
+    net = False
+
+    def test_missing_schema(self) -> None:
+        """Reject a missing schema before attempting database discovery."""
+        superset = SupersetQuery()
+        with patch.object(superset, 'get_database_id_by_schema_name',
+                          return_value=1) as lookup:
+            msg = 'Either site or schema_name must be provided'
+            with self.assertRaisesRegex(TypeError, msg):
+                superset.merge_query_arguments()
+            lookup.assert_not_called()
 
 
 class TestSupersetWithoutAuth(TestCase):
