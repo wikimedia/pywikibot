@@ -86,8 +86,11 @@ jobs:
           python -m pip install --upgrade pip
           pip --version
           pip install -r dev-requirements.txt
-          pip install -r requirements.txt
-          pip install wikitextparser
+          if [ "${{ matrix.python-version }}" = "3.13t" ]; then
+            pip install '.[all-no-gui]'
+          else
+            pip install -r requirements.txt
+          fi
           pip install requests[socks]
       - name: Install DjVuLibre
         if: runner.os == 'Linux'

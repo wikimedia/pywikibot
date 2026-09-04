@@ -62,6 +62,14 @@ extra_deps = {
     ],
 }
 
+# Install every optional dependency except the Tkinter GUI dependencies.
+extra_deps['all-no-gui'] = [
+    requirement
+    for name, requirements in extra_deps.items()
+    if name != 'Tkinter'
+    for requirement in requirements
+]
+
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {

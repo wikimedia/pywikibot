@@ -11,6 +11,7 @@ import sys
 import unittest
 from unittest.mock import patch
 
+from packaging.requirements import Requirement
 from packaging.version import Version
 
 import pywikibot
@@ -54,6 +55,31 @@ class TestSetup(TestCase):
         mock_print.assert_any_call(
             f'\n\nNew version {str(version)!r} is not higher than last '
             f'version {newer_version!r}.'
+        )
+
+    def test_requirements_file(self) -> None:
+        """Test that pip requirements use valid dependency specifiers."""
+        with open(setup.path / 'requirements.txt') as f:
+            lines = [line.partition('#')[0].strip() for line in f]
+
+        for requirement in lines:
+            if requirement and not requirement.startswith('-'):
+                with self.subTest(requirement=requirement):
+                    Requirement(requirement)
+
+    def test_all_no_gui_extra(self) -> None:
+        """Test that the all-no-gui extra excludes only Tkinter."""
+        expected = {
+            requirement
+            for name, requirements in setup.extra_deps.items()
+            if name not in {'all-no-gui', 'Tkinter'}
+            for requirement in requirements
+        }
+        self.assertSetEqual(set(setup.extra_deps['all-no-gui']), expected)
+        self.assertNotIn(
+            'pillow',
+            {Requirement(requirement).name.lower()
+             for requirement in setup.extra_deps['all-no-gui']},
         )
 
     def test_read_desc(self) -> None:
