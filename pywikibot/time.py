@@ -160,14 +160,12 @@ class Timestamp(datetime.datetime):
             strpfmt += '.%f'
             strpstr += m['u'].replace(',', '.')  # .ljust(7, '0')
 
-        if m['tz']:
-            if m['tz'] == 'Z':
-                strpfmt += 'Z'
-                strpstr += 'Z'
-            else:
-                strpfmt += '%z'
-                # strptime wants HHMM, without ':'
-                strpstr += (m['tz'].replace(':', '')).ljust(5, '0')
+        if tz := m['tz']:
+            strpfmt += '%z'
+            if tz != 'Z':
+                # Complete abbreviated offsets, preserving any colon.
+                tz = tz.ljust(6 if ':' in tz else 5, '0')
+            strpstr += tz
 
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
