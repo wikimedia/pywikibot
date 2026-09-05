@@ -72,9 +72,8 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 
 # Regex matching file links with optional parameters.
 #
-# Captures the filename and parameters, including nested links
-# within the parameters. The regex safely matches the closing
-# brackets even if inner wikilinks contain [[ or ]].
+# Captures the filename and parameters, including links within the
+# parameters. Inner wikilinks cannot contain nested wikilinks.
 # The Namespace names must be substituted into the pattern, e.g.:
 #     FILE_LINK_REGEX % 'File'
 # or: FILE_LINK_REGEX % '|'.join(site.namespaces[6])
@@ -93,17 +92,16 @@ FILE_LINK_REGEX = r"""
     (
         \|
         (
-            (
-                (?=(?P<inner_link>
-                    \[\[.*?\]\]
-                ))(?P=inner_link)
-            )?
+            (?=(?P<inner_link>
+                \[\[(?:(?!\[\[).)*?\]\]
+            ))(?P=inner_link)
+        |
             (?=(?P<other_chars>
-                [^\[\]]*
+                [^\[\]]+
             ))(?P=other_chars)
         |
             (?=(?P<not_wikilink>
-                \[[^]]*\]
+                \[(?!\[)[^]]*\]
             ))(?P=not_wikilink)
         )*?
     )??

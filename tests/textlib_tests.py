@@ -1448,16 +1448,15 @@ class TestReplaceExcept(DefaultSiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-    @unittest.expectedFailure  # T396721
-    def test_replace_tag_file_failure(self) -> None:
-        """Test showing limits of the file link regex."""
-        # When the double brackets are unbalanced, the regex
-        # does not correctly detect the end of the file link.
+    def test_replace_tag_file_unbalanced(self) -> None:
+        """Test replacing text in a file link with invalid nested wikilinks."""
+        # MediaWiki does not render this as a file link, so both occurrences
+        # of x should be replaced without changing the malformed brackets.
         self.assertEqual(
             textlib.replaceExcept(
                 '[[File:a|[[foo]] [[bar [[invalid ]].x]][[x]]',
                 'x', 'y', ['file'], site=self.site),
-            '[[File:a|[[foo]] [[bar [invalid] ]].x]][[y]]')
+            '[[File:a|[[foo]] [[bar [[invalid ]].y]][[y]]')
 
     def test_replace_tags_interwiki(self) -> None:
         """Test replacing not inside interwiki links."""
