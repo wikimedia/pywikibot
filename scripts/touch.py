@@ -94,7 +94,8 @@ class PurgeBot(MultipleSitesBot):
         """
         # We can have multiple sites, save pages and cache rate limit
         self.pages[page.site].append(page)
-        self.limit.setdefault(page.site, page.site.ratelimit('purge'))
+        if page.site not in self.limit:
+            self.limit[page.site] = page.site.ratelimit('purge')
         self.purgepages()
 
     def teardown(self) -> None:
