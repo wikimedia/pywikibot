@@ -778,16 +778,20 @@ class TestSiteSysopWrite(TestCase):
                         show='content|comment|user',
                         reason='pywikibot unit tests')
 
-    @unittest.expectedFailure  # T367309
     def test_revdel_file(self) -> None:
         """Test deleting and undeleting file revisions."""
-        site = pywikibot.Site('test')
+        site = self.get_site()
 
         # Verify state
         site.deleterevs('oldimage', [20210314184415, 20210314184430],
                         show='content|comment|user',
                         reason='pywikibot unit tests',
                         target='File:T276726.png')
+
+        self.addCleanup(
+            site.deleterevs, 'oldimage', [20210314184415, 20210314184430],
+            show='content|comment|user', reason='pywikibot unit tests',
+            target='File:T276726.png')
 
         # Single revision
         site.deleterevs('oldimage', '20210314184415', hide='user', show='',
@@ -799,9 +803,7 @@ class TestSiteSysopWrite(TestCase):
 
         fp1 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp1, history=True)
-        for v in fp1._file_revisions.values():
-            if v['timestamp'] == ts1:
-                self.assertHasAttr(v, 'userhidden')
+        self.assertHasAttr(fp1._file_revisions[ts1], 'userhidden')
 
         # Multiple revisions
         site.deleterevs('oldimage', '20210314184415|20210314184430',
@@ -810,9 +812,8 @@ class TestSiteSysopWrite(TestCase):
 
         fp2 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp2, history=True)
-        for v in fp2._file_revisions.values():
-            if v['timestamp'] in (ts1, ts2):
-                self.assertHasAttr(v, 'commenthidden')
+        for ts in (ts1, ts2):
+            self.assertHasAttr(fp2._file_revisions[ts], 'commenthidden')
 
         # Concurrently show and hide
         site.deleterevs('oldimage', ['20210314184415', '20210314184430'],
@@ -822,17 +823,11 @@ class TestSiteSysopWrite(TestCase):
 
         fp3 = pywikibot.FilePage(site, 'File:T276726.png')
         site.loadimageinfo(fp3, history=True)
-        for v in fp3._file_revisions.values():
-            if v['timestamp'] in (ts1, ts2):
-                self.assertNotHasAttr(v, 'commenthidden')
-                self.assertNotHasAttr(v, 'userhidden')
-                self.assertNotHasAttr(v, 'filehidden')
-
-        # Cleanup
-        site.deleterevs('oldimage', [20210314184415, 20210314184430],
-                        show='content|comment|user',
-                        reason='pywikibot unit tests',
-                        target='File:T276726.png')
+        for ts in (ts1, ts2):
+            info = fp3._file_revisions[ts]
+            self.assertNotHasAttr(info, 'commenthidden')
+            self.assertHasAttr(info, 'userhidden')
+            self.assertHasAttr(info, 'filehidden')
 
     def test_delete_oldimage(self) -> None:
         """Test deleting and undeleting specific versions of files."""
