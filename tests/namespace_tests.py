@@ -16,35 +16,6 @@ from pywikibot.site._namespace import BuiltinNamespace
 from tests.aspects import TestCase
 
 
-# Default namespaces which should work in any MW wiki
-_base_builtin_ns = {
-    'Media': -2,
-    'Special': -1,
-    '': 0,
-    'Talk': 1,
-    'User': 2,
-    'User talk': 3,
-    'Project': 4,
-    'Project talk': 5,
-    'MediaWiki': 8,
-    'MediaWiki talk': 9,
-    'Template': 10,
-    'Template talk': 11,
-    'Help': 12,
-    'Help talk': 13,
-    'Category': 14,
-    'Category talk': 15,
-}
-image_builtin_ns = dict(_base_builtin_ns)
-image_builtin_ns['Image'] = 6
-image_builtin_ns['Image talk'] = 7
-file_builtin_ns = dict(_base_builtin_ns)
-file_builtin_ns['File'] = 6
-file_builtin_ns['File talk'] = 7
-builtin_ns = dict(list(image_builtin_ns.items())
-                  + list(file_builtin_ns.items()))
-
-
 def builtin_NamespacesDict():
     """Return a NamespacesDict of the builtin namespaces."""
     return NamespacesDict(Namespace.builtin_namespaces())
