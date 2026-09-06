@@ -183,8 +183,8 @@ class SupersetQuery:
 
         :param database_id: The superset database ID.
         :param schema_name: The superset schema name.
-        :param site: The target site
-        :raises TypeError: if site and schema_name are both defined'
+        :param site: The target site.
+        :raises TypeError: if site and schema_name are both defined.
         :raises TypeError: If determined database_id is not an integer.
         :raises TypeError: If neither site nor schema_name is
             determined.
