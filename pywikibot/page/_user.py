@@ -76,7 +76,7 @@ class User(Page):
         """
         self._isAutoblock = True
         if title.startswith('#'):
-            title = title[1:]
+            title = title.removeprefix('#')
         elif ':#' in title:
             title = title.replace(':#', ':')
         else:

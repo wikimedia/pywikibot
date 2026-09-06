@@ -229,6 +229,7 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
+        option, sep, value = arg.partition(':')
         if arg == '-remove':
             options['remove'] = True
         elif arg.startswith('-subst'):
@@ -245,17 +246,17 @@ def main(*args: str) -> None:
                     "Please enter the XML dump's filename: ")
             else:
                 xmlfilename = arg[5:]
-        elif arg.startswith('-addcat:'):
-            options['addcat'] = arg[len('-addcat:'):]
-        elif arg.startswith('-summary:'):
-            options['summary'] = arg[len('-summary:'):]
-        elif arg.startswith('-onlyuser:'):
-            user = arg[len('-onlyuser:'):]
-        elif arg.startswith('-skipuser:'):
-            user = arg[len('-skipuser:'):]
+        elif option == '-addcat' and sep:
+            options['addcat'] = value
+        elif option == '-summary' and sep:
+            options['summary'] = value
+        elif option == '-onlyuser' and sep:
+            user = value
+        elif option == '-skipuser' and sep:
+            user = value
             skip = True
-        elif arg.startswith('-timestamp:'):
-            timestamp = arg[len('-timestamp:'):]
+        elif option == '-timestamp' and sep:
+            timestamp = value
         elif not gen_factory.handle_arg(arg):
             template_name = pywikibot.Page(site, arg, ns=10)
             template_names.append(template_name.title(with_ns=False))

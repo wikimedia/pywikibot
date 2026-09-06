@@ -151,7 +151,7 @@ class CacheEntry(api.CachedRequest):
 
         site = self.key[0:end + 1]
         if site[0:5] == 'Site(':
-            site = 'APISite(' + site[5:]
+            site = 'APISite(' + site.removeprefix('Site(')
 
         username = None
         login_status = None

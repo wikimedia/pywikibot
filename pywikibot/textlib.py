@@ -965,7 +965,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             new_label = page_title
             # remove preleading ":" from the link text
             if new_label[0] == ':':
-                new_label = new_label[1:]
+                new_label = new_label.removeprefix(':')
 
         new_linktrail = groups['linktrail']
         if new_linktrail:

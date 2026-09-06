@@ -657,16 +657,17 @@ def main(*args: str) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
+        option, sep, value = arg.partition(':')
         if arg == '-talk':
             config.report_dead_links_on_talk = True
         elif arg == '-notalk':
             config.report_dead_links_on_talk = False
         elif arg == '-repeat':
             gen = RepeatPageGenerator()
-        elif arg.startswith('-ignore:'):
-            http_ignores.append(int(arg[8:]))
-        elif arg.startswith('-day:'):
-            config.weblink_dead_days = int(arg[5:])
+        elif option == '-ignore' and sep:
+            http_ignores.append(int(value))
+        elif option == '-day' and sep:
+            config.weblink_dead_days = int(value)
         elif arg.startswith('-xmlstart'):
             if len(arg) == 9:
                 xml_start = pywikibot.input(

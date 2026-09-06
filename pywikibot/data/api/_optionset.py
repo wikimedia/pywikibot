@@ -87,7 +87,7 @@ class OptionSet(MutableMapping):
 
         for type_value in site._paraminfo.parameter(module, param)['type']:
             if type_value[0] == '!':
-                self._valid_disable.add(type_value[1:])
+                self._valid_disable.add(type_value.removeprefix('!'))
             else:
                 self._valid_enable.add(type_value)
         if clear_invalid:

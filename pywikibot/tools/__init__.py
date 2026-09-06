@@ -510,7 +510,7 @@ class MediaWikiVersion:
             raise ValueError(f'Generator string ({generator!r}) must start '
                              f'with "{prefix}"')
 
-        return MediaWikiVersion(generator[len(prefix):])
+        return MediaWikiVersion(generator.removeprefix(prefix))
 
     def __str__(self) -> str:
         """Return version number with optional suffix."""

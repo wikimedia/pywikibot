@@ -147,13 +147,14 @@ def main(*args: str) -> None:
     namespaces = []
 
     for arg in pywikibot.handle_args(args):
+        option, sep, value = arg.partition(':')
         if arg in ('-count', '-list'):
             operation = arg[1:]
-        elif arg.startswith('-namespace:'):
+        elif option == '-namespace' and sep:
             try:
-                namespaces.append(int(arg[len('-namespace:'):]))
+                namespaces.append(int(value))
             except ValueError:
-                namespaces.append(arg[len('-namespace:'):])
+                namespaces.append(value)
         else:
             args_list.append(arg)
 
