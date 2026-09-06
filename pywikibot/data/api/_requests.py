@@ -424,7 +424,8 @@ class Request(MutableMapping, WaitingMixin):
         if hasattr(self, '__defaulted'):
             return
 
-        if self.mime is not None and set(self._params) & set(self.mime):
+        if (self.mime is not None
+                and not self._params.keys().isdisjoint(self.mime)):
             raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
