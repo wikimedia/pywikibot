@@ -446,7 +446,7 @@ class CategoryDatabase:
                     suppress(pickle.PicklingError):
                 pickle.dump(databases, f, protocol=config.pickle_protocol)
         else:
-            with suppress(EnvironmentError):
+            with suppress(OSError):
                 os.remove(filename)
                 pywikibot.info(
                     f'Database is empty. {config.shortpath(filename)} removed')

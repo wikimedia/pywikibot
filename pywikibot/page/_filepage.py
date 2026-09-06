@@ -396,7 +396,7 @@ class FilePage(Page):
         :param url_height: Download thumbnail with given height
         :param url_param: Download thumbnail with given param
         :return: True if download is successful, False otherwise.
-        :raises IOError: If filename cannot be written for any reason.
+        :raises OSError: If filename cannot be written for any reason.
         """
         if not filename:
             path = Path()

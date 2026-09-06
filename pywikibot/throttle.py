@@ -169,7 +169,7 @@ class Throttle:
         """Write process entries to file."""
         processes = sorted(processes, key=lambda p: (p.pid, p.site))
 
-        with suppress(IOError), open(self.ctrlfilename, 'w') as f:
+        with suppress(OSError), open(self.ctrlfilename, 'w') as f:
             f.writelines(FORMAT_LINE.format_map(p._asdict())
                          for p in processes)
 

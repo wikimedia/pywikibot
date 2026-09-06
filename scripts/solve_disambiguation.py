@@ -504,7 +504,7 @@ class PrimaryIgnoreManager:
                 self.disamb_page.title(as_url=True) + '.txt')
 
             # Open file for appending. If none exists, create a new one.
-            with suppress(IOError), open(filename, 'a', encoding='utf-8') as f:
+            with suppress(OSError), open(filename, 'a', encoding='utf-8') as f:
                 f.write('\n'.join(page_titles) + '\n')
 
 

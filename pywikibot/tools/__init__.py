@@ -860,7 +860,7 @@ def file_mode_checker(
     :param mode: Requested file mode
     :param quiet: Warn about file mode change if False.
     :param create: Create the file if it does not exist already
-    :raise IOError: The file does not exist and `create` is False.
+    :raise OSError: The file does not exist and `create` is False.
     """
     try:
         st_mode = os.stat(filename).st_mode
