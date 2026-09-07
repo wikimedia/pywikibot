@@ -228,11 +228,6 @@ XmlDumpPageGenerator = partial(
     _XMLDumpPageGenerator, text_predicate=weblinks_from_text)
 
 
-class NotAnURLError(BaseException):
-
-    """The link is not an URL."""
-
-
 class LinkCheckThread(threading.Thread):
 
     """A thread responsible for checking one URL.
