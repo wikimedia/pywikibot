@@ -106,8 +106,6 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
 
     """Tests for the BaseBot subclasses."""
 
-    CANT_SET_ATTRIBUTE_RE = "can't set attribute"
-    NOT_IN_TREAT_RE = 'Requesting the site not while in treat is not allowed.'
     dry = True
 
     sites = {

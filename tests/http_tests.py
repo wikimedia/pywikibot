@@ -290,7 +290,6 @@ class CharsetTestCase(TestCase):
 
     """Test that HttpRequest correctly handles the charsets given."""
 
-    CODEC_CANT_DECODE_RE = "codec can't decode byte"
     net = False
 
     STR = 'äöü'
