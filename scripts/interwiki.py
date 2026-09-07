@@ -477,9 +477,7 @@ class InterwikiBotConfig:
     nobackonly = False
     parenthesesonly = False
     quiet = False
-    rememberno = False
     remove = []
-    repository = False
     restore_all = False
     same = False
     select = False
