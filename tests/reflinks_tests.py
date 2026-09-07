@@ -195,7 +195,6 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
 def dummy_constructor(self, *args, **kwargs) -> None:
     """A constructor faking the actual constructor."""
-    TestReferencesBotConstructor.constructor_args = args
     TestReferencesBotConstructor.constructor_kwargs = kwargs
 
 
