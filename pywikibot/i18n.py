@@ -25,8 +25,7 @@ import json
 import os
 import pkgutil
 import re
-from collections import abc
-from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Generator, Iterable, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from pathlib import Path
@@ -518,45 +517,6 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         plural_value = static_plural_value
 
     return re.sub(PLURAL_PATTERN, replace_plural, message)
-
-
-class _PluralMappingAlias(abc.Mapping):
-
-    """Aliasing class to allow non mappings in _extract_plural.
-
-    That function only uses __getitem__ so this is only implemented
-    here.
-    """
-
-    def __init__(
-        self,
-        source: int | str | Sequence[int] | Mapping[str, int],
-    ) -> None:
-        self.source = source
-        if isinstance(source, str):
-            self.source = int(source)
-
-        self.index = -1
-        super().__init__()
-
-    def __getitem__(self, key: str) -> int:
-        self.index += 1
-        if isinstance(self.source, dict):
-            return int(self.source[key])
-
-        if isinstance(self.source, (tuple, list)):
-            if self.index < len(self.source):
-                return int(self.source[self.index])
-            raise ValueError('Length of parameter does not match PLURAL '
-                             'occurrences.')
-        assert isinstance(self.source, int)
-        return self.source
-
-    def __iter__(self) -> Iterator[int]:
-        raise NotImplementedError
-
-    def __len__(self) -> int:
-        raise NotImplementedError
 
 
 DEFAULT_FALLBACK = ('_default', )
