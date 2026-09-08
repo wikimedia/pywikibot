@@ -301,9 +301,9 @@ def package_versions(
 
     std_lib_dir = pathlib.Path(sysconfig.get_paths()['stdlib'])
 
-    root_packages = {key.split('.')[0] for key in modules}
+    root_packages = {key.partition('.')[0] for key in modules}
 
-    builtin_packages = {name.split('.')[0] for name in root_packages
+    builtin_packages = {name for name in root_packages
                         if name in sys.builtin_module_names
                         or '_' + name in sys.builtin_module_names}
 
