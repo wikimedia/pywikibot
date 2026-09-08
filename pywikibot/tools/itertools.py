@@ -271,22 +271,32 @@ def filter_unique(iterable, container=None, key=None, add=None):
         container = set()
 
     if not add:
-        if hasattr(container, 'add'):
-            def container_add(x) -> None:
-                container.add(key(x) if key else x)
-
-            add = container_add
+        if key is None:
+            def key_getter(item):
+                return item
         else:
-            def container_setitem(x) -> None:
-                container.__setitem__(key(x) if key else x,
-                                      True)
+            key_getter = key
 
-            add = container_setitem
+        if hasattr(container, 'add'):
+            def add_to_container(item):
+                container.add(item)
+        else:
+            def add_to_container(item):
+                container.__setitem__(item, True)
 
-    for item in iterable:
-        try:
-            if (key(item) if key else item) not in container:
-                add(item)
-                yield item
-        except StopIteration:
-            return
+        for item in iterable:
+            try:
+                cmp = key_getter(item)
+                if cmp not in container:
+                    add_to_container(cmp)
+                    yield item
+            except StopIteration:
+                return
+    else:
+        for item in iterable:
+            try:
+                if (key(item) if key else item) not in container:
+                    add(item)
+                    yield item
+            except StopIteration:
+                return
