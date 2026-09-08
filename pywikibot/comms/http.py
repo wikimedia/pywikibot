@@ -457,7 +457,7 @@ def fetch(uri: str,
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
-    headers.update(config.extra_headers.copy() or {})
+    headers.update(config.extra_headers)
 
     def assign_fake_user_agent(use_fake_user_agent, uri):
         uri_domain = urlparse(uri).netloc
