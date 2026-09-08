@@ -2119,7 +2119,7 @@ class GeneratorsMixin:
         if hasattr(self, '_patroldisabled') and self._patroldisabled:
             return
 
-        if all(_ is None for _ in [rcid, revid, revision]):
+        if rcid is None and revid is None and revision is None:
             raise Error('No rcid, revid or revision provided.')
 
         if rcid is None:
