@@ -93,12 +93,11 @@ class FilePage(Page):
                 continue
 
             ts_key = pywikibot.Timestamp.fromISOformat(file_rev['timestamp'])
-            file_revision = self._file_revisions.get(ts_key)
-            if file_revision is None:
-                self._file_revisions[ts_key] = FileInfo(file_rev, self)
-            else:
+            if ts_key in self._file_revisions:
                 # add new imageinfo attributes since last request.
-                file_revision.update(file_rev)
+                self._file_revisions[ts_key].update(file_rev)
+            else:
+                self._file_revisions[ts_key] = FileInfo(file_rev, self)
 
     @property
     def latest_file_info(self):
