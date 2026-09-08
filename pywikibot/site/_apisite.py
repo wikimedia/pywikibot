@@ -93,6 +93,8 @@ __all__ = ('APISite', )
 
 _mw_msg_cache: defaultdict[str, dict[str, str]] = defaultdict(dict)
 
+CAPTCHA_TYPES = {'math', 'simple'}
+
 
 class _OnErrorExc(NamedTuple):
     exception: Exception
@@ -2229,7 +2231,7 @@ class APISite(
 
                         req['captchaid'] = captcha['id']
 
-                        if captcha['type'] in ['math', 'simple']:
+                        if captcha['type'] in CAPTCHA_TYPES:
                             req['captchaword'] = input(captcha['question'])
                             continue
 
