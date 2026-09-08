@@ -140,12 +140,21 @@ class ThreadList(list):
 
     .. seealso:: :class:`BoundedPoolExecutor`
 
-    :param limit: the number of simultaneous threads
+    :param limit: the positive integer number of simultaneous threads
     :param wait_time: how long to wait if active threads exceeds limit
+    :raises TypeError: limit is not an integer or is a boolean
+    :raises ValueError: limit is less than 1
     """
 
     limit: int = 128  #: :meta private:
     wait_time: float = 2.0  #: :meta private:
+
+    def __post_init__(self) -> None:
+        """Validate the thread limit."""
+        if not isinstance(self.limit, int) or isinstance(self.limit, bool):
+            raise TypeError("'limit' must be an integer")
+        if self.limit < 1:
+            raise ValueError("Minimum 'limit' is 1")
 
     def active_count(self) -> int:
         """Return the number of alive threads and delete all non-alive ones."""
