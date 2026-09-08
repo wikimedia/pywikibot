@@ -387,6 +387,22 @@ def as_filename(string: str, repl: str = '_') -> str:
     return re.sub(f'[{pattern}]', repl, string)
 
 
+_STR_TO_BOOL = {
+    'y': True,
+    'yes': True,
+    't': True,
+    'true': True,
+    'on': True,
+    '1': True,
+    'n': False,
+    'no': False,
+    'f': False,
+    'false': False,
+    'off': False,
+    '0': False,
+}
+
+
 def strtobool(val: str) -> bool:
     """Convert a string representation of truth to True or False.
 
@@ -411,11 +427,10 @@ def strtobool(val: str) -> bool:
     :raises ValueError: `val` is not a valid truth value
     """
     val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
-        return True
-    if val in ('n', 'no', 'f', 'false', 'off', '0'):
-        return False
-    raise ValueError(f'invalid truth value {val!r}')
+    try:
+        return _STR_TO_BOOL[val]
+    except KeyError:
+        raise ValueError(f'invalid truth value {val!r}')
 
 
 def normalize_username(username) -> str | None:
