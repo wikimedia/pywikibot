@@ -180,6 +180,9 @@ class Category(Page):
             raise TypeError(
                 "articles() got an unexpected keyword argument 'member_type'")
 
+        if total == 0:
+            return
+
         member_type = ['page', 'file']
         if not recurse:
             yield from self.members(
