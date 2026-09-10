@@ -65,7 +65,8 @@ class EditorTestCase(TestCase):
             return handle, filename
 
         def run(*args, **kwargs):
-            with self.assertRaises(OSError):
+            with self.assertRaisesRegex(
+                    OSError, r'\[Errno 9\] Bad file descriptor'):
                 os.fstat(handle)
 
         with patch.object(editor.tempfile, 'mkstemp', side_effect=mkstemp):

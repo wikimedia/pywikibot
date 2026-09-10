@@ -120,7 +120,8 @@ class TestUploadbotTempFiles(TestCase):
                            return_value=(temp_fd, tempname)),
                 mock.patch('pywikibot.specialbots._upload.http.fetch',
                            return_value=response),
-                self.assertRaises(requests.Timeout),
+                self.assertRaisesRegex(
+                    requests.Timeout, 'Download timed out'),
             ):
                 bot.read_file_content('https://yo.wikipedia.org/mahveo.png')
 
