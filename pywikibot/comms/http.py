@@ -456,8 +456,7 @@ def fetch(uri: str,
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
-    headers = headers or {}
-    headers.update(config.extra_headers)
+    headers = (headers or {}) | config.extra_headers
 
     def assign_fake_user_agent(use_fake_user_agent, uri):
         uri_domain = urlparse(uri).netloc
@@ -488,7 +487,7 @@ def fetch(uri: str,
     else:
         headers['user-agent'] = assign_user_agent(headers.get('user-agent'))
 
-    callbacks = kwargs.pop('callbacks', [])
+    callbacks = list(kwargs.pop('callbacks', []))
     # error_handling_callback will be executed first.
     if default_error_handling:
         callbacks.insert(0, error_handling_callback)

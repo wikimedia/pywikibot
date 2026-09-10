@@ -13,7 +13,7 @@ import warnings
 from contextlib import suppress
 from http import HTTPStatus
 from platform import python_implementation
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import requests
 
@@ -230,6 +230,37 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertNotIn(';)', ua)
         self.assertIn('requests/', ua)
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), ua)
+
+
+class FetchInputTestCase(TestCase):
+
+    """Test input handling by :func:`http.fetch`."""
+
+    net = False
+
+    def test_inputs_are_not_modified(self) -> None:
+        """Test that headers and callbacks remain unchanged."""
+        headers = {'X-Caller': 'value'}
+        callback = Mock()
+        callbacks = [callback]
+        response = requests.Response()
+        response.status_code = HTTPStatus.OK
+
+        with (
+            patch.object(config, 'extra_headers', {'X-Extra': 'configured'}),
+            patch.object(http, '_decide_encoding', return_value='utf-8'),
+            patch.object(http.session, 'request', return_value=response)
+            as request,
+        ):
+            http.fetch('https://example.test', headers=headers,
+                       callbacks=callbacks)
+
+        self.assertEqual(headers, {'X-Caller': 'value'})
+        self.assertEqual(callbacks, [callback])
+        request_headers = request.call_args.kwargs['headers']
+        self.assertEqual(request_headers['X-Caller'], 'value')
+        self.assertEqual(request_headers['X-Extra'], 'configured')
+        callback.assert_called_once_with(response)
 
 
 @require_modules('fake_useragent')
