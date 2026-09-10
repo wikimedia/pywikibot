@@ -25,7 +25,6 @@ a deprecator without any arguments.
 """
 from __future__ import annotations
 
-import collections
 import inspect
 import re
 import sys
@@ -433,7 +432,7 @@ def deprecated_args(**arg_pairs: str | None):
 
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
-            params = collections.OrderedDict()
+            params = {}
             for param in wrapper.__signature__.parameters.values():
                 params[param.name] = param.replace()
             for old_arg, new_arg in arg_pairs.items():
@@ -442,8 +441,7 @@ def deprecated_args(**arg_pairs: str | None):
                     default=f'[deprecated name of {new_arg}]'
                     if new_arg not in [True, False, None, '']
                     else NotImplemented)
-            params = collections.OrderedDict(sorted(params.items(),
-                                                    key=lambda x: x[1].kind))
+            params = dict(sorted(params.items(), key=lambda x: x[1].kind))
             wrapper.__signature__ = inspect.Signature()
             wrapper.__signature__._parameters = params
 
