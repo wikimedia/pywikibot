@@ -191,7 +191,9 @@ class BoundedThreadPoolTests(TestCase):
                 pool = BoundedPoolExecutor(executor, max_bound=1,
                                            max_workers=1)
                 pool.shutdown()
-                with self.assertRaises(RuntimeError):
+                with self.assertRaisesRegex(
+                        RuntimeError,
+                        'cannot schedule new futures after shutdown'):
                     pool.submit(pow, 2, 3)
                 self.assertTrue(
                     pool._bound_semaphore.acquire(blocking=False)
@@ -207,7 +209,8 @@ class BoundedThreadPoolTests(TestCase):
                 failure = error('submission failed')
                 with patch.object(ThreadPoolExecutor, 'submit',
                                   side_effect=failure):
-                    with self.assertRaises(error) as caught:
+                    with self.assertRaisesRegex(
+                            error, 'submission failed') as caught:
                         pool.submit(pow, 2, 3)
                 self.assertIs(caught.exception, failure)
                 self.assertTrue(

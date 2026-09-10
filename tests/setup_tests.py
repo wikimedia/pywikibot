@@ -46,7 +46,9 @@ class TestSetup(TestCase):
 
         with patch.object(sys, 'argv', ['setup.py', 'sdist']):
             with patch('builtins.print') as mock_print:
-                with self.assertRaises(SystemExit):
+                with self.assertRaisesRegex(
+                        SystemExit,
+                        r'Build of distribution package canceled'):
                     setup.get_validated_version('pywikibot')
 
         mock_print.assert_any_call(
