@@ -78,7 +78,8 @@ class BasicThreadedGeneratorTestCase(TestCase):
 
         def consume() -> None:
             try:
-                received.extend(generator)
+                for item in generator:
+                    received.append(item)
             except type(failure) as e:
                 errors.append(e)
 
