@@ -12,7 +12,7 @@ import re
 from collections import abc, defaultdict
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import suppress
-from functools import singledispatch
+from functools import cache, singledispatch
 from string import digits as _decimalDigits  # noqa: N812
 from typing import TYPE_CHECKING, Any
 
@@ -393,10 +393,8 @@ _digitDecoders: dict[str, decoder_type] = {
 # the size of zero-padding for numbers
 _reParameters = re.compile('|'.join(f'(%[1-9]?{s})' for s in _digitDecoders))
 
-# A map of sitecode+pattern to (re matching object and corresponding decoders)
-_escPtrnCache2: dict[str, tuple[re.Pattern[str], str, list[decoder_type]]] = {}
 
-
+@cache
 def escapePattern2(
     pattern: str
 ) -> tuple[re.Pattern[str], str, list[decoder_type]]:
@@ -435,28 +433,25 @@ def escapePattern2(
             f'in {subpattern}!')
         return newpattern + re.escape(dec), strpattern + subpattern
 
-    if pattern not in _escPtrnCache2:
-        newPattern = ''  # match starts at the beginning of the string
-        strPattern = ''
-        decoders: list[decoder_type] = []
-        for s in _reParameters.split(pattern):
-            if s is None:
-                continue
-            if (len(s) in (2, 3) and s[0] == '%'
-                    and s[-1] in _digitDecoders
-                    and (len(s) == 2 or s[1] in _decimalDigits)):
-                # Must match a "%2d" or "%d" style
-                dec = _digitDecoders[s[-1]]
-                newPattern, strPattern = decode(dec, s, newPattern, strPattern)
-            else:
-                newPattern += re.escape(s)
-                strPattern += s
+    newPattern = ''  # match starts at the beginning of the string
+    strPattern = ''
+    decoders: list[decoder_type] = []
+    for s in _reParameters.split(pattern):
+        if s is None:
+            continue
+        if (len(s) in (2, 3) and s[0] == '%'
+                and s[-1] in _digitDecoders
+                and (len(s) == 2 or s[1] in _decimalDigits)):
+            # Must match a "%2d" or "%d" style
+            dec = _digitDecoders[s[-1]]
+            newPattern, strPattern = decode(dec, s, newPattern, strPattern)
+        else:
+            newPattern += re.escape(s)
+            strPattern += s
 
-        newPattern += '$'  # end of the string
-        compiledPattern = re.compile(newPattern)
-        _escPtrnCache2[pattern] = (compiledPattern, strPattern, decoders)
-
-    return _escPtrnCache2[pattern]
+    newPattern += '$'  # end of the string
+    compiledPattern = re.compile(newPattern)
+    return compiledPattern, strPattern, decoders
 
 
 @singledispatch
