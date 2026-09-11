@@ -9,7 +9,7 @@ from __future__ import annotations
 import itertools
 import re
 import sys
-from collections import OrderedDict, deque
+from collections import deque
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
@@ -2102,7 +2102,7 @@ def extract_templates_and_params(
     text: str,
     remove_disabled_parts: bool = False,
     strip: bool = False,
-) -> list[tuple[str, OrderedDict[str, str]]]:
+) -> list[tuple[str, dict[str, str]]]:
     """Return a list of templates found in text.
 
     Return value is a list of tuples. There is one tuple for each use of a
@@ -2111,7 +2111,8 @@ def extract_templates_and_params(
     strings; as in MediaWiki, an unnamed parameter is given a parameter name
     with an integer value corresponding to its position among the unnamed
     parameters, and if this results multiple parameters with the same name
-    only the last value provided will be returned.
+    only the last value provided will be returned. Parameters retain their
+    insertion order; replacing a value does not move its key.
 
     This uses the package :py:obj:`mwparserfromhell` or
     :py:obj:`wikitextparser` as MediaWiki markup parser.
@@ -2133,6 +2134,9 @@ def extract_templates_and_params(
        *mwparserfromhell* is strictly recommended.
     .. version-changed:: 11.1
        Raise ModuleNotFoundError if no wikitext parser is installed.
+    .. version-changed:: next
+       Parameter mappings are plain :class:`dict` instances instead of
+       :class:`collections.OrderedDict` instances.
 
     :param text: The wikitext from which templates are extracted
     :param remove_disabled_parts: If enabled, remove disabled wikitext
@@ -2169,7 +2173,7 @@ def extract_templates_and_params(
         arguments = 'params'
 
     for template in templates:
-        params = OrderedDict()
+        params = {}
         for param in getattr(template, arguments):
             value = str(param.value)  # mwpfh needs upcast to str
 
@@ -2199,9 +2203,13 @@ def extract_templates_and_params_regex_simple(text: str):
     This method will incorrectly split arguments when an argument value
     contains a '|', such as {{template|a={{b|c}} }}.
 
+    .. version-changed:: next
+       Parameter mappings are plain :class:`dict` instances instead of
+       :class:`collections.OrderedDict` instances, retaining insertion order.
+
     :param text: The wikitext from which templates are extracted
     :return: List of template name and params
-    :rtype: list of tuple of name and OrderedDict
+    :rtype: list of tuple of name and dict
     """
     result = []
 
@@ -2213,7 +2221,7 @@ def extract_templates_and_params_regex_simple(text: str):
 
         numbered_param_identifiers = itertools.count(1)
 
-        params = OrderedDict(
+        params = dict(
             arg.split('=', 1)
             if '=' in arg
             else (str(next(numbered_param_identifiers)), arg)

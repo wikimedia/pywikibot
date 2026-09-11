@@ -15,6 +15,13 @@ Release 12
 
 **Other breaking changes**
 
+* Return insertion-ordered plain dictionaries for template parameters from
+  :func:`textlib.extract_templates_and_params`,
+  :func:`textlib.extract_templates_and_params_regex_simple`, and
+  :attr:`page.Page.raw_extracted_templates`. These replace ``OrderedDict``;
+  mapping equality no longer compares parameter order, and ``OrderedDict``
+  methods such as ``move_to_end()`` are no longer available on the results.
+
 Deprecations
 ============
 

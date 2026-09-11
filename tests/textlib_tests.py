@@ -10,7 +10,6 @@ from __future__ import annotations
 import functools
 import re
 import unittest
-from collections import OrderedDict
 from contextlib import nullcontext, suppress
 from pathlib import Path
 from unittest import mock
@@ -349,145 +348,146 @@ class TestTemplateParams(TestCase):
 
     net = False
 
+    def assertParamsEqual(self, actual, expected, *, ordered=True) -> None:
+        """Compare template results including the order of their parameters."""
+        actual = [(name, list(params.items())) for name, params in actual]
+        expected = [(name, list(params.items())) for name, params in expected]
+        if ordered:
+            self.assertEqual(actual, expected)
+        else:
+            self.assertCountEqual(actual, expected)
+
     def _common_results(self, func) -> None:
         """Common cases."""
-        self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{a }}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{ a }}'), [('a', OrderedDict())])
-        self.assertEqual(func('{{a|b=c}}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b|c=d}}'),
-                         [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
-        self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'),
-                         [('a', OrderedDict((('b', 'c'), ('f', 'g'),
-                                             ('d', 'e'), ('1', ''))))])
-        self.assertEqual(func('{{a|1=2|c=d}}'),
-                         [('a', OrderedDict((('1', '2'), ('c', 'd'))))])
-        self.assertEqual(func('{{a|c=d|1=2}}'),
-                         [('a', OrderedDict((('c', 'd'), ('1', '2'))))])
-        self.assertEqual(func('{{a|5=d|a=b}}'),
-                         [('a', OrderedDict((('5', 'd'), ('a', 'b'))))])
-        self.assertEqual(func('{{a|=2}}'),
-                         [('a', OrderedDict((('', '2'), )))])
-        self.assertEqual(func('{{a|}}'),
-                         [('a', OrderedDict((('1', ''), )))])
-        self.assertEqual(func('{{a|=|}}'),
-                         [('a', OrderedDict((('', ''), ('1', ''))))])
-        self.assertEqual(func('{{a||}}'),
-                         [('a', OrderedDict((('1', ''), ('2', ''))))])
-        self.assertEqual(func('{{a|b={{{1}}}}}'),
-                         [('a', OrderedDict((('b', '{{{1}}}'), )))])
-        self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
-                         [('a',
-                           OrderedDict((('b',
-                                         '<noinclude>{{{1}}}</noinclude>'),
-                                        )))])
-        self.assertEqual(func('{{Template:a|b=c}}'),
-                         [('Template:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{template:a|b=c}}'),
-                         [('template:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{:a|b=c}}'),
-                         [(':a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b={{{1}}}|c={{{2}}}}}'),
-                         [('a', OrderedDict((('b', '{{{1}}}'),
-                                             ('c', '{{{2}}}'))))])
-        self.assertEqual(func('{{a|b=c}}{{d|e=f}}'),
-                         [('a', OrderedDict((('b', 'c'), ))),
-                          ('d', OrderedDict((('e', 'f'), )))])
+        self.assertParamsEqual(func('{{a}}'), [('a', {})])
+        self.assertParamsEqual(func('{{ a}}'), [('a', {})])
+        self.assertParamsEqual(func('{{a }}'), [('a', {})])
+        self.assertParamsEqual(func('{{ a }}'), [('a', {})])
+        self.assertParamsEqual(func('{{a|b=c}}'),
+                               [('a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{a|b|c=d}}'),
+                               [('a', {'1': 'b', 'c': 'd'})])
+        self.assertParamsEqual(func('{{a|b=c|f=g|d=e|1=}}'),
+                               [('a', {'b': 'c', 'f': 'g', 'd': 'e',
+                                       '1': ''})])
+        self.assertParamsEqual(func('{{a|1=2|c=d}}'),
+                               [('a', {'1': '2', 'c': 'd'})])
+        self.assertParamsEqual(func('{{a|c=d|1=2}}'),
+                               [('a', {'c': 'd', '1': '2'})])
+        self.assertParamsEqual(func('{{a|5=d|a=b}}'),
+                               [('a', {'5': 'd', 'a': 'b'})])
+        self.assertParamsEqual(func('{{a|=2}}'),
+                               [('a', {'': '2'})])
+        self.assertParamsEqual(func('{{a|}}'),
+                               [('a', {'1': ''})])
+        self.assertParamsEqual(func('{{a|=|}}'),
+                               [('a', {'': '', '1': ''})])
+        self.assertParamsEqual(func('{{a||}}'),
+                               [('a', {'1': '', '2': ''})])
+        self.assertParamsEqual(func('{{a|b={{{1}}}}}'),
+                               [('a', {'b': '{{{1}}}'})])
+        self.assertParamsEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
+                               [('a',
+                                 {'b': '<noinclude>{{{1}}}</noinclude>'})])
+        self.assertParamsEqual(func('{{Template:a|b=c}}'),
+                               [('Template:a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{template:a|b=c}}'),
+                               [('template:a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{:a|b=c}}'),
+                               [(':a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{a|b={{{1}}}|c={{{2}}}}}'),
+                               [('a', {'b': '{{{1}}}', 'c': '{{{2}}}'})])
+        self.assertParamsEqual(func('{{a|b=c}}{{d|e=f}}'),
+                               [('a', {'b': 'c'}),
+                                ('d', {'e': 'f'})])
 
         # initial '{' and '}' should be ignored as outer wikitext
-        self.assertEqual(func('{{{a|b}}X}'),
-                         [('a', OrderedDict((('1', 'b'), )))])
+        self.assertParamsEqual(func('{{{a|b}}X}'),
+                               [('a', {'1': 'b'})])
 
         # sf.net bug 1575: unclosed template
-        self.assertEqual(func('{{a'), [])
-        self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
+        self.assertParamsEqual(func('{{a'), [])
+        self.assertParamsEqual(func('{{a}}{{foo|'), [('a', {})])
 
     def _unstripped(self, func) -> None:
         """Common cases of unstripped results."""
-        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
-                         [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
+        self.assertParamsEqual(func('{{a|b=<!--{{{1}}}-->}}'),
+                               [('a', {'b': '<!--{{{1}}}-->'})])
 
-        self.assertEqual(func('{{a|  }}'),
-                         [('a', OrderedDict((('1', '  '), )))])
-        self.assertEqual(func('{{a| | }}'),
-                         [('a', OrderedDict((('1', ' '), ('2', ' '))))])
-        self.assertEqual(func('{{a| =|}}'),
-                         [('a', OrderedDict(((' ', ''), ('1', ''))))])
+        self.assertParamsEqual(func('{{a|  }}'),
+                               [('a', {'1': '  '})])
+        self.assertParamsEqual(func('{{a| | }}'),
+                               [('a', {'1': ' ', '2': ' '})])
+        self.assertParamsEqual(func('{{a| =|}}'),
+                               [('a', {' ': '', '1': ''})])
 
-        self.assertEqual(func('{{a| b=c}}'),
-                         [('a', OrderedDict(((' b', 'c'), )))])
-        self.assertEqual(func('{{a|b =c}}'),
-                         [('a', OrderedDict((('b ', 'c'), )))])
-        self.assertEqual(func('{{a|b= c}}'),
-                         [('a', OrderedDict((('b', ' c'), )))])
-        self.assertEqual(func('{{a|b=c }}'),
-                         [('a', OrderedDict((('b', 'c '), )))])
+        self.assertParamsEqual(func('{{a| b=c}}'),
+                               [('a', {' b': 'c'})])
+        self.assertParamsEqual(func('{{a|b =c}}'),
+                               [('a', {'b ': 'c'})])
+        self.assertParamsEqual(func('{{a|b= c}}'),
+                               [('a', {'b': ' c'})])
+        self.assertParamsEqual(func('{{a|b=c }}'),
+                               [('a', {'b': 'c '})])
 
-        self.assertEqual(func('{{a| foo |2= bar }}'),
-                         [('a', OrderedDict((('1', ' foo '),
-                                             ('2', ' bar '))))])
+        self.assertParamsEqual(func('{{a| foo |2= bar }}'),
+                               [('a', {'1': ' foo ', '2': ' bar '})])
 
         # The correct entry 'bar' is removed
-        self.assertEqual(func('{{a| foo |2= bar | baz }}'),
-                         [('a', OrderedDict((('1', ' foo '),
-                                             ('2', ' baz '))))])
+        self.assertParamsEqual(func('{{a| foo |2= bar | baz }}'),
+                               [('a', {'1': ' foo ', '2': ' baz '})])
         # However whitespace prevents the correct item from being removed
-        self.assertEqual(func('{{a| foo | 2 = bar | baz }}'),
-                         [('a', OrderedDict((('1', ' foo '), (' 2 ', ' bar '),
-                                             ('2', ' baz '))))])
+        self.assertParamsEqual(func('{{a| foo | 2 = bar | baz }}'),
+                               [('a', {'1': ' foo ', ' 2 ': ' bar ',
+                                       '2': ' baz '})])
 
     def _stripped(self, func) -> None:
         """Common cases of stripped results."""
-        self.assertEqual(func('{{a|  }}'),
-                         [('a', OrderedDict((('1', '  '), )))])
-        self.assertEqual(func('{{a| | }}'),
-                         [('a', OrderedDict((('1', ' '), ('2', ' '))))])
-        self.assertEqual(func('{{a| =|}}'),
-                         [('a', OrderedDict((('', ''), ('1', ''))))])
+        self.assertParamsEqual(func('{{a|  }}'),
+                               [('a', {'1': '  '})])
+        self.assertParamsEqual(func('{{a| | }}'),
+                               [('a', {'1': ' ', '2': ' '})])
+        self.assertParamsEqual(func('{{a| =|}}'),
+                               [('a', {'': '', '1': ''})])
 
-        self.assertEqual(func('{{a| b=c}}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b =c}}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b= c}}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b=c }}'),
-                         [('a', OrderedDict((('b', 'c'), )))])
+        self.assertParamsEqual(func('{{a| b=c}}'),
+                               [('a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{a|b =c}}'),
+                               [('a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{a|b= c}}'),
+                               [('a', {'b': 'c'})])
+        self.assertParamsEqual(func('{{a|b=c }}'),
+                               [('a', {'b': 'c'})])
 
-        self.assertEqual(func('{{a| foo |2= bar }}'),
-                         [('a', OrderedDict((('1', ' foo '), ('2', 'bar'))))])
+        self.assertParamsEqual(func('{{a| foo |2= bar }}'),
+                               [('a', {'1': ' foo ', '2': 'bar'})])
 
         # 'bar' is always removed
-        self.assertEqual(func('{{a| foo |2= bar | baz }}'),
-                         [('a', OrderedDict((('1', ' foo '),
-                                             ('2', ' baz '))))])
-        self.assertEqual(func('{{a| foo | 2 = bar | baz }}'),
-                         [('a', OrderedDict((('1', ' foo '),
-                                             ('2', ' baz '))))])
+        self.assertParamsEqual(func('{{a| foo |2= bar | baz }}'),
+                               [('a', {'1': ' foo ', '2': ' baz '})])
+        self.assertParamsEqual(func('{{a| foo | 2 = bar | baz }}'),
+                               [('a', {'1': ' foo ', '2': ' baz '})])
 
     def _etp_regex_differs(self, func) -> None:
         """Common cases not handled the same by ETP_REGEX."""
         # inner {} should be treated as part of the value
-        self.assertEqual(func('{{a|b={} }}'),
-                         [('a', OrderedDict((('b', '{} '), )))])
+        self.assertParamsEqual(func('{{a|b={} }}'),
+                               [('a', {'b': '{} '})])
 
     def _order_differs(self, func) -> None:
         """Common cases where the order of templates differs."""
-        self.assertCountEqual(func('{{a|b={{c}}}}'),
-                              [('a', OrderedDict((('b', '{{c}}'), ))),
-                               ('c', OrderedDict())])
+        self.assertParamsEqual(func('{{a|b={{c}}}}'),
+                               [('a', {'b': '{{c}}'}),
+                                ('c', {})], ordered=False)
 
-        self.assertCountEqual(func('{{a|{{c|d}}}}'),
-                              [('c', OrderedDict((('1', 'd'), ))),
-                               ('a', OrderedDict([('1', '{{c|d}}')]))])
+        self.assertParamsEqual(func('{{a|{{c|d}}}}'),
+                               [('c', {'1': 'd'}),
+                                ('a', {'1': '{{c|d}}'})], ordered=False)
 
         # inner '}' after {{b|c}} should be treated as wikitext
-        self.assertCountEqual(func('{{a|{{b|c}}}|d}}'),
-                              [('a', OrderedDict([('1', '{{b|c}}}'),
-                                                  ('2', 'd')])),
-                               ('b', OrderedDict([('1', 'c')]))])
+        self.assertParamsEqual(func('{{a|{{b|c}}}|d}}'),
+                               [('a', {'1': '{{b|c}}}', '2': 'd'}),
+                                ('b', {'1': 'c'})], ordered=False)
 
     def _mwpfh_passes(self, func) -> None:
         """Common cases failing with wikitextparser but passes with mwpfh.
@@ -508,8 +508,8 @@ class TestTemplateParams(TestCase):
             with self.subTest(template=template, failing=failing):
                 name = template.strip('{}').split('|')[0]
                 with context:
-                    self.assertEqual(func(template),
-                                     [(name, OrderedDict((('b', 'c'), )))])
+                    self.assertParamsEqual(func(template),
+                                           [(name, {'b': 'c'})])
 
     def test_extract_templates_params_mwpfh(self) -> None:
         """Test using mwparserfromhell."""
@@ -520,17 +520,15 @@ class TestTemplateParams(TestCase):
         self._etp_regex_differs(func)
         self._mwpfh_passes(func)
 
-        self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d}}'), ))),
-                               ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
-                               ('d', OrderedDict())
-                               ])
+        self.assertParamsEqual(func('{{a|{{c|{{d}}}}}}'),
+                               [('c', {'1': '{{d}}'}),
+                                ('a', {'1': '{{c|{{d}}}}'}),
+                                ('d', {})], ordered=False)
 
-        self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d|}}'), ))),
-                               ('a', OrderedDict([('1', '{{c|{{d|}}}}')])),
-                               ('d', OrderedDict([('1', '')]))
-                               ])
+        self.assertParamsEqual(func('{{a|{{c|{{d|}}}}}}'),
+                               [('c', {'1': '{{d|}}'}),
+                                ('a', {'1': '{{c|{{d|}}}}'}),
+                                ('d', {'1': ''})], ordered=False)
 
     def test_extract_templates_params_parser_stripped(self) -> None:
         """Test using mwparserfromhell with stripping."""
@@ -551,17 +549,15 @@ class TestTemplateParams(TestCase):
         self._etp_regex_differs(func)
         self._mwpfh_passes(func)
 
-        self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d}}'), ))),
-                               ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
-                               ('d', OrderedDict())
-                               ])
+        self.assertParamsEqual(func('{{a|{{c|{{d}}}}}}'),
+                               [('c', {'1': '{{d}}'}),
+                                ('a', {'1': '{{c|{{d}}}}'}),
+                                ('d', {})], ordered=False)
 
-        self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
-                              [('c', OrderedDict((('1', '{{d|}}'), ))),
-                               ('a', OrderedDict([('1', '{{c|{{d|}}}}')])),
-                               ('d', OrderedDict([('1', '')]))
-                               ])
+        self.assertParamsEqual(func('{{a|{{c|{{d|}}}}}}'),
+                               [('c', {'1': '{{d|}}'}),
+                                ('a', {'1': '{{c|{{d|}}}}'}),
+                                ('d', {'1': ''})], ordered=False)
 
     def test_extract_templates_params(self) -> None:
         """Test that the normal entry point works."""
@@ -584,36 +580,33 @@ class TestTemplateParams(TestCase):
 
         # The simple regex copies the whitespace of mwpfh, but does
         # not have additional entries for nested templates.
-        self.assertEqual(func('{{a| b={{c}}}}'),
-                         [('a', OrderedDict(((' b', '{{c}}'), )))])
-        self.assertEqual(func('{{a|b={{c}}}}'),
-                         [('a', OrderedDict((('b', '{{c}}'), )))])
-        self.assertEqual(func('{{a|b= {{c}}}}'),
-                         [('a', OrderedDict((('b', ' {{c}}'), )))])
-        self.assertEqual(func('{{a|b={{c}} }}'),
-                         [('a', OrderedDict((('b', '{{c}} '), )))])
+        self.assertParamsEqual(func('{{a| b={{c}}}}'),
+                               [('a', {' b': '{{c}}'})])
+        self.assertParamsEqual(func('{{a|b={{c}}}}'),
+                               [('a', {'b': '{{c}}'})])
+        self.assertParamsEqual(func('{{a|b= {{c}}}}'),
+                               [('a', {'b': ' {{c}}'})])
+        self.assertParamsEqual(func('{{a|b={{c}} }}'),
+                               [('a', {'b': '{{c}} '})])
 
         # These three are from _order_differs, and while the first works
-        self.assertEqual(func('{{a|{{c}} }}'),
-                         [('a', OrderedDict((('1', '{{c}} '), )))])
+        self.assertParamsEqual(func('{{a|{{c}} }}'),
+                               [('a', {'1': '{{c}} '})])
 
         # an inner '|' causes extract_template_and_params_regex_simple to
         # split arguments incorrectly in the next two cases.
-        self.assertEqual(func('{{a|{{c|d}} }}'),
-                         [('a', OrderedDict([('1', '{{c'),
-                                             ('2', 'd}} ')]))])
+        self.assertParamsEqual(func('{{a|{{c|d}} }}'),
+                               [('a', {'1': '{{c', '2': 'd}} '})])
 
-        self.assertEqual(func('{{a|{{b|c}}}|d}}'),
-                         [('a', OrderedDict([('1', '{{b'),
-                                             ('2', 'c}}}'),
-                                             ('3', 'd')]))])
+        self.assertParamsEqual(func('{{a|{{b|c}}}|d}}'),
+                               [('a', {'1': '{{b', '2': 'c}}}', '3': 'd'})])
 
         # Safe fallback to handle arbitrary template levels
         # by merging top level templates together.
         # i.e. 'b' is not recognised as a template, and 'foo' is also
         # consumed as part of 'a'.
-        self.assertEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
-                         [(None, OrderedDict())])
+        self.assertParamsEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
+                               [(None, {})])
 
     def test_nested_template_regex_search(self) -> None:
         """Test NESTED_TEMPLATE_REGEX search."""
