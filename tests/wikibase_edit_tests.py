@@ -127,7 +127,6 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
-    @unittest.expectedFailure  # T367324
     def test_edit_entity_propagation(self) -> None:
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
@@ -140,24 +139,25 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         ref.setTarget('test')
         claim.addQualifier(qual)
         claim.addSource(ref)
+        item.claims[claim.id] = [claim]
         item.editEntity()
         self.assertIsNotNone(claim.snak)
         self.assertIsNotNone(qual.hash)
         self.assertIsNotNone(ref.hash)
-        self.assertSame(claim.on_item, item)
-        self.assertSame(qual.on_item, item)
-        self.assertSame(ref.on_item, item)
-        qual = pywikibot.Claim(testsite, 'P97339')
-        qual.setTarget('test')
-        ref = pywikibot.Claim(testsite, 'P97339')
-        ref.setTarget('test')
+        self.assertIs(claim.on_item, item)
+        self.assertIs(qual.on_item, item)
+        self.assertIs(ref.on_item, item)
+        qual = pywikibot.Claim(testsite, 'P97339', is_qualifier=True)
+        qual.setTarget('test2')
+        ref = pywikibot.Claim(testsite, 'P97339', is_reference=True)
+        ref.setTarget('test2')
         claim.qualifiers[qual.id].append(qual)
         claim.sources[0][ref.id].append(ref)
         item.editEntity()
         self.assertIsNotNone(qual.hash)
         self.assertIsNotNone(ref.hash)
-        self.assertSame(qual.on_item, item)
-        self.assertSame(ref.on_item, item)
+        self.assertIs(qual.on_item, item)
+        self.assertIs(ref.on_item, item)
 
     @unittest.expectedFailure  # T367323
     def test_edit_entity_new_property(self) -> None:

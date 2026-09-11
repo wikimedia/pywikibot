@@ -1,6 +1,8 @@
 Release 11.8
 ============
 
+* Correctly propagate reference group hashes after
+  :meth:`page.WikibaseEntity.editEntity`. (:phab:`T367324`)
 * Reset the retry counter for each query in :class:`data.sparql.SparqlQuery`.
 * Deduplicate intersections with a single input in :func:`tools.itertools.intersect_generators`.
 * Accept path-like filenames and detect suffixes case-insensitively in :func:`tools.open_archive`.
