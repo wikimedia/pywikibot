@@ -19,5 +19,5 @@ class Family(family.BetaSubdomainFamily):
 
     authornamespaces = {
         '_default': [0],
-        'beta': [102],
+        'en': [102],
     }
