@@ -431,6 +431,8 @@ def replaceExcept(text: str,
             # nothing left to replace
             break
 
+        match_start = match.start()
+
         # check which exception will occur next.
         nextExceptionMatch = None
         for dontTouchR in dontTouchRegexes:
@@ -441,7 +443,7 @@ def replaceExcept(text: str,
                 nextExceptionMatch = excMatch
 
         if nextExceptionMatch is not None \
-                and nextExceptionMatch.start() <= match.start():
+                and nextExceptionMatch.start() <= match_start:
             # an HTML comment or text in nowiki tags stands before the next
             # valid match. Skip.
             index = nextExceptionMatch.end()
@@ -482,19 +484,19 @@ def replaceExcept(text: str,
                 last = group_match.end()
             replacement += new[last:]
 
-        text = text[:match.start()] + replacement + text[match.end():]
+        text = text[:match_start] + replacement + text[match.end():]
 
         # continue the search on the remaining text
         if allowoverlap:
-            index = match.start() + 1
+            index = match_start + 1
         else:
-            index = match.start() + len(replacement)
+            index = match_start + len(replacement)
 
         if not match.group():
             # When the regex allows to match nothing, shift by one char
             index += 1
 
-        markerpos = match.start() + len(replacement)
+        markerpos = match_start + len(replacement)
         replaced += 1
 
     return text[:markerpos] + marker + text[markerpos:]
