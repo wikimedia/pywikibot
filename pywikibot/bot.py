@@ -2257,9 +2257,10 @@ class WikidataBot(Bot, ExistingPageBot):
 
         if data is None:
             data = {}
+        db_name = page.site.dbName()
         data.setdefault('sitelinks', {}).update({
-            page.site.dbName(): {
-                'site': page.site.dbName(),
+            db_name: {
+                'site': db_name,
                 'title': page.title()
             }
         })
