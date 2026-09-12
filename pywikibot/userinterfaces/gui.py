@@ -89,18 +89,18 @@ class TextEditor(ScrolledText):
     @staticmethod
     def _initialize_config(theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
+        normal = idleConf.GetHighlight(theme, 'normal')
+        hilite = idleConf.GetHighlight(theme, 'hilite')
         return {
             'padx': 5,
             'wrap': 'word',
             'undo': 'True',
             'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
-            'foreground': idleConf.GetHighlight(theme, 'normal')['foreground'],
-            'background': idleConf.GetHighlight(theme, 'normal')['background'],
-            'highlightcolor': idleConf.GetHighlight(
-                theme, 'hilite')['foreground'],
-            'highlightbackground': idleConf.GetHighlight(
-                theme, 'hilite')['background'],
+            'foreground': normal['foreground'],
+            'background': normal['background'],
+            'highlightcolor': hilite['foreground'],
+            'highlightbackground': hilite['background'],
             'insertbackground': idleConf.GetHighlight(
                 theme, 'cursor')['foreground'],
         }
