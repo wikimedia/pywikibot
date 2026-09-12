@@ -7,6 +7,7 @@
 """Tests for :mod:`editor` module."""
 from __future__ import annotations
 
+import errno
 import os
 import unittest
 from contextlib import suppress
@@ -65,9 +66,9 @@ class EditorTestCase(TestCase):
             return handle, filename
 
         def run(*args, **kwargs):
-            with self.assertRaisesRegex(
-                    OSError, r'\[Errno 9\] Bad file descriptor'):
+            with self.assertRaises(OSError) as cm:
                 os.fstat(handle)
+            self.assertEqual(cm.exception.errno, errno.EBADF)
 
         with patch.object(editor.tempfile, 'mkstemp', side_effect=mkstemp):
             with patch.object(editor.subprocess, 'run', side_effect=run):
