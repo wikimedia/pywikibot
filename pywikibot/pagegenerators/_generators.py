@@ -998,8 +998,9 @@ generator GoogleSearchPageGenerator depends on package
 
         # restrict query to local site
         site = self.site
-        local_query = f'{self.query} site:{site.hostname()}'
-        base = f'{site.protocol()}://{site.hostname()}{site.articlepath}'
+        hostname = site.hostname()
+        local_query = f'{self.query} site:{hostname}'
+        base = f'{site.protocol()}://{hostname}{site.articlepath}'
         pattern = re.compile(base.replace('{}', '(?P<title>.+)'))
 
         for url in self.queryGoogle(local_query, num_results=self.limit,
