@@ -343,8 +343,8 @@ class PagesTagParser(collections.abc.Container):
 
     def __str__(self) -> str:
         descriptors = self.get_descriptors().items()
-        attrs = [v.attrs.get(self) for k, v in descriptors
-                 if v.attrs.get(self) is not None]
+        attrs = [attr for k, v in descriptors
+                 if (attr := v.attrs.get(self)) is not None]
         attrs = ' '.join(str(attr) for attr in attrs)
         return f'<pages {attrs} />' if attrs else '<pages />'
 
