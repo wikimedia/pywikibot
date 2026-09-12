@@ -196,7 +196,8 @@ class UI(ABUIC):
 
         # Add default before the last linefeed
         if text.endswith('\n'):
-            text_parts[-1] = re.sub(r'\r?\n\Z', '', text_parts[-1])
+            text_parts[-1] = (
+                text_parts[-1].removesuffix('\n').removesuffix('\r'))
             text_parts.extend(('default', '\n'))
 
         text_parts.append('default')
