@@ -461,9 +461,9 @@ class TestFilterUnique(TestCase):
 
         if key in (hash, passthrough):
             if isinstance(deduped, OrderedDict):
-                self.assertEqual(list(deduped.keys()), [1, 3])
+                self.assertEqual(list(deduped), [1, 3])
             elif isinstance(deduped, Mapping):
-                self.assertCountEqual(list(deduped.keys()), [1, 3])
+                self.assertCountEqual(list(deduped), [1, 3])
             else:
                 self.assertEqual(deduped, {1, 3})
 
@@ -472,9 +472,9 @@ class TestFilterUnique(TestCase):
 
         if key in (hash, passthrough):
             if isinstance(deduped, OrderedDict):
-                self.assertEqual(list(deduped.keys()), [1, 3, 2, 4])
+                self.assertEqual(list(deduped), [1, 3, 2, 4])
             elif isinstance(deduped, Mapping):
-                self.assertCountEqual(list(deduped.keys()), [1, 2, 3, 4])
+                self.assertCountEqual(list(deduped), [1, 2, 3, 4])
             else:
                 self.assertEqual(deduped, {1, 2, 3, 4})
 

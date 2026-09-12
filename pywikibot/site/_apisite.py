@@ -1743,10 +1743,10 @@ class APISite(
 
         >>> site = pywikibot.Site()
         >>> tokens = site.get_tokens([])  # get all tokens
-        >>> list(tokens.keys())  # result depends on user
+        >>> list(tokens)  # result depends on user
         ['createaccount', 'login']
         >>> tokens = site.get_tokens(['csrf', 'patrol'])
-        >>> list(tokens.keys())  # doctest: +SKIP
+        >>> list(tokens)  # doctest: +SKIP
         ['csrf', 'patrol']
         >>> token = site.get_tokens(['csrf']).get('csrf')  # get a single token
         >>> token  # doctest: +SKIP

@@ -112,11 +112,11 @@ class TestLinkObject(SiteAttributeTestCase):
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
                 link = pywikibot.page.Link(
-                    prefix + list(self.titles.keys())[0], self.enwiki)
+                    prefix + list(self.titles)[0], self.enwiki)
                 self.assertEqual(link.namespace, num)
                 # namespace prefixes are case-insensitive
                 lowered_link = pywikibot.page.Link(
-                    prefix.lower() + list(self.titles.keys())[1], self.enwiki)
+                    prefix.lower() + list(self.titles)[1], self.enwiki)
                 self.assertEqual(lowered_link.namespace, num)
 
     def testTitles(self) -> None:

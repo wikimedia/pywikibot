@@ -281,7 +281,7 @@ def _create_default_regexes() -> None:
             r'\[\[:?(%s)\s?:[^\]]*\]\]\s*',
             lambda site: '|'.join(
                 ignore_case(i) for i in site.validLanguageLinks()
-                + list(site.family.obsolete.keys()))),
+                + list(site.family.obsolete))),
         # Module invocations (currently only Lua)
         'invoke': (
             r'\{\{\s*\#(?:%s):(?s:.*?)\}\}',
@@ -1476,7 +1476,7 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
     languages = '|'.join(site.validLanguageLinks()
-                         + list(site.family.obsolete.keys()))
+                         + list(site.family.obsolete))
     if not languages:
         return text
     interwikiR = re.compile(rf'\[\[({languages})\s?:[^\[\]\n]*\]\][\s]*',
@@ -1654,7 +1654,7 @@ def interwikiFormat(links: dict, insite=None) -> str:
     if insite is None:
         insite = pywikibot.Site()
 
-    ar = interwikiSort(list(links.keys()), insite)
+    ar = interwikiSort(list(links), insite)
     s = []
     for site in ar:
         if isinstance(links[site], pywikibot.Link):

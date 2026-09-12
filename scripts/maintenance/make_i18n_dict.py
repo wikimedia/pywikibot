@@ -76,7 +76,7 @@ class i18nBot:  # noqa: N801
             print('No messages found, read them first.\n'
                   'Use "run" or "to_json" methods')
             return
-        keys = list(self.dict.keys())
+        keys = list(self.dict)
         keys.remove('qqq')
         keys.sort()
         keys.insert(0, 'qqq')
@@ -97,7 +97,7 @@ class i18nBot:  # noqa: N801
     def read(self, oldmsg, newmsg=None) -> None:
         """Read a single message from source script."""
         msg = getattr(self.script, oldmsg)
-        keys = list(msg.keys())
+        keys = list(msg)
         keys.append('qqq')
         if newmsg is None:
             newmsg = oldmsg

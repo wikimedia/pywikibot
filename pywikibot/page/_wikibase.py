@@ -1933,7 +1933,7 @@ class Claim(Property):
         else:
             if self.qualifiers:
                 data['qualifiers'] = {}
-                data['qualifiers-order'] = list(self.qualifiers.keys())
+                data['qualifiers-order'] = list(self.qualifiers)
                 for prop, qualifiers in self.qualifiers.items():
                     for qualifier in qualifiers:
                         assert qualifier.isQualifier is True
@@ -1944,7 +1944,7 @@ class Claim(Property):
                 data['references'] = []
                 for collection in self.sources:
                     reference = {
-                        'snaks': {}, 'snaks-order': list(collection.keys())}
+                        'snaks': {}, 'snaks-order': list(collection)}
                     for prop, val in collection.items():
                         reference['snaks'][prop] = []
                         for source in val:

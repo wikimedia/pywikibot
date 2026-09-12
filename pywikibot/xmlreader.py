@@ -164,7 +164,7 @@ class XmlDump:
                 since='9.0.0')
 
         if revisions not in self.rev_actions:
-            actions = str(list(self.rev_actions.keys())).strip('[]')
+            actions = str(list(self.rev_actions)).strip('[]')
             raise ValueError(f"'revisions' must be one of {actions}.")
 
         self._parse = self.rev_actions[revisions]

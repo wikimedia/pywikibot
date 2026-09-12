@@ -206,7 +206,7 @@ class GeneratorsMixin:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:
-                rvgen.request['titles'] = list(cache.keys())
+                rvgen.request['titles'] = list(cache)
             rvgen.request['rvprop'] = self._rvprops(content=content)
             if coordinates:
                 rvgen.request['coprop'] = [
@@ -238,7 +238,7 @@ class GeneratorsMixin:
                 except KeyError:
                     pywikibot.debug(f"No 'title' in {pagedata}\n"
                                     f'{pageids=!s}\n'
-                                    f'titles={list(cache.keys())}')
+                                    f'titles={list(cache)}')
                     continue
 
                 priority, page = cache[pagedata['title']]
