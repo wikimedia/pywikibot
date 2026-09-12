@@ -209,6 +209,9 @@ class GeneratorWrapper(ABC, Generator):
 
     """A Generator base class which wraps the internal `generator` property.
 
+    The wrapped generator is created and validated on first iteration and
+    reused until :meth:`restart` is called.
+
     This generator iterator also has :python:`generator.close()
     <reference/expressions.html#generator.close>` mixin method and it can
     be used as Iterable and Iterator as well.
@@ -272,12 +275,12 @@ class GeneratorWrapper(ABC, Generator):
 
         :raises TypeError: generator property is not a generator
         """
-        if not isinstance(self.generator, Generator):
-            raise TypeError('generator property is not a generator but '
-                            f'{type(self.generator).__name__}')
         if not hasattr(self, '_started_gen'):
-            # start the generator
-            self._started_gen = self.generator
+            generator = self.generator
+            if not isinstance(generator, Generator):
+                raise TypeError('generator property is not a generator but '
+                                f'{type(generator).__name__}')
+            self._started_gen = generator
         return next(self._started_gen)
 
     @deprecated_args(val='value', tb='traceback')  # since 10.7.0

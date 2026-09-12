@@ -29,6 +29,7 @@ from pywikibot.tools import (
     is_ip_network,
     suppress_warnings,
 )
+from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import (
     filter_unique,
     intersect_generators,
@@ -39,6 +40,55 @@ from pywikibot.tools.itertools import (
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 from tests.utils import skipping
+
+
+class TestGeneratorWrapper(TestCase):
+
+    """Test lazy initialization of the wrapped generator."""
+
+    net = False
+
+    def setUp(self) -> None:
+        """Create a wrapper with a tracked generator property."""
+        super().setUp()
+
+        class Wrapper(GeneratorWrapper):
+
+            @property
+            def generator(self):
+                return (i for i in range(3))
+
+        self.wrapper = Wrapper()
+        patcher = mock.patch.object(
+            Wrapper, 'generator', new_callable=mock.PropertyMock)
+        self.generator = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.generator.side_effect = lambda: (i for i in range(3))
+
+    def test_lifecycle(self) -> None:
+        """Fetch the generator once until explicitly restarted."""
+        self.generator.assert_not_called()
+        self.assertEqual(list(self.wrapper), [0, 1, 2])
+        with self.assertRaises(StopIteration):
+            next(self.wrapper)
+        self.generator.assert_called_once_with()
+        self.wrapper.restart()
+        self.assertEqual(next(self.wrapper), 0)
+        self.assertEqual(self.generator.call_count, 2)
+        self.wrapper.close()
+        with self.assertRaises(StopIteration):
+            next(self.wrapper)
+        self.assertEqual(self.generator.call_count, 2)
+
+    def test_invalid_generator(self) -> None:
+        """Reject an invalid result once and allow initialization to retry."""
+        self.generator.side_effect = [42, (i for i in range(3))]
+        with self.assertRaisesRegex(
+                TypeError, '^generator property is not a generator but int$'):
+            next(self.wrapper)
+        self.generator.assert_called_once_with()
+        self.assertEqual(next(self.wrapper), 0)
+        self.assertEqual(self.generator.call_count, 2)
 
 
 class OpenArchiveTestCase(TestCase):
