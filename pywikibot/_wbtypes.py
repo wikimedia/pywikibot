@@ -168,11 +168,12 @@ class Coordinate(WbRepresentation):
             by Wikibase
         """
         if not self._entity:
-            if self.globe not in self.site.globes():
+            globes = self.site.globes()
+            if self.globe not in globes:
                 raise exceptions.CoordinateGlobeUnknownError(
                     f'{self.globe} is not supported in Wikibase yet.')
 
-            return self.site.globes()[self.globe]
+            return globes[self.globe]
 
         if isinstance(self._entity, pywikibot.ItemPage):
             return self._entity.concept_uri()
