@@ -2320,8 +2320,9 @@ class LexemePage(WikibasePage):
             value = getattr(self, prop, None)
             if not value:
                 continue
-            if not diffto or diffto.get(prop) != value.getID():
-                data[prop] = value.getID()
+            value_id = value.getID()
+            if not diffto or diffto.get(prop) != value_id:
+                data[prop] = value_id
 
         return data
 
