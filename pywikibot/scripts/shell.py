@@ -47,7 +47,7 @@ def main(*args: str) -> None:
         print('{} arguments: {}\n'  # noqa: T201
               .format(warn_type, ', '.join(args)))
 
-    # Various stuffs in Python 3.4+, such as history file.
+    # Set up interactive features such as command history.
     # This is defined in the site module of the Python Standard Library,
     # and usually called by the built-in CPython interactive shell.
     if hasattr(sys, '__interactivehook__'):

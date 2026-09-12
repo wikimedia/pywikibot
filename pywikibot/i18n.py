@@ -850,8 +850,7 @@ def twget_keys(twtitle: str) -> list[str]:
              for filename in sorted(os.listdir(pathname))
              if filename.endswith('.json')]
 
-    # exclude languages does not have this specific message in that package
-    # i.e. an incomplete set of translated messages.
+    # Exclude languages whose translations do not include this message.
     return [lang for lang in langs
             if lang != 'qqq' and _get_translation(lang, twtitle)]
 

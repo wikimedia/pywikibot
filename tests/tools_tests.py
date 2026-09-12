@@ -553,7 +553,7 @@ class TestFilterUnique(TestCase):
 
     def test_obj_id(self) -> None:
         """Test filter_unique with objects using id as key, which fails."""
-        # Two objects which may be equal do not necessary have the same id.
+        # Two objects which may be equal do not necessarily have the same id.
         deduped = set()
         deduper = filter_unique(self.decs, container=deduped, key=id)
         self.assertIsEmpty(deduped)

@@ -241,7 +241,7 @@ class GeneratorWrapper(ABC, Generator):
         ...
     StopIteration
     >>> gen.restart()  # restart a closed generator
-    >>> # also send() and throw() works
+    >>> # also send() and throw() work
     >>> gen.send(None) + gen.send(None)
     'Py'
     >>> gen.throw(RuntimeError('Foo'))

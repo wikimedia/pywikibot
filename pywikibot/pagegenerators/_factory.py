@@ -1048,7 +1048,7 @@ class GeneratorFactory:
         .. version-changed:: 11.4.1
            If preleading ``not:`` directive is given, special namespaces
            ``-1`` and ``-2`` are not included.
-           The ``-start`` or ``-until`` parameters appends a placeholder
+           The ``-start`` or ``-until`` parameters append a placeholder
            to :attr:`gens`, which indicates that a generator was
            specified.
 
