@@ -194,13 +194,10 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 else:
                     cache[item] -= ones
 
-        # We can quit if an iterable is exceeded and cached iterables is
-        # a subset of active iterables.
+        # We can quit if a source is exhausted and every cached item has
+        # only been found in sources which are still active.
         if len(active_iterables) < n_gen:
-            cached_iterables = set(
-                itertools.chain.from_iterable(v.keys()
-                                              for v in cache.values()))
-            if cached_iterables <= active_iterables:
+            if all(v.keys() <= active_iterables for v in cache.values()):
                 return
 
 
