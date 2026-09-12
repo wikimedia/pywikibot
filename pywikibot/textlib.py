@@ -1437,9 +1437,8 @@ def getLanguageLinks(
         # language, or if it's e.g. a category tag or an internal link
         lang = fam.obsolete.get(lang, lang)
         if lang in fam.langs:
-            if '|' in pagetitle:
-                # ignore text after the pipe
-                pagetitle = pagetitle[:pagetitle.index('|')]
+            # ignore text after the pipe
+            pagetitle = pagetitle.partition('|')[0]
             # we want the actual page objects rather than the titles
             site = pywikibot.Site(code=lang, fam=fam)
             # skip language links to its own site

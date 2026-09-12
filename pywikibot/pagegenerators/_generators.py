@@ -452,8 +452,7 @@ def _yield_titles(f: io.TextIOBase,
     f.seek(0)
     for title in f:
         title = title.strip()
-        if '|' in title:
-            title = title[:title.index('|')]
+        title = title.partition('|')[0]
         if title:
             yield pywikibot.Page(site, title)
 

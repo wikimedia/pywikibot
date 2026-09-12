@@ -344,7 +344,7 @@ class Link(BaseLink):
                 # remove any subsequent whitespace
                 t = t.lstrip(':').lstrip(' ')
                 continue
-            prefix = t[:t.index(':')].lower()  # part of text before :
+            prefix = t.partition(':')[0].lower()  # part of text before :
             ns = self._source.namespaces.lookup_name(prefix)
             if ns:
                 # The prefix is a namespace in the source wiki
@@ -437,7 +437,7 @@ class Link(BaseLink):
                                                  if self._namespace % 2 else
                                                  self._namespace + 1]
                 if '' in other_ns:  # other namespace uses empty str as ns
-                    next_ns = t[:t.index(':')]
+                    next_ns = t.partition(':')[0]
                     if self._site.namespaces.lookup_name(next_ns):
                         raise InvalidTitleError(
                             f"The (non-)talk page of '{self._text}' is a valid"
