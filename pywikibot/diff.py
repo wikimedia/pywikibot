@@ -200,7 +200,7 @@ class Hunk:
 
     def __str__(self) -> str:
         """Return the diff as plain text."""
-        return ''.join(self.diff_plain_text)
+        return self.diff_plain_text
 
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
