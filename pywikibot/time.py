@@ -481,8 +481,9 @@ def str2timedelta(
         duration *= 12
 
         if timestamp:
+            date = timestamp.date()
             return pywikibot.date.apply_month_delta(
-                timestamp.date(), month_delta=duration) - timestamp.date()
+                date, month_delta=duration) - date
         return datetime.timedelta(days=days)
 
     # days, seconds, hours, weeks
