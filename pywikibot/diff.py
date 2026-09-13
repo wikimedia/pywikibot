@@ -368,10 +368,10 @@ class PatchManager:
         """Dynamically determine context range for a super hunk."""
         a0, a1 = super_hunk.a_rng
         b0, b1 = super_hunk.b_rng
-        return ((a0 - min(super_hunk.pre_context, self.context),
-                 a1 + min(super_hunk.post_context, self.context)),
-                (b0 - min(super_hunk.pre_context, self.context),
-                 b1 + min(super_hunk.post_context, self.context)))
+        pre_context = min(super_hunk.pre_context, self.context)
+        post_context = min(super_hunk.post_context, self.context)
+        return ((a0 - pre_context, a1 + post_context),
+                (b0 - pre_context, b1 + post_context))
 
     def _generate_diff(self, hunks: _SuperHunk) -> str:
         """Generate a diff text for the given hunks."""
