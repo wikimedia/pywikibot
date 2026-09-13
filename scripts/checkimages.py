@@ -1376,10 +1376,10 @@ class CheckImagesBot:
             find_type = tupla[2]
             find = tupla[3]
             find_list = self.load(find)
-            imagechanges = tupla[4]
-            if imagechanges.lower() == 'false':
+            imagechanges = tupla[4].lower()
+            if imagechanges == 'false':
                 imagestatus = False
-            elif imagechanges.lower() == 'true':
+            elif imagechanges == 'true':
                 imagestatus = True
             else:
                 pywikibot.error('Imagechanges set wrongly!')
@@ -1391,8 +1391,9 @@ class CheckImagesBot:
                 head_2 = re.findall(r'\s*== *(.+?) *==\s*', head_2)[0]
             text = tupla[7] % self.image_name
             mex_catched = tupla[8]
+            find_type = find_type.lower()
             for k in find_list:
-                if find_type.lower() == 'findonly':
+                if find_type == 'findonly':
                     search_results = re.findall(fr'{k.lower()}',
                                                 image_check_text_lower)
                     if search_results \
@@ -1405,7 +1406,7 @@ class CheckImagesBot:
                         self.summary_used = summary
                         self.mex_used = mex_catched
                         break
-                elif find_type.lower() == 'find' \
+                elif find_type == 'find' \
                     and re.search(fr'{k.lower()}',
                                   image_check_text_lower):
                     self.some_problem = True
