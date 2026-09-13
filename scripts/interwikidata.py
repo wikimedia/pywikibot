@@ -115,17 +115,19 @@ class IWBot(ConfigParserBot, ExistingPageBot, SingleSiteBot):
 
     def create_item(self) -> pywikibot.ItemPage:
         """Create item in repo for current_page."""
+        dbname = self.site.dbName()
+        title = self.current_page.title()
         data = {
             'sitelinks': {
-                self.site.dbName(): {
-                    'site': self.site.dbName(),
-                    'title': self.current_page.title()
+                dbname: {
+                    'site': dbname,
+                    'title': title
                 }
             },
             'labels': {
                 self.site.lang: {
                     'language': self.site.lang,
-                    'value': self.current_page.title()
+                    'value': title
                 }
             }
         }
