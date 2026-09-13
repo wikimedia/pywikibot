@@ -239,10 +239,11 @@ def ignore_case(string: str) -> str:
 
 def _tag_pattern(tag_name: str) -> str:
     """Return a tag pattern for the given tag name."""
+    tag_pattern = ignore_case(tag_name)
     return (
-        rf'<{ignore_case(tag_name)}(?:>|\s+[^>]*(?<!/)>)'  # start tag
+        rf'<{tag_pattern}(?:>|\s+[^>]*(?<!/)>)'  # start tag
         r'.*?'  # contents
-        rf'</{ignore_case(tag_name)}\s*>'  # end tag
+        rf'</{tag_pattern}\s*>'  # end tag
     )
 
 
