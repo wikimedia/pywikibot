@@ -174,8 +174,10 @@ class CategoryGraphBot(SingleSiteBot):
             # repeat recursively
             self.scan_level(subcat, level - 1, h)
             # track graph's structure to reduce too big graph
-            self.rev[e.get_destination()].append(e.get_source())
-            self.fw[e.get_source()].append(e.get_destination())
+            source = e.get_source()
+            destination = e.get_destination()
+            self.rev[destination].append(source)
+            self.fw[source].append(destination)
 
     def run(self) -> None:
         """Main function of CategoryGraphBot."""
