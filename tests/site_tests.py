@@ -177,7 +177,10 @@ class TestSiteObject(DefaultSiteTestCase):
         months = ['january', 'february', 'march', 'april', 'may_long',
                   'june', 'july', 'august', 'september', 'october',
                   'november', 'december']
-        codes = sorted(mysite.family.codes)
+        codes = sorted(
+            set(mysite.family.codes)
+            | set(getattr(mysite.family, 'test_codes', ()))
+        )
         lang1, lang2 = codes[0], codes[-1]
         with self.subTest(messages='months', lang1=lang1, lang2=lang2):
             self.assertLength(mysite.mediawiki_messages(months, lang1), 12)
