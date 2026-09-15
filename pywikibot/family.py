@@ -671,8 +671,8 @@ class Family:
             return None
 
         raise RuntimeError(
-            'Found multiple matches for URL "{}": {}'
-            .format(url, ', '.join(str(s) for s in matched_sites)))
+            f'Found multiple matches for URL "{url}": '
+            f'{", ".join(str(s) for s in matched_sites)}')
 
     def dbName(self, code) -> str:
         """Return the name of the MySQL database."""

@@ -467,8 +467,8 @@ class GeneratorFactory:
 
         if start_ or end_:
             pywikibot.info(
-                'Fetching log events in range: {} - {}.'
-                .format(end or 'beginning of time', start or 'now'))
+                'Fetching log events in range: %s - %s.',
+                end or 'beginning of time', start or 'now')
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.

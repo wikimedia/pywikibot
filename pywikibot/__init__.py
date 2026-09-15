@@ -130,8 +130,8 @@ def _code_fam_from_url(url: str, name: str | None = None) -> tuple[str, str]:
         matched_sites.append((family.code, family))
 
     if len(matched_sites) > 1:
-        warning('Found multiple matches for URL "{}": {} (use first)'
-                .format(url, ', '.join(str(s) for s in matched_sites)))
+        warning('Found multiple matches for URL "%s": %s (use first)',
+                url, ', '.join(str(s) for s in matched_sites))
     return matched_sites[0]
 
 

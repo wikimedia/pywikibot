@@ -1005,8 +1005,8 @@ The text message is:
             'readonly',  # T154011
         ]
 
-        pywikibot.error('Detected MediaWiki API exception {}{}'
-                        .format(e, '; retrying' if retry else '; raising'))
+        pywikibot.error('Detected MediaWiki API exception %s%s',
+                        e, '; retrying' if retry else '; raising')
         param_repr = str(self._params)
         pywikibot.log(f'MediaWiki exception {class_name} details:\n'
                       f'          query=\n{pprint.pformat(param_repr)}\n'
