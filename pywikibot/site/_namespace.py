@@ -456,10 +456,9 @@ class NamespacesDict(Mapping):
 
         # Namespace.lookup_name returns None if the name is not recognised
         if None in result:
-            raise KeyError(
-                'Namespace identifier(s) not recognised: {}'
-                .format(','.join(str(identifier)
-                                 for identifier, ns in zip(identifiers, result)
-                                 if ns is None)))
+            names = ','.join(str(identifier)
+                             for identifier, ns in zip(identifiers, result)
+                             if ns is None)
+            raise KeyError(f'Namespace identifier(s) not recognised: {names}')
 
         return result

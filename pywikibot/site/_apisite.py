@@ -416,16 +416,12 @@ class APISite(
                 error_msg = ('No username has been defined in your '
                              'user config file: you have to add in this '
                              'file the following line:\n'
-                             "usernames['{family}'][{lang!r}]= {username!r}"
-                             .format(family=self.family,
-                                     lang=self.lang,
-                                     username=self.userinfo['name']))
+                             f"usernames['{self.family}'][{self.lang!r}]= "
+                             f"{self.userinfo['name']!r}")
             else:
-                error_msg = ('Logged in on {site} via OAuth as {wrong}, but '
-                             'expect as {right}'
-                             .format(site=self,
-                                     wrong=self.userinfo['name'],
-                                     right=self.username()))
+                error_msg = (f'Logged in on {self} via OAuth as '
+                             f"{self.userinfo['name']}, but "
+                             f'expect as {self.username()}')
 
             raise NoUsernameError(error_msg)
 

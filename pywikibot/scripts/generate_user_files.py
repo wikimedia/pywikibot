@@ -97,8 +97,8 @@ def file_exists(filename) -> bool:
     """Return whether the file exists and print a message if it exists."""
     path = Path(filename)
     if path.exists():
-        pywikibot.info('{1} already exists in the target directory "{0}".'
-                       .format(path.parent, path.name))
+        pywikibot.info('%s already exists in the target directory "%s".',
+                       path.name, path.parent)
         return True
     return False
 
@@ -508,9 +508,9 @@ def main(*args: str) -> None:
 
     local_args = pywikibot.handle_args(args)
     if local_args:
-        pywikibot.info('Unknown argument{}: {}'
-                       .format('s' if len(local_args) > 1 else '',
-                               ', '.join(local_args)))
+        pywikibot.info('Unknown argument%s: %s',
+                       's' if len(local_args) > 1 else '',
+                       ', '.join(local_args))
         return
 
     pywikibot.info('You can abort at any time by pressing ctrl-c')

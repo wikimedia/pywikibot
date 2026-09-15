@@ -855,9 +855,8 @@ def merge_unique_dicts(*args, **kwargs):
         conflicts.update(key for key in arg if key in result)
         result.update(arg)
     if conflicts:
-        raise ValueError('Multiple dicts contain the same keys: {}'
-                         .format(', '.join(sorted(str(key)
-                                                  for key in conflicts))))
+        keys = ', '.join(sorted(str(key) for key in conflicts))
+        raise ValueError(f'Multiple dicts contain the same keys: {keys}')
     return result
 
 

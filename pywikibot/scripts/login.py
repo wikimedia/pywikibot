@@ -86,9 +86,8 @@ def _oauth_login(site) -> None:
         pywikibot.error(f'Invalid OAuth info for {site}.')
     elif site.username() != identity['username']:
         pywikibot.error(
-            'Logged in on {site} via OAuth as {wrong}, but expect as {right}'
-            .format(site=site,
-                    wrong=identity['username'], right=site.username()))
+            'Logged in on %s via OAuth as %s, but expect as %s',
+            site, identity['username'], site.username())
     else:
         oauth_token = login_manager.consumer_token + login_manager.access_token
         pywikibot.info(

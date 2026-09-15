@@ -598,17 +598,12 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         if prev_limit != new_limit:
             pywikibot.debug(
-                '{name}: query_limit: {query}, api_limit: {api}, '
-                'limit: {limit}, new_limit: {new}, count: {count}\n'
-                '{name}: {prefix}limit: {value}'
-                .format(name=self.__class__.__name__,
-                        query=self.query_limit,
-                        api=self.api_limit,
-                        limit=self.limit,
-                        new=new_limit,
-                        count=self._count,
-                        prefix=self.prefix,
-                        value=self.request[self.prefix + 'limit']))
+                '%s: query_limit: %s, api_limit: %s, '
+                'limit: %s, new_limit: %s, count: %s\n'
+                '%s: %slimit: %s',
+                self.__class__.__name__, self.query_limit, self.api_limit,
+                self.limit, new_limit, self._count, self.__class__.__name__,
+                self.prefix, self.request[self.prefix + 'limit'])
         return prev_limit, new_limit
 
     def _get_resultdata(self):
