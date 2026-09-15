@@ -908,7 +908,7 @@ class WbTime(WbRepresentation):
         if self.year <= 0:
             raise ValueError('You cannot turn BC dates into a Timestamp')
         ts = Timestamp.fromISOformat(
-            self.toTimestr(force_iso=True).lstrip('+'))
+            self.toTimestr(force_iso=True).removeprefix('+'))
         if timezone_aware:
             ts = ts.replace(tzinfo=datetime.timezone(
                 datetime.timedelta(minutes=self.timezone)))

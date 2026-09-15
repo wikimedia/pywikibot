@@ -361,7 +361,7 @@ def find_alternates(filename, script_paths):
                 scripts[name] = script_name
 
     # remove .py for better matching
-    filename = filename[:-3]
+    filename = filename.removesuffix('.py')
     similar_scripts = get_close_matches(filename, scripts,
                                         config.pwb_close_matches,
                                         config.pwb_cut_off)

@@ -313,7 +313,7 @@ class UploadRobot(BaseBot):
                     return None
 
             first_check = False
-            ext = os.path.splitext(filename)[1].lower().strip('.')
+            ext = os.path.splitext(filename)[1].lower().removeprefix('.')
             # are any chars in forbidden also in filename?
             invalid = set(forbidden) & set(filename)
             if invalid:
