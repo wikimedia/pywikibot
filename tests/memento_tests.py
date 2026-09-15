@@ -51,9 +51,11 @@ class TestMementoRequestHead(TestCase):
         from pywikibot.data.memento import MementoClient
 
         session = session_class.return_value
-        session.head.side_effect = RequestsConnectionError
+        session.head.side_effect = RequestsConnectionError(
+            'Connection aborted.')
 
-        with self.assertRaises(RequestsConnectionError):
+        with self.assertRaisesRegex(
+                RequestsConnectionError, r'Connection aborted'):
             MementoClient.request_head('https://example.org')
 
         session.close.assert_called_once_with()

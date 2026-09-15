@@ -104,7 +104,7 @@ class TestWelcomeBot(TestCase):
         """Test that the signature file is closed when reading fails."""
         file_obj = MagicMock()
         file_obj.__enter__.return_value = file_obj
-        file_obj.read.side_effect = OSError
+        file_obj.read.side_effect = OSError('Simulated read failure')
 
         with (
             patch.object(
@@ -112,7 +112,7 @@ class TestWelcomeBot(TestCase):
             patch.object(welcome.pywikibot.config, 'datafilepath',
                          return_value='signatures.txt'),
             patch('builtins.open', return_value=file_obj),
-            self.assertRaises(OSError),
+            self.assertRaisesRegex(OSError, r'Simulated read failure'),
         ):
             welcome.WelcomeBot.define_sign(SimpleNamespace())
 

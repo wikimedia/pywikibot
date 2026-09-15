@@ -122,7 +122,9 @@ class TestDjVuFileWithoutLib(TestCase):
     def test_file_existence(self) -> None:
         """Test file existence checks."""
         self.assertEqual(os.path.abspath(file_djvu), self.djvu.file)
-        with self.assertRaises(OSError):
+        with self.assertRaisesRegex(
+                OSError,
+                r'No such file|No such file or directory|cannot find'):
             DjVuFile(self.file_djvu_not_existing)
 
     def test_str_method(self) -> None:

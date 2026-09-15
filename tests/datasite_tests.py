@@ -98,7 +98,9 @@ class TestDataSiteSearchEntities(WikidataTestCase):
     def test_invalid_language(self) -> None:
         """Test behavior of search_entities with invalid language provided."""
         datasite = self.get_repo()
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+                ValueError,
+                r'Data site used does not support provided language\.'):
             datasite.search_entities('abc', 'invalidlanguage')
 
 
