@@ -61,6 +61,37 @@ KNOWN_TRACKER_PARAMS = [
 
 KNOWN_TRACKER_REGEX = re.compile(rf'({"|".join(KNOWN_TRACKER_PARAMS)})')
 
+# Archive hosts whose query strings must be preserved (T410853).
+ARCHIVE_HOSTS = (
+    'web.archive.org',
+    'archive.is',
+    'archive.ph',
+    'archive.today',
+)
+
+
+def is_archive_url(url: urllib.parse.ParseResult) -> bool:
+    """Return True if *url* points to a known web-archive host.
+
+    Matches netloc exactly or as a subdomain of an archive host
+    (case-insensitive). Also treats Internet Archive Wayback Machine
+    paths under ``/web/`` on archive.org hosts as archives.
+
+    .. version-added:: 11.8
+    """
+    netloc = (url.netloc or '').lower()
+    if netloc.startswith('www.'):
+        netloc = netloc[4:]
+    for host in ARCHIVE_HOSTS:
+        if netloc == host or netloc.endswith('.' + host):
+            return True
+    # Wayback Machine style paths on archive.org (optional path check)
+    if netloc == 'archive.org' or netloc.endswith('.archive.org'):
+        path = url.path or ''
+        if path.startswith('/web/') or '/web/' in path:
+            return True
+    return False
+
 
 class TrackingParamRemoverBot(
     SingleSiteBot,
@@ -76,9 +107,15 @@ class TrackingParamRemoverBot(
     def remove_tracking_params(url: urllib.parse.ParseResult) -> str:
         """Remove tracking query parameters if they are present.
 
+        Tracking parameters on archive URLs are left unchanged so that
+        archived snapshots remain functional (T410853).
+
         :param url: The URL to check
         :returns: URL as string
         """
+        if is_archive_url(url):
+            return urllib.parse.urlunparse(url)
+
         filtered_params = []
 
         tracker_present = False
