@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json as jsonlib
 import re
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from contextlib import suppress
 from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, NoReturn
@@ -1639,6 +1639,11 @@ class Claim(Property):
     """A Claim on a Wikibase entity.
 
     Claims are standard claims as well as references and qualifiers.
+
+    .. version-changed:: 11.8
+       Qualifiers and reference groups loaded from JSON use :class:`dict`
+       instead of :class:`collections.OrderedDict`. Insertion order is
+       preserved; mapping equality no longer depends on key order.
     """
 
     TARGET_CONVERTER = {
@@ -1702,7 +1707,7 @@ class Claim(Property):
         if self.isQualifier and self.isReference:
             raise ValueError('Claim cannot be both a qualifier and reference.')
         self.sources = []
-        self.qualifiers = OrderedDict()
+        self.qualifiers = {}
         self.target = None
         self.snaktype = 'value'
         self._on_item = None  # The item it's on
@@ -1873,7 +1878,7 @@ class Claim(Property):
         Reference objects are represented a bit differently, and require
         some more handling.
         """
-        source = OrderedDict()
+        source = {}
 
         # Before #84516 Wikibase did not implement snaks-order.
         # https://gerrit.wikimedia.org/r/c/84516/
