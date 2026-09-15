@@ -142,8 +142,7 @@ def getversion_git(path=None):
         # some Windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
-    with open(os.path.join(_program_dir, '.git/config')) as f:
-        tag = f.read()
+    tag = (Path(_program_dir) / '.git' / 'config').read_text()
     # Try 'origin' and then 'gerrit' as remote name; bail if can't find either.
     remote_pos = tag.find('[remote "origin"]')
     if remote_pos == -1:

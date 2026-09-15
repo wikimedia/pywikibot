@@ -843,12 +843,12 @@ def twget_keys(twtitle: str) -> list[str]:
     # obtain the directory containing all the json files for this package
     package = twtitle.split('-')[0]
     mod = __import__(_messages_package_name, fromlist=['__file__'])
-    pathname = os.path.join(next(iter(mod.__path__)), package)
+    pathname = Path(next(iter(mod.__path__))) / package
 
     # build a list of languages in that directory
-    langs = [filename.removesuffix('.json')
-             for filename in sorted(os.listdir(pathname))
-             if filename.endswith('.json')]
+    langs = [path.stem
+             for path in sorted(pathname.iterdir(), key=lambda path: path.name)
+             if path.name.endswith('.json')]
 
     # Exclude languages whose translations do not include this message.
     return [lang for lang in langs

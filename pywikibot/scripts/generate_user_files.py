@@ -57,9 +57,9 @@ def change_base_dir():
     """Create a new user directory."""
     while True:
         new_base = pywikibot.input('New user directory? ')
-        new_base = os.path.abspath(new_base)
-        if os.path.exists(new_base):
-            if os.path.isfile(new_base):
+        new_base = Path(os.path.abspath(new_base))
+        if new_base.exists():
+            if new_base.is_file():
                 pywikibot.error('there is an existing file with that name.')
                 continue
             # make sure user can read and write this directory
@@ -69,16 +69,16 @@ def change_base_dir():
             pywikibot.info('Using existing directory')
         else:
             try:
-                os.mkdir(new_base, pywikibot.config.private_files_permission)
+                new_base.mkdir(mode=pywikibot.config.private_files_permission)
             except Exception as e:
                 pywikibot.error(f'directory creation failed: {e}')
                 continue
             pywikibot.info('Created new directory.')
         break
 
-    if new_base == pywikibot.config.get_base_dir(new_base):
+    if str(new_base) == pywikibot.config.get_base_dir(str(new_base)):
         # config would find that file
-        return new_base
+        return str(new_base)
 
     msg = fill(f"""WARNING: Your user files will be created in the directory
 '{new_base}' you have chosen. To access these files, you will either have
@@ -88,16 +88,17 @@ your operating system. See your operating system documentation for how to
 set environment variables.""", width=76)
     pywikibot.info(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
-        return new_base
+        return str(new_base)
     pywikibot.info('Aborting changes.')
     return False
 
 
 def file_exists(filename) -> bool:
     """Return whether the file exists and print a message if it exists."""
-    if os.path.exists(filename):
+    path = Path(filename)
+    if path.exists():
         pywikibot.info('{1} already exists in the target directory "{0}".'
-                       .format(*os.path.split(filename)))
+                       .format(path.parent, path.name))
         return True
     return False
 
@@ -477,8 +478,8 @@ def ask_for_dir_change(force: bool) -> tuple[bool, bool]:
     pywikibot.info(f'\nYour default user directory is "{base_dir}"')
     while True:
         # Show whether file exists
-        userfile = file_exists(os.path.join(base_dir, USER_BASENAME))
-        passfile = file_exists(os.path.join(base_dir, PASS_BASENAME))
+        userfile = file_exists(Path(base_dir) / USER_BASENAME)
+        passfile = file_exists(Path(base_dir) / PASS_BASENAME)
         if force and not config.verbose_output or not (userfile or passfile):
             break
         if pywikibot.input_yn(

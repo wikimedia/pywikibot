@@ -276,9 +276,9 @@ ignore_bot_templates = False
 # #############################################
 
 
-def user_home_path(path: str) -> str:
+def user_home_path(path: str | os.PathLike[str]) -> str:
     """Return a file path to a file in the user home."""
-    return os.path.join(os.path.expanduser('~'), path)
+    return str(Path(os.path.expanduser('~')) / path)
 
 
 def get_user_config_file() -> str:
@@ -295,7 +295,7 @@ def get_user_config_file() -> str:
     return 'user-config.py'
 
 
-def get_base_dir(test_directory: str | None = None,
+def get_base_dir(test_directory: str | os.PathLike[str] | None = None,
                  config_file: str = 'user-config.py') -> str:
     r"""Return the directory in which user-specific information is stored.
 
@@ -324,11 +324,11 @@ def get_base_dir(test_directory: str | None = None,
         directory will cause it to be selected as the base directory.
     :param config_file: Filename of the user config file
     """
-    def exists(directory: str) -> bool:
+    def exists(directory: str | os.PathLike[str]) -> bool:
         directory = os.path.abspath(directory)
         if directory == test_directory:
             return True
-        return os.path.exists(os.path.join(directory, config_file))
+        return (Path(directory) / config_file).exists()
 
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
@@ -366,19 +366,19 @@ def get_base_dir(test_directory: str | None = None,
                 base_dir_cand.append([home, '.pywikibot'])
 
             for dir_ in base_dir_cand:
-                dir_s = os.path.join(*dir_)
+                dir_s = Path(*dir_)
                 try:
-                    os.makedirs(dir_s, mode=private_folder_permission)
+                    dir_s.mkdir(mode=private_folder_permission, parents=True)
                 except OSError:  # PermissionError or already exists
                     if exists(dir_s):
-                        base_dir = dir_s
+                        base_dir = str(dir_s)
                         break
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
 
     # make sure this path is valid and that it contains user-config file
-    if not os.path.isdir(base_dir):
+    if not Path(base_dir).is_dir():
         raise RuntimeError(f"Directory '{base_dir}' does not exist.")
 
     # check if config_file is in base_dir
@@ -414,7 +414,7 @@ for arg in sys.argv[1:]:
 family_files: dict[str, str] = {}
 
 
-def register_families_folder(folder_path: str,
+def register_families_folder(folder_path: str | os.PathLike[str],
                              not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
 
@@ -429,23 +429,23 @@ def register_families_folder(folder_path: str,
     """
     suffix = '_family.py'
 
-    if not os.path.exists(folder_path):
+    folder = Path(folder_path)
+    if not folder.exists():
         if not_exists_ok:
             return
         raise FileNotFoundError(
             f'Family folder {folder_path!r} does not exist')
 
-    if os.path.isdir(folder_path):
-        for file_name in os.listdir(folder_path):
-            if file_name.endswith(suffix):
-                family_name = file_name.removesuffix(suffix)
-                family_files[family_name] = os.path.join(folder_path,
-                                                         file_name)
+    if folder.is_dir():
+        for file_path in folder.iterdir():
+            if file_path.name.endswith(suffix):
+                family_name = file_path.name.removesuffix(suffix)
+                family_files[family_name] = str(file_path)
         return
 
     # probably there is a zip file chain (T278076)
     # find the parent zip folder
-    path = Path(folder_path)
+    path = folder
     if not is_zipfile(path):
         for parent in path.parents:
             if is_zipfile(path):
@@ -461,15 +461,14 @@ def register_families_folder(folder_path: str,
         if file_name.endswith(suffix):
             file_path = Path(file_name)
             family_name = file_path.name.removesuffix(suffix)
-            family_files[family_name] = os.path.join(folder_path,
-                                                     file_path.name)
+            family_files[family_name] = str(folder / file_path.name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
 # 'families/' is a subdirectory of the directory in which config.py is found.
-register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
+register_families_folder(Path(__file__).parent / 'families')
 # 'families/' can also be stored in the base directory
-register_families_folder(os.path.join(base_dir, 'families'),
+register_families_folder(Path(base_dir) / 'families',
                          not_exists_ok=True)
 
 
@@ -876,7 +875,7 @@ cmd_7zip = '7za'
 # #############################################
 
 
-def makepath(path: str, create: bool = True) -> str:
+def makepath(path: str | os.PathLike[str], create: bool = True) -> str:
     """Return a normalized absolute version of the path argument.
 
     If the given path already exists in the filesystem or create is
@@ -891,13 +890,14 @@ def makepath(path: str, create: bool = True) -> str:
     :param create: Create the directory if it is True. Otherwise do not
         change the filesystem. Default is True.
     """
-    dpath = os.path.normpath(os.path.dirname(path))
-    if create and not os.path.exists(dpath):
-        os.makedirs(dpath)
+    dpath = Path(os.path.normpath(os.path.dirname(path)))
+    if create and not dpath.exists():
+        dpath.mkdir(parents=True)
     return os.path.normpath(os.path.abspath(path))
 
 
-def datafilepath(*filename: str, create: bool = True) -> str:
+def datafilepath(*filename: str | os.PathLike[str],
+                 create: bool = True) -> str:
     """Return an absolute path to a data file in a standard location.
 
     Argument(s) are zero or more directory names, optionally followed by
@@ -909,6 +909,7 @@ def datafilepath(*filename: str, create: bool = True) -> str:
     :param create: Create the directory if it is True. Otherwise don't
         change the filesystem. Default is True.
     """
+    # Preserve trailing separators for makepath directory creation.
     return makepath(os.path.join(base_dir, *filename), create=create)
 
 
@@ -938,19 +939,19 @@ _public_globals = {
 _exec_globals = copy.deepcopy(_public_globals)
 
 # Always try to get the user files
-_filename = os.path.join(base_dir, user_config_file)
-if os.path.exists(_filename):
-    _filestatus = os.stat(_filename)
+_filename = Path(base_dir) / user_config_file
+if _filename.exists():
+    _filestatus = _filename.stat()
     _filemode = _filestatus[0]
     _fileuid = _filestatus[4]
     if not OSWIN32 \
        and _fileuid not in [os.getuid(), 0]:  # type: ignore[attr-defined]
-        warning(f'Skipped {_filename!r}: owned by someone else.')
+        warning(f'Skipped {str(_filename)!r}: owned by someone else.')
     elif OSWIN32 or _filemode & 0o02 == 0:
-        with open(_filename, 'rb') as f:
-            exec(compile(f.read(), _filename, 'exec'), _exec_globals)
+        exec(compile(_filename.read_bytes(), str(_filename), 'exec'),
+             _exec_globals)
     else:
-        warning(f'Skipped {_filename!r}: writeable by others.')
+        warning(f'Skipped {str(_filename)!r}: writeable by others.')
 elif __no_user_config and __no_user_config != '2':
     warning(f'{user_config_file} cannot be loaded.')
 
