@@ -3,7 +3,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-"""Unit tests for Page.stable_revision."""
+"""Unit tests for Page.stable_revision and flagged_state."""
 from __future__ import annotations
 
 import unittest
@@ -143,6 +143,93 @@ class TestPageStableRevision(TestCase):
 
             result = self.page.stable_revision
             self.assertEqual(result.revid, 999)
+
+
+class TestPageFlaggedState(TestCase):
+
+    """Test Page.flagged_state with full mocking."""
+
+    family = 'wikipedia'
+    code = 'fi'
+    dry = True
+
+    def setUp(self) -> None:
+        """Test setup."""
+        super().setUp()
+        self.page = pywikibot.Page(self.site, 'TestPage')
+        self.page.exists = MagicMock(return_value=True)
+
+    def _mock_response(self, data: dict | list[dict]) -> dict:
+        """Helper: build API response for action=query&prop=flagged."""
+        return {
+            'query': {
+                'pages': data if isinstance(data, list) else [data]
+            }
+        }
+
+    @patch('pywikibot.site._apisite.APISite.has_extension')
+    def test_flagged_state_extension_disabled(self, mock_has_ext):
+        """FlaggedRevs not enabled → UnknownExtensionError."""
+        mock_has_ext.return_value = False
+        with self.assertRaisesRegex(
+            UnknownExtensionError,
+            'Method "flagged_state" is not implemented without the extension '
+            'FlaggedRevs'
+        ):
+            self.page.flagged_state
+
+    @patch('pywikibot.site._apisite.APISite.simple_request')
+    @patch('pywikibot.site._apisite.APISite.has_extension')
+    def test_flagged_state_none(self, mock_has_ext, mock_req):
+        """API returns no flagged key → None."""
+        mock_has_ext.return_value = True
+        mock_req.return_value.submit.return_value = self._mock_response(
+            {'pageid': 1, 'ns': 0, 'title': 'TestPage'}
+        )
+        self.assertIsNone(self.page.flagged_state)
+
+    @patch('pywikibot.site._apisite.APISite.simple_request')
+    @patch('pywikibot.site._apisite.APISite.has_extension')
+    def test_flagged_state_success(self, mock_has_ext, mock_req):
+        """Valid flagged dict is returned."""
+        mock_has_ext.return_value = True
+        flagged = {
+            'stable_revid': 12345,
+            'level': 2,
+            'level_text': 'stable',
+            'pending_since': '2025-01-01T00:00:00Z',
+        }
+        mock_req.return_value.submit.return_value = self._mock_response(
+            {
+                'pageid': 1,
+                'title': 'TestPage',
+                'flagged': flagged,
+            }
+        )
+        result = self.page.flagged_state
+        self.assertEqual(result, flagged)
+        self.assertEqual(result['stable_revid'], 12345)
+        self.assertEqual(result['level'], 2)
+        # Cached: second access does not call the API again
+        mock_req.reset_mock()
+        self.assertEqual(self.page.flagged_state, flagged)
+        mock_req.assert_not_called()
+
+    @patch('pywikibot.site._apisite.APISite.simple_request')
+    @patch('pywikibot.site._apisite.APISite.has_extension')
+    def test_site_flagged_state(self, mock_has_ext, mock_req):
+        """APISite.flagged_state returns the flagged dict."""
+        mock_has_ext.return_value = True
+        flagged = {'stable_revid': 42, 'level': 1}
+        mock_req.return_value.submit.return_value = self._mock_response(
+            {
+                'pageid': 1,
+                'title': 'TestPage',
+                'flagged': flagged,
+            }
+        )
+        self.assertEqual(self.site.flagged_state(self.page), flagged)
+        self.assertEqual(self.site.stable_revid(self.page), 42)
 
 
 class TestFlaggedRevsReview(PatchingTestCase):

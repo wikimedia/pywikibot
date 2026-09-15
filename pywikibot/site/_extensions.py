@@ -478,12 +478,22 @@ class FlaggedRevsMixin:
     """
 
     @need_extension('FlaggedRevs')
-    def stable_revid(self: BaseSiteProtocol,
-                     page: pywikibot.Page) -> int | None:
-        """Return the stable (reviewed) revision id for a page, if any.
+    def flagged_state(self: BaseSiteProtocol,
+                      page: pywikibot.Page) -> dict | None:
+        """Return the FlaggedRevs info dict for a page, if any.
+
+        Uses ``prop=flagged`` and returns the ``flagged`` object from the
+        API (keys such as ``stable_revid``, ``level``, ``level_text``,
+        ``pending_since``), or ``None`` if the page has no flagged data.
+
+        .. version-added:: 11.8
+        .. seealso::
+           - :meth:`stable_revid`
+           - :attr:`BasePage.flagged_state
+             <page.BasePage.flagged_state>`
 
         :param page: The page to inspect.
-        :return: The stable revision id or None if not available.
+        :return: Flagged info dict or None if not available.
         :raises UnknownExtensionError: FlaggedRevs not available
         """
         req = self.simple_request(
@@ -498,7 +508,22 @@ class FlaggedRevsMixin:
         if not pages:
             return None
 
-        return pages[0].get('flagged', {}).get('stable_revid')
+        flagged = pages[0].get('flagged')
+        return flagged or None
+
+    @need_extension('FlaggedRevs')
+    def stable_revid(self: BaseSiteProtocol,
+                     page: pywikibot.Page) -> int | None:
+        """Return the stable (reviewed) revision id for a page, if any.
+
+        :param page: The page to inspect.
+        :return: The stable revision id or None if not available.
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        flagged = self.flagged_state(page)
+        if not flagged:
+            return None
+        return flagged.get('stable_revid')
 
     @need_extension('FlaggedRevs')
     @need_right('review')

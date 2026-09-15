@@ -572,6 +572,7 @@ class BasePage(ComparableMixin):
         .. version-added:: 11.7
         .. seealso:
            - :attr:`stable_revision`
+           - :attr:`flagged_state`
            - :attr:`latest_revision_id`
 
         :raises UnknownExtensionError: FlaggedRevs not available
@@ -583,6 +584,8 @@ class BasePage(ComparableMixin):
         """Remove the cached latest stable revision id set for this Page."""
         with suppress(AttributeError):
             del self._stable_revision_id
+        with suppress(AttributeError):
+            del self._flagged_state
 
     @property
     def stable_revision(self) -> pywikibot.page.Revision | None:
@@ -622,6 +625,34 @@ class BasePage(ComparableMixin):
             return self.get_revision(revid, content=True)
 
         return None
+
+    @property
+    @cached
+    def flagged_state(self) -> dict | None:
+        """Return FlaggedRevs info for this page, if any.
+
+        Returns the ``flagged`` property dict from the API (for example
+        ``stable_revid``, ``level``, ``level_text``, ``pending_since``)
+        or ``None`` if the page has no flagged data.
+
+        .. version-added:: 11.8
+        .. seealso::
+           - :attr:`stable_revision_id`
+           - :attr:`stable_revision`
+           - :meth:`APISite.flagged_state
+             <pywikibot.site._extensions.FlaggedRevsMixin.flagged_state>`
+
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        return self.site.flagged_state(self)
+
+    @flagged_state.deleter
+    def flagged_state(self) -> None:
+        """Remove the cached flagged state set for this Page."""
+        with suppress(AttributeError):
+            del self._flagged_state
+        with suppress(AttributeError):
+            del self._stable_revision_id
 
     def _check_revision(self, revid: int, refresh: bool) -> None:
         """Check whether the *revid* is valid and belongs to this page."""
@@ -678,6 +709,7 @@ class BasePage(ComparableMixin):
 
         # The stable revision may have changed.
         del self.stable_revision_id
+        del self.flagged_state
 
     def unreview(
         self,
@@ -724,6 +756,7 @@ class BasePage(ComparableMixin):
 
         # The stable revision may have changed.
         del self.stable_revision_id
+        del self.flagged_state
 
     @property
     def text(self) -> str:
