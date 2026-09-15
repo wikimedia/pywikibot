@@ -965,11 +965,11 @@ class _DifferentTypeError(UserWarning, TypeError):
         actual_type: type,
         allowed_types: tuple[type, ...],
     ) -> None:
+        allowed_type_names = '", "'.join(t.__name__ for t in allowed_types)
         super().__init__(
-            'Configuration variable "{}" is defined as "{}" in '
-            'your {} but expected "{}".'
-            .format(name, actual_type.__name__, user_config_file,
-                    '", "'.join(t.__name__ for t in allowed_types)))
+            f'Configuration variable "{name}" is defined as '
+            f'"{actual_type.__name__}" in your {user_config_file} '
+            f'but expected "{allowed_type_names}".')
 
 
 def _assert_default_type(

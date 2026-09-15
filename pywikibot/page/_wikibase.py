@@ -640,9 +640,9 @@ class WikibasePage(BasePage, WikibaseEntity):
 
             if self._namespace:
                 if self._namespace != entity_type_ns:
-                    raise ValueError('Namespace "{}" is not valid for Wikibase'
-                                     ' entity type "{}"'
-                                     .format(int(kwargs['ns']), entity_type))
+                    raise ValueError(
+                        f'Namespace "{int(kwargs["ns"])}" is not valid for '
+                        f'Wikibase entity type "{entity_type}"')
             else:
                 self._namespace = entity_type_ns
                 kwargs['ns'] = self._namespace.id
@@ -1116,10 +1116,9 @@ class ItemPage(WikibasePage):
         base_uri, _, qid = uri.rpartition('/')
         if base_uri != site.concept_base_uri.rstrip('/'):
             raise ValueError(
-                'The supplied data repository ({repo}) does not correspond to '
-                'that of the item ({item})'.format(
-                    repo=site.concept_base_uri.rstrip('/'),
-                    item=base_uri))
+                'The supplied data repository '
+                f'({site.concept_base_uri.rstrip("/")}) does not correspond '
+                f'to that of the item ({base_uri})')
 
         item = cls(site, qid)
         if not lazy_load and not item.exists():

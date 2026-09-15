@@ -299,8 +299,9 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             kwargs = self._clean_kwargs(kwargs)  # hasn't been called yet
         parameters = kwargs['parameters']
         if 'action' in parameters and parameters['action'] != 'query':
-            raise Error("{}: 'action' must be 'query', not {}"
-                        .format(self.__class__.__name__, kwargs['action']))
+            raise Error(
+                f"{self.__class__.__name__}: 'action' must be 'query', "
+                f"not {kwargs['action']}")
         parameters['action'] = 'query'
         # make sure request type is valid, and get limit key if any
         for modtype in ('generator', 'list', 'prop', 'meta'):

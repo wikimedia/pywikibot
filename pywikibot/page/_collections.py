@@ -436,8 +436,8 @@ class SiteLinkCollection(MutableMapping):
                     json = {'site': key, 'title': json}
                 elif key != json['site']:
                     raise ValueError(
-                        "Key '{}' doesn't match the site of the value: '{}'"
-                        .format(key, json['site']))
+                        f"Key '{key}' doesn't match the site of the value: "
+                        f"'{json['site']}'")
                 norm_data[key] = json
         else:
             for obj in data:
