@@ -497,8 +497,8 @@ def writelogheader() -> None:
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
-        _log('VERSION: {}'.format(version.getversion(
-            online=config.log_pywiki_repo_version).strip()))
+        _log('VERSION: %s', version.getversion(
+            online=config.log_pywiki_repo_version).strip())
     except VersionParseError:
         _exception()
 
@@ -961,20 +961,19 @@ def suggest_help(missing_parameters: Sequence[str] | None = None,
         messages.append(
             'Unable to execute script because no generator was defined.')
     if missing_parameters:
-        messages.append('Missing parameter{s} "{params}".'
-                        .format(s='s' if len(missing_parameters) > 1 else '',
-                                params='", "'.join(missing_parameters)))
+        suffix = 's' if len(missing_parameters) > 1 else ''
+        params = '", "'.join(missing_parameters)
+        messages.append(f'Missing parameter{suffix} "{params}".')
     if missing_action:
         messages.append('No action defined.')
     if unknown_parameters:
-        messages.append('Unknown parameter{s} "{params}".'
-                        .format(s='s' if len(unknown_parameters) > 1 else '',
-                                params='", "'.join(unknown_parameters)))
+        suffix = 's' if len(unknown_parameters) > 1 else ''
+        params = '", "'.join(unknown_parameters)
+        messages.append(f'Unknown parameter{suffix} "{params}".')
     if missing_dependencies:
-        messages.append('Missing dependenc{s} "{deps}".'
-                        .format(
-                            s='ies' if len(missing_dependencies) > 1 else 'y',
-                            deps='", "'.join(missing_dependencies)))
+        suffix = 'ies' if len(missing_dependencies) > 1 else 'y'
+        deps = '", "'.join(missing_dependencies)
+        messages.append(f'Missing dependenc{suffix} "{deps}".')
     if additional_text:
         messages.append(additional_text.strip())
     if messages:
@@ -997,10 +996,9 @@ def writeToCommandLogFile() -> None:
     command_log = Path(config.datafilepath('logs', 'commands.log'))
     mode = 'a' if command_log.exists() else 'w'
     with command_log.open(mode, encoding='utf-8') as command_log_file:
-        command_log_file.write('{} r{} Python {} '
-                               .format(iso_date,
-                                       version.getversiondict()['rev'],
-                                       sys.version.split()[0]))
+        command_log_file.write(
+            f"{iso_date} r{version.getversiondict()['rev']} "
+            f'Python {sys.version.split()[0]} ')
         command_log_file.write(' '.join(args) + os.linesep)
 
 
@@ -1422,8 +1420,8 @@ class BaseBot(OptionHandler):
             pywikibot.info('Execution time: ' + used)
 
             if self.counter['read']:
-                pywikibot.info('Read operation time: {:.1f} seconds'
-                               .format(read_seconds / self.counter['read']))
+                pywikibot.info('Read operation time: %.1f seconds',
+                               read_seconds / self.counter['read'])
 
             for op, count in self.counter.items():
                 if not count or op == 'read':

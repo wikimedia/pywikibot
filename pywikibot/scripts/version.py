@@ -105,8 +105,8 @@ def main(*args: str) -> None:
                      'PYWIKIBOT_NO_USER_CONFIG'])
     for environ_name in sorted(settings):
         pywikibot.info(
-            '{}: {}'.format(environ_name,
-                            os.environ.get(environ_name, 'Not set') or "''"))
+            '%s: %s', environ_name,
+            os.environ.get(environ_name, 'Not set') or "''")
 
     pywikibot.info('Config base dir: ' + pywikibot.config.base_dir)
 

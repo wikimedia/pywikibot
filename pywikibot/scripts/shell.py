@@ -44,8 +44,7 @@ def main(*args: str) -> None:
         warn_type = 'Unknown'
 
     if args:
-        print('{} arguments: {}\n'  # noqa: T201
-              .format(warn_type, ', '.join(args)))
+        print(f'{warn_type} arguments: {", ".join(args)}\n')  # noqa: T201
 
     # Set up interactive features such as command history.
     # This is defined in the site module of the Python Standard Library,

@@ -220,9 +220,9 @@ def _print_requirements(requirements,
     else:
         format_string = '\nA package necessary for {} is {}.'
     print(format_string.format(script or 'pywikibot', variant))
-    print('Please {} required module{} with:\n\n'
-          .format('install' if variant == 'missing' else 'update',
-                  's' if len(requirements) > 1 else ''))
+    action = 'install' if variant == 'missing' else 'update'
+    suffix = 's' if len(requirements) > 1 else ''
+    print(f'Please {action} required module{suffix} with:\n\n')
 
     for requirement in requirements:
         print(f"    pip install \"{str(requirement).partition(';')[0]}\"\n")
@@ -489,9 +489,9 @@ def execute() -> bool:
     if global_args:  # don't use sys.argv
         unknown_args = pwb.handle_args(global_args)
         if unknown_args:
-            print('ERROR: unknown pwb.py argument{}: {}\n'
-                  .format('' if len(unknown_args) == 1 else 's',
-                          ', '.join(unknown_args)))
+            suffix = '' if len(unknown_args) == 1 else 's'
+            print(f'ERROR: unknown pwb.py argument{suffix}: '
+                  f'{", ".join(unknown_args)}\n')
             return False
 
     if not filename:
