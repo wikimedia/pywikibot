@@ -324,12 +324,13 @@ class UploadRobot(BaseBot):
 
             if allowed_formats and ext not in allowed_formats:
                 if self.opt.always:
-                    pywikibot.info('File format is not one of [{}]'
-                                   .format(' '.join(allowed_formats)))
+                    pywikibot.info(
+                        'File format is not one of [%s]',
+                        ' '.join(allowed_formats))
 
                 elif pywikibot.input_yn(
-                        'File format is not one of [{}], but {!r}. Skip?'
-                        .format(' '.join(allowed_formats), ext)):
+                        'File format is not one of '
+                        f'[{" ".join(allowed_formats)}], but {ext!r}. Skip?'):
                     return None
 
                 continue

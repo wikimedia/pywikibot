@@ -538,7 +538,7 @@ class ShowingListOption(ListOption, OutputOption):
             text = self.pre + '\n'
         width = len(str(self.maximum))
         for i, item in enumerate(self._list, self.minimum):
-            text += '{:>{width}} - {}\n'.format(i, item, width=width)
+            text += f'{i:>{width}} - {item}\n'
         if self.post is not None:
             text += self.post + '\n'
         return text
