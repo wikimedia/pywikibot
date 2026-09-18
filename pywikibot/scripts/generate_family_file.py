@@ -270,17 +270,18 @@ class FamilyFileGenerator:
             self.show('Terminating.')
             sys.exit(1)
 
-        code_hostname_pairs = '\n        '.join(
-            f"'{k}': '{urlparse(w.server).netloc}',"
-            for k, w in self.wikis.items())
+        hostname_pairs = []
+        path_pairs = []
+        protocol_pairs = []
+        for code, wiki in self.wikis.items():
+            parsed_server = urlparse(wiki.server)
+            hostname_pairs.append(f"'{code}': '{parsed_server.netloc}',")
+            path_pairs.append(f"'{code}': '{wiki.scriptpath}',")
+            protocol_pairs.append(f"'{code}': '{parsed_server.scheme}',")
 
-        code_path_pairs = '\n            '.join(
-            f"'{k}': '{w.scriptpath}',"
-            for k, w in self.wikis.items())
-
-        code_protocol_pairs = '\n            '.join(
-            f"'{k}': '{urlparse(w.server).scheme}',"
-            for k, w in self.wikis.items())
+        code_hostname_pairs = '\n        '.join(hostname_pairs)
+        code_path_pairs = '\n            '.join(path_pairs)
+        code_protocol_pairs = '\n            '.join(protocol_pairs)
 
         content = family_template % {
             'url': self.base_url, 'name': self.name,
