@@ -882,13 +882,13 @@ def handle_args(args: Iterable[str] | None = None,
         show_help(show_global=do_help_val == 'global')
         sys.exit(0)
 
-    if calledModuleName() != 'generate_user_files':  # T261771
+    if module_name != 'generate_user_files':  # T261771
         try:
             pywikibot.Site()
         except (UnknownFamilyError, UnknownSiteError):
             _exception(exc_info=False)
             sys.exit(1)
-        if calledModuleName() == 'wrapper':
+        if module_name == 'wrapper':
             pywikibot._sites.clear()
 
     _debug('handle_args() completed.')
