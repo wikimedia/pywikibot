@@ -818,8 +818,9 @@ class DisambiguationRobot(SingleSiteBot):
                     # There are links to change; stop loop and save page
                     break
 
+                match_start, match_end = m.span()
                 # Ensure that next time around we will not find this same hit.
-                curpos = m.start() + 1
+                curpos = match_start + 1
                 try:
                     foundlink = pywikibot.Link(m['title'], disamb_page.site)
                     foundlink.parse()
@@ -847,16 +848,18 @@ class DisambiguationRobot(SingleSiteBot):
                 context = 60
 
                 # check if there's a dn-template here already
-                if (self.opt.dnskip and self.dn_template_str
-                        and self.dn_template_str[:-2] in text[
-                            m.end():m.end() + len(self.dn_template_str) + 8]):
-                    continue
+                if self.opt.dnskip and self.dn_template_str:
+                    dn_template_end = (match_end
+                                       + len(self.dn_template_str) + 8)
+                    if self.dn_template_str[:-2] in text[
+                            match_end:dn_template_end]:
+                        continue
 
-                edit = EditOption('edit page', 'e', text, m.start(),
+                edit = EditOption('edit page', 'e', text, match_start,
                                   disamb_page.title())
                 context_option = HighlightContextOption(
-                    'more context', 'm', text, 60, start=m.start(),
-                    end=m.end())
+                    'more context', 'm', text, 60, start=match_start,
+                    end=match_end)
                 context_option.before_question = True
 
                 options = [ListOption(self.opt.pos, ''),
@@ -875,7 +878,7 @@ class DisambiguationRobot(SingleSiteBot):
                 options.append(context_option)
                 if not edited:
                     options.append(ShowPageOption(
-                        'show disambiguation page', 'd', m.start(),
+                        'show disambiguation page', 'd', match_start,
                         disamb_page))
 
                 options += [
@@ -934,7 +937,7 @@ class DisambiguationRobot(SingleSiteBot):
                 if answer == 't':
                     assert self.dn_template_str
                     # small chunk of text to search
-                    search_text = text[m.end():m.end() + context]
+                    search_text = text[match_end:match_end + context]
                     # figure out where the link (and sentence) ends, put note
                     # there
                     end_of_word_match = re.search(r'\s', search_text)
@@ -945,15 +948,15 @@ class DisambiguationRobot(SingleSiteBot):
                         position_split = 0
 
                     # insert dab needed template
-                    text = (text[:m.end() + position_split]
+                    text = (text[:match_end + position_split]
                             + self.dn_template_str
-                            + text[m.end() + position_split:])
+                            + text[match_end + position_split:])
                     dn = True
                     continue
 
                 if answer == 'u':
                     # unlink - we remove the section if there's any
-                    text = text[:m.start()] + link_text + text[m.end():]
+                    text = text[:match_start] + link_text + text[match_end:]
                     unlink_counter += 1
                     continue
 
@@ -997,7 +1000,7 @@ class DisambiguationRobot(SingleSiteBot):
                                f'{link_text[len(new_page_title):]}')
                 else:
                     newlink = f'[[{new_page_title}{section}|{link_text}]]'
-                text = text[:m.start()] + newlink + text[m.end():]
+                text = text[:match_start] + newlink + text[match_end:]
                 continue
 
             if text == original_text:
