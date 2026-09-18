@@ -752,15 +752,18 @@ class DisambiguationRobot(SingleSiteBot):
         include = False
         unlink_counter = 0
         new_targets = []
+        ref_page_title = disamb_page_title = None
         try:
             text = ref_page.get()
         except IsRedirectPageError:
+            ref_page_title = ref_page.title()
+            disamb_page_title = disamb_page.title()
             pywikibot.info(
-                f'{ref_page.title()} is a redirect to {disamb_page.title()}')
+                f'{ref_page_title} is a redirect to {disamb_page_title}')
             if disamb_page.isRedirectPage():
                 target = self.opt.pos[0]
                 if pywikibot.input_yn(
-                    f'Do you want to make redirect {ref_page.title()} point '
+                    f'Do you want to make redirect {ref_page_title} point '
                     f'to {target}?',
                         default=False, automatic_quit=False):
                     redir_text = f'#{self.site.redirect()} [[{target}]]'
@@ -772,7 +775,7 @@ class DisambiguationRobot(SingleSiteBot):
             else:
                 choice = pywikibot.input_choice(
                     f'Do you want to work on pages linking to '
-                    f'{ref_page.title()}?',
+                    f'{ref_page_title}?',
                     [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
                     automatic_quit=False)
                 if choice == 'y':
@@ -833,13 +836,16 @@ class DisambiguationRobot(SingleSiteBot):
 
                 # Check whether the link found is to disamb_page.
                 try:
-                    if foundlink.canonical_title() != disamb_page.title():
+                    disamb_page_title = (disamb_page_title
+                                         or disamb_page.title())
+                    if foundlink.canonical_title() != disamb_page_title:
                         continue
 
                 except Error:
                     # must be a broken link
+                    ref_page_title = ref_page_title or ref_page.title()
                     pywikibot.log('Invalid link [[{}]] in page [[{}]]'
-                                  .format(m['title'], ref_page.title()))
+                                  .format(m['title'], ref_page_title))
                     continue
 
                 n_links += 1  # new link found: increase link counter
@@ -856,7 +862,7 @@ class DisambiguationRobot(SingleSiteBot):
                         continue
 
                 edit = EditOption('edit page', 'e', text, match_start,
-                                  disamb_page.title())
+                                  disamb_page_title)
                 context_option = HighlightContextOption(
                     'more context', 'm', text, 60, start=match_start,
                     end=match_end)
