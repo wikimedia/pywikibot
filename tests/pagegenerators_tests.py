@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import calendar
 import datetime
+import re
 import sys
 import unittest
 from collections import Counter
@@ -158,6 +159,25 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.NamespaceFilterPageGenerator(
             gen, ('Talk', 'Template'), site)
         self.assertLength(tuple(gen), 10)
+
+    def test_PageTitleFilterPageGenerator_compiles_once(self) -> None:
+        """Test ignore patterns are compiled once per site."""
+        patterns = ['^Talk:', '/Meta$']
+        ignore_list = {'wikipedia': {'en': patterns}}
+        pages = list(pagegenerators.PagesFromTitlesGenerator(
+            self.titles, self.site))
+        expected = [page for page in pages
+                    if not page.title().startswith('Talk:')
+                    and not page.title().endswith('/Meta')]
+
+        with mock.patch(
+            'pywikibot.pagegenerators._filters.re.compile', wraps=re.compile
+        ) as compile_pattern:
+            result = list(pagegenerators.PageTitleFilterPageGenerator(
+                pages, ignore_list))
+
+        self.assertEqual(result, expected)
+        self.assertEqual(compile_pattern.call_count, len(patterns))
 
     def test_category_filter_enumerates_once(self) -> None:
         """Test that categories are enumerated once for multiple filters."""
