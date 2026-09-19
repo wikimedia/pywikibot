@@ -192,7 +192,12 @@ from textwrap import fill
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot.bot import SingleSiteBot
-from pywikibot.exceptions import EditConflictError, Error, HiddenKeyError
+from pywikibot.exceptions import (
+    EditConflictError,
+    Error,
+    HiddenKeyError,
+    UnknownExtensionError,
+)
 from pywikibot.tools import cached
 
 
@@ -826,8 +831,17 @@ class WelcomeBot(SingleSiteBot):
 
         .. version-changed:: 7.0
            also skip if user is locked globally
+        .. version-changed:: 11.8
+           Also skip globally blocked users if the site supports checking
+           global account blocks.
         """
-        if user.is_blocked() or user.is_locked():
+        blocked = user.is_blocked() or user.is_locked()
+        if not blocked:
+            # GlobalBlocking or account block queries may be unavailable.
+            with suppress(UnknownExtensionError, NotImplementedError):
+                blocked = user.is_globally_blocked()
+
+        if blocked:
             self.show_status(Msg.SKIP)
             pywikibot.info(f'{user.username} has been blocked!')
 

@@ -316,6 +316,29 @@ class User(Page):
         """
         return self.site.is_locked(self.username, force)
 
+    def is_globally_blocked(self) -> bool:
+        """Return whether an active global block matches this user.
+
+        IP lookups include covering range blocks. For a CIDR range, a
+        matching block must cover the entire range. This checks global
+        block records, regardless of local exemptions or disabling.
+        CentralAuth locks are not included. Results are not cached.
+
+        This method cannot detect hidden global autoblocks through an IP
+        lookup because the API excludes them from these results.
+
+        .. version-added:: 11.8
+        .. seealso::
+           - :meth:`is_blocked`
+           - :meth:`is_locked`
+           - :meth:`APISite.is_globally_blocked()
+             <pywikibot.site._extensions.GlobalBlockingMixin.is_globally_blocked>`
+
+        :raises NotImplementedError: The API cannot query account blocks.
+        :raises UnknownExtensionError: GlobalBlocking is not installed.
+        """
+        return self.site.is_globally_blocked(self.username)
+
     def isEmailable(self, force: bool = False) -> bool:  # noqa: N802
         """Determine whether emails may be sent to this user through MediaWiki.
 

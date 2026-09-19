@@ -6,7 +6,9 @@
 """Objects representing API interface to MediaWiki site extensions."""
 from __future__ import annotations
 
+import re
 from collections.abc import Generator, Iterable
+from ipaddress import ip_network
 from typing import TYPE_CHECKING, Protocol
 
 import pywikibot
@@ -29,6 +31,7 @@ if TYPE_CHECKING:
 
 
 class BaseSiteProtocol(Protocol):
+    _paraminfo: api.ParamInfo
     _proofread_levels: dict[int, str]
     tokens: dict[str, str]
 
@@ -335,6 +338,68 @@ class PageViewInfoMixin:
         )
         for pagedata in query:
             yield pywikibot.Page(self, pagedata['title']), pagedata['count']
+
+
+class GlobalBlockingMixin:
+
+    """APISite mixin for the GlobalBlocking extension.
+
+    .. version-added:: 11.8
+    """
+
+    @need_extension('GlobalBlocking')
+    def is_globally_blocked(self: BaseSiteProtocol, user: str) -> bool:
+        """Return whether an active global block matches the target.
+
+        IP lookups include covering range blocks. For a CIDR range, a
+        matching block must cover the entire range. Account lookups
+        require an API supporting the ``bgtargets`` parameter.
+
+        This checks global block records, including locally disabled
+        blocks. It does not check exemptions or CentralAuth locks, and
+        does not determine whether an edit is permitted. Results are not
+        cached.
+
+        This method cannot detect hidden global autoblocks through an IP
+        lookup because the API excludes them from these results.
+
+        .. seealso::
+           - :ext:`GlobalBlocking/API#list=globalblocks_(bg)`
+           - :meth:`pywikibot.User.is_globally_blocked`
+           - :meth:`pywikibot.site._apisite.APISite.is_locked`
+
+        :param user: Username, IP address or CIDR range to check
+        :raises ValueError: The target is empty or contains list separators.
+        :raises NotImplementedError: The API cannot query account blocks.
+        :raises UnknownExtensionError: GlobalBlocking is not installed.
+        """
+        user = user.strip()
+        if not user:
+            raise ValueError('The global block target must not be empty.')
+        if '|' in user or '\x1f' in user:
+            raise ValueError('The global block target must not contain '
+                             'list separators.')
+
+        # Recognize leading-zero IPv4 addresses accepted by MediaWiki.
+        address, separator, prefix = user.partition('/')
+        if re.fullmatch(r'[0-9]{1,3}(?:\.[0-9]{1,3}){3}', address):
+            address = '.'.join(str(int(part)) for part in address.split('.'))
+        try:
+            # MediaWiki accepts CIDR ranges with nonzero host bits.
+            ip_network(address + separator + prefix, strict=False)
+        except ValueError:
+            if self._paraminfo.parameter('query+globalblocks',
+                                         'targets') is None:
+                raise NotImplementedError(
+                    'This site does not support global account block queries.')
+            parameter = 'bgtargets'
+        else:
+            parameter = 'bgip'
+
+        req = self.simple_request(action='query', list='globalblocks',
+                                  bgprop='id', bglimit=1,
+                                  **{parameter: [user]})
+        return bool(req.submit()['query']['globalblocks'])
 
 
 class GlobalUsageMixin:

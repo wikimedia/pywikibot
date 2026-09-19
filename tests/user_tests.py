@@ -13,7 +13,11 @@ from unittest.mock import patch
 
 import pywikibot
 from pywikibot import Page, Timestamp, User
-from pywikibot.exceptions import AutoblockUserError
+from pywikibot.exceptions import (
+    APIError,
+    AutoblockUserError,
+    UnknownExtensionError,
+)
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 
@@ -227,6 +231,84 @@ class TestUserClass(TestCase):
 
         self.assertFalse(user.is_partial_blocked())
         self.assertIsNone(user.get_block_info())
+
+
+class TestGlobalBlocks(TestCase):
+
+    """Test global block lookups without changing live blocks."""
+
+    family = 'wikipedia'
+    code = 'en'
+    dry = True
+
+    def test_global_blocks(self) -> None:
+        """Use range-aware IP queries and exact account queries."""
+        cases = (
+            ('192.0.2.1', 'bgip', [{'id': 1}]),
+            ('192.000.002.001', 'bgip', [{'id': 1}]),
+            ('2001:db8::1', 'bgip', []),
+            ('192.0.2.0/24', 'bgip', [{'id': 2}]),
+            ('192.0.2.1/24', 'bgip', [{'id': 2}]),
+            ('Example', 'bgtargets', [{'id': 3}]),
+        )
+        with patch.object(self.site, 'has_extension', return_value=True), \
+                patch.object(self.site._paraminfo, 'parameter',
+                             return_value={'name': 'targets'}), \
+                patch.object(self.site, 'simple_request') as request:
+            for target, parameter, blocks in cases:
+                with self.subTest(target=target):
+                    request.return_value.submit.return_value = {
+                        'query': {'globalblocks': blocks},
+                    }
+                    user = User(self.site, target)
+                    self.assertIs(user.is_globally_blocked(), bool(blocks))
+                    request.assert_called_with(
+                        action='query', list='globalblocks', bgprop='id',
+                        bglimit=1, **{parameter: [user.username]})
+
+            # A second lookup must observe the changed block status.
+            request.return_value.submit.return_value = {
+                'query': {'globalblocks': []},
+            }
+            self.assertFalse(user.is_globally_blocked())
+
+            self.assertFalse(self.site.is_globally_blocked(' 192.0.2.1 '))
+            request.assert_called_with(
+                action='query', list='globalblocks', bgprop='id', bglimit=1,
+                bgip=['192.0.2.1'])
+
+    def test_unsupported_account_query(self) -> None:
+        """Do not send an account filter that an older API would ignore."""
+        with patch.object(self.site, 'has_extension', return_value=True), \
+                patch.object(self.site._paraminfo, 'parameter',
+                             return_value=None), \
+                patch.object(self.site, 'simple_request') as request:
+            with self.assertRaisesRegex(NotImplementedError,
+                                        'global account block queries'):
+                User(self.site, 'Example').is_globally_blocked()
+            request.assert_not_called()
+
+    def test_global_block_errors(self) -> None:
+        """Unavailable or failed queries must not report an unblocked user."""
+        user = User(self.site, '192.0.2.1')
+        with self.assertRaisesRegex(UnknownExtensionError, 'GlobalBlocking'):
+            user.is_globally_blocked()
+
+        with patch.object(self.site, 'has_extension', return_value=True), \
+                patch.object(self.site, 'simple_request') as request:
+            with self.assertRaisesRegex(ValueError, 'must not be empty'):
+                self.site.is_globally_blocked('')
+
+            for target in ('Example|Other', '\x1fExample\x1fOther'):
+                with self.subTest(target=target):
+                    with self.assertRaisesRegex(ValueError, 'list separators'):
+                        self.site.is_globally_blocked(target)
+            request.assert_not_called()
+
+            request.return_value.submit.side_effect = APIError(
+                'readapidenied', 'Read access denied')
+            with self.assertRaisesRegex(APIError, 'readapidenied'):
+                user.is_globally_blocked()
 
 
 class TestUserMethods(DefaultSiteTestCase):
