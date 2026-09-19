@@ -2037,6 +2037,26 @@ class BasePage(ComparableMixin):
 
         return self._pageimage
 
+    def pageviews(
+        self,
+        days: int | None = None,
+        *,
+        metric: str = 'pageviews',
+    ) -> dict[str, int | None]:
+        """Return daily page views for this page.
+
+        Uses the MediaWiki extension PageViewInfo.
+
+        .. version-added:: 11.8
+
+        :param days: Number of days to return, up to the site-configured
+            maximum. If ``None``, use the site's default.
+        :param metric: Page view metric supported by the site.
+        :return: Mapping of ISO date strings to view counts. A count may
+            be ``None`` when data is unavailable.
+        """
+        return self.site.pageviews(self, days, metric=metric)
+
     def getRedirectTarget(self, *,
                           ignore_section: bool = True) -> pywikibot.Page:
         """Return a Page object for the target this Page redirects to.
