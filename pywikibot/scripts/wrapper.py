@@ -553,7 +553,7 @@ def main() -> None:
         print(__doc__)
 
 
-def run() -> None:  # pragma: no cover
+def run() -> None:
     """Site package entry point. Print doc if necessary.
 
     .. version-added:: 7.0
