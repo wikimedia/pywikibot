@@ -36,8 +36,9 @@ if TYPE_CHECKING:
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
 # nds_nl code alias requires "_"
+# vikidia uses "." for test codes
 # dash must be the last char to be reused as regex
-CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_.-'
 
 
 class Family:
@@ -408,7 +409,8 @@ class Family:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
                     f'Family {cls.name} code {code} must be ASCII lowercase'
-                    ' letters and digits [a-z0-9] or underscore/dash [_-]',
+                    ' letters and digits [a-z0-9] or special characters '
+                    f'[{CODE_CHARACTERS[36:]}]',
                     FamilyMaintenanceWarning,
                     stacklevel=2,
                 )

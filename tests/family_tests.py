@@ -8,11 +8,12 @@
 from __future__ import annotations
 
 import unittest
+import warnings
 from collections.abc import Mapping
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.exceptions import UnknownFamilyError
+from pywikibot.exceptions import FamilyMaintenanceWarning, UnknownFamilyError
 from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.tools import suppress_warnings
 from tests.aspects import PatchingTestCase, TestCase
@@ -29,7 +30,9 @@ class TestFamily(TestCase):
         """Test that a family can be loaded via Family.load."""
         for name in pywikibot.config.family_files:
             with self.subTest(family=name):
-                f = Family.load(name)
+                with warnings.catch_warnings():
+                    warnings.simplefilter('error', FamilyMaintenanceWarning)
+                    f = Family.load(name)
                 self.assertIsInstance(f.langs, dict)
                 self.assertTrue(f.langs)
 
