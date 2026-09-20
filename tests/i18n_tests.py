@@ -206,7 +206,9 @@ class TestFallbackTranslate(TestCase):
     def testNoEnglish(self) -> None:
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
-            with self.subTest(code=code), self.assertRaises(KeyError):
+            with self.subTest(code=code), self.assertRaisesRegex(
+                    KeyError,
+                    'No fallback key found in lookup dict for "en"'):
                 i18n.translate(code, self.msg_no_english, fallback=True)
 
 
@@ -282,7 +284,9 @@ class TestTWTranslate(TWNTestCaseBase):
                          'test-localized EN')
 
         i18n.set_messages_package('pywikibot.scripts.i18n')
-        with self.assertRaises(TranslationError):
+        with self.assertRaisesRegex(
+                TranslationError,
+                'No translation available for key test-localized'):
             i18n.twtranslate('en', 'test-localized', fallback=False)
 
     def testLocalized(self) -> None:
@@ -312,7 +316,9 @@ class TestTWTranslate(TWNTestCaseBase):
 
     def testNoEnglish(self) -> None:
         """Test translating into English with missing entry."""
-        with self.assertRaises(TranslationError):
+        with self.assertRaisesRegex(
+                TranslationError,
+                'No translation available for key test-no-english'):
             i18n.twtranslate('en', 'test-no-english')
 
 

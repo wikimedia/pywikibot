@@ -281,9 +281,13 @@ class TestTimeFunctions(TestCase):
         self.assertEqual(str2timedelta('7d'), str2timedelta('1w'))
         self.assertEqual(str2timedelta('3y'), timedelta(1096))
         self.assertEqual(str2timedelta('3y', date), timedelta(1095))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+                ValueError,
+                'Time period qualifier is unrecognized: 4000@'):
             str2timedelta('4000@')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+                ValueError,
+                r'Time period qualifier is unrecognized: \$1'):
             str2timedelta('$1')
 
     def test_parse_duration(self) -> None:
@@ -292,9 +296,15 @@ class TestTimeFunctions(TestCase):
         self.assertEqual(parse_duration('7d'), ('d', 7))
         self.assertEqual(parse_duration('3y'), ('y', 3))
 
-        for invalid_value in ('', '3000', '4000@'):
+        cases = {
+            '': 'Time period should be a numeric value followed by '
+                'its qualifier',
+            '3000': 'Time period qualifier is unrecognized: 3000',
+            '4000@': 'Time period qualifier is unrecognized: 4000@',
+        }
+        for invalid_value, pattern in cases.items():
             with self.subTest(value=invalid_value), \
-                    self.assertRaises(ValueError):
+                    self.assertRaisesRegex(ValueError, pattern):
                 parse_duration(invalid_value)
 
 

@@ -45,7 +45,7 @@ class TestObsoleteSite(DefaultSiteTestCase):
         self.assertEqual(site.code, 'ru-sib')
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(KeyError, 'ru-sib'):
             site.hostname()
         # See also http_tests, which tests that ru-sib.wikipedia.org is offline
 

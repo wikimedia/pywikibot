@@ -79,7 +79,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         """Test accessing a property not in siteinfo."""
         not_exists = 'this-property-does-not-exist'
         mysite = self.site
-        with self.assertRaises(KeyError):
+        with self.assertRaisesRegex(KeyError, not_exists):
             mysite.siteinfo.__getitem__(not_exists)
         self.assertNotIn(not_exists, mysite.siteinfo)
         self.assertIsEmpty(mysite.siteinfo.get(not_exists))
