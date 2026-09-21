@@ -58,10 +58,10 @@ class EventStreams(GeneratorWrapper):
     >>> stream.register_filter(type='edit', wiki='wikidatawiki', bot=True)
     >>> change = next(stream)
     >>> msg = '{type} on page {title} by {user}.'.format_map(change)
-    >>> print(msg)  # doctest: +SKIP
+    >>> print(msg)
     edit on page Q2190037 by KrBot.
     >>> from pprint import pprint
-    >>> pprint(change, width=75, indent=1)  # doctest: +SKIP
+    >>> pprint(change, width=75, indent=1)
     {'$schema': '/mediawiki/recentchange/1.0.0',
      'bot': True,
      'comment': '/* wbsetreference-set:2| */ [[Property:P10585]]: 96FPN, см. '
