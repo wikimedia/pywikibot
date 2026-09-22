@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from collections.abc import Generator, Iterable
 from ipaddress import ip_network
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import pywikibot
 from pywikibot.data import api
@@ -23,6 +23,7 @@ from pywikibot.exceptions import (
     UnexpectedAPIDataError,
 )
 from pywikibot.site._decorators import need_extension, need_right
+from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import merge_unique_dicts
 
 
@@ -206,6 +207,114 @@ class ProofreadPageMixin:
 class GeoDataMixin:
 
     """APISite mixin for GeoData extension."""
+
+    @need_extension('GeoData')
+    def geosearch(
+        self: BaseSiteProtocol,
+        *,
+        coord: tuple[float, float] | None = None,
+        page: pywikibot.page.BasePage | str | None = None,
+        bbox: tuple[float, float, float, float] | None = None,
+        radius: int | None = None,
+        namespaces: NamespaceArgType = 0,
+        total: int | None = 10,
+    ) -> Generator[dict[str, Any]]:
+        """Yield geographic search records from the GeoData extension.
+
+        Specify exactly one of *coord*, *page* or *bbox*. Results retain
+        the API's order and metadata, including ``pageid``, ``ns``,
+        ``title``, ``lat``, ``lon``, ``dist`` and ``primary``. Additional
+        coordinate properties are included where available. Distances
+        are in metres, measured from the search point or box centre.
+
+        Only primary coordinates are searched, using the site's default
+        globe (normally Earth). When searching around a page, that page
+        is excluded from the results.
+
+        GeoSearch does not support continuation. The API caps the result
+        count (normally 500, or 5000 with the ``apihighlimits`` right), so
+        this method cannot enumerate every page in a densely mapped area.
+        The radius and bounding-box size are also limited by the site.
+
+        For example, search within 5 km of a point in Lagos:
+
+        .. code-block:: python
+
+           for result in site.geosearch(coord=(6.455, 3.3841), radius=5000):
+               print(result['title'], result['dist'])
+
+        .. version-added:: 11.8
+        .. seealso:: :api:`Geosearch`
+
+        :param coord: Search centre as ``(latitude, longitude)``.
+        :param page: Title or page on this site whose primary coordinates
+            define the search centre. The page must have coordinates.
+        :param bbox: Bounding box as ``(north, west, south, east)``.
+        :param radius: Search radius in metres for *coord* or *page*.
+            If None, use the site's default (normally 500 metres).
+            Cannot be combined with *bbox*.
+        :param namespaces: Namespace identifiers or names, optionally
+            separated by ``|``. Defaults to the main namespace.
+            None or an empty iterable searches all namespaces.
+        :param total: Maximum records to yield, subject to the API limit.
+            None requests the API maximum; nonpositive values yield none.
+        :raises ValueError: Conflicting or malformed search inputs.
+        :raises RuntimeError: The reference page belongs to another site.
+        :raises UnknownExtensionError: GeoData is not installed.
+        :raises APIError: The reference page is missing or has no
+            coordinates (``no-coordinates``), or the API rejects the query.
+        :raises UnexpectedAPIDataError: The response does not contain a
+            list of search records.
+        """
+        if sum(value is not None for value in (coord, page, bbox)) != 1:
+            raise ValueError('Specify exactly one of coord, page or bbox.')
+        if bbox is not None and radius is not None:
+            raise ValueError('radius cannot be combined with bbox.')
+
+        parameters: dict[str, Any] = {
+            'action': 'query',
+            'list': 'geosearch',
+            'gslimit': 'max' if total is None else total,
+            'gsprop': ['type', 'name', 'dim', 'country', 'region', 'globe'],
+            'formatversion': 2,
+        }
+        if coord is not None:
+            if len(coord) != 2:
+                raise ValueError('coord must contain latitude and longitude.')
+            parameters['gscoord'] = coord
+        elif bbox is not None:
+            if len(bbox) != 4:
+                raise ValueError('bbox must contain north, west, south, east.')
+            parameters['gsbbox'] = bbox
+        else:
+            parameters['gspage'] = page
+
+        if radius is not None:
+            parameters['gsradius'] = radius
+        if isinstance(namespaces, str):
+            namespaces = namespaces.split('|')
+        parameters['gsnamespace'] = (
+            [ns.id for ns in self.namespaces.resolve(namespaces)]
+            if namespaces is not None else []
+        ) or '*'
+
+        if total is not None and total <= 0:
+            return
+
+        # This module has no continuation; a smaller batch loses results.
+        request = self.simple_request(**parameters)
+        data = request.submit()
+        try:
+            records = data['query']['geosearch']
+        except (KeyError, TypeError) as e:
+            raise UnexpectedAPIDataError(
+                'GeoSearch response is missing the search result list') from e
+        if not isinstance(records, list) or any(
+            not isinstance(record, dict) for record in records
+        ):
+            raise UnexpectedAPIDataError(
+                'GeoSearch response must contain a list of search records')
+        yield from records
 
     @need_extension('GeoData')
     def loadcoordinfo(self: BaseSiteProtocol, page) -> None:

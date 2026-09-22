@@ -12,8 +12,15 @@ from unittest.mock import patch
 
 import pywikibot
 from pywikibot.comms.http import user_agent, user_agent_username
+from pywikibot.data.api import Request
+from pywikibot.exceptions import (
+    APIError,
+    UnexpectedAPIDataError,
+    UnknownExtensionError,
+)
 from pywikibot.tools import suppress_warnings
-from tests.aspects import DefaultSiteTestCase
+from tests.aspects import DefaultSiteTestCase, TestCase
+from tests.utils import DrySite
 
 
 class TestDrySite(DefaultSiteTestCase):
@@ -146,6 +153,125 @@ class TestDrySite(DefaultSiteTestCase):
 
         self.assertEqual(
             res, user_agent(x, format_string='Foo ({script_comments})'))
+
+
+class TestGeoSearch(TestCase):
+
+    """Test geographic searches without relying on changing map data."""
+
+    family = 'wikipedia'
+    code = 'en'
+    dry = True
+
+    def test_geosearch(self) -> None:
+        """Preserve geographic records for each search input mode."""
+        records = [
+            {'pageid': 2, 'ns': 0, 'title': 'Nearby', 'lat': 6.46,
+             'lon': 3.38, 'dist': 500.0, 'primary': True, 'country': 'NG'},
+            {'pageid': 1, 'ns': 0, 'title': 'Further', 'lat': 6.47,
+             'lon': 3.38, 'dist': 1500.0, 'primary': True},
+        ]
+        box = (6.48, 3.36, 6.43, 3.41)
+        cases = (
+            ({'coord': (6.455, 3.3841), 'radius': 5000},
+             {'gscoord': '6.455|3.3841', 'gsradius': '5000'}),
+            ({'page': 'Lagos'}, {'gspage': 'Lagos'}),
+            ({'page': pywikibot.Page(self.site, 'Lagos#History')},
+             {'gspage': 'Lagos'}),
+            ({'bbox': box}, {'gsbbox': '6.48|3.36|6.43|3.41'}),
+        )
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(Request, 'submit', autospec=True) as submit,
+            patch.object(pywikibot.config, 'step', 1),
+        ):
+            submit.return_value = {
+                'query': {'geosearch': records},
+            }
+            for inputs, parameters in cases:
+                with self.subTest(inputs=inputs):
+                    submit.reset_mock()
+                    results = list(self.site.geosearch(
+                        **inputs, namespaces='0|Talk', total=2))
+                    self.assertEqual(results, records)
+                    submit.assert_called_once()
+                    request = submit.call_args.args[0]
+                    self.assertEqual(request._encoded_items(), {
+                        'action': 'query', 'list': 'geosearch', 'gslimit': '2',
+                        'gsprop': 'type|name|dim|country|region|globe',
+                        'gsnamespace': '0|1', 'formatversion': '2',
+                        **parameters,
+                    })
+
+    def test_geosearch_empty_and_limits(self) -> None:
+        """Handle an empty response and explicit result limits."""
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(Request, 'submit', autospec=True) as submit,
+        ):
+            submit.return_value = {'query': {'geosearch': []}}
+            self.assertIsEmpty(list(self.site.geosearch(
+                coord=(0, 0), namespaces=None, total=None)))
+            parameters = submit.call_args.args[0]._encoded_items()
+            self.assertEqual(parameters['gslimit'], 'max')
+            self.assertEqual(parameters['gsnamespace'], '*')
+
+            submit.reset_mock()
+            self.assertIsEmpty(list(self.site.geosearch(
+                coord=(0, 0), total=0)))
+            submit.assert_not_called()
+
+    def test_geosearch_errors(self) -> None:
+        """Reject invalid inputs and propagate unavailable search errors."""
+        with self.assertRaisesRegex(UnknownExtensionError, 'GeoData'):
+            list(self.site.geosearch(coord=(0, 0)))
+
+        cases = (
+            ({}, 'exactly one'),
+            ({'coord': (0, 0), 'page': 'Lagos'}, 'exactly one'),
+            ({'coord': (0,)}, 'latitude and longitude'),
+            ({'bbox': (0, 0)}, 'north, west, south, east'),
+            ({'bbox': (1, 0, 0, 1), 'radius': 500}, 'combined with bbox'),
+        )
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(Request, 'submit', autospec=True) as submit,
+        ):
+            for inputs, message in cases:
+                with self.subTest(inputs=inputs):
+                    with self.assertRaisesRegex(ValueError, message):
+                        list(self.site.geosearch(**inputs))
+            submit.assert_not_called()
+
+            other_page = pywikibot.Page(
+                DrySite('de', 'wikipedia', None), 'Lagos')
+            submit.side_effect = Request._encoded_items
+            with self.assertRaisesRegex(RuntimeError,
+                                        'different from Request.site'):
+                list(self.site.geosearch(page=other_page))
+
+            submit.side_effect = APIError(
+                'no-coordinates', 'The reference page has no coordinates')
+            with self.assertRaisesRegex(APIError, 'no-coordinates'):
+                list(self.site.geosearch(page='Lagos'))
+
+    def test_geosearch_malformed_response(self) -> None:
+        """Reject malformed responses before yielding any records."""
+        responses = (
+            {'query': {}},
+            {'query': {'geosearch': {'unexpected': 'object'}}},
+            {'query': {'geosearch': [{'title': 'Nearby'}, 'unexpected']}},
+        )
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(Request, 'submit', autospec=True) as submit,
+        ):
+            for response in responses:
+                with self.subTest(response=response):
+                    submit.return_value = response
+                    with self.assertRaisesRegex(UnexpectedAPIDataError,
+                                                'GeoSearch response'):
+                        next(self.site.geosearch(coord=(0, 0)))
 
 
 if __name__ == '__main__':
