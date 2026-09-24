@@ -291,7 +291,7 @@ class UI(ABUIC):
                 codecedText = codecedText.encode(
                     self.transliteration_target,
                     'replace').decode(self.transliteration_target)
-            transliteratedText = ''
+            parts = []
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
             prev = '-'
@@ -308,8 +308,7 @@ class UI(ABUIC):
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText = (
-                        f'{transliteratedText}'
+                    parts.append(
                         f'<<lightyellow>>{transliterated}<<previous>>'
                     )
                     # memorize if we replaced a single letter by multiple
@@ -318,9 +317,9 @@ class UI(ABUIC):
                         prev = transliterated[-1]
                 else:
                     # no need to try to transliterate.
-                    transliteratedText += char
+                    parts.append(char)
                     prev = char
-            text = transliteratedText
+            text = ''.join(parts)
 
         if not targetStream:
             targetStream = self.stderr
