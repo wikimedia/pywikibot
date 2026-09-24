@@ -446,10 +446,9 @@ class TestUpload(TestCase):
             ignore_warnings=True, report_success=False,
             file_key=self._file_key, offset=self._offset))
 
-        # Check if it's still cached
-        with self.assertAPIError('siiinvalidsessiondata') as cm:
+        # Check that the file is no longer in the stash
+        with self.assertAPIError('uploadstash-file-not-found'):
             self.site.stash_info(self._file_key)
-        self.assertStartsWith(cm.exception.info, 'File not found')
 
     def test_continue_filekey_once(self) -> None:
         """Test continuing to upload a file without using chunked mode."""
