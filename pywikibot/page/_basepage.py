@@ -1169,13 +1169,8 @@ class BasePage(ComparableMixin):
 
         templates = {tl.title(with_ns=False)
                      for tl in self.templates(namespaces=Namespace.TEMPLATE)}
-        disambigs = set()
-        # always use cached disambig templates
-        disambigs.update(self.site._disambigtemplates)
-        # see if any template on this page is in the set of disambigs
-        disambig_in_page = disambigs.intersection(templates)
         return (self.namespace() != Namespace.TEMPLATE
-                and bool(disambig_in_page))
+                and not self.site._disambigtemplates.isdisjoint(templates))
 
     def getReferences(self,
                       follow_redirects: bool = True,
