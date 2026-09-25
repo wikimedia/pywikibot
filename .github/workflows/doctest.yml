@@ -80,12 +80,7 @@ jobs:
         run: |
           python pwb.py version
           pytest --version
-          coverage run -m pytest pywikibot \
-            --doctest-modules \
-            --ignore-glob=*eventstreams.py \
-            --ignore-glob="*gui.py" \
-            --ignore-glob="*memento.py" \
-            --doctest-wait
+          coverage run -m pytest pywikibot --doctest-modules --ignore-glob=*eventstreams.py --ignore-glob="*gui.py" --ignore-glob="*memento.py" --doctest-wait
       - name: Close WMCS SOCKS tunnel
         if: always()
         shell: bash
