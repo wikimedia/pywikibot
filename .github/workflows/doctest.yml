@@ -63,16 +63,12 @@ jobs:
           ssh_user: ${{ secrets.WMCS_USER }}
           ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate user files
-        run: >
-          python -Werror::UserWarning -m pwb generate_user_files
-            -site:wikipedia:test
-            -user:${{ env.PYWIKIBOT_USERNAME }}
-            -v -debug
+        run: |-
+          python -Werror::UserWarning -m pwb generate_user_files -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug
       - name: doctest with pytest
         id: ci_test
         continue-on-error: true
         env:
-          PYWIKIBOT_TEST_NO_RC: ${{ (matrix.site == 'wikisource:zh' || matrix.test_no_rc) && 1 || 0 }}
           # Force GIL "off" due to mwparserfromhell issue as suggested by warning in T412624
           PYTHON_GIL: ${{ endsWith(matrix.python-version, 't') && '0' || '1' }}
           HTTP_PROXY: socks5h://127.0.0.1:1080
