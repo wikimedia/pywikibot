@@ -2040,7 +2040,7 @@ class BasePage(ComparableMixin):
     ) -> dict[str, int | None]:
         """Return daily page views for this page.
 
-        Uses the MediaWiki extension PageViewInfo.
+        Uses the MediaWiki extension :ext:`PageViewInfo<PageViewInfo>`.
 
         .. version-added:: 11.8
 

@@ -148,13 +148,16 @@ class ThreadList(list):
 
     .. version-changed:: 10.0
        the unintentional and undocumented *args* parameter was removed.
+    .. version-changed:: 11.8
+       Raise TypeError if *limit* is not an integer; raise ValueError if
+       *limit* is less than 1.
 
     .. seealso:: :class:`BoundedPoolExecutor`
 
     :param limit: the positive integer number of simultaneous threads
     :param wait_time: how long to wait if active threads exceeds limit
     :raises TypeError: limit is not an integer or is a boolean
-    :raises ValueError: limit is less than 1
+    :raises ValueError: limit is less than 1.
     """
 
     limit: int = 128  #: :meta private:
@@ -270,6 +273,10 @@ class BoundedPoolExecutor(futures.Executor):
                                      max_workers=1) as executor:
                future = executor.submit(pow, 323, 1235)
                print(future.result())
+
+        .. version-changed:: 11.8
+           Release bounded capacity when submission fails with any
+           Exception.
         """
         self._bound_semaphore.acquire()
 

@@ -434,6 +434,8 @@ def fetch(uri: str,
 
     .. version-changed:: 7.0
         The *body* parameter was removed; use *data* instead.
+    .. version-changed:: 11.8
+       Avoid mutating headers inputs.
 
     See :py:obj:`requests.Session.request` for parameters.
 

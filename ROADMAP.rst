@@ -1,8 +1,53 @@
 Release 11.8
 ============
 
+* Load only current revision ID with :attr:`page.BasePage.latest_revision_id`.
+* Return non-option defaults with :func:`bot.input_list_choice`. (:phab:`T305937`)
+* Add :meth:`APISite.geosearch()<pywikibot.site._extensions.GeoDataMixin.geosearch>`
+  method. (:phab:`T438772`)
+* Preserve labels with different prefixes in :func:`textlib.replace_links`. (:phab:`T396719`)
+* Resolve :func:`i18n.bundles` paths from package.
+* Add :meth:`pywikibot.User.is_globally_blocked` and :meth:`APISite.is_globally_blocked()
+  <pywikibot.site._extensions.GlobalBlockingMixin.is_globally_blocked>` to support
+  :ext:`GlobalBlocking extension<GlobalBlocking/API#list=globalblocks_(bg)>`. (:phab:`T394628`)
+* Initialize the wrapped generator once per lifecycle with
+  :class:`tools.collections.GeneratorWrapper`.
+* Use ``functools.cache`` for :func:`date.escapePattern2`.
+* Avoid mutating request inputs in :func:`comms.http.fetch`.
+* Buffer :class:`textlib.GetDataHTML` output in :attr:`textlib.GetDataHTML.textdata`.
+* Short-circuit intersection cache checks in :func:`tools.itertools.intersect_generators`.
+* Add :ext:`PageViewInfo` extension support with :meth:`page.BasePage.pageviews`
+  and :class:`site.PageViewInfoMixin<pywikibot.site._extensions.PageViewInfoMixin>`.
+  (:phab:`T325473`)
+* Use plain dictionaries for Wikibase :class:`pywikibot.Claim` mappings.
+* Add :attr:`page.BasePage.flagged_state` and :meth:`APSite.flagged_state()
+  <pywikibot.site._extensions.FlaggedRevsMixin.flagged_state>` site method
+  for :ext:`FlaggedRevs` info. (:phab:`T410893`)
+* Disable ``maxlag`` for meta queries, paraminfo and help. (:phab:`T421642`)
+* Added Ukrainian Vikidia and updated testing subdomains for that family.
 * Correctly propagate reference group hashes after
   :meth:`page.WikibaseEntity.editEntity`. (:phab:`T367324`)
+* Prevent recursive logging :func:`handler initialization<bot.init_handlers>`. (:phab:`T436130`)
+* Avoid duplicate revision updates and avoid constructing cached file revisions
+  again in :class:`FilePage<page.FilePage>`.
+* Stop pre-encoding API titles because :class:`data.api.Request` normalizes
+  byte parameters back to strings before serialization.
+* Isolate cached tables by server URL in :mod:`data.wikistats` module.
+* Exceptions from the :meth:`tools.threading.ThreadedGenerator.run` producer
+  are re-raised during iteration after yielding any queued results.
+* Release bounded capacity in :meth:`tools.threading.BoundedPoolExecutor.submit`
+  when submission fails with any Exception.
+* Avoid duplicate key evaluation in :func:`tools.itertools.filter_unique`.
+* Replace :func:`tools.strtobool` value checks with constant mapping.
+* Avoid unnecessary request if *total* is 0 in :meth:`Category.articles()<page.Category.articles>`.
+* Reject invalid :class:`tools.threading.ThreadList` limits.
+* Public *reason* and *comment* parameters used for page-action and upload
+  summaries were renamed to *summary*. The old parameter names remain
+  available as deprecated aliases. (:phab:`T62442`)
+* Cache valid site codes in :func:`titletranslate.translate`.
+* Normalize family aliases in :meth:`data.wikistats.WikiStats.get` before cache lookup.
+* Preserve Windows commands without a file placeholder in :class:`editor.TextEditor`.
+* Preserve existing endpoint query parameters in :meth:`data.sparql.SparqlQuery.query`.
 * Reset the retry counter for each query in :class:`data.sparql.SparqlQuery`.
 * Deduplicate intersections with a single input in :func:`tools.itertools.intersect_generators`.
 * Accept path-like filenames and detect suffixes case-insensitively in :func:`tools.open_archive`.
@@ -31,9 +76,6 @@ Release 11.8
 * Update translations (i18n).
 * Add new :class:`family.WikimediaSubdomainFamily`.
 * Update documentation for :meth:`page.BasePage.exists`. (:phab:`T334341`)
-* Public *reason* and *comment* parameters used for page-action and upload
-  summaries were renamed to *summary*. The old parameter names remain
-  available as deprecated aliases. (:phab:`T62442`)
 
 
 Deprecations

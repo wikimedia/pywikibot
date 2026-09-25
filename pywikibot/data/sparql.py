@@ -135,6 +135,9 @@ class SparqlQuery(WaitingMixin):
            looks like the user is not logged in.
         .. version-changed:: 9.6
            retry on internal server error (500).
+        .. version-changed:: 11.8
+           Preserve existing endpoint query parameters.
+
 
         :param query: Query text
         :raises NoUsernameError: User not logged in

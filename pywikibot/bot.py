@@ -374,6 +374,9 @@ def init_handlers() -> None:
     .. version-changed:: 6.2
        Different logfiles are used if multiple processes of the same
        script are running.
+    .. version-changed:: 11.8
+       Moved to :func:`_init_handlers` to prevent recursive handler
+       initialization.
     """
     global _handlers_initializing
 
@@ -389,7 +392,11 @@ def init_handlers() -> None:
 
 
 def _init_handlers() -> None:
-    """Initialize logging handlers without a re-entrancy check."""
+    """Initialize logging handlers without a re-entrancy check.
+
+    .. version-added:: 11.8
+       Moved from :func:`init_handlers`.
+    """
     module_name = calledModuleName()
     if not module_name:
         module_name = 'terminal-interface'

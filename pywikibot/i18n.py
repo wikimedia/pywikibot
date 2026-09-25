@@ -885,6 +885,9 @@ def bundles(stem: bool = False) -> Generator[Path | str]:
     'i18n'
 
     .. version-added:: 7.0
+    .. version-changed:: 11.8
+       Resolve message bundle directories from the imported messages
+       package instead of the current working directory.
 
     :param stem: Yield the Path.stem if True and the Path object otherwise
     """

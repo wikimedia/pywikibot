@@ -36,3 +36,5 @@
          object is passed to *generator* keyword parameter.
 
          .. warning:: this is just a sample
+
+   .. autofunction:: _init_handlers

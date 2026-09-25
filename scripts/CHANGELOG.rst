@@ -9,6 +9,16 @@ archivebot
 
 * Fix ``-locale`` and ``-timezone`` options.
 
+category
+^^^^^^^^
+
+* Extract argument handling. (:phab:`T434526`)
+
+category_graph
+^^^^^^^^^^^^^^
+
+* Cache subcategory lists.
+
 category_redirect
 ^^^^^^^^^^^^^^^^^
 
@@ -46,12 +56,26 @@ parser_function_count
 
 * Fix explicit :func:`pywikibot.handle_args` arguments.
 
+redirect
+^^^^^^^^
+
+* Prevent infinite recursion loop in fix_moved_broken_redirects. (:phab:`T432620`)
+
+reflinks
+^^^^^^^^
+
+* Skip adding references to templates.
+
 solve_disambiguation
 ^^^^^^^^^^^^^^^^^^^^
 
 * Return on OSError, preserving the initialized ignore list as the pre-pathlib implementation
   did.
 
+touch
+^^^^^
+
+* Avoid recalculating cached purge rate limits.
 
 tracking_param_remover
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -62,6 +86,11 @@ transwikiimport
 ^^^^^^^^^^^^^^^
 
 * Make summaries order-independent.
+
+weblinkchecker
+^^^^^^^^^^^^^^
+
+* Honour ``-ignore`` HTTP status codes
 
 
 11.7.0
