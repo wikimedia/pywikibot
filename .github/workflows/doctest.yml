@@ -63,9 +63,11 @@ jobs:
           ssh_user: ${{ secrets.WMCS_USER }}
           ssh_key: ${{ secrets.WMCS_SSH_KEY }}
       - name: Generate user files
-        run: |
-          python -Werror::UserWarning -m pwb generate_user_files \
-            -site:wikipedia:test -user:${{ env.PYWIKIBOT_USERNAME }} -v -debug;
+        run: >
+          python -Werror::UserWarning -m pwb generate_user_files
+            -site:wikipedia:test
+            -user:${{ env.PYWIKIBOT_USERNAME }}
+            -v -debug
       - name: doctest with pytest
         id: ci_test
         continue-on-error: true
