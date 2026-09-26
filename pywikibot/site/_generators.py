@@ -697,7 +697,7 @@ class GeneratorsMixin:
                     excluded_namespaces.add(14)
 
                 if namespaces:
-                    if excluded_namespaces.intersection(namespaces):
+                    if not excluded_namespaces.isdisjoint(namespaces):
                         raise ValueError(
                             f'incompatible namespaces {namespaces!r} and '
                             f'member_type {member_type!r}')
