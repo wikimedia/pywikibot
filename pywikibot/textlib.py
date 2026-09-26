@@ -2171,9 +2171,7 @@ def glue_template_and_params(template_and_params) -> str:
     params changes).
     """
     template, params = template_and_params
-    text = ''
-    for items in params.items():
-        text += '|{}={}\n'.format(*items)
+    text = ''.join('|{}={}\n'.format(*items) for items in params.items())
 
     return f'{{{{{template}\n{text}}}}}'
 
