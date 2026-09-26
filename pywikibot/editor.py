@@ -204,7 +204,7 @@ class TextEditor:
                     if unusable in editor.lower():
                         break
                 else:
-                    if set(editor) & set('\a\b\f\n\r\t\v'):
+                    if not set('\a\b\f\n\r\t\v').isdisjoint(editor):
                         # single character string literals from
                         # https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
                         # encode('unicode-escape') also changes Unicode
