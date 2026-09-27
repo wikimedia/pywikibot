@@ -152,10 +152,7 @@ class TestPwb(PwbTestCase):
         remaining = stderr.readlines()
         self.assertLength(remaining, 3)  # always 3 lines remaining after list
 
-    @unittest.skipIf(
-        python_implementation() == 'GraalVM' or sys.platform == 'win32',
-        reason='T439308, T439337'
-    )
+    @unittest.skipIf(python_implementation() == 'GraalVM', reason='T439308')
     def test_console_scripts_entry_point(self) -> None:
         """Test that the pwb console_scripts entry point is registered.
 
