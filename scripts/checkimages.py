@@ -1213,13 +1213,19 @@ class CheckImagesBot:
                         f'page {self.image}!')
             self.all_licenses = []
 
+            template_titles = []
+            if templates_in_the_image_raw:
+                template_titles = [
+                    (template,
+                     template.title(as_url=True, with_ns=False).lower())
+                    for template in self.licenses_found
+                ]
+
             # Found the templates ONLY in the image's description
             for template_selected in templates_in_the_image_raw:
                 tp = pywikibot.Page(self.site, template_selected)
                 page_title = tp.title(as_url=True, with_ns=False).lower()
-                for template_real in self.licenses_found:
-                    template_title = template_real.title(as_url=True,
-                                                         with_ns=False).lower()
+                for template_real, template_title in template_titles:
                     if page_title == template_title \
                        and template_real not in self.all_licenses:
                         self.all_licenses.append(template_real)
