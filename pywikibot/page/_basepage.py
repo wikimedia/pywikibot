@@ -2128,14 +2128,15 @@ class BasePage(ComparableMixin):
                                reverse: bool = False,
                                total: int | None = None):
         """Return the version history as a wiki table."""
-        result = '{| class="wikitable"\n'
-        result += '! oldid || date/time || username || edit summary\n'
+        table = ['{| class="wikitable"\n'
+                 '! oldid || date/time || username || edit summary\n']
         for entry in self.revisions(reverse=reverse, total=total):
-            result += '|----\n'
-            result += (f'| {entry.revid} || {entry.timestamp} || {entry.user} '
-                       f'|| <nowiki>{entry.comment}</nowiki>\n')
-        result += '|}\n'
-        return result
+            table.append(
+                '|----\n'
+                f'| {entry.revid} || {entry.timestamp} || {entry.user} '
+                f'|| <nowiki>{entry.comment}</nowiki>\n')
+        table.append('|}\n')
+        return ''.join(table)
 
     def contributors(self,
                      total: int | None = None,
