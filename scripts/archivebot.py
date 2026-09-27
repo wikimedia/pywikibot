@@ -583,13 +583,12 @@ class DiscussionPage(pywikibot.Page):
         if sort_threads:
             self.archiver.info('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
-        newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
-        for t in self.threads:
-            newtext += t.to_text()
+        page_text = [self.header.strip() + '\n\n']  # Fix trailing newlines
+        page_text.extend(t.to_text() for t in self.threads)
         if self.full:
             summary += ' ' + i18n.twtranslate(self.site.code,
                                               'archivebot-archive-full')
-        self.text = newtext
+        self.text = ''.join(page_text)
         self.save(summary, asynchronous=asynchronous)
 
 
