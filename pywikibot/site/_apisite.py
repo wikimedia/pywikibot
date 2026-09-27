@@ -43,6 +43,7 @@ from pywikibot.exceptions import (
     PageDeletedConflictError,
     PageRelatedError,
     PageSaveRelatedError,
+    ServerError,
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
@@ -673,10 +674,10 @@ class APISite(
                 formatversion=2,
             )
             uidata = uirequest.submit()
-            assert 'query' in uidata, \
-                   "API userinfo response lacks 'query' key"
-            assert 'userinfo' in uidata['query'], \
-                   "API userinfo response lacks 'userinfo' key"
+            if 'query' not in uidata:
+                raise ServerError("API userinfo response lacks 'query' key")
+            if 'userinfo' not in uidata['query']:
+                raise ServerError("API userinfo response lacks 'userinfo' key")
             self._userinfo = uidata['query']['userinfo']
             if self._loginstatus != login.LoginStatus.IN_PROGRESS \
                and ('anon' in self._userinfo or not self._userinfo.get('id')):
