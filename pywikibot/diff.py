@@ -382,17 +382,20 @@ class PatchManager:
 
         context_range = self._get_context_range(hunks)
 
-        output = (
-            f'<<aqua>>{Hunk.get_header_text(*context_range)}<<default>>\n'
-            f'{extend_context(context_range[0][0], hunks[0].a_rng[0])}'
-        )
+        diff_text = [
+            f'<<aqua>>{Hunk.get_header_text(*context_range)}<<default>>\n',
+            extend_context(context_range[0][0], hunks[0].a_rng[0]),
+        ]
         previous_hunk = None
         for hunk in hunks:
             if previous_hunk:
-                output += extend_context(previous_hunk.a_rng[1], hunk.a_rng[0])
+                diff_text.append(extend_context(previous_hunk.a_rng[1],
+                                                hunk.a_rng[0]))
             previous_hunk = hunk
-            output += hunk.diff_text
-        output += extend_context(hunks[-1].a_rng[1], context_range[0][1])
+            diff_text.append(hunk.diff_text)
+        diff_text.append(extend_context(hunks[-1].a_rng[1],
+                                        context_range[0][1]))
+        output = ''.join(diff_text)
         if self._replace_invisible:
             output = chars.replace_invisible(output)
 
