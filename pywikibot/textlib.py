@@ -2326,13 +2326,13 @@ class TimeStripper:
 
         It does so to prevent spurious earlier matches.
         """
-        all_matches = list(pat.finditer(txt))
-        cnt = len(all_matches)
+        cnt = 0
+        m = None
+        for m in pat.finditer(txt):
+            cnt += 1
 
-        if not cnt:
+        if m is None:
             return (txt, None)
-
-        m = all_matches[-1]
 
         def marker(m: re.Match[str]):
             """Replace exactly the same number of matched characters.
