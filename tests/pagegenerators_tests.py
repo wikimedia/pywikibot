@@ -36,7 +36,7 @@ from tests.aspects import (
     require_modules,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
-from tests.utils import skipping
+from tests.utils import expected_failure_if, skipping
 
 
 en_wp_page_titles = (
@@ -1835,6 +1835,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
 
     """Test UnconnectedPageGenerator."""
 
+    @expected_failure_if(pywikibot.config.family == 'betawikipedia')  # T439358
     def test_unconnected_with_repo(self) -> None:
         """Test UnconnectedPageGenerator."""
         site = self.site.data_repository()

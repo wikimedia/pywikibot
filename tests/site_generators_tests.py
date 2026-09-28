@@ -794,6 +794,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             func('m', 2, 1, True, is_ts=True)
 
 
+@expected_failure_if(pywikibot.config.family == 'betawikipedia')  # T439358
 class TestUnconnectedPages(DefaultSiteTestCase):
 
     """Test unconnected_pages method without cache enabled."""
