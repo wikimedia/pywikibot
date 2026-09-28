@@ -655,6 +655,9 @@ class APISite(
         .. seealso:: :api:`Userinfo`
         .. version-changed:: 8.0
            Use API formatversion 2.
+        .. version-changed:: 11.8
+           Raise ServerError instead of AttributeError if response lacks
+           'query' or 'userinfo' key.
 
         :return: A dict with the following keys and values:
 
@@ -665,6 +668,7 @@ class APISite(
           - rights: list of rights (could be empty)
           - messages: True if user has a new message on talk page (bool)
           - blockinfo: present if user is blocked (dict)
+        :raises ServerError: response lacks 'query' or 'userinfo' key.
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self.simple_request(
@@ -678,6 +682,7 @@ class APISite(
                 raise ServerError("API userinfo response lacks 'query' key")
             if 'userinfo' not in uidata['query']:
                 raise ServerError("API userinfo response lacks 'userinfo' key")
+
             self._userinfo = uidata['query']['userinfo']
             if self._loginstatus != login.LoginStatus.IN_PROGRESS \
                and ('anon' in self._userinfo or not self._userinfo.get('id')):

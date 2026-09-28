@@ -1,6 +1,9 @@
 Release 11.8
 ============
 
+* Various performance, stability, and code quality improvements.
+* Raise ServerError instead of AssertionError for invalid :meth:`APISite.userinfo()
+  <pywikibot.site._apisite.APISite.userinfo>` API response. (:phab:`T423061`)
 * Load only current revision ID with :attr:`page.BasePage.latest_revision_id`.
 * Return non-option defaults with :func:`bot.input_list_choice`. (:phab:`T305937`)
 * Add :meth:`APISite.geosearch()<pywikibot.site._extensions.GeoDataMixin.geosearch>`
@@ -52,7 +55,6 @@ Release 11.8
 * Deduplicate intersections with a single input in :func:`tools.itertools.intersect_generators`.
 * Accept path-like filenames and detect suffixes case-insensitively in :func:`tools.open_archive`.
 * Add support for all existing Beta Cluster wikis. (:phab:`T225892`)
-* Various performance, stability, and code quality improvements.
 * Support selective page preloading of :meth:`APISite.preloadpages
   <pywikibot.site._generators.GeneratorsMixin.preloadpages>` with
   :func:`pagegenerators.PreloadingGenerator` and :func:`pagegenerators.DequePreloadingGenerator`.
