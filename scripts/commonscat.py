@@ -469,8 +469,8 @@ class CommonscatBot(ConfigParserBot, ExistingPageBot):
         commonsSite = self.current_page.site.image_repository()
         commonsPage = pywikibot.Page(commonsSite, 'Category:' + name)
 
-        try:  # parse title (T26742)
-            str(commonsPage)
+        try:  # parse title (T267742)
+            str(commonsPage)  # noqa: B018
         except InvalidTitleError:
             return ''
 

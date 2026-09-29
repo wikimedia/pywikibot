@@ -21,7 +21,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 7
+    timeout-minutes: 6
     strategy:
       fail-fast: false
       matrix:
