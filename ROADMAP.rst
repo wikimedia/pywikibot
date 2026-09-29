@@ -1,6 +1,8 @@
 Release 11.9
 ============
 
+* The *force* parameter of :class:`pywikibot.User` methods was renamed to
+  *refresh* (:phab:`T433225`)
 * Suggest installing all requirements for missing dependencies with
   :mod:`pwb<pywikibot.scripts.wrapper>` wrapper.
 * Various performance, stability, and code quality improvements.
@@ -107,6 +109,8 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.9.0: The *force* parameter of :class:`pywikibot.User` methods was renamed to
+  *refresh*. The old parameter name will be removed. (:phab:`T433225`)
 * 11.8.0: Public *reason* and *comment* parameters used for page-action and
   upload summaries were renamed to *summary*. The old parameter names will
   be removed. (:phab:`T62442`)
