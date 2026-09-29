@@ -79,9 +79,9 @@ class TestSiteObject(DefaultSiteTestCase):
 
         site = (
             self.site
-            if not isinstance(self.site.family,
-                              pywikibot.family.BetaSubdomainFamily)
-            and self.site.code != 'beta'  # exclude Beta Cluster sites
+            # Beta projects use BetaSubdomainFamily instead of WikimediaFamily
+            if isinstance(self.site.family, pywikibot.family.WikimediaFamily)
+            and self.site.code != 'beta'  # Exclude the remaining Beta sites
             else None
         )
 
