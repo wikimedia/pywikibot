@@ -157,6 +157,8 @@ Options (may be omitted):
 
 -locale:LOCALE  Switch to locale LOCALE.
 
+-timezone:ZONE  Switch to timezone ZONE.
+
 -namespace:NS   Only archive pages from the given namespace.
 
 -page:PAGE      Archive a single PAGE. Default namespace is a user talk
@@ -201,7 +203,7 @@ import re
 import signal
 import threading
 import time
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from contextlib import nullcontext
 from hashlib import md5
 from math import ceil
@@ -581,13 +583,12 @@ class DiscussionPage(pywikibot.Page):
         if sort_threads:
             self.archiver.info('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
-        newtext = self.header.strip() + '\n\n'  # Fix trailing newlines
-        for t in self.threads:
-            newtext += t.to_text()
+        page_text = [self.header.strip() + '\n\n']  # Fix trailing newlines
+        page_text.extend(t.to_text() for t in self.threads)
         if self.full:
             summary += ' ' + i18n.twtranslate(self.site.code,
                                               'archivebot-archive-full')
-        self.text = newtext
+        self.text = ''.join(page_text)
         self.save(summary, asynchronous=asynchronous)
 
 
@@ -613,12 +614,12 @@ class PageArchiver:
         :param force: override security value
         :param asynchronous: asynchronous processing activated
         """
-        self.attributes = OrderedDict([
-            ('archive', ['', False]),
-            ('algo', ['old(24h)', False]),
-            ('counter', ['1', False]),
-            ('maxarchivesize', ['200K', False]),
-        ])
+        self.attributes = {
+            'archive': ['', False],
+            'algo': ['old(24h)', False],
+            'counter': ['1', False],
+            'maxarchivesize': ['200K', False],
+        }
         self.salt = salt
         self.force = force
         self.sort = sort
@@ -1064,9 +1065,9 @@ def main(*args: str) -> None:
             filename = value
         elif option == 'locale':
             # Required for english month names
-            locale.setlocale(locale.LC_TIME, value.encode('utf8'))
+            locale.setlocale(locale.LC_TIME, value)
         elif option == 'timezone':
-            os.environ['TZ'] = value.timezone
+            os.environ['TZ'] = value
             # Or use the preset value
             if hasattr(time, 'tzset'):
                 time.tzset()

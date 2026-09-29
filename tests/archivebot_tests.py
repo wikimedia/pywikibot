@@ -11,7 +11,7 @@ import unittest
 from contextlib import suppress
 from datetime import datetime
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot.exceptions import Error
@@ -82,6 +82,32 @@ class TestArchiveBotFunctions(TestCase):
     """Test functions in archivebot."""
 
     net = False
+
+    def _run_main(self, option: str) -> None:
+        """Run main with site-dependent work bypassed."""
+        with patch.object(archivebot.pywikibot, 'handle_args',
+                          return_value=[option]):
+            with patch.object(archivebot.pywikibot, 'Site'):
+                with patch.object(archivebot, 'show_md5_key',
+                                  return_value=True):
+                    archivebot.main(option)
+
+    def test_locale_option(self) -> None:
+        """Test that the locale option passes a string to setlocale."""
+        with patch.object(archivebot.locale, 'setlocale') as setlocale:
+            self._run_main('-locale:C')
+
+        setlocale.assert_called_once_with(archivebot.locale.LC_TIME, 'C')
+
+    def test_timezone_option(self) -> None:
+        """Test that the timezone option sets the TZ environment variable."""
+        environ = {}
+        with patch.object(archivebot.os, 'environ', environ):
+            with patch.object(archivebot.time, 'tzset', create=True) as tzset:
+                self._run_main('-timezone:UTC')
+
+        self.assertEqual(environ['TZ'], 'UTC')
+        tzset.assert_called_once_with()
 
     def test_get_params_reuses_isocalendar(self) -> None:
         """Test that the ISO calendar is calculated once."""
@@ -314,6 +340,24 @@ class TestPageArchiverObject(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    def test_attributes_order(self) -> None:
+        """Test order when attributes are added or updated."""
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot-01')
+        template = pywikibot.Page(site, 'Template:Pywikibot_archivebot')
+        archiver = archivebot.PageArchiver(page, template, '')
+
+        archiver.set_attr('minthreadsleft', '3')
+        archiver.set_attr('algo', 'old(60d)')
+
+        self.assertEqual(
+            list(archiver.attributes),
+            ['archive', 'algo', 'counter', 'maxarchivesize',
+             'minthreadsleft'])
+        self.assertEqual(
+            archiver.saveables(),
+            ['archive', 'algo', 'minthreadsleft'])
+
     def testLoadConfigInTemplateNamespace(self) -> None:
         """Test loading of config with TEMPLATE_PAGE in Template ns.
 
@@ -332,9 +376,15 @@ class TestPageArchiverObject(TestCase):
         tmpl_without_ns = pywikibot.Page(site, 'Pywikibot_archivebot', ns=10)
 
         try:
-            archivebot.PageArchiver(page, tmpl_with_ns, '')
+            archiver = archivebot.PageArchiver(page, tmpl_with_ns, '')
         except Error as e:  # pragma: no cover
             self.fail(f'PageArchiver() raised {e}!')
+
+        self.assertIs(type(archiver.attributes), dict)
+        self.assertEqual(
+            list(archiver.attributes),
+            ['archive', 'algo', 'counter', 'maxarchivesize'])
+        self.assertEqual(archiver.saveables(), ['archive', 'algo'])
 
         try:
             archivebot.PageArchiver(page, tmpl_without_ns, '')

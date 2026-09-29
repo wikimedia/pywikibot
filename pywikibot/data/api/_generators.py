@@ -299,13 +299,15 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
             kwargs = self._clean_kwargs(kwargs)  # hasn't been called yet
         parameters = kwargs['parameters']
         if 'action' in parameters and parameters['action'] != 'query':
-            raise Error("{}: 'action' must be 'query', not {}"
-                        .format(self.__class__.__name__, kwargs['action']))
+            raise Error(
+                f"{self.__class__.__name__}: 'action' must be 'query', "
+                f"not {kwargs['action']}")
         parameters['action'] = 'query'
         # make sure request type is valid, and get limit key if any
         for modtype in ('generator', 'list', 'prop', 'meta'):
             if modtype in parameters:
                 self.modules = parameters[modtype].split('|')
+                self._module_keys = frozenset(self.modules)
                 break
         else:
             raise Error(f'{type(self).__name__}: No query module name found'
@@ -596,17 +598,12 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
         if prev_limit != new_limit:
             pywikibot.debug(
-                '{name}: query_limit: {query}, api_limit: {api}, '
-                'limit: {limit}, new_limit: {new}, count: {count}\n'
-                '{name}: {prefix}limit: {value}'
-                .format(name=self.__class__.__name__,
-                        query=self.query_limit,
-                        api=self.api_limit,
-                        limit=self.limit,
-                        new=new_limit,
-                        count=self._count,
-                        prefix=self.prefix,
-                        value=self.request[self.prefix + 'limit']))
+                '%s: query_limit: %s, api_limit: %s, '
+                'limit: %s, new_limit: %s, count: %s\n'
+                '%s: %slimit: %s',
+                self.__class__.__name__, self.query_limit, self.api_limit,
+                self.limit, new_limit, self._count, self.__class__.__name__,
+                self.prefix, self.request[self.prefix + 'limit'])
         return prev_limit, new_limit
 
     def _get_resultdata(self):
@@ -655,7 +652,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
 
             yield result
 
-            modules_item_intersection = set(self.modules) & set(item)
+            modules_item_intersection = self._module_keys.intersection(item)
             if isinstance(item, dict) and modules_item_intersection:
                 # Count elements contained in sub-items.
                 # If we need to count elements contained in items in
@@ -1121,11 +1118,13 @@ def update_page(page: pywikibot.Page,
 
     props = props or []
 
-    # test for pagedict content only and call updater function
-    for element in ('coordinates', 'revisions'):
-        if element in pagedict:
-            updater = globals()['_update_' + element]
-            updater(page, pagedict[element])
+    if 'coordinates' in pagedict:
+        _update_coordinates(page, pagedict['coordinates'])
+    elif 'coordinates' in props:
+        page._coords = []
+
+    if 'revisions' in pagedict:
+        _update_revisions(page, pagedict['revisions'])
 
     # test for pagedict and props contents, call updater or set attribute
     for element in ('categories', 'langlinks', 'templates'):

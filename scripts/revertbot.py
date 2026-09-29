@@ -136,6 +136,13 @@ class AbstractRevertBot(OptionHandler, abc.ABC):
                                           textlink=True)))
 
         if not self.opt.rollback:
+            # Load missing contents together so the accesses below use cache.
+            missing_revids = [revision.revid for revision in history
+                              if revision.text is None]
+            if missing_revids:
+                page.site.loadrevisions(
+                    page, revids=missing_revids, content=True)
+
             comment = i18n.twtranslate(
                 self.site, 'revertbot-revert',
                 {'revid': rev.revid,
@@ -145,7 +152,7 @@ class AbstractRevertBot(OptionHandler, abc.ABC):
                 comment += ': ' + self.opt.comment
 
             old = page.text
-            page.text = page.get_revision(rev.revid, content=True).text
+            page.text = page.get_revision(rev.revid).text
             pywikibot.showDiff(old, page.text)
             page.save(comment)
             return comment

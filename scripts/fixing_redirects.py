@@ -127,7 +127,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
             # remove preleading ":"
             if link_text[0] == ':':
-                link_text = link_text[1:]
+                link_text = link_text.removeprefix(':')
             if link_text[0].isupper() or link_text[0].isdigit():
                 new_page_title = target_page.title()
             else:
@@ -135,7 +135,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, AutomaticTWSummaryBot):
 
             # remove preleading ":"
             if new_page_title[0] == ':':
-                new_page_title = new_page_title[1:]
+                new_page_title = new_page_title.removeprefix(':')
 
             if new_page_title == link_text and not section \
                or self.opt.overwrite:

@@ -26,6 +26,7 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot.exceptions import APIError
 from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
+from pywikibot.tools import PYTHON_VERSION
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
 
@@ -496,6 +497,10 @@ def execute(
         captured stderr, and the :exc:`subprocess.TimeoutExpired`
         exception if the process timed out.
     """
+    if PYTHON_VERSION < (3, 10):
+        command.insert(1, '-W ignore::FutureWarning:pwb:55')
+        command.insert(1, '-W ignore::FutureWarning:__main__:55')
+
     env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'

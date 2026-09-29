@@ -343,8 +343,8 @@ class PagesTagParser(collections.abc.Container):
 
     def __str__(self) -> str:
         descriptors = self.get_descriptors().items()
-        attrs = [v.attrs.get(self) for k, v in descriptors
-                 if v.attrs.get(self) is not None]
+        attrs = [attr for k, v in descriptors
+                 if (attr := v.attrs.get(self)) is not None]
         attrs = ' '.join(str(attr) for attr in attrs)
         return f'<pages {attrs} />' if attrs else '<pages />'
 
@@ -1111,7 +1111,7 @@ class IndexPage(pywikibot.Page):
         if hasattr(self, '_pageid'):
             ppi_args['prppiipageid'] = str(self._pageid)
         else:
-            ppi_args['prppiititle'] = self.title().encode(site.encoding())
+            ppi_args['prppiititle'] = self.title()
 
         ppi_gen = site._generator(ListGenerator, 'proofreadpagesinindex',
                                   **ppi_args)

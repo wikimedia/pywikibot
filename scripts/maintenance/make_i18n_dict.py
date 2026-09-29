@@ -45,14 +45,19 @@ from pywikibot import config
 
 class i18nBot:  # noqa: N801
 
-    """I18n bot."""
+    """I18n bot.
+
+    .. version-changed:: 11.8
+       Fix regressions for pathlib conversion and script attribute
+       lookup.
+    """
 
     def __init__(self, script, *args, **kwargs) -> None:
         """Initializer."""
         modules = script.split('.')
         self.scriptname = modules[0]
         self.script = import_module('scripts.' + self.scriptname)
-        for m in modules:
+        for m in modules[1:]:
             self.script = getattr(self.script, m)
         self.messages = {}
         # setup the message dict
@@ -71,7 +76,7 @@ class i18nBot:  # noqa: N801
             print('No messages found, read them first.\n'
                   'Use "run" or "to_json" methods')
             return
-        keys = list(self.dict.keys())
+        keys = list(self.dict)
         keys.remove('qqq')
         keys.sort()
         keys.insert(0, 'qqq')
@@ -92,7 +97,7 @@ class i18nBot:  # noqa: N801
     def read(self, oldmsg, newmsg=None) -> None:
         """Read a single message from source script."""
         msg = getattr(self.script, oldmsg)
-        keys = list(msg.keys())
+        keys = list(msg)
         keys.append('qqq')
         if newmsg is None:
             newmsg = oldmsg
@@ -132,14 +137,14 @@ class i18nBot:  # noqa: N801
         if not self.dict:
             self.run(quiet)
         json_dir = Path(config.base_dir, 'scripts/i18n', self.scriptname)
-        json_dir.mkdir(exist_ok=True)
+        json_dir.mkdir(parents=True, exist_ok=True)
 
         for lang in self.dict:
             new_dict = {}
 
             file_path = json_dir / f'{lang}.json'
             if file_path.is_file():
-                new_dict = json.load(file_path.read_text(encoding='utf-8'))
+                new_dict = json.loads(file_path.read_text(encoding='utf-8'))
 
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
             new_dict.update(self.dict[lang])

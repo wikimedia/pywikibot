@@ -45,20 +45,21 @@ by default::
                   relative and absolute, is acceptable. See:
                   :api:`Protect#Parameters`
 
-Usage:
+**Usage:**
 
     python pwb.py protect <OPTIONS>
 
-Examples
---------
+**Examples:**
 
 Protect everything in the category 'To protect' prompting:
 
     python pwb.py protect -cat:"To protect"
 
-Unprotect all pages listed in text file 'unprotect.txt' without prompting:
+Unprotect all pages listed in text file 'unprotect.txt' without
+prompting:
 
     python pwb.py protect -file:unprotect.txt -unprotect -always
+
 """
 from __future__ import annotations
 
@@ -111,7 +112,7 @@ class ProtectionRobot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
         applicable = self.current_page.applicable_protections()
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)
-        self.current_page.protect(reason=self.opt.summary,
+        self.current_page.protect(summary=self.opt.summary,
                                   expiry=self.opt.expiry,
                                   protections=protections)
 

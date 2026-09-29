@@ -51,7 +51,7 @@ Bots and scripts
 +--------------------------+---------------------------------------------------------+
 | basic.py                 | Is a template from which simple bots can be made.       |
 +--------------------------+---------------------------------------------------------+
-| blockpagechecker.py      | Deletes any protection templates that are on pages      |
+| blockpageschecker.py     | Deletes any protection templates that are on pages      |
 |                          | which aren't actually protected.                        |
 +--------------------------+---------------------------------------------------------+
 | category.py              | Add a category link to all pages mentioned on a page,   |
@@ -145,10 +145,8 @@ Bots and scripts
 |                          | without title and fetch the html title from the link to |
 |                          | use it as the title of the wiki link in the reference.  |
 +--------------------------+---------------------------------------------------------+
-| replace.py               | Search articles for a text and replace it by another    |
-|                          | text. Both text are set in two configurable             |
-|                          | text files. The bot can either work on a set of given   |
-|                          | pages or crawl an SQL dump.                             |
+| replace.py               | Replaces text on pages using command-line pairs,        |
+|                          | a pairs file, or predefined fixes.                      |
 +--------------------------+---------------------------------------------------------+
 | replicate_wiki.py        | Replicates pages in wiki to a second wiki within family |
 +--------------------------+---------------------------------------------------------+
@@ -179,7 +177,7 @@ Bots and scripts
 +--------------------------+---------------------------------------------------------+
 | upload.py                | Upload an image to a wiki.                              |
 +--------------------------+---------------------------------------------------------+
-| watchlists.py            | Allows access to the account's watchlist.               |
+| watchlist.py             | Allows access to the account's watchlist.               |
 +--------------------------+---------------------------------------------------------+
 | weblinkchecker.py        | Check if external links are still working.              |
 +--------------------------+---------------------------------------------------------+

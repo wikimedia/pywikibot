@@ -25,8 +25,7 @@ import json
 import os
 import pkgutil
 import re
-from collections import abc
-from collections.abc import Generator, Iterable, Iterator, Mapping, Sequence
+from collections.abc import Generator, Iterable, Mapping, Sequence
 from contextlib import suppress
 from functools import cache
 from pathlib import Path
@@ -359,6 +358,7 @@ def set_messages_package(package_name: str) -> None:
     global _messages_available
     _messages_package_name = package_name
     _messages_available = None
+    _get_bundle.cache_clear()
 
 
 def messages_available() -> bool:
@@ -517,45 +517,6 @@ def _extract_plural(lang: str, message: str, parameters: Mapping[str, int]
         plural_value = static_plural_value
 
     return re.sub(PLURAL_PATTERN, replace_plural, message)
-
-
-class _PluralMappingAlias(abc.Mapping):
-
-    """Aliasing class to allow non mappings in _extract_plural.
-
-    That function only uses __getitem__ so this is only implemented
-    here.
-    """
-
-    def __init__(
-        self,
-        source: int | str | Sequence[int] | Mapping[str, int],
-    ) -> None:
-        self.source = source
-        if isinstance(source, str):
-            self.source = int(source)
-
-        self.index = -1
-        super().__init__()
-
-    def __getitem__(self, key: str) -> int:
-        self.index += 1
-        if isinstance(self.source, dict):
-            return int(self.source[key])
-
-        if isinstance(self.source, (tuple, list)):
-            if self.index < len(self.source):
-                return int(self.source[self.index])
-            raise ValueError('Length of parameter does not match PLURAL '
-                             'occurrences.')
-        assert isinstance(self.source, int)
-        return self.source
-
-    def __iter__(self) -> Iterator[int]:
-        raise NotImplementedError
-
-    def __len__(self) -> int:
-        raise NotImplementedError
 
 
 DEFAULT_FALLBACK = ('_default', )
@@ -882,15 +843,14 @@ def twget_keys(twtitle: str) -> list[str]:
     # obtain the directory containing all the json files for this package
     package = twtitle.split('-')[0]
     mod = __import__(_messages_package_name, fromlist=['__file__'])
-    pathname = os.path.join(next(iter(mod.__path__)), package)
+    pathname = Path(next(iter(mod.__path__))) / package
 
     # build a list of languages in that directory
-    langs = [filename.removesuffix('.json')
-             for filename in sorted(os.listdir(pathname))
-             if filename.endswith('.json')]
+    langs = [path.stem
+             for path in sorted(pathname.iterdir(), key=lambda path: path.name)
+             if path.name.endswith('.json')]
 
-    # exclude languages does not have this specific message in that package
-    # i.e. an incomplete set of translated messages.
+    # Exclude languages whose translations do not include this message.
     return [lang for lang in langs
             if lang != 'qqq' and _get_translation(lang, twtitle)]
 
@@ -919,14 +879,20 @@ def bundles(stem: bool = False) -> Generator[Path | str]:
     >>> path = next(i18n.bundles())
     >>> path.is_dir()
     True
-    >>> path.parent.as_posix()
-    'scripts/i18n'
+    >>> path.is_absolute()
+    True
+    >>> path.parent.name
+    'i18n'
 
     .. version-added:: 7.0
+    .. version-changed:: 11.8
+       Resolve message bundle directories from the imported messages
+       package instead of the current working directory.
 
     :param stem: Yield the Path.stem if True and the Path object otherwise
     """
-    for dirpath in Path(*_messages_package_name.split('.')).iterdir():
+    mod = __import__(_messages_package_name, fromlist=['__path__'])
+    for dirpath in Path(next(iter(mod.__path__))).iterdir():
         if dirpath.is_dir() and not dirpath.match('*__'):  # ignore cache
             if stem:
                 yield dirpath.stem

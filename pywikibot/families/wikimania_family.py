@@ -13,8 +13,7 @@ from pywikibot import family
 from pywikibot.tools import classproperty
 
 
-# The Wikimania family
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for Wikimania wikis.
 

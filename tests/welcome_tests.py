@@ -80,12 +80,29 @@ class TestWelcomeBot(TestCase):
 
         bot.report_bad_account.assert_not_called()
 
+    def test_skip_page_globally_blocked(self) -> None:
+        """Skip a globally blocked user without a local block or lock."""
+        bot = SimpleNamespace(show_status=MagicMock())
+        user = MagicMock(username='Iyanu')
+        user.is_blocked.return_value = False
+        user.is_locked.return_value = False
+        user.is_globally_blocked.return_value = True
+
+        with patch.object(welcome.pywikibot, 'info') as info:
+            result = welcome.WelcomeBot.skip_page(bot, user)
+
+        self.assertTrue(result)
+        bot.show_status.assert_called_once_with(welcome.Msg.SKIP)
+        info.assert_called_once_with('Iyanu has been blocked!')
+        user.groups.assert_not_called()
+
     def test_skip_page_reuses_edit_count(self) -> None:
         """Test that the edit count is retrieved once."""
         bot = SimpleNamespace(show_status=MagicMock())
-        user = MagicMock(username='Alice')
+        user = MagicMock(username='Iyanu')
         user.is_blocked.return_value = False
         user.is_locked.return_value = False
+        user.is_globally_blocked.return_value = False
         user.groups.return_value = []
         user.editCount.return_value = 1
 
@@ -98,13 +115,13 @@ class TestWelcomeBot(TestCase):
         self.assertTrue(result)
         user.editCount.assert_called_once_with()
         bot.show_status.assert_called_once_with(welcome.Msg.IGNORE)
-        info.assert_called_once_with('Alice has only 1 contributions.')
+        info.assert_called_once_with('Iyanu has only 1 contributions.')
 
     def test_signature_file_closed_on_read_error(self) -> None:
         """Test that the signature file is closed when reading fails."""
         file_obj = MagicMock()
         file_obj.__enter__.return_value = file_obj
-        file_obj.read.side_effect = OSError
+        file_obj.read.side_effect = OSError('Simulated read failure')
 
         with (
             patch.object(
@@ -112,7 +129,7 @@ class TestWelcomeBot(TestCase):
             patch.object(welcome.pywikibot.config, 'datafilepath',
                          return_value='signatures.txt'),
             patch('builtins.open', return_value=file_obj),
-            self.assertRaises(OSError),
+            self.assertRaisesRegex(OSError, r'Simulated read failure'),
         ):
             welcome.WelcomeBot.define_sign(SimpleNamespace())
 

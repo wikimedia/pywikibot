@@ -62,6 +62,14 @@ extra_deps = {
     ],
 }
 
+# Install every optional dependency except the Tkinter GUI dependencies.
+extra_deps['all-no-gui'] = [
+    requirement
+    for name, requirements in extra_deps.items()
+    if name != 'Tkinter'
+    for requirement in requirements
+]
+
 
 # ------- setup extra_requires for scripts ------- #
 script_deps = {
@@ -148,13 +156,11 @@ def get_validated_version(name: str) -> str:  # pragma: no cover
         print(e)
         sys.exit('Creating source distribution canceled.')
 
-    last_tag = None
-    if tags:
-        for tag in ('stable', 'python2'):
-            with suppress(ValueError):
-                tags.remove(tag)
-
-        last_tag = tags[-1]
+    versions = []
+    for tag in tags:
+        with suppress(InvalidVersion):
+            versions.append(Version(tag))
+    last_version = max(versions, default=None)
 
     warning = ''
     try:
@@ -162,10 +168,10 @@ def get_validated_version(name: str) -> str:  # pragma: no cover
     except InvalidVersion:
         warning = f'{version} is not a valid version string following PEP 440.'
     else:
-        if last_tag and vrsn <= Version(last_tag):
+        if last_version and vrsn <= last_version:
             warning = (
                 f'New version {version!r} is not higher than last version '
-                f'{last_tag!r}.'
+                f'{str(last_version)!r}.'
             )
 
     if warning:

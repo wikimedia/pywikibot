@@ -233,9 +233,11 @@ GLOBAL OPTIONS
 -nolog            Disable the log file (if it is enabled by default).
                   Also disable command.log.
 
--maxlag           Sets a new maxlag parameter to a number of seconds.
-                  Defer bot edits during periods of database server lag.
-                  Default is set by config.py
+-maxlag           Sets write_maxlag to a number of seconds and increases
+                  read_maxlag to at least this value. If read_maxlag is
+                  set to None, it remains unchanged. Defer bot requests
+                  during periods of database server lag. Defaults are
+                  set by config.py.
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait
 -pt:n             between saving pages.
@@ -308,6 +310,7 @@ def set_interface(module_name: str) -> None:
 
 
 _handlers_initialized = []  # we can have a script and the script wrapper
+_handlers_initializing = False
 
 
 def handler_namer(name: str) -> str:
@@ -371,6 +374,28 @@ def init_handlers() -> None:
     .. version-changed:: 6.2
        Different logfiles are used if multiple processes of the same
        script are running.
+    .. version-changed:: 11.8
+       Moved to :func:`_init_handlers` to prevent recursive handler
+       initialization.
+    """
+    global _handlers_initializing
+
+    # Throttle logs during setup and can invoke this pending routine again.
+    if _handlers_initializing:
+        return
+
+    _handlers_initializing = True
+    try:
+        _init_handlers()
+    finally:
+        _handlers_initializing = False
+
+
+def _init_handlers() -> None:
+    """Initialize logging handlers without a re-entrancy check.
+
+    .. version-added:: 11.8
+       Moved from :func:`init_handlers`.
     """
     module_name = calledModuleName()
     if not module_name:
@@ -481,8 +506,8 @@ def writelogheader() -> None:
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
-        _log('VERSION: {}'.format(version.getversion(
-            online=config.log_pywiki_repo_version).strip()))
+        _log('VERSION: %s', version.getversion(
+            online=config.log_pywiki_repo_version).strip())
     except VersionParseError:
         _exception()
 
@@ -646,7 +671,7 @@ def input_list_choice(question: str,
                       answers: AnswerType,
                       default: int | str | None = None,
                       force: bool = False) -> str:
-    """Ask the user the question and return one of the valid answers.
+    """Ask the user the question and return an answer or the default.
 
     :param question: The question asked without trailing spaces.
     :param answers: The valid answers each containing a full length
@@ -654,7 +679,7 @@ def input_list_choice(question: str,
     :param default: The result if no answer was entered. It must not be
         in the valid answers and can be disabled by setting it to None.
     :param force: Automatically use the default
-    :return: The selected answer.
+    :return: The selected answer or the default.
     """
     assert ui is not None
     return ui.input_list_choice(question, answers, default=default,
@@ -839,9 +864,14 @@ def handle_args(args: Iterable[str] | None = None,
         elif option == '-daemonize':
             redirect_std = value or None
             daemonize.daemonize(redirect_std=redirect_std)
+        elif option == '-maxlag':
+            maxlag = int(value)
+            if config.read_maxlag is not None:
+                config.read_maxlag = max(config.read_maxlag, maxlag)
+            config.write_maxlag = maxlag
         else:
             # the argument depends on numerical config settings
-            # e.g. -maxlag and -step:
+            # e.g. -read_maxlag, -write_maxlag or -step:
             try:
                 _arg = option[1:]
                 # explicitly check for int (so bool doesn't match)
@@ -866,13 +896,13 @@ def handle_args(args: Iterable[str] | None = None,
         show_help(show_global=do_help_val == 'global')
         sys.exit(0)
 
-    if calledModuleName() != 'generate_user_files':  # T261771
+    if module_name != 'generate_user_files':  # T261771
         try:
             pywikibot.Site()
         except (UnknownFamilyError, UnknownSiteError):
             _exception(exc_info=False)
             sys.exit(1)
-        if calledModuleName() == 'wrapper':
+        if module_name == 'wrapper':
             pywikibot._sites.clear()
 
     _debug('handle_args() completed.')
@@ -945,20 +975,19 @@ def suggest_help(missing_parameters: Sequence[str] | None = None,
         messages.append(
             'Unable to execute script because no generator was defined.')
     if missing_parameters:
-        messages.append('Missing parameter{s} "{params}".'
-                        .format(s='s' if len(missing_parameters) > 1 else '',
-                                params='", "'.join(missing_parameters)))
+        suffix = 's' if len(missing_parameters) > 1 else ''
+        params = '", "'.join(missing_parameters)
+        messages.append(f'Missing parameter{suffix} "{params}".')
     if missing_action:
         messages.append('No action defined.')
     if unknown_parameters:
-        messages.append('Unknown parameter{s} "{params}".'
-                        .format(s='s' if len(unknown_parameters) > 1 else '',
-                                params='", "'.join(unknown_parameters)))
+        suffix = 's' if len(unknown_parameters) > 1 else ''
+        params = '", "'.join(unknown_parameters)
+        messages.append(f'Unknown parameter{suffix} "{params}".')
     if missing_dependencies:
-        messages.append('Missing dependenc{s} "{deps}".'
-                        .format(
-                            s='ies' if len(missing_dependencies) > 1 else 'y',
-                            deps='", "'.join(missing_dependencies)))
+        suffix = 'ies' if len(missing_dependencies) > 1 else 'y'
+        deps = '", "'.join(missing_dependencies)
+        messages.append(f'Missing dependenc{suffix} "{deps}".')
     if additional_text:
         messages.append(additional_text.strip())
     if messages:
@@ -981,10 +1010,9 @@ def writeToCommandLogFile() -> None:
     command_log = Path(config.datafilepath('logs', 'commands.log'))
     mode = 'a' if command_log.exists() else 'w'
     with command_log.open(mode, encoding='utf-8') as command_log_file:
-        command_log_file.write('{} r{} Python {} '
-                               .format(iso_date,
-                                       version.getversiondict()['rev'],
-                                       sys.version.split()[0]))
+        command_log_file.write(
+            f"{iso_date} r{version.getversiondict()['rev']} "
+            f'Python {sys.version.split()[0]} ')
         command_log_file.write(' '.join(args) + os.linesep)
 
 
@@ -1406,8 +1434,8 @@ class BaseBot(OptionHandler):
             pywikibot.info('Execution time: ' + used)
 
             if self.counter['read']:
-                pywikibot.info('Read operation time: {:.1f} seconds'
-                               .format(read_seconds / self.counter['read']))
+                pywikibot.info('Read operation time: %.1f seconds',
+                               read_seconds / self.counter['read'])
 
             for op, count in self.counter.items():
                 if not count or op == 'read':
@@ -2205,17 +2233,19 @@ class WikidataBot(Bot, ExistingPageBot):
 
             # FIXME: the user may provide a better source, but we only
             # assume it's the default one
-            if ('s' not in exists_arg and sourceclaim
-                and any(sourceclaim.getID() in ref
-                        and all(snak.target_equals(sourceclaim.getTarget())
-                                for snak in ref[sourceclaim.getID()])
-                        for ref in existing.sources)):
-                logger_callback(
-                    f'Skipping {claim_id} because claim with the same source'
-                    ' already exists')
-                _log("Append 's' to -exists argument to override this "
-                     'behavior')
-                break
+            if 's' not in exists_arg and sourceclaim:
+                source_id = sourceclaim.getID()
+                source_target = sourceclaim.getTarget()
+                if any(source_id in ref
+                       and all(snak.target_equals(source_target)
+                               for snak in ref[source_id])
+                       for ref in existing.sources):
+                    logger_callback(
+                        f'Skipping {claim_id} because claim with the same'
+                        ' source already exists')
+                    _log("Append 's' to -exists argument to override this "
+                         'behavior')
+                    break
         else:
             return self.user_add_claim(item, claim, source, **kwargs)
 
@@ -2241,9 +2271,10 @@ class WikidataBot(Bot, ExistingPageBot):
 
         if data is None:
             data = {}
+        db_name = page.site.dbName()
         data.setdefault('sitelinks', {}).update({
-            page.site.dbName(): {
-                'site': page.site.dbName(),
+            db_name: {
+                'site': db_name,
                 'title': page.title()
             }
         })

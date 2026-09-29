@@ -78,8 +78,8 @@ class TextEditor:
             # or to jump to the line of the first occurrence.
             # TODO: Find a better solution than hardcoding these, e.g. a config
             # option.
-            line = text[:jump_index].count('\n')
-            column = jump_index - (text[:jump_index].rfind('\n') + 1)
+            line = text.count('\n', 0, jump_index)
+            column = jump_index - (text.rfind('\n', 0, jump_index) + 1)
         else:
             line = column = 0
 
@@ -175,11 +175,12 @@ class TextEditor:
             _cmd = winreg.QueryValueEx(_key2, '')[0]
             # See T102465 for issues relating to using this value.
             cmd = _cmd
-            if cmd.find('%1'):
+            if '%1' in cmd:
                 cmd = cmd[:cmd.find('%1')]
                 # Remove any trailing character, which should be a quote or
                 # space and then remove all whitespace.
-                return cmd[:-1].strip()
+                cmd = cmd[:-1]
+            return cmd.strip()
         except OSError as e:
             # Catch any key lookup errors
             pywikibot.info(f'Unable to detect program for file extension '
@@ -203,7 +204,7 @@ class TextEditor:
                     if unusable in editor.lower():
                         break
                 else:
-                    if set(editor) & set('\a\b\f\n\r\t\v'):
+                    if not set('\a\b\f\n\r\t\v').isdisjoint(editor):
                         # single character string literals from
                         # https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals
                         # encode('unicode-escape') also changes Unicode

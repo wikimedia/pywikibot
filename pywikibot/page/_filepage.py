@@ -93,11 +93,11 @@ class FilePage(Page):
                 continue
 
             ts_key = pywikibot.Timestamp.fromISOformat(file_rev['timestamp'])
-            file_revision = self._file_revisions.setdefault(
-                ts_key, FileInfo(file_rev, self))
-
-            # add new imageinfo attributes since last request.
-            file_revision.update(file_rev)
+            if ts_key in self._file_revisions:
+                # add new imageinfo attributes since last request.
+                self._file_revisions[ts_key].update(file_rev)
+            else:
+                self._file_revisions[ts_key] = FileInfo(file_rev, self)
 
     @property
     def latest_file_info(self):
@@ -283,7 +283,7 @@ class FilePage(Page):
 
         .. version-added:: 7.1
         """
-        return bool(list(self.using_pages(total=1)))
+        return next(self.using_pages(total=1), None) is not None
 
     def upload(self, source: str, **kwargs) -> bool:
         """Upload this file to the wiki.
@@ -292,12 +292,15 @@ class FilePage(Page):
 
         :param source: Path or URL to the file to be uploaded.
 
-        :keyword comment: Edit summary; if this is not provided, then
+        .. version-changed:: 11.8
+           The *comment* keyword was renamed to *summary*.
+
+        :keyword summary: Edit summary; if this is not provided, then
             filepage.text will be used. An empty summary is not
             permitted. This may also serve as the initial page text (see
             below).
         :keyword text: Initial page text; if this is not set, then
-            filepage.text will be used, or comment.
+            filepage.text will be used, or summary.
         :keyword watch: If true, add filepage to the bot user's
             watchlist
         :keyword ignore_warnings: It may be a static boolean, a callable
@@ -396,7 +399,7 @@ class FilePage(Page):
         :param url_height: Download thumbnail with given height
         :param url_param: Download thumbnail with given param
         :return: True if download is successful, False otherwise.
-        :raises IOError: If filename cannot be written for any reason.
+        :raises OSError: If filename cannot be written for any reason.
         """
         if not filename:
             path = Path()

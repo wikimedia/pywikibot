@@ -135,6 +135,9 @@ class SparqlQuery(WaitingMixin):
            looks like the user is not logged in.
         .. version-changed:: 9.6
            retry on internal server error (500).
+        .. version-changed:: 11.8
+           Preserve existing endpoint query parameters.
+
 
         :param query: Query text
         :raises NoUsernameError: User not logged in
@@ -144,8 +147,13 @@ class SparqlQuery(WaitingMixin):
 
         # force cleared
         self.last_response = None
+        self.current_retries = 0
 
-        url = f'{self.endpoint}?query={quote(query)}'
+        endpoint = urlparse(self.endpoint)
+        query_string = f'query={quote(query)}'
+        if endpoint.query:
+            query_string = f'{endpoint.query}&{query_string}'
+        url = endpoint._replace(query=query_string).geturl()
         while True:
             try:
                 self.last_response = cast(Response,

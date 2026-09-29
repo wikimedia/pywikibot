@@ -10,8 +10,7 @@ from pywikibot import family
 from pywikibot.tools import classproperty
 
 
-# The Wikimedia family that is known as Wikisource
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for Wikisource."""
 
@@ -38,6 +37,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     }
 
     # Sites we want to edit but not count as real languages
+    # Note: wikisource:beta is deprecated since 11.8.0 in favour of
+    # betawikisource:en.
     test_codes = ['beta']
 
     category_redirect_templates = {

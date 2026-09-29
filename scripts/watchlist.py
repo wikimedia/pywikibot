@@ -60,12 +60,13 @@ def get(site=None) -> list[str]:
     return [p.title() for p in site.watched_pages()]
 
 
-def count_watchlist(site=None) -> None:
+def count_watchlist(site=None) -> list[pywikibot.Page]:
     """Count only the total number of page(s) in watchlist for this wiki."""
     if site is None:
         site = pywikibot.Site()
-    watchlist_count = len(refresh(site))
-    pywikibot.info(f'There are {watchlist_count} page(s) in the watchlist.')
+    watchlist = refresh(site)
+    pywikibot.info(f'There are {len(watchlist)} page(s) in the watchlist.')
+    return watchlist
 
 
 def count_watchlist_all(quiet=False) -> None:
@@ -162,8 +163,7 @@ def main(*args: str) -> None:
         count_watchlist_all()
     else:
         site = pywikibot.Site()
-        count_watchlist(site)
-        watchlist = list(site.watched_pages(force=True))
+        watchlist = count_watchlist(site)
         for page in watchlist:
             try:
                 pywikibot.stdout(page.title())

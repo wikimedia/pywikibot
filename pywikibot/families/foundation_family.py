@@ -12,14 +12,19 @@ from __future__ import annotations
 from pywikibot import family
 
 
-class Family(family.WikimediaFamily, family.SingleSiteFamily):
+class Family(family.WikimediaFamily):
 
     """Family class for Foundation wiki.
 
-    .. version-added:: 3.0
+    .. version-changed:: 11.8
+       beta site code was added.
     """
 
     name = 'foundation'
-    domain = 'foundation.wikimedia.org'
+    langs = {
+        'foundation': 'foundation.wikimedia.org',
+        'beta': 'foundation.wikimedia.beta.wmcloud.org',
+    }
 
+    test_codes = ['beta']
     interwiki_forward = 'wmf'

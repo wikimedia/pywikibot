@@ -193,7 +193,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.result('2'), ('', [options[1]]))
         self.assertEqual(option.result('1,2'), ('', [options[0], options[1]]))
 
-    def test_choice_excepton(self) -> None:
+    def test_choice_exception(self) -> None:
         """Test ChoiceException."""
         option = ChoiceException('Test', 'T')
         self.assertTrue(option.stop)

@@ -205,8 +205,7 @@ def user_agent_username(username=None) -> str:
     To achieve that, this function:
 
     - replaces spaces (' ') with '_'
-    - encodes the username as 'utf-8' and if the username is not ASCII
-    - URL encodes the username if it is not ASCII, or contains '%'
+    - URL encodes the username if it is not ASCII or contains '%'
 
     .. version-changed:: 11.0
        If *username* is not given, get it from environment variables
@@ -219,17 +218,12 @@ def user_agent_username(username=None) -> str:
         return ''
 
     username = username.replace(' ', '_')  # Avoid spaces or %20.
-    try:
-        username.encode('ascii')  # just test, but not actually use it
-    except UnicodeEncodeError:
-        username = quote(username.encode('utf-8'))
-    else:
-        # % is legal in the default $wgLegalTitleChars
-        # This is so that ops know the real pywikibot will not
-        # allow a useragent in the username to allow through a hand-coded
-        # percent-encoded value.
-        if '%' in username:
-            username = quote(username)
+    # % is legal in the default $wgLegalTitleChars
+    # This is so that ops know the real pywikibot will not
+    # allow a useragent in the username to allow through a hand-coded
+    # percent-encoded value.
+    if '%' in username or not username.isascii():
+        username = quote(username)
     return username
 
 
@@ -440,6 +434,8 @@ def fetch(uri: str,
 
     .. version-changed:: 7.0
         The *body* parameter was removed; use *data* instead.
+    .. version-changed:: 11.8
+       Avoid mutating headers inputs.
 
     See :py:obj:`requests.Session.request` for parameters.
 
@@ -462,8 +458,7 @@ def fetch(uri: str,
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
-    headers = headers or {}
-    headers.update(config.extra_headers.copy() or {})
+    headers = (headers or {}) | config.extra_headers
 
     def assign_fake_user_agent(use_fake_user_agent, uri):
         uri_domain = urlparse(uri).netloc
@@ -494,7 +489,7 @@ def fetch(uri: str,
     else:
         headers['user-agent'] = assign_user_agent(headers.get('user-agent'))
 
-    callbacks = kwargs.pop('callbacks', [])
+    callbacks = list(kwargs.pop('callbacks', []))
     # error_handling_callback will be executed first.
     if default_error_handling:
         callbacks.insert(0, error_handling_callback)

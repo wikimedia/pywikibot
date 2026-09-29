@@ -39,6 +39,7 @@ def translate(
             'Either page or site parameter must be given with translate()')
 
     site = site or page.site
+    site_codes: set[str] | None = None
     result = set()
 
     if hints is None:
@@ -62,8 +63,10 @@ def translate(
         else:
             codes = site.family.language_groups.get(code, code.split(','))
 
+        if site_codes is None:
+            site_codes = site.codes
         for newcode in codes:
-            if newcode in site.codes:
+            if newcode in site_codes:
                 if newcode != site.code:
                     ns = page.namespace() if page else 0
                     link = pywikibot.Link(newname,
@@ -81,8 +84,10 @@ def translate(
         if dict_name:
             pywikibot.info(f'TitleTranslate: {page.title()} was recognized as '
                            f'{dict_name} with value {value}')
+            if site_codes is None:
+                site_codes = site.codes
             for entry_lang, entry in date.formats[dict_name].items():
-                if entry_lang not in site.codes:
+                if entry_lang not in site_codes:
                     continue
 
                 if entry_lang != page.site.lang:

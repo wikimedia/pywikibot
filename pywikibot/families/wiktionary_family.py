@@ -9,8 +9,7 @@ from __future__ import annotations
 from pywikibot import family
 
 
-# The Wikimedia family that is known as Wiktionary
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for Wiktionary.
 

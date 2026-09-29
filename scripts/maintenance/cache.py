@@ -26,29 +26,29 @@ The following parameters are supported:
 -o                Output command which is output when the filter evaluated to
                   True. If it returns None it won't output anything.
 
-Examples
---------
+.. admonition:: Examples
 
-  Print the filename of any entry with 'wikidata' in the key:
+   Print the filename of any entry with 'wikidata' in the key:
 
-    -c "wikidata" in entry._uniquedescriptionstr()
+     -c "wikidata" in entry._uniquedescriptionstr()
 
-  Customised output if the site code is 'ar':
+   Customised output if the site code is 'ar':
 
-    -c entry.site.code == "ar"
-    -o uniquedesc(entry)
+     -c entry.site.code == "ar"
+     -o uniquedesc(entry)
 
-  Or the state of the login:
+   Or the state of the login:
 
-    -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
-    -o uniquedesc(entry)
+     -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
+     -o uniquedesc(entry)
 
-  If the function only uses one parameter for the entry it can be omitted:
+   If the function only uses one parameter for the entry it can be
+   omitted:
 
-    -c has_password
-    -o uniquedesc
+     -c has_password
+     -o uniquedesc
 
-Available filter commands:
+Available filter commands::
 
     has_password(entry)
     is_logout(entry)
@@ -58,12 +58,12 @@ Available filter commands:
     older_than_one_day(entry)
     recent(entry)
 
-There are helper functions which can be part of a command:
+There are helper functions which can be part of a command::
 
     older_than(entry, interval)
     newer_than(entry, interval)
 
-Available output commands:
+Available output commands::
 
     uniquedesc(entry)
 """
@@ -74,13 +74,14 @@ import hashlib
 import os
 import pickle
 import sys
+from contextlib import nullcontext
 from pathlib import Path
 from random import sample
 
 import pywikibot
 from pywikibot.data import api
 
-# The follow attributes are used by eval()
+# The following attributes are used by eval()
 from pywikibot.login import LoginStatus  # noqa: F401
 from pywikibot.page import User  # noqa: F401
 from pywikibot.site import APISite, ClosedSite, DataSite  # noqa: F401
@@ -151,7 +152,7 @@ class CacheEntry(api.CachedRequest):
 
         site = self.key[0:end + 1]
         if site[0:5] == 'Site(':
-            site = 'APISite(' + site[5:]
+            site = 'APISite(' + site.removeprefix('Site(')
 
         username = None
         login_status = None
@@ -244,74 +245,77 @@ def process_entries(cache_path, func, use_accesstime: bool | None = None,
         return
 
     if os.path.isdir(cache_path):
-        filenames = [os.path.join(cache_path, filename)
-                     for filename in os.listdir(cache_path)]
+        context = os.scandir(cache_path)
     else:
-        filenames = [cache_path]
+        context = nullcontext([cache_path])
 
-    if tests:
-        filenames = sample(filenames, min(len(filenames), tests))
+    with context as files:
+        filenames = (os.fspath(file) for file in files)
+        if tests:
+            filenames = list(filenames)
+            filenames = sample(filenames, min(len(filenames), tests))
 
-    for filepath in filenames:
-        filename = os.path.basename(filepath)
-        cache_dir = os.path.dirname(filepath)
-        if use_accesstime is not False:
-            stinfo = os.stat(filepath)
+        for filepath in filenames:
+            filename = os.path.basename(filepath)
+            cache_dir = os.path.dirname(filepath)
+            if use_accesstime is not False:
+                stinfo = os.stat(filepath)
 
-        entry = CacheEntry(cache_dir, filename)
+            entry = CacheEntry(cache_dir, filename)
 
-        # Deletion is chosen only, abbreviate this request
-        if func is None and output_func is None \
-           and action_func == CacheEntry._delete:
-            action_func(entry)
-            continue
-
-        # Skip foreign python specific directory
-        *_, version = cache_path.partition('-')
-        if version and version[-1] != str(PYTHON_VERSION[0]):
-            pywikibot.error(f"Skipping {cache_path} directory, can't read "
-                            f'content with python {PYTHON_VERSION[0]}')
-            continue
-
-        try:
-            entry._load_cache()
-        except ValueError:
-            pywikibot.error(f'Failed loading {entry._cachefile_path()}')
-            pywikibot.exception()
-            continue
-
-        if use_accesstime is None:
-            stinfo2 = os.stat(filepath)
-            use_accesstime = stinfo.st_atime != stinfo2.st_atime
-
-        if use_accesstime:
-            # Reset access times to values before loading cache entry.
-            os.utime(filepath, (stinfo.st_atime, stinfo.st_mtime))
-            entry.stinfo = stinfo
-
-        try:
-            entry.parse_key()
-        except ParseError as e:
-            pywikibot.error(
-                f'Problems parsing {entry.filename} with key {entry.key}')
-            pywikibot.error(e)
-            continue
-
-        try:
-            entry._rebuild()
-        except Exception:
-            pywikibot.error(f'Problems loading {entry.filename} with key '
-                            f'{entry.key}, {entry._parsed_key!r}')
-            pywikibot.exception()
-            continue
-
-        if func is None or func(entry):
-            if output_func or action_func is None:
-                output = entry if output_func is None else output_func(entry)
-                if output is not None:
-                    pywikibot.info(output)
-            if action_func:
+            # Deletion is chosen only, abbreviate this request
+            if func is None and output_func is None \
+               and action_func == CacheEntry._delete:
                 action_func(entry)
+                continue
+
+            # Skip foreign python specific directory
+            *_, version = cache_path.partition('-')
+            if version and version[-1] != str(PYTHON_VERSION[0]):
+                pywikibot.error(f"Skipping {cache_path} directory, can't read "
+                                f'content with python {PYTHON_VERSION[0]}')
+                continue
+
+            try:
+                entry._load_cache()
+            except ValueError:
+                pywikibot.error(f'Failed loading {entry._cachefile_path()}')
+                pywikibot.exception()
+                continue
+
+            if use_accesstime is None:
+                stinfo2 = os.stat(filepath)
+                use_accesstime = stinfo.st_atime != stinfo2.st_atime
+
+            if use_accesstime:
+                # Reset access times to values before loading cache entry.
+                os.utime(filepath, (stinfo.st_atime, stinfo.st_mtime))
+                entry.stinfo = stinfo
+
+            try:
+                entry.parse_key()
+            except ParseError as e:
+                pywikibot.error(
+                    f'Problems parsing {entry.filename} with key {entry.key}')
+                pywikibot.error(e)
+                continue
+
+            try:
+                entry._rebuild()
+            except Exception:
+                pywikibot.error(f'Problems loading {entry.filename} with key '
+                                f'{entry.key}, {entry._parsed_key!r}')
+                pywikibot.exception()
+                continue
+
+            if func is None or func(entry):
+                if output_func or action_func is None:
+                    output = (entry if output_func is None
+                              else output_func(entry))
+                    if output is not None:
+                        pywikibot.info(output)
+                if action_func:
+                    action_func(entry)
 
 
 def _parse_command(command, name):

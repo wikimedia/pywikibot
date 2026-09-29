@@ -32,7 +32,7 @@ language to be used can be set as follows:
 #. set the `userinterface_lang` in your :ref:`user-config.py<User Interface Settings>` to your preferred language
 #. set environment variable `PYWIKIBOT_USERINTERFACE_LANG` to your preferred language
 #. default is obtained from `locale.getlocale`
-#. fallback is `'en'` for English if all other options fails
+#. fallback is `'en'` for English if all other options fail
 
 .. note:: The preferred language code must follow ISO 639.
 .. version-added:: 7.0

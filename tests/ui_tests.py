@@ -292,6 +292,40 @@ class TestTerminalInput(UITestCase):
             + 'question (default: 2): ')
         self.assertEqual(rv, 'answer 2')
 
+    def test_input_list_choice_non_option_default(self) -> None:
+        """Test input_list_choice with a default outside the options."""
+        options = ('foo', 'bar', None)
+        self.strin.write('\n2\n')
+        self.strin.seek(0)
+
+        rv = pywikibot.bot.input_list_choice(
+            'question', options, default='baz')
+
+        self.assertEqual(self.strout.getvalue(), '')
+        self.assertEqual(
+            self.strerr.getvalue(),
+            ''.join(f'{num}: {item}\n'
+                    for num, item in enumerate(options, start=1))
+            + 'question (default: baz): ')
+        self.assertEqual(rv, 'baz')
+
+    def test_input_list_choice_forced_non_option_default(self) -> None:
+        """Test forced input_list_choice with an external default."""
+        rv = pywikibot.bot.input_list_choice(
+            'question', ('foo', 'bar'), default='baz', force=True)
+
+        self.assertEqual(self.strout.getvalue(), '')
+        self.assertEqual(
+            self.strerr.getvalue(), 'question (default: baz):\n')
+        self.assertEqual(rv, 'baz')
+
+    def test_input_list_choice_forced_invalid_numeric_default(self) -> None:
+        """Test forced input_list_choice with an invalid list index."""
+        with self.assertRaisesRegex(
+                ValueError, 'Invalid value "3" for default during force.'):
+            pywikibot.bot.input_list_choice(
+                'question', ('foo', 'bar'), default='3', force=True)
+
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
 class TestTerminalOutputColorUnix(UITestCase):

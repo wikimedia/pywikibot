@@ -379,8 +379,10 @@ class BasePage(ComparableMixin):
         pywikibot.exceptions.IsRedirectPageError: ... is a redirect page.
 
         .. version-changed:: 9.2
-           :exc:`exceptions.SectionError` is raised if the
-           :meth:`section` does not exist
+           Added validation for the section in the page title.
+        .. version-changed:: 11.8
+           A title fragment neither selects nor validates a section; the
+           complete page text is returned.
         .. seealso:: :attr:`text` property
 
         :param force: Reload all page attributes, including errors.
@@ -388,8 +390,6 @@ class BasePage(ComparableMixin):
             redirect, do not raise an exception.
         :raises NoPageError: The page does not exist.
         :raises IsRedirectPageError: The page is a redirect.
-        :raises SectionError: The section does not exist on a page with
-            a # link.
         """
         if force:
             del self.latest_revision_id
@@ -401,17 +401,7 @@ class BasePage(ComparableMixin):
             if not get_redirect:
                 raise
 
-        text = self.latest_revision.text
-
-        # check for valid section in title
-        page_section = self.section()
-        if page_section:
-            content = textlib.extract_sections(text, self.site)
-            if page_section not in content.sections:
-                raise SectionError(f'{page_section!r} is not a valid section '
-                                   f'of {self.title(with_section=False)}')
-
-        return text
+        return self.latest_revision.text
 
     def has_content(self) -> bool:
         """Page has been loaded.
@@ -518,7 +508,7 @@ class BasePage(ComparableMixin):
     def latest_revision_id(self):
         """Return the current revision id for this page."""
         if not hasattr(self, '_revid'):
-            self.revisions()
+            self.site.loadrevisions(self)
         return self._revid
 
     @latest_revision_id.deleter
@@ -582,6 +572,7 @@ class BasePage(ComparableMixin):
         .. version-added:: 11.7
         .. seealso:
            - :attr:`stable_revision`
+           - :attr:`flagged_state`
            - :attr:`latest_revision_id`
 
         :raises UnknownExtensionError: FlaggedRevs not available
@@ -593,6 +584,8 @@ class BasePage(ComparableMixin):
         """Remove the cached latest stable revision id set for this Page."""
         with suppress(AttributeError):
             del self._stable_revision_id
+        with suppress(AttributeError):
+            del self._flagged_state
 
     @property
     def stable_revision(self) -> pywikibot.page.Revision | None:
@@ -632,6 +625,34 @@ class BasePage(ComparableMixin):
             return self.get_revision(revid, content=True)
 
         return None
+
+    @property
+    @cached
+    def flagged_state(self) -> dict | None:
+        """Return FlaggedRevs info for this page, if any.
+
+        Returns the ``flagged`` property dict from the API (for example
+        ``stable_revid``, ``level``, ``level_text``, ``pending_since``)
+        or ``None`` if the page has no flagged data.
+
+        .. version-added:: 11.8
+        .. seealso::
+           - :attr:`stable_revision_id`
+           - :attr:`stable_revision`
+           - :meth:`APISite.flagged_state
+             <pywikibot.site._extensions.FlaggedRevsMixin.flagged_state>`
+
+        :raises UnknownExtensionError: FlaggedRevs not available
+        """
+        return self.site.flagged_state(self)
+
+    @flagged_state.deleter
+    def flagged_state(self) -> None:
+        """Remove the cached flagged state set for this Page."""
+        with suppress(AttributeError):
+            del self._flagged_state
+        with suppress(AttributeError):
+            del self._stable_revision_id
 
     def _check_revision(self, revid: int, refresh: bool) -> None:
         """Check whether the *revid* is valid and belongs to this page."""
@@ -682,12 +703,13 @@ class BasePage(ComparableMixin):
 
         self.site.review_revision(
             revid,
-            summary=summary,
+            comment=summary,
             flag=flag,
         )
 
         # The stable revision may have changed.
         del self.stable_revision_id
+        del self.flagged_state
 
     def unreview(
         self,
@@ -728,12 +750,13 @@ class BasePage(ComparableMixin):
 
         self.site.review_revision(
             revid,
-            summary=summary,
+            comment=summary,
             unapprove=True,
         )
 
         # The stable revision may have changed.
         del self.stable_revision_id
+        del self.flagged_state
 
     @property
     def text(self) -> str:
@@ -972,8 +995,7 @@ class BasePage(ComparableMixin):
     def exists(self) -> bool:
         """Return True if page exists on the wiki, even if it's a redirect.
 
-        If the title includes a section, return False if this section
-        isn't found.
+        A section in the title is ignored.
         """
         with suppress(AttributeError):
             return self.pageid > 0
@@ -1147,13 +1169,8 @@ class BasePage(ComparableMixin):
 
         templates = {tl.title(with_ns=False)
                      for tl in self.templates(namespaces=Namespace.TEMPLATE)}
-        disambigs = set()
-        # always use cached disambig templates
-        disambigs.update(self.site._disambigtemplates)
-        # see if any template on this page is in the set of disambigs
-        disambig_in_page = disambigs.intersection(templates)
         return (self.namespace() != Namespace.TEMPLATE
-                and bool(disambig_in_page))
+                and not self.site._disambigtemplates.isdisjoint(templates))
 
     def getReferences(self,
                       follow_redirects: bool = True,
@@ -1163,7 +1180,7 @@ class BasePage(ComparableMixin):
                       namespaces=None,
                       total: int | None = None,
                       content: bool = False) -> Iterable[pywikibot.Page]:
-        """Return an iterator all pages that refer to or embed the page.
+        """Return an iterator over all pages that refer to or embed the page.
 
         If you need a full list of referring pages, use
         ``pages = list(s.getReferences())``
@@ -2015,6 +2032,26 @@ class BasePage(ComparableMixin):
 
         return self._pageimage
 
+    def pageviews(
+        self,
+        days: int | None = None,
+        *,
+        metric: str = 'pageviews',
+    ) -> dict[str, int | None]:
+        """Return daily page views for this page.
+
+        Uses the MediaWiki extension :ext:`PageViewInfo<PageViewInfo>`.
+
+        .. version-added:: 11.8
+
+        :param days: Number of days to return, up to the site-configured
+            maximum. If ``None``, use the site's default.
+        :param metric: Page view metric supported by the site.
+        :return: Mapping of ISO date strings to view counts. A count may
+            be ``None`` when data is unavailable.
+        """
+        return self.site.pageviews(self, days, metric=metric)
+
     def getRedirectTarget(self, *,
                           ignore_section: bool = True) -> pywikibot.Page:
         """Return a Page object for the target this Page redirects to.
@@ -2027,16 +2064,16 @@ class BasePage(ComparableMixin):
              <pywikibot.site._apisite.APISite.getredirtarget>`
            * :meth:`moved_target`
 
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
 
         :raises CircularRedirectError: Page is a circular redirect
         :raises InterwikiRedirectPageError: The redirect target is on
             another site
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         return self.site.getredirtarget(self, ignore_section=ignore_section)
 
@@ -2091,14 +2128,15 @@ class BasePage(ComparableMixin):
                                reverse: bool = False,
                                total: int | None = None):
         """Return the version history as a wiki table."""
-        result = '{| class="wikitable"\n'
-        result += '! oldid || date/time || username || edit summary\n'
+        table = ['{| class="wikitable"\n'
+                 '! oldid || date/time || username || edit summary\n']
         for entry in self.revisions(reverse=reverse, total=total):
-            result += '|----\n'
-            result += (f'| {entry.revid} || {entry.timestamp} || {entry.user} '
-                       f'|| <nowiki>{entry.comment}</nowiki>\n')
-        result += '|}\n'
-        return result
+            table.append(
+                '|----\n'
+                f'| {entry.revid} || {entry.timestamp} || {entry.user} '
+                f'|| <nowiki>{entry.comment}</nowiki>\n')
+        table.append('|}\n')
+        return ''.join(table)
 
     def contributors(self,
                      total: int | None = None,
@@ -2156,9 +2194,10 @@ class BasePage(ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def move(self,
              newtitle: str,
-             reason: str | None = None,
+             summary: str | None = None,
              movetalk: bool = True,
              noredirect: bool = False,
              movesubpages: bool = True) -> pywikibot.page.Page:
@@ -2166,18 +2205,20 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 7.2
            The *movesubpages* parameter was added
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
 
         :param newtitle: The new page title.
-        :param reason: The edit summary for the move.
+        :param summary: The edit summary for the move.
         :param movetalk: If true, move this page's talk page (if it exists)
         :param noredirect: If move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
         :param movesubpages: Rename subpages, if applicable.
         """
-        if reason is None:
+        if summary is None:
             pywikibot.info(f'Moving {self} to [[{newtitle}]].')
-            reason = pywikibot.input('Please enter a reason for the move:')
-        return self.site.movepage(self, newtitle, reason,
+            summary = pywikibot.input('Please enter a reason for the move:')
+        return self.site.movepage(self, newtitle, summary=summary,
                                   movetalk=movetalk,
                                   noredirect=noredirect,
                                   movesubpages=movesubpages)
@@ -2226,9 +2267,10 @@ class BasePage(ComparableMixin):
         """
         return self.site.rollbackpage(self, **kwargs)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def delete(
         self,
-        reason: str | None = None,
+        summary: str | None = None,
         prompt: bool = True,
         mark: bool = False,
         automatic_quit: bool = False,
@@ -2242,6 +2284,8 @@ class BasePage(ComparableMixin):
 
         .. version-changed:: 11.2
            *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
 
         .. seealso::
            - :meth:`undelete`
@@ -2250,7 +2294,7 @@ class BasePage(ComparableMixin):
            - :meth:`site.APISite.delete
              <pywikibot.site._apisite.APISite.delete>`
 
-        :param reason: The edit summary for the deletion, or rationale
+        :param summary: The edit summary for the deletion, or rationale
             for deletion if requesting. If None, ask for it.
         :param prompt: If true, prompt user for confirmation before deleting.
         :param mark: If true, and user does not have sysop rights, place a
@@ -2266,9 +2310,10 @@ class BasePage(ComparableMixin):
             1        page was deleted
             -1       page was marked for deletion
         """
-        if reason is None:
+        if summary is None:
             pywikibot.info(f'Deleting {self.title(as_link=True)}.')
-            reason = pywikibot.input('Please enter a reason for the deletion:')
+            summary = pywikibot.input(
+                'Please enter a reason for the deletion:')
 
         # If user has 'delete' right, delete the page
         if self.site.has_right('delete'):
@@ -2283,7 +2328,8 @@ class BasePage(ComparableMixin):
                     answer = 'y'
                     self.site._noDeletePrompt = True
             if answer == 'y':
-                self.site.delete(self, reason, deletetalk=deletetalk)
+                self.site.delete(
+                    self, summary=summary, deletetalk=deletetalk)
                 return 1
             return 0
 
@@ -2300,7 +2346,7 @@ class BasePage(ComparableMixin):
                 answer = 'y'
                 self.site._noMarkDeletePrompt = True
         if answer == 'y':
-            template = '{{delete|1=%s}}\n' % reason
+            template = '{{delete|1=%s}}\n' % summary
             # We can't add templates in a wikidata item, so let's use its
             # talk page
             if isinstance(self, pywikibot.ItemPage):
@@ -2310,7 +2356,7 @@ class BasePage(ComparableMixin):
             else:
                 target = self
             target.text = template + target.text
-            target.save(summary=reason)
+            target.save(summary=summary)
             return -1
         return 0
 
@@ -2321,7 +2367,7 @@ class BasePage(ComparableMixin):
         """
         if not hasattr(self, '_has_deleted_revisions'):
             gen = self.site.deletedrevs(self, total=1, prop=['ids'])
-            self._has_deleted_revisions = bool(list(gen))
+            self._has_deleted_revisions = next(gen, None) is not None
         return self._has_deleted_revisions
 
     def loadDeletedRevisions(self, total: int | None = None, **kwargs):
@@ -2411,7 +2457,8 @@ class BasePage(ComparableMixin):
                 f'Timestamp {timestamp} is not a deleted revision')
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    def undelete(self, reason: str | None = None) -> None:
+    @deprecated_args(reason='summary')  # since 11.8.0
+    def undelete(self, summary: str | None = None) -> None:
         """Undelete revisions based on the markers set by previous calls.
 
         If no calls have been made since :meth:`loadDeletedRevisions`,
@@ -2441,23 +2488,28 @@ class BasePage(ComparableMixin):
            - :meth:`site.APISite.undelete
              <pywikibot.site._apisite.APISite.undelete>`
 
-        :param reason: Reason for the action.
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
+        :param summary: Summary for the action.
         """
         if hasattr(self, '_deletedRevs'):
             undelete_revs = [ts for ts, rev in self._deletedRevs.items()
                              if rev.get('marked')]
         else:
             undelete_revs = []
-        if reason is None:
+        if summary is None:
             warn('Not passing a reason for undelete() is deprecated.',
                  DeprecationWarning, stacklevel=2)
             pywikibot.info(f'Undeleting {self.title(as_link=True)}.')
-            reason = pywikibot.input(
+            summary = pywikibot.input(
                 'Please enter a reason for the undeletion:')
-        self.site.undelete(self, reason, revisions=undelete_revs)
+        self.site.undelete(
+            self, summary=summary, revisions=undelete_revs)
 
+    @deprecated_args(reason='summary')  # since 11.8.0
     def protect(self,
-                reason: str | None = None,
+                summary: str | None = None,
                 protections: dict[str, str | None] | None = None,
                 **kwargs) -> None:
         """Protect or unprotect a wiki page. Requires  *protect* right.
@@ -2481,7 +2533,10 @@ class BasePage(ComparableMixin):
              <pywikibot.site._apisite.APISite.protect>`
            - :meth:`applicable_protections`
 
-        :param reason: Reason for the action, default is None and will
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
+        :param summary: Summary for the action, default is None and will
             set an empty string.
         :param protections: A dict mapping type of protection to
             protection level of that type. Allowed protection types for
@@ -2493,9 +2548,9 @@ class BasePage(ComparableMixin):
 
         """
         protections = protections or {}  # protections is converted to {}
-        reason = reason or ''  # None is converted to ''
+        summary = summary or ''  # None is converted to ''
 
-        self.site.protect(self, protections, reason, **kwargs)
+        self.site.protect(self, protections, summary=summary, **kwargs)
 
     def change_category(self, old_cat, new_cat,
                         summary: str | None = None,

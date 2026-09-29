@@ -9,7 +9,7 @@ from __future__ import annotations
 import itertools
 import re
 import sys
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
@@ -149,6 +149,9 @@ def to_ascii_digits(phrase: str,
         known languages to convert.
     :return: The string with ascii digits
     """
+    if langs is None and phrase.isascii():
+        return phrase
+
     if langs is None:
         langs = NON_ASCII_DIGITS.keys()
     elif isinstance(langs, str):
@@ -239,16 +242,17 @@ def ignore_case(string: str) -> str:
 
 def _tag_pattern(tag_name: str) -> str:
     """Return a tag pattern for the given tag name."""
+    tag_pattern = ignore_case(tag_name)
     return (
-        rf'<{ignore_case(tag_name)}(?:>|\s+[^>]*(?<!/)>)'  # start tag
-        r'[\s\S]*?'  # contents
-        rf'</{ignore_case(tag_name)}\s*>'  # end tag
+        rf'<{tag_pattern}(?:>|\s+[^>]*(?<!/)>)'  # start tag
+        r'.*?'  # contents
+        rf'</{tag_pattern}\s*>'  # end tag
     )
 
 
 def _tag_regex(tag_name: str):
     """Return a compiled tag regex for the given tag name."""
-    return re.compile(_tag_pattern(tag_name))
+    return re.compile(_tag_pattern(tag_name), re.DOTALL)
 
 
 def _create_default_regexes() -> None:
@@ -265,14 +269,14 @@ def _create_default_regexes() -> None:
         # categories
         'category': (r'\[\[ *(?:%s)\s*:.*?\]\]',
                      lambda site: '|'.join(site.namespaces[14])),
-        'comment': re.compile(r'<!--[\s\S]*?-->'),
+        'comment': re.compile(r'<!--.*?-->', re.DOTALL),
         # files
         'file': (FILE_LINK_REGEX, lambda site: '|'.join(site.namespaces[6])),
         # section headers
         'header': re.compile(
-            r'(?:(?<=\n)|\A)(?:<!--[\s\S]*?-->)*'
-            r'(=(?:[^\n]|<!--[\s\S]*?-->)+=)'
-            r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
+            r'(?:(?<=\n)|\A)(?s:<!--.*?-->)*'
+            r'(=(?:[^\n]|(?s:<!--.*?-->))+=)'
+            r' *(?s:<!--.*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
         # also finds links to foreign sites with preleading ":"
@@ -280,18 +284,18 @@ def _create_default_regexes() -> None:
             r'\[\[:?(%s)\s?:[^\]]*\]\]\s*',
             lambda site: '|'.join(
                 ignore_case(i) for i in site.validLanguageLinks()
-                + list(site.family.obsolete.keys()))),
+                + list(site.family.obsolete))),
         # Module invocations (currently only Lua)
         'invoke': (
-            r'\{\{\s*\#(?:%s):[\s\S]*?\}\}',
+            r'\{\{\s*\#(?:%s):(?s:.*?)\}\}',
             lambda site: '|'.join(
                 ignore_case(mw) for mw in site.getmagicwords('invoke'))),
         # this matches internal wikilinks, but also interwiki, categories, and
         # images.
         'link': re.compile(r'\[\[[^\]|]*(\|[^\]]*)?\]\]'),
         # pagelist tag (used in Proofread extension).
-        'pagelist': re.compile(r'<{}[\s\S]*?/>'
-                               .format(ignore_case('pagelist'))),
+        'pagelist': re.compile(r'<{}.*?/>'
+                               .format(ignore_case('pagelist')), re.DOTALL),
         # Wikibase property inclusions
         'property': (
             r'\{\{\s*\#(?:%s):\s*[Pp]\d+.*?\}\}',
@@ -306,7 +310,8 @@ def _create_default_regexes() -> None:
         # source code readability.
         # TODO: handle nested tables.
         'table': re.compile(
-            r'(?:(?<=\n)|\A){\|[\S\s]*?\n\|}|%s' % _tag_pattern('table')),
+            r'(?:(?<=\n)|\A){\|.*?\n\|}|%s' % _tag_pattern('table'),
+            re.DOTALL),
         'template': NESTED_TEMPLATE_REGEX,
     })
 
@@ -429,6 +434,8 @@ def replaceExcept(text: str,
             # nothing left to replace
             break
 
+        match_start = match.start()
+
         # check which exception will occur next.
         nextExceptionMatch = None
         for dontTouchR in dontTouchRegexes:
@@ -439,7 +446,7 @@ def replaceExcept(text: str,
                 nextExceptionMatch = excMatch
 
         if nextExceptionMatch is not None \
-                and nextExceptionMatch.start() <= match.start():
+                and nextExceptionMatch.start() <= match_start:
             # an HTML comment or text in nowiki tags stands before the next
             # valid match. Skip.
             index = nextExceptionMatch.end()
@@ -480,19 +487,19 @@ def replaceExcept(text: str,
                 last = group_match.end()
             replacement += new[last:]
 
-        text = text[:match.start()] + replacement + text[match.end():]
+        text = text[:match_start] + replacement + text[match.end():]
 
         # continue the search on the remaining text
         if allowoverlap:
-            index = match.start() + 1
+            index = match_start + 1
         else:
-            index = match.start() + len(replacement)
+            index = match_start + len(replacement)
 
         if not match.group():
             # When the regex allows to match nothing, shift by one char
             index += 1
 
-        markerpos = match.start() + len(replacement)
+        markerpos = match_start + len(replacement)
         replaced += 1
 
     return text[:markerpos] + marker + text[markerpos:]
@@ -671,10 +678,19 @@ class GetDataHTML(HTMLParser):
         self.removetags: list[str] = (removetags if removetags is not None
                                       else ['style', 'script'])
 
-        #: The cleaned output text collected during parsing.
-        self.textdata = ''
+        self._textdata: list[str] = []
 
         self._skiptag: str | None = None
+
+    @property
+    def textdata(self) -> str:
+        """Return the cleaned output text collected during parsing."""
+        return ''.join(self._textdata)
+
+    @textdata.setter
+    def textdata(self, value: str) -> None:
+        """Set the cleaned output text collected during parsing."""
+        self._textdata = [value] if value else []
 
     def __call__(self, text: str) -> str:
         """Feed the parser with *text* and return cleaned :attr:`textdata`.
@@ -688,7 +704,7 @@ class GetDataHTML(HTMLParser):
 
     def close(self) -> None:
         """Clean current processing and clear :attr:`textdata`."""
-        self.textdata = ''
+        self._textdata.clear()
         self._skiptag = None
         super().close()
 
@@ -701,7 +717,7 @@ class GetDataHTML(HTMLParser):
         :param data: The text data between HTML tags.
         """
         if not self._skiptag:
-            self.textdata += data
+            self._textdata.append(data)
 
     def handle_starttag(self,
                         tag: str,
@@ -726,7 +742,7 @@ class GetDataHTML(HTMLParser):
                 f' {name}' if value is None else f' {name}="{value}"'
                 for name, value in attrs
             )
-            self.textdata += f'<{tag}{attr_text}>'
+            self._textdata.append(f'<{tag}{attr_text}>')
 
         if tag in self.removetags:
             self._skiptag = tag
@@ -741,7 +757,7 @@ class GetDataHTML(HTMLParser):
         :param tag: The name of the closing tag.
         """
         if tag in self.keeptags:
-            self.textdata += f'</{tag}>'
+            self._textdata.append(f'</{tag}>')
         if tag in self.removetags and tag == self._skiptag:
             self._skiptag = None
 
@@ -965,7 +981,7 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             new_label = page_title
             # remove preleading ":" from the link text
             if new_label[0] == ':':
-                new_label = new_label[1:]
+                new_label = new_label.removeprefix(':')
 
         new_linktrail = groups['linktrail']
         if new_linktrail:
@@ -1026,11 +1042,14 @@ def replace_links(text: str, replace, site: pywikibot.site.BaseSite) -> str:
             # compare title, but only with parts if linktrail works
             if not linktrail.sub('',
                                  parsed_link_title[len(new_link_title):]):
-                # TODO: This must also compare everything that was used as a
-                #       prefix (in case insensitive)
+                label_prefix = new_label[:-len(parsed_link_title)]
+                link_prefix = new_link.canonical_title()[:-len(new_link.title)]
+                if new_link.site != site:
+                    link_prefix = f':{new_link.site.code}:{link_prefix}'
                 must_piped = (
                     not parsed_link_title.startswith(new_link_title)
-                    or parsed_new_label.namespace != new_link.namespace)
+                    or parsed_new_label.namespace != new_link.namespace
+                    or label_prefix.lower() != link_prefix.lower())
 
         if must_piped:
             new_text = f'[[{new_title}|{new_label}]]'
@@ -1433,9 +1452,8 @@ def getLanguageLinks(
         # language, or if it's e.g. a category tag or an internal link
         lang = fam.obsolete.get(lang, lang)
         if lang in fam.langs:
-            if '|' in pagetitle:
-                # ignore text after the pipe
-                pagetitle = pagetitle[:pagetitle.index('|')]
+            # ignore text after the pipe
+            pagetitle = pagetitle.partition('|')[0]
             # we want the actual page objects rather than the titles
             site = pywikibot.Site(code=lang, fam=fam)
             # skip language links to its own site
@@ -1473,7 +1491,7 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
     languages = '|'.join(site.validLanguageLinks()
-                         + list(site.family.obsolete.keys()))
+                         + list(site.family.obsolete))
     if not languages:
         return text
     interwikiR = re.compile(rf'\[\[({languages})\s?:[^\[\]\n]*\]\][\s]*',
@@ -1651,7 +1669,7 @@ def interwikiFormat(links: dict, insite=None) -> str:
     if insite is None:
         insite = pywikibot.Site()
 
-    ar = interwikiSort(list(links.keys()), insite)
+    ar = interwikiSort(list(links), insite)
     s = []
     for site in ar:
         if isinstance(links[site], pywikibot.Link):
@@ -1929,7 +1947,7 @@ def replaceCategoryLinks(oldtext: str,
 
     if under_categories:
         category = get_regexes('category', site)[0]
-        last_category = list(category.finditer(newtext))[-1]
+        last_category = deque(category.finditer(newtext), maxlen=1)[0]
         for reg in under_categories:
             special = reg.search(newtext)
             if special and not isDisabled(newtext, special.start()):
@@ -2153,9 +2171,7 @@ def glue_template_and_params(template_and_params) -> str:
     params changes).
     """
     template, params = template_and_params
-    text = ''
-    for items in params.items():
-        text += '|{}={}\n'.format(*items)
+    text = ''.join('|{}={}\n'.format(*items) for items in params.items())
 
     return f'{{{{{template}\n{text}}}}}'
 

@@ -24,7 +24,7 @@ INVISIBLE_REGEX = re.compile(f"[{''.join(_invisible_chars)}]")
 
 def contains_invisible(text):
     """Return True if the text contain any of the invisible characters."""
-    return any(char in _invisible_chars for char in text)
+    return not _invisible_chars.isdisjoint(text)
 
 
 def replace_invisible(text):

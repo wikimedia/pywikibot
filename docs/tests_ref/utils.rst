@@ -3,7 +3,7 @@
 *************************************
 
 .. automodule:: tests.utils
-    :synopsis: Test utility funktions
+    :synopsis: Test utility functions
     :members:
     :undoc-members:
     :show-inheritance:

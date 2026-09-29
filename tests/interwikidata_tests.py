@@ -103,7 +103,9 @@ class TestInterwikidataBot(SiteConfigTestCase, SiteAttributeTestCase):
     def test_without_repo(self) -> None:
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(
+                ValueError,
+                'wikitech:en does not have a data repository'):
             DummyBot(generator=[wt_page],
                      site=self.wt)
 

@@ -16,10 +16,6 @@ from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase
 
 
-WARN_SELF_CALL = (r'Referencing this attribute like a function '
-                  r'is deprecated .+; use it directly instead')
-
-
 class TestBaseSiteProperties(TestCase):
 
     """Test properties for BaseSite."""

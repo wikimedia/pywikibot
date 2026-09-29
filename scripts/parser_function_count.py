@@ -167,7 +167,7 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
 def main(*args: str) -> None:
     """Process command line arguments and invoke ParserFunctionCountBot."""
-    local_args = pywikibot.handle_args(*args)
+    local_args = pywikibot.handle_args(args)
     options = {}
 
     # Parse command line arguments

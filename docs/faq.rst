@@ -21,10 +21,10 @@ Frequently asked questions
     available and appropriate. See also: :manpage:`MySQL`
 
 **The bot cannot delete pages**
-  Your account needs delete rights on your wiki. If you have setup another
+  Your account needs delete rights on your wiki. If you have set up another
   account in your user_config use ``-user``
   :ref:`global options` to change it.
-  Maybe you have to login first.
+  Maybe you have to log in first.
 
 **ERROR: Unable to execute script because no *generator* was defined.**
   Using ``-help`` option is a good way to find all generators which can be

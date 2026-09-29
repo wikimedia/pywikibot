@@ -269,13 +269,15 @@ class TestLogentryParams(TestLogentriesBase):
     def test_moved_target_fail_old(self) -> None:
         """Test moved_target method failing on older wiki."""
         site = self.get_site('old')
-        with self.assertRaises(NoMoveTargetError):
+        with self.assertRaisesRegex(
+                NoMoveTargetError, 'Move target page of .* not found'):
             self.get_mainpage(site).moved_target()
 
     def test_moved_target_fail_de(self) -> None:
         """Test moved_target method failing on de-wiki."""
         page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
-        with self.assertRaises(NoMoveTargetError):
+        with self.assertRaisesRegex(
+                NoMoveTargetError, 'Move target page of .* not found'):
             page.moved_target()
 
     def test_thanks_page(self, key) -> None:

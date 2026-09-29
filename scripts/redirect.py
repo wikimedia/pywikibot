@@ -264,7 +264,7 @@ class RedirectGenerator(OptionHandler):
 
         :[2]: target page title of the redirect, or chain (may not exist)
         :[3]: target page of the redirect, or end of chain, or page title
-              where chain or loop detecton was halted, or None if unknown
+              where chain or loop detection was halted, or None if unknown
         """
         for apiQ in self._next_redirect_group():
             gen = pywikibot.data.api.Request(
@@ -463,7 +463,7 @@ class RedirectRobot(ExistingPageBot):
             f'target page is on different site {page.site}')
         reason = i18n.twtranslate(page.site, summary_key, bot_prefix=True)
         if page.site.has_right('delete'):
-            page.delete(reason, prompt=False)
+            page.delete(summary=reason, prompt=False)
         elif self.sdtemplate:
             pywikibot.info('User does not have delete right, '
                            'put page to speedy deletion.')
@@ -490,18 +490,36 @@ class RedirectRobot(ExistingPageBot):
             pywikibot.info(f'{page} is on another site, skipping.')
         return None
 
-    def fix_moved_broken_redirects(self, target: pywikibot.Page) -> None:
+    def fix_moved_broken_redirects(
+        self,
+        target: pywikibot.Page,
+        visited: set[pywikibot.Page] | None = None,
+    ) -> None:
         """Try to fix a deleted redirect using moved_target method."""
         redir_page = self.current_page
         done = not self.opt.delete
         movedTarget = None
 
+        if visited is None:
+            visited = {redir_page}
+
+        if target in visited:
+            pywikibot.info(f'Redirect target {target} forms a redirect loop')
+            return
+
+        visited.add(target)
+
         with suppress(NoMoveTargetError):
             movedTarget = target.moved_target()
 
         if movedTarget:
+            if movedTarget in visited:
+                pywikibot.info(
+                    f'Redirect target {movedTarget} forms a redirect loop')
+                return
+
             if not movedTarget.exists():
-                self.fix_moved_broken_redirects(movedTarget)
+                self.fix_moved_broken_redirects(movedTarget, visited=visited)
                 # process other cases within recursive loop
                 return
 

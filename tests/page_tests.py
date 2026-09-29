@@ -7,6 +7,7 @@
 """Tests for the page module."""
 from __future__ import annotations
 
+import inspect
 import pickle
 import re
 import time
@@ -31,7 +32,12 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, unittest_print
-from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
+from tests.aspects import (
+    DefaultSiteTestCase,
+    DeprecationTestCase,
+    SiteAttributeTestCase,
+    TestCase,
+)
 from tests.utils import skipping
 
 
@@ -106,11 +112,11 @@ class TestLinkObject(SiteAttributeTestCase):
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
                 link = pywikibot.page.Link(
-                    prefix + list(self.titles.keys())[0], self.enwiki)
+                    prefix + list(self.titles)[0], self.enwiki)
                 self.assertEqual(link.namespace, num)
                 # namespace prefixes are case-insensitive
                 lowered_link = pywikibot.page.Link(
-                    prefix.lower() + list(self.titles.keys())[1], self.enwiki)
+                    prefix.lower() + list(self.titles)[1], self.enwiki)
                 self.assertEqual(lowered_link.namespace, num)
 
     def testTitles(self) -> None:
@@ -184,6 +190,115 @@ class TestPageTitle(DefaultSiteTestCase):
 
         self.assertEqual(title, 'Help:Test page#Testing')
         section.assert_called_once_with()
+
+
+class TestPageGet(DefaultSiteTestCase):
+
+    """Test retrieving page text."""
+
+    dry = True
+
+    def _page_with_text(self, title: str, text: str) -> pywikibot.Page:
+        """Return a page with cached *text*."""
+        page = pywikibot.Page(self.site, title)
+        page._revid = 1
+        page._isredir = False
+        page._revisions[1] = pywikibot.page.Revision(
+            revid=1, slots={'main': {'*': text}})
+        return page
+
+    def test_latest_revision_id_loads_current_revision(self) -> None:
+        """Test loading and caching the latest revision ID."""
+        page = pywikibot.Page(self.site, 'Test page')
+        revision = pywikibot.page.Revision(revid=123)
+
+        def loadrevisions(loaded_page) -> None:
+            loaded_page._revisions[revision.revid] = revision
+            loaded_page.latest_revision_id = revision.revid
+
+        with mock.patch.object(
+                self.site, 'loadrevisions',
+                side_effect=loadrevisions) as loadrevisions:
+            self.assertEqual(page.latest_revision_id, revision.revid)
+            self.assertEqual(page.latest_revision_id, revision.revid)
+
+        loadrevisions.assert_called_once_with(page)
+        self.assertEqual(list(page._revisions), [revision.revid])
+        self.assertIs(page._revisions[revision.revid], revision)
+        self.assertIsNone(revision.text)
+
+    def test_get_does_not_validate_section(self) -> None:
+        """Test that get does not inspect a title section."""
+        text = '== Existing ==\nText'
+        page = self._page_with_text('Test#Missing', text)
+
+        with mock.patch.object(page, 'section') as section:
+            self.assertEqual(page.get(), text)
+        section.assert_not_called()
+
+    def test_text_section_regressions(self) -> None:
+        """Test parser-normalized headings do not affect page text."""
+        cases = (
+            (
+                'T422856',
+                'Test#Radio stations in India by state',
+                '==== Radio stations  in India by state ====\nContent',
+            ),
+            (
+                'T411307',
+                'Test#Japanese superhero films by decade',
+                '==== Japanese superhero films\u200e by decade ====\nContent',
+            ),
+        )
+
+        for task, title, text in cases:
+            with self.subTest(task=task):
+                page = self._page_with_text(title, text)
+                self.assertEqual(page.text, text)
+
+    def test_check_section(self) -> None:
+        """Test explicit section validation."""
+        page = self._page_with_text('Test#Existing', '== Existing ==\nText')
+        page._check_section()
+
+        page = self._page_with_text('Test#Missing', '== Existing ==\nText')
+
+        with self.assertRaisesRegex(SectionError,
+                                    "'Missing' is not a valid section"):
+            page._check_section()
+
+    def test_check_section_missing_page(self) -> None:
+        """Test strict redirect checking preserves a missing target."""
+        page = pywikibot.Page(self.site, 'Missing#Section')
+        page._getexception = NoPageError(page)
+
+        page._check_section()
+
+    def test_redirect_target_checks_section(self) -> None:
+        """Test explicit redirect section validation is preserved."""
+        page = pywikibot.Page(self.site, 'Redirect')
+        page._isredir = True
+        data = {
+            'query': {
+                'redirects': [{
+                    'from': 'Redirect',
+                    'to': 'Target',
+                    'tofragment': 'Section',
+                }],
+                'pages': {'1': {'title': 'Target'}},
+            },
+        }
+        request = mock.Mock()
+        request.submit.return_value = data
+
+        with mock.patch.object(self.site, 'simple_request',
+                               return_value=request):
+            with mock.patch.object(
+                    pywikibot.Page, '_check_section') as check_section:
+                target = page.getRedirectTarget(ignore_section=False)
+
+        self.assertEqual(target.title(), 'Target#Section')
+        check_section.assert_called_once_with()
 
 
 class TestPageObjectEnglish(TestCase):
@@ -1052,9 +1167,7 @@ class TestPageRedirects(TestCase):
             p3.get()
 
         page = pywikibot.Page(site, 'User:Legoktm/R2#Section')
-        with self.assertRaisesRegex(SectionError,
-                                    "'Section' is not a valid section"):
-            page.get()
+        self.assertEqual(page.get(), text)
 
         site = pywikibot.Site('mediawiki')
         page = pywikibot.Page(site, 'Manual:Pywikibot/2.0 #See_also')
@@ -1082,6 +1195,47 @@ class TestPageRedirects(TestCase):
         self.assertEqual(text, p2.get(get_redirect=True))
 
 
+class TestActionSummaryParameters(DeprecationTestCase):
+
+    """Test action summary parameters in Page methods."""
+
+    net = False
+
+    def test_signatures(self) -> None:
+        """Public signatures expose the new name and deprecated alias."""
+        methods = (
+            pywikibot.page.BasePage.move,
+            pywikibot.page.BasePage.delete,
+            pywikibot.page.BasePage.undelete,
+            pywikibot.page.BasePage.protect,
+        )
+        for method in methods:
+            with self.subTest(method=method.__name__):
+                parameters = inspect.signature(method).parameters
+                self.assertIn('summary', parameters)
+                self.assertIn('reason', parameters)
+
+    def test_reason_alias(self) -> None:
+        """The reason alias forwards its value to the summary position."""
+        page = mock.MagicMock()
+        result = pywikibot.page.BasePage.move(
+            page, 'New title', reason='Legacy summary')
+
+        self.assertEqual(result, page.site.movepage.return_value)
+        page.site.movepage.assert_called_once_with(
+            page,
+            'New title',
+            summary='Legacy summary',
+            movetalk=True,
+            noredirect=False,
+            movesubpages=True,
+        )
+        self.assertOneDeprecationParts(
+            'reason argument of pywikibot.page._basepage.BasePage.move',
+            'summary',
+        )
+
+
 class TestPageUserAction(DefaultSiteTestCase):
 
     """Test page user actions."""
@@ -1091,8 +1245,9 @@ class TestPageUserAction(DefaultSiteTestCase):
     def test_purge(self) -> None:
         """Test purging the mainpage."""
         mainpage = self.get_mainpage()
-        self.assertIsInstance(mainpage.purge(), bool)
-        self.assertEqual(mainpage.purge(),
+        result = mainpage.purge()
+        self.assertIsInstance(result, bool)
+        self.assertEqual(result,
                          mainpage.purge(forcelinkupdate=None))
 
     def test_watch(self) -> None:
@@ -1148,7 +1303,7 @@ class TestPageDelete(TestCase):
         p.save('Pywikibot unit test')
 
         # Test deletion
-        res = p.delete(reason='Pywikibot unit test', prompt=False, mark=False)
+        res = p.delete(summary='Pywikibot unit test', prompt=False, mark=False)
         self.assertEqual(p.pageid, 0)
         self.assertEqual(res, 1)
         with self.assertRaisesRegex(NoPageError, NO_PAGE_RE):
@@ -1161,7 +1316,7 @@ class TestPageDelete(TestCase):
         p.markDeletedRevision(del_revs[-2])
         with self.assertRaisesRegex(ValueError, 'is not a deleted revision'):
             p.markDeletedRevision(123)
-        p.undelete(reason='Pywikibot unit test')
+        p.undelete(summary='Pywikibot unit test')
         revs = list(p.revisions())
         self.assertLength(revs, 2)
         self.assertEqual(revs[1].revid, revid)
@@ -1208,13 +1363,13 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
 
         p1.protect(protections={'edit': '', 'move': ''},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
     def test_protect_with_empty_parameters(self) -> None:
@@ -1223,12 +1378,12 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
 
-        p1.protect(reason='Pywikibot unit test')
+        p1.protect(summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
     def test_protect_alt(self) -> None:
@@ -1237,14 +1392,14 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinite'),
                           'move': ('autoconfirmed', 'infinite')})
         # workaround
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
         p1.protect(protections={'edit': '', 'move': ''},
-                   reason='Pywikibot unit test')
+                   summary='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
 

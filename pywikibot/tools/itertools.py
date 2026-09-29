@@ -119,7 +119,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
     .. version-added:: 3.0
 
     .. version-changed:: 5.0
-       Avoid duplicates (:phab:`T263947`).
+       Avoid duplicates except *allow_duplicates* is set.
 
     .. version-changed:: 6.4
        ``genlist`` was renamed to ``iterables``; consecutive iterables
@@ -132,6 +132,10 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
        Iterable elements may consist of lists or tuples
        ``allow_duplicates`` is a keyword-only argument
 
+    .. version-changed:: 11.8
+       Preserve colliding intersection items without ``hash()``. Avoid
+       duplicates for a single iterable if *allow_duplicates* is not set.
+
     :param iterables: Page generators
     :param allow_duplicates: Optional keyword argument to allow duplicates
         if present in all generators
@@ -140,7 +144,10 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
         return
 
     if len(iterables) == 1:
-        yield from iterables[0]
+        if allow_duplicates:
+            yield from iterables[0]
+        else:
+            yield from filter_unique(iterables[0])
         return
 
     # If any iterable is empty, no pages are going to be returned
@@ -158,7 +165,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
 
     ones = collections.Counter(range(n_gen))
     active_iterables = set(range(n_gen))
-    seen = set()
+    seen: set[Hashable] = set()
 
     # Get items from iterables in a round-robin way.
     sentinel = object()
@@ -169,7 +176,7 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 active_iterables.discard(index)
                 continue
 
-            if not allow_duplicates and hash(item) in seen:
+            if not allow_duplicates and item in seen:
                 continue
 
             # Each cache entry is a Counter of iterables' index
@@ -181,19 +188,16 @@ def intersect_generators(*iterables, allow_duplicates: bool = False):
                 # Remove item from cache if possible or decrease Counter entry
                 if not allow_duplicates:
                     del cache[item]
-                    seen.add(hash(item))
+                    seen.add(item)
                 elif cache[item] == ones:
                     del cache[item]
                 else:
                     cache[item] -= ones
 
-        # We can quit if an iterable is exceeded and cached iterables is
-        # a subset of active iterables.
+        # We can quit if a source is exhausted and every cached item has
+        # only been found in sources which are still active.
         if len(active_iterables) < n_gen:
-            cached_iterables = set(
-                itertools.chain.from_iterable(v.keys()
-                                              for v in cache.values()))
-            if cached_iterables <= active_iterables:
+            if all(v.keys() <= active_iterables for v in cache.values()):
                 return
 
 
@@ -264,22 +268,32 @@ def filter_unique(iterable, container=None, key=None, add=None):
         container = set()
 
     if not add:
-        if hasattr(container, 'add'):
-            def container_add(x) -> None:
-                container.add(key(x) if key else x)
-
-            add = container_add
+        if key is None:
+            def key_getter(item):
+                return item
         else:
-            def container_setitem(x) -> None:
-                container.__setitem__(key(x) if key else x,
-                                      True)
+            key_getter = key
 
-            add = container_setitem
+        if hasattr(container, 'add'):
+            def add_to_container(item):
+                container.add(item)
+        else:
+            def add_to_container(item):
+                container.__setitem__(item, True)
 
-    for item in iterable:
-        try:
-            if (key(item) if key else item) not in container:
-                add(item)
-                yield item
-        except StopIteration:
-            return
+        for item in iterable:
+            try:
+                cmp = key_getter(item)
+                if cmp not in container:
+                    add_to_container(cmp)
+                    yield item
+            except StopIteration:
+                return
+    else:
+        for item in iterable:
+            try:
+                if (key(item) if key else item) not in container:
+                    add(item)
+                    yield item
+            except StopIteration:
+                return

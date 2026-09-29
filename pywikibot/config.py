@@ -38,6 +38,9 @@ utility methods to build paths relative to base_dir:
    default. Editor detection functions were moved to :mod:`editor`.
 .. version-added:: 11.4
    The 7-zip executable variable *cmd_7zip* was added.
+.. version-added:: 11.8
+   The *read_maxlag* config variable was added; The *maxlag* config
+   variable was renamed to *write_maxlag*.
 """
 from __future__ import annotations
 
@@ -103,10 +106,11 @@ _private_values = {'authenticate', 'db_password'}
 # no longer used. The values of this dict is the Pywikibot version of
 # the deprecation but unused.
 _deprecated_variables = {
-    'absolute_import': '10.0.0 ',
-    'division': '10.0.0',
-    'unicode_literals': '10.0.0',
-    'textfile_encoding': '11.5.0',
+    'absolute_import': ('10.0.0', None),
+    'division': ('10.0.0', None),
+    'unicode_literals': ('10.0.0', None),
+    'textfile_encoding': ('11.5.0', None),
+    'maxlag': ('11.8.0', 'write_maxlag'),
 }
 
 # ############# ACCOUNT SETTINGS ##############
@@ -276,9 +280,9 @@ ignore_bot_templates = False
 # #############################################
 
 
-def user_home_path(path: str) -> str:
+def user_home_path(path: str | os.PathLike[str]) -> str:
     """Return a file path to a file in the user home."""
-    return os.path.join(os.path.expanduser('~'), path)
+    return str(Path(os.path.expanduser('~')) / path)
 
 
 def get_user_config_file() -> str:
@@ -295,7 +299,7 @@ def get_user_config_file() -> str:
     return 'user-config.py'
 
 
-def get_base_dir(test_directory: str | None = None,
+def get_base_dir(test_directory: str | os.PathLike[str] | None = None,
                  config_file: str = 'user-config.py') -> str:
     r"""Return the directory in which user-specific information is stored.
 
@@ -324,11 +328,11 @@ def get_base_dir(test_directory: str | None = None,
         directory will cause it to be selected as the base directory.
     :param config_file: Filename of the user config file
     """
-    def exists(directory: str) -> bool:
+    def exists(directory: str | os.PathLike[str]) -> bool:
         directory = os.path.abspath(directory)
         if directory == test_directory:
             return True
-        return os.path.exists(os.path.join(directory, config_file))
+        return (Path(directory) / config_file).exists()
 
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
@@ -366,19 +370,19 @@ def get_base_dir(test_directory: str | None = None,
                 base_dir_cand.append([home, '.pywikibot'])
 
             for dir_ in base_dir_cand:
-                dir_s = os.path.join(*dir_)
+                dir_s = Path(*dir_)
                 try:
-                    os.makedirs(dir_s, mode=private_folder_permission)
+                    dir_s.mkdir(mode=private_folder_permission, parents=True)
                 except OSError:  # PermissionError or already exists
                     if exists(dir_s):
-                        base_dir = dir_s
+                        base_dir = str(dir_s)
                         break
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
 
     # make sure this path is valid and that it contains user-config file
-    if not os.path.isdir(base_dir):
+    if not Path(base_dir).is_dir():
         raise RuntimeError(f"Directory '{base_dir}' does not exist.")
 
     # check if config_file is in base_dir
@@ -414,7 +418,7 @@ for arg in sys.argv[1:]:
 family_files: dict[str, str] = {}
 
 
-def register_families_folder(folder_path: str,
+def register_families_folder(folder_path: str | os.PathLike[str],
                              not_exists_ok: bool = False) -> None:
     """Register all family class files contained in a directory.
 
@@ -429,23 +433,23 @@ def register_families_folder(folder_path: str,
     """
     suffix = '_family.py'
 
-    if not os.path.exists(folder_path):
+    folder = Path(folder_path)
+    if not folder.exists():
         if not_exists_ok:
             return
         raise FileNotFoundError(
             f'Family folder {folder_path!r} does not exist')
 
-    if os.path.isdir(folder_path):
-        for file_name in os.listdir(folder_path):
-            if file_name.endswith(suffix):
-                family_name = file_name.removesuffix(suffix)
-                family_files[family_name] = os.path.join(folder_path,
-                                                         file_name)
+    if folder.is_dir():
+        for file_path in folder.iterdir():
+            if file_path.name.endswith(suffix):
+                family_name = file_path.name.removesuffix(suffix)
+                family_files[family_name] = str(file_path)
         return
 
     # probably there is a zip file chain (T278076)
     # find the parent zip folder
-    path = Path(folder_path)
+    path = folder
     if not is_zipfile(path):
         for parent in path.parents:
             if is_zipfile(path):
@@ -461,15 +465,14 @@ def register_families_folder(folder_path: str,
         if file_name.endswith(suffix):
             file_path = Path(file_name)
             family_name = file_path.name.removesuffix(suffix)
-            family_files[family_name] = os.path.join(folder_path,
-                                                     file_path.name)
+            family_files[family_name] = str(folder / file_path.name)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
 # 'families/' is a subdirectory of the directory in which config.py is found.
-register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
+register_families_folder(Path(__file__).parent / 'families')
 # 'families/' can also be stored in the base directory
-register_families_folder(os.path.join(base_dir, 'families'),
+register_families_folder(Path(base_dir) / 'families',
                          not_exists_ok=True)
 
 
@@ -707,7 +710,8 @@ upload_to_commons = False
 # time is increased accordingly. The default setting is 0.1 seconds per
 # https://wikitech.wikimedia.org/wiki/Robot_policy.
 #
-# 'maxlag' is used to control the rate of server access (see below).
+# 'read_maxlag' and 'write_maxlag' are used to control the rate of server
+# access (see below).
 # Set minthrottle to non-zero to use a throttle on read access.
 minthrottle = 0.1
 maxthrottle = 60
@@ -722,13 +726,14 @@ noisysleep = 3.0
 
 # Defer bot edits during periods of database server lag. For details, see
 # https://www.mediawiki.org/wiki/Manual:Maxlag_parameter
-# You can set this variable to a number of seconds, or to None (or 0) to
+# You can set these variables to a number of seconds, or to None (or 0) to
 # disable this behavior. Higher values are more aggressive in seeking
 # access to the wiki.
 # Non-Wikimedia wikis may or may not support this feature; for families
 # that do not use it, it is recommended to set minthrottle (above) to
 # at least 1 second.
-maxlag = 5
+read_maxlag = 30
+write_maxlag = 5
 
 # Maximum of pages which can be retrieved at one time from wiki server.
 # -1 indicates limit by api restriction
@@ -876,7 +881,7 @@ cmd_7zip = '7za'
 # #############################################
 
 
-def makepath(path: str, create: bool = True) -> str:
+def makepath(path: str | os.PathLike[str], create: bool = True) -> str:
     """Return a normalized absolute version of the path argument.
 
     If the given path already exists in the filesystem or create is
@@ -891,13 +896,14 @@ def makepath(path: str, create: bool = True) -> str:
     :param create: Create the directory if it is True. Otherwise do not
         change the filesystem. Default is True.
     """
-    dpath = os.path.normpath(os.path.dirname(path))
-    if create and not os.path.exists(dpath):
-        os.makedirs(dpath)
+    dpath = Path(os.path.normpath(os.path.dirname(path)))
+    if create and not dpath.exists():
+        dpath.mkdir(parents=True)
     return os.path.normpath(os.path.abspath(path))
 
 
-def datafilepath(*filename: str, create: bool = True) -> str:
+def datafilepath(*filename: str | os.PathLike[str],
+                 create: bool = True) -> str:
     """Return an absolute path to a data file in a standard location.
 
     Argument(s) are zero or more directory names, optionally followed by
@@ -909,13 +915,21 @@ def datafilepath(*filename: str, create: bool = True) -> str:
     :param create: Create the directory if it is True. Otherwise don't
         change the filesystem. Default is True.
     """
+    # Preserve trailing separators for makepath directory creation.
     return makepath(os.path.join(base_dir, *filename), create=create)
 
 
 def shortpath(path: str) -> str:
-    """Return a file path relative to config.base_dir."""
-    if path.startswith(base_dir):
-        return path[len(base_dir) + len(os.path.sep):]
+    """Return a file path relative to config.base_dir.
+
+    .. version-changed:: 11.8
+       Path components are used to determine whether *path* is inside
+       :data:`base_dir`.
+    """
+    path_obj = Path(path)
+    if path_obj.is_relative_to(base_dir):
+        relative_path = path_obj.relative_to(base_dir)
+        return '' if relative_path == Path('.') else str(relative_path)
     return path
 
 
@@ -931,19 +945,19 @@ _public_globals = {
 _exec_globals = copy.deepcopy(_public_globals)
 
 # Always try to get the user files
-_filename = os.path.join(base_dir, user_config_file)
-if os.path.exists(_filename):
-    _filestatus = os.stat(_filename)
+_filename = Path(base_dir) / user_config_file
+if _filename.exists():
+    _filestatus = _filename.stat()
     _filemode = _filestatus[0]
     _fileuid = _filestatus[4]
     if not OSWIN32 \
        and _fileuid not in [os.getuid(), 0]:  # type: ignore[attr-defined]
-        warning(f'Skipped {_filename!r}: owned by someone else.')
+        warning(f'Skipped {str(_filename)!r}: owned by someone else.')
     elif OSWIN32 or _filemode & 0o02 == 0:
-        with open(_filename, 'rb') as f:
-            exec(compile(f.read(), _filename, 'exec'), _exec_globals)
+        exec(compile(_filename.read_bytes(), str(_filename), 'exec'),
+             _exec_globals)
     else:
-        warning(f'Skipped {_filename!r}: writeable by others.')
+        warning(f'Skipped {str(_filename)!r}: writeable by others.')
 elif __no_user_config and __no_user_config != '2':
     warning(f'{user_config_file} cannot be loaded.')
 
@@ -958,11 +972,11 @@ class _DifferentTypeError(UserWarning, TypeError):
         actual_type: type,
         allowed_types: tuple[type, ...],
     ) -> None:
+        allowed_type_names = '", "'.join(t.__name__ for t in allowed_types)
         super().__init__(
-            'Configuration variable "{}" is defined as "{}" in '
-            'your {} but expected "{}".'
-            .format(name, actual_type.__name__, user_config_file,
-                    '", "'.join(t.__name__ for t in allowed_types)))
+            f'Configuration variable "{name}" is defined as '
+            f'"{actual_type.__name__}" in your {user_config_file} '
+            f'but expected "{allowed_type_names}".')
 
 
 def _assert_default_type(
@@ -994,7 +1008,7 @@ DEPRECATED_VARIABLE = (
     '"{name}" present in your '
     f'{user_config_file} is deprecated since'
     ' {since} and no longer a supported configuration variable and should be'
-    ' removed. Please inform the maintainers if you depend on it.'
+    ' removed{instead}. Please inform the maintainers if you depend on it.'
 )
 
 
@@ -1004,7 +1018,7 @@ def _check_user_config_types(
     skipped: frozenset[str],
 ) -> None:
     """Check the types compared to the default values."""
-    for name, value in user_config.items():
+    for name, value in list(user_config.items()):
         if name in default_values:
             try:
                 if name == 'socket_timeout':
@@ -1018,12 +1032,19 @@ def _check_user_config_types(
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
             if name in _deprecated_variables:
+                since, instead = _deprecated_variables[name]
                 msg = DEPRECATED_VARIABLE.format(
                     name=name,
-                    since=_deprecated_variables[name]
+                    since=since,
+                    instead=f'; use {instead} instead' if instead else '',
                 )
                 warn('\n' + fill(msg),
                      _ConfigurationDeprecationWarning, stacklevel=2)
+
+                if instead is not None:
+                    user_config[instead] = user_config[name]
+                    del user_config[name]
+
             else:
                 warn('\n' + fill(f'Configuration variable "{name}" is defined '
                                  f'in your {user_config_file} but unknown. It'

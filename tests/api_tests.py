@@ -860,7 +860,17 @@ class TestUrlEncoding(TestCase):
         """Test moving 'token' parameters from a list to the end."""
         query = [('action', 'edit'), ('token', 'a'), ('supertoken', 'b'),
                  ('text', 'text')]
+        original_query = query[:]
         expect = 'action=edit&text=text&token=a&supertoken=b'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+        self.assertEqual(query, original_query)
+
+    def test_url_encoding_from_tuple(self) -> None:
+        """Test moving 'token' parameters from a tuple to the end."""
+        query = (('action', 'edit'), ('token', 'a'), ('text', 'text'))
+        expect = 'action=edit&text=text&token=a'
         result = api.encode_url(query)
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)

@@ -376,7 +376,7 @@ class ParamInfo(Sized, Container):
         modules = set(self.action_modules)
         for parent_module in self._modules:
             submodules = self.submodules(parent_module, path=True)
-            assert not submodules & modules
+            assert submodules.isdisjoint(modules)
             modules |= submodules
         return modules
 

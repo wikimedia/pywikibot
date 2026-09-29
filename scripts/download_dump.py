@@ -209,8 +209,8 @@ def main(*args: str) -> None:
                 continue
 
             if option == 'storepath':
-                opts[option] = os.path.abspath(value) or pywikibot.input(
-                    'Enter the store path: ')
+                opts[option] = os.path.abspath(
+                    value or pywikibot.input('Enter the store path: '))
                 continue
 
             if option == 'dumpdate':

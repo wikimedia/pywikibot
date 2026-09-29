@@ -82,30 +82,30 @@ The following config variables are supported:
  weblink_dead_days          sets the timespan (default: one week) after which
                             a dead link will be reported
 
-Examples
---------
+.. admonition:: Examples
 
-Loads all wiki pages in alphabetical order using the Special:Allpages
-feature:
+   Loads all wiki pages in alphabetical order using the
+   ``Special:Allpages`` feature:
 
-    python pwb.py weblinkchecker -start:!
+       python pwb.py weblinkchecker -start:!
 
-Loads all wiki pages using the Special:Allpages feature, starting at
-"Example page":
+   Loads all wiki pages using the Special:Allpages feature, starting at
+   "Example page":
 
-    python pwb.py weblinkchecker -start:Example_page
+       python pwb.py weblinkchecker -start:Example_page
 
-Loads all wiki pages that link to www.example.org:
+   Loads all wiki pages that link to www.example.org:
 
-    python pwb.py weblinkchecker -weblink:www.example.org
+       python pwb.py weblinkchecker -weblink:www.example.org
 
-Only checks links found in the wiki page "Example page":
+   Only checks links found in the wiki page "Example page":
 
-    python pwb.py weblinkchecker Example page
+       python pwb.py weblinkchecker Example page
 
-Loads all wiki pages where dead links were found during a prior run:
+   Loads all wiki pages where dead links were found during a prior run:
 
-    python pwb.py weblinkchecker -repeat
+       python pwb.py weblinkchecker -repeat
+
 """
 from __future__ import annotations
 
@@ -114,6 +114,7 @@ import re
 import threading
 import time
 import urllib.parse as urlparse
+from collections import deque
 from contextlib import suppress
 from functools import partial
 from http import HTTPStatus
@@ -227,11 +228,6 @@ XmlDumpPageGenerator = partial(
     _XMLDumpPageGenerator, text_predicate=weblinks_from_text)
 
 
-class NotAnURLError(BaseException):
-
-    """The link is not an URL."""
-
-
 class LinkCheckThread(threading.Thread):
 
     """A thread responsible for checking one URL.
@@ -304,7 +300,7 @@ class LinkCheckThread(threading.Thread):
                 self.url, headers=header,
                 use_fake_user_agent=self._use_fake_user_agent)
             bad = (r.status_code != HTTPStatus.OK
-                   or r.status_code in self.http_ignores)
+                   and r.status_code not in self.http_ignores)
             message = HTTPStatus(r.status_code).phrase
         except (requests.exceptions.InvalidURL, FatalServerError):
             bad = True
@@ -455,7 +451,7 @@ class DeadLinkReportThread(threading.Thread):
         """Initializer."""
         super().__init__()
         self.semaphore = threading.Semaphore()
-        self.queue = []
+        self.queue = deque()
         self.finishing = False
         self.killed = False
 
@@ -484,8 +480,8 @@ class DeadLinkReportThread(threading.Thread):
                 continue
 
             with self.semaphore:
-                url, error_report, containing_page, archive_url = self.queue[0]
-                self.queue = self.queue[1:]
+                (url, error_report,
+                 containing_page, archive_url) = self.queue.popleft()
                 talk_page = containing_page.toggleTalkPage()
                 pywikibot.info(
                     f'<<lightaqua>>** Reporting dead link on {talk_page}...')
@@ -661,16 +657,17 @@ def main(*args: str) -> None:
     gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
+        option, sep, value = arg.partition(':')
         if arg == '-talk':
             config.report_dead_links_on_talk = True
         elif arg == '-notalk':
             config.report_dead_links_on_talk = False
         elif arg == '-repeat':
             gen = RepeatPageGenerator()
-        elif arg.startswith('-ignore:'):
-            http_ignores.append(int(arg[8:]))
-        elif arg.startswith('-day:'):
-            config.weblink_dead_days = int(arg[5:])
+        elif option == '-ignore' and sep:
+            http_ignores.append(int(value))
+        elif option == '-day' and sep:
+            config.weblink_dead_days = int(value)
         elif arg.startswith('-xmlstart'):
             if len(arg) == 9:
                 xml_start = pywikibot.input(

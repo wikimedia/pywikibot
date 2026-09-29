@@ -19,11 +19,12 @@ class Family(family.SubdomainFamily):
 
     codes = {
         'ar', 'ca', 'de', 'el', 'en', 'es', 'eu', 'fr', 'hy', 'it', 'nl', 'oc',
-        'pt', 'ru', 'scn',
+        'pt', 'ru', 'scn', 'uk',
     }
 
     # Sites we want to edit but not count as real languages
-    test_codes = ['central', 'fr-testing', 'en-testing']
+    # (testing is a subdomain)
+    test_codes = ['central', 'fr.testing', 'en.testing']
 
     @classproperty
     def domains(cls):

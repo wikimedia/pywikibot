@@ -1,52 +1,83 @@
-Release 11.7
+Release 11.8
 ============
 
-* Yield non-strict unconnected pages in :meth:`APISite.unconnected_pages()
-  <pywikibot.site._extensions.WikibaseClientMixin.unconnected_pages>` and fix the
-  regression introduced in :ref:`10.4.0`.
-* :meth:`api.Request.wait()<data.api.Request.wait>` and :meth:`data.WaitingMixin.wait`
-  accept *kwargs* to be passed to :exc:`exceptions.ApiTimeoutError`. (:phab:`T434974`)
-* :exc:`exceptions.ApiTimeoutError` supports *site* and *uri* attributes passed
-  as parameters. (:phab:`T434974`)
-* Update translations (i18n)
-* Honor *mode* for uncompressed archives in :func:`tools.open_archive`.
-* Remove minimum retry limit from maxlag wait cycle in :meth:`data.api.Request.submit`.
-  (:phab:`T434566`)
-* Fix upload counter in :class:`specialbots.UploadRobot`.
-* Avoid unnecessary :class:`pywikibot.Site` creation in :class:`specialbots.UploadRobot`.
-* Add :meth:`page.BasePage.review` and :meth:`page.BasePage.unreview`, which call
-  :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`.
-  (:phab:`T408389`)
-* Add :meth:`APISite.review_revision()<pywikibot.site._extensions.FlaggedRevsMixin.review_revision>`
-  for the :ext:`FlaggedRevs` extension. (:phab:`T408389`)
-* Add ``show`` filters to :meth:`APISite.blocks()
-  <pywikibot.site._generators.GeneratorsMixin.blocks>`; they can be set by the new *account*, *ip*,
-  *ip_range* and *temp* parameters. (:phab:`T433531`)
-* Duplicate pages are no longer yielded in :meth:`page.BasePage.getReferences` and
-  :meth:`APISite.pagereferences()<pywikibot.site._generators.GeneratorsMixin.pagereferences>` when
-  backlinks and template inclusions overlap. (:phab:`T405551`)
-* :meth:`page.BasePage.getOldVersion` is only a convenience wrapper around
-  :meth:`page.BasePage.get_revision`. It is deprecated now in favour of
-  ``get_revision(oldid, content=True).text``.  (:phab:`T433799`)
-* HTML comments spanning multiple lines are now recognized with :class:`textlib.Timestripper`.
-  (:phab:`T432541`)
-* The *lang* parameter of the :func:`i18n.altlang` function is now positional-only. The *lang* value
-  is no longer included in the returned fallback sequence; the fallback sequence was changed from a
-  list to a tuple.
-* Raise the newly implemented :exc:`exceptions.CitoidError` when the Citoid service of the
-  :mod:`data.citoid` module returns an error response. (:phab:`T433230`)
-* Improvements for :meth:`APISite.assert_valid_iter_params()
-  <pywikibot.site._apisite.APISite.assert_valid_iter_params>`: the *msg_prefix* parameter is now
-  positional-only and the *is_ts* parameter is now keyword-only. If *start* and *end* parameters are
-  ``datetime`` objects, the *is_ts* parameter is always treated as ``True``. A ``ValueError`` is
-  raised instead of ``AssertionError`` when *start* and *end* parameters are in the wrong order.
-* All ``ucshow`` parameters of :api:`Usercontribs` are supported by
-  :meth:`APSite.usercontribs()<pywikibot.site._generators.GeneratorsMixin.usercontribs>`,
-  :meth:`pywikibot.User.contributions` and :meth:`pywikibot.User.contribs`.
-* :ext:`FlaggedRevs` support was added. The :meth:`APSite.stable_revid()
-  <pywikibot.site._extensions.FlaggedRevsMixin.stable_revid>` site method
-  and the :attr:`page.BasePage.stable_revision_id` and :attr:`page.BasePage.stable_revision`
-  properties were added to retrieve the stable revision and its ID. (:phab:`T409848`)
+* Various performance, stability, and code quality improvements.
+* Raise ServerError instead of AssertionError for invalid :meth:`APISite.userinfo()
+  <pywikibot.site._apisite.APISite.userinfo>` API response. (:phab:`T423061`)
+* Load only current revision ID with :attr:`page.BasePage.latest_revision_id`.
+* Return non-option defaults with :func:`bot.input_list_choice`. (:phab:`T305937`)
+* Add :meth:`APISite.geosearch()<pywikibot.site._extensions.GeoDataMixin.geosearch>`
+  method. (:phab:`T438772`)
+* Preserve labels with different prefixes in :func:`textlib.replace_links`. (:phab:`T396719`)
+* Resolve :func:`i18n.bundles` paths from package.
+* Add :meth:`pywikibot.User.is_globally_blocked` and :meth:`APISite.is_globally_blocked()
+  <pywikibot.site._extensions.GlobalBlockingMixin.is_globally_blocked>` to support
+  :ext:`GlobalBlocking extension<GlobalBlocking/API#list=globalblocks_(bg)>`. (:phab:`T394628`)
+* Initialize the wrapped generator once per lifecycle with
+  :class:`tools.collections.GeneratorWrapper`.
+* Use ``functools.cache`` for :func:`date.escapePattern2`.
+* Avoid mutating request inputs in :func:`comms.http.fetch`.
+* Buffer :class:`textlib.GetDataHTML` output in :attr:`textlib.GetDataHTML.textdata`.
+* Short-circuit intersection cache checks in :func:`tools.itertools.intersect_generators`.
+* Add :ext:`PageViewInfo` extension support with :meth:`page.BasePage.pageviews`
+  and :class:`site.PageViewInfoMixin<pywikibot.site._extensions.PageViewInfoMixin>`.
+  (:phab:`T325473`)
+* Use plain dictionaries for Wikibase :class:`pywikibot.Claim` mappings.
+* Add :attr:`page.BasePage.flagged_state` and :meth:`APSite.flagged_state()
+  <pywikibot.site._extensions.FlaggedRevsMixin.flagged_state>` site method
+  for :ext:`FlaggedRevs` info. (:phab:`T410893`)
+* Disable ``maxlag`` for meta queries, paraminfo and help. (:phab:`T421642`)
+* Added Ukrainian Vikidia and updated testing subdomains for that family.
+* Correctly propagate reference group hashes after
+  :meth:`page.WikibaseEntity.editEntity`. (:phab:`T367324`)
+* Prevent recursive logging :func:`handler initialization<bot.init_handlers>`. (:phab:`T436130`)
+* Avoid duplicate revision updates and avoid constructing cached file revisions
+  again in :class:`FilePage<page.FilePage>`.
+* Stop pre-encoding API titles because :class:`data.api.Request` normalizes
+  byte parameters back to strings before serialization.
+* Isolate cached tables by server URL in :mod:`data.wikistats` module.
+* Exceptions from the :meth:`tools.threading.ThreadedGenerator.run` producer
+  are re-raised during iteration after yielding any queued results.
+* Release bounded capacity in :meth:`tools.threading.BoundedPoolExecutor.submit`
+  when submission fails with any Exception.
+* Avoid duplicate key evaluation in :func:`tools.itertools.filter_unique`.
+* Replace :func:`tools.strtobool` value checks with constant mapping.
+* Avoid unnecessary request if *total* is 0 in :meth:`Category.articles()<page.Category.articles>`.
+* Reject invalid :class:`tools.threading.ThreadList` limits.
+* Public *reason* and *comment* parameters used for page-action and upload
+  summaries were renamed to *summary*. The old parameter names remain
+  available as deprecated aliases. (:phab:`T62442`)
+* Cache valid site codes in :func:`titletranslate.translate`.
+* Normalize family aliases in :meth:`data.wikistats.WikiStats.get` before cache lookup.
+* Preserve Windows commands without a file placeholder in :class:`editor.TextEditor`.
+* Preserve existing endpoint query parameters in :meth:`data.sparql.SparqlQuery.query`.
+* Reset the retry counter for each query in :class:`data.sparql.SparqlQuery`.
+* Deduplicate intersections with a single input in :func:`tools.itertools.intersect_generators`.
+* Accept path-like filenames and detect suffixes case-insensitively in :func:`tools.open_archive`.
+* Add support for all existing Beta Cluster wikis. (:phab:`T225892`)
+* Support selective page preloading of :meth:`APISite.preloadpages
+  <pywikibot.site._generators.GeneratorsMixin.preloadpages>` with
+  :func:`pagegenerators.PreloadingGenerator` and :func:`pagegenerators.DequePreloadingGenerator`.
+* Apply title filters first in :meth:`pagegenerators.GeneratorFactory.getCombinedGenerator`
+  and avoid loading page data for titles rejected by title filters.
+* Support immutable sequences in :func:`data.api.encode_url`.
+* Clear bundle cache when switching packages with :func:`i18n.set_messages_package`.
+* Use pathlib for path containment in :func:`config.shortpath` and
+  :func:`version.get_module_filename`.
+* Add *depth* parameter to :func:`pagegenerators.PetScanPageGenerator`.
+* The :class:`specialbots.UploadRobot` class now cleans up temporary download files
+  after upload completion or failure, while preserving caller-provided local files.
+* Fix :meth:`APISite.loadrevisions<pywikibot.site._generators.GeneratorsMixin.loadrevisions>`
+  *step* handling.
+* Keep preload *groupsize* per site in :func:`pagegenerators.PreloadingGenerator`.
+* Preserve colliding intersection items without ``hash()`` in
+  :func:`tools.itertools.intersect_generators`.
+* :meth:`page.BasePage.get` no longer validates section fragments or raises
+  :exc:`exceptions.SectionError` for them, as the method always retrieves the complete
+  page text (:phab:`T422856`, :phab:`T422859`).
+* Update translations (i18n).
+* Add new :class:`family.WikimediaSubdomainFamily`.
+* Update documentation for :meth:`page.BasePage.exists`. (:phab:`T334341`)
 
 
 Deprecations
@@ -149,6 +180,9 @@ Pending removal in Pywikibot 13
 Pending removal in Pywikibot 14
 -------------------------------
 
+* 11.8.0: Public *reason* and *comment* parameters used for page-action and
+  upload summaries were renamed to *summary*. The old parameter names will
+  be removed. (:phab:`T62442`)
 * 11.7.0: :meth:`page.BasePage.getOldVersion` is now deprecated in favour of
   :meth:`get_revision(oldid, content=True).text<page.BasePage.get_revision>`. (:phab:`T433799`)
 * 11.7.0: The *lang* parameter of the :func:`i18n.altlang` function is positional-only. Passing

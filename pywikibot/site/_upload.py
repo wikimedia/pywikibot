@@ -13,7 +13,7 @@ from warnings import warn
 
 import pywikibot
 from pywikibot.exceptions import APIError, Error, UploadError
-from pywikibot.tools import compute_file_hash
+from pywikibot.tools import compute_file_hash, deprecated_args
 
 
 __all__ = ('Uploader', )
@@ -30,11 +30,11 @@ class Uploader:
         file will be obtained.
     :param source_filename: path to the file to be uploaded
     :param source_url: URL of the file to be uploaded
-    :param comment: Edit summary; if this is not provided, then
+    :param summary: Edit summary; if this is not provided, then
         filepage.text will be used. An empty summary is not permitted.
         This may also serve as the initial page text (see below).
     :param text: Initial page text; if this is not set, then
-        filepage.text will be used, or comment.
+        filepage.text will be used, or summary.
     :param watch: If true, add filepage to the bot user's watchlist
     :param chunk_size: The chunk size in bytes for chunked uploading
         (see :api:`Upload#Chunked_uploading`). It will only upload in
@@ -84,23 +84,28 @@ class Uploader:
                              'version(s) of this file.',
     }
 
+    @deprecated_args(comment='summary')  # since 11.8.0
     def __init__(self,
                  site: pywikibot.site.APISite,
                  filepage: pywikibot.FilePage,
                  *,
                  source_filename: str | None = None,
                  source_url: str | None = None,
-                 comment: str | None = None,
+                 summary: str | None = None,
                  text: str | None = None,
                  watch: bool = False,
                  chunk_size: int = 0,
                  asynchronous: bool = False,
                  ignore_warnings=False,
                  report_success: bool | None = None) -> None:
-        """Initializer."""
+        """Initializer.
+
+        .. version-changed:: 11.8
+           The *comment* parameter was renamed to *summary*.
+        """
         self.site = site
         self.filepage = filepage
-        self.comment = comment
+        self.comment = summary
         self.text = text
         self.watch = watch
         self.ignore_warnings = ignore_warnings
@@ -219,14 +224,14 @@ class Uploader:
             elif offset is False:
                 if file_size != stash_info['size']:
                     raise ValueError(
-                        'For the file key "{}" the server reported a size '
-                        '{} while the file size is {}'
-                        .format(file_key, stash_info['size'], file_size))
+                        f'For the file key "{file_key}" the server reported '
+                        f'a size {stash_info["size"]} while the file size is '
+                        f'{file_size}')
             elif offset is not False and offset != stash_info['size']:
                 raise ValueError(
-                    'For the file key "{}" the server reported a size {} '
-                    'while the offset was {}'
-                    .format(file_key, stash_info['size'], offset))
+                    f'For the file key "{file_key}" the server reported '
+                    f'a size {stash_info["size"]} while the offset was '
+                    f'{offset}')
 
             if verify_stash:
                 # The SHA1 was also requested so calculate and compare it
@@ -235,9 +240,9 @@ class Uploader:
                 sha1 = compute_file_hash(self.filename, bytes_to_read=offset)
                 if sha1 != stash_info['sha1']:
                     raise ValueError(
-                        'The SHA1 of {} bytes of the stashed "{}" is {} '
-                        'while the local file is {}'
-                        .format(offset, file_key, stash_info['sha1'], sha1))
+                        f'The SHA1 of {offset} bytes of the stashed '
+                        f'"{file_key}" is {stash_info["sha1"]} '
+                        f'while the local file is {sha1}')
 
         assert offset is not True
         if file_key and file_size is None:
@@ -489,8 +494,8 @@ class Uploader:
                     return False
 
                 if len(warnings) > 1:
-                    warn('The upload returned {} warnings: {}'
-                         .format(len(warnings), ', '.join(warnings)),
+                    warn(f'The upload returned {len(warnings)} warnings: '
+                         f'{", ".join(warnings)}',
                          UserWarning, 3)
                 warning, message = next(iter(warnings.items()))
                 warning = warning_keys.get(warning, warning)

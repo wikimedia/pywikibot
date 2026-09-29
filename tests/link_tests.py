@@ -859,7 +859,11 @@ class TestForeignInterwikiLinks(WikimediaDefaultSiteTestCase):
         anyway but the title cannot be parsed:
         """
         link = Link('bugzilla:1337', source=self.site)
-        with self.assertRaises(SiteDefinitionError):
+        with self.assertRaisesRegex(
+                SiteDefinitionError,
+                r'bugzilla:1337 is not a local page|'
+                r'interwiki prefix bugzilla|'
+                r'Invalid AutoFamily'):
             link.site
         self.assertEqual(link.site.sitename, 'wikimedia:wikimedia')
         self.assertTrue(link._is_interwiki)

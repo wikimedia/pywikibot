@@ -17,12 +17,12 @@ How to get links from summary section of page
 =============================================
 
 >>> import pywikibot
->>> from pwikibot import textlib
+>>> from pywikibot import textlib
 >>> site = pywikibot.Site('wikipedia:en')  # create a Site object
 >>> page = pywikibot.Page(site, 'Deep learning')  # create a Page object
 >>> sect = textlib.extract_sections(page.text, site)  # divide content into sections
 >>> links = sorted(link['title'] for link in pywikibot.link_regex.finditer(sect.header))
 >>> pages = [pywikibot.Page(site, title) for title in links]
 
-* ``links`` is a list containing all link titles in alphabethical order
+* ``links`` is a list containing all link titles in alphabetical order
 * ``pages`` is a sorted list containing all ``Page`` objects

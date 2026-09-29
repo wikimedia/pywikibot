@@ -420,16 +420,26 @@ class Request(MutableMapping, WaitingMixin):
         """Add default parameters to the API request.
 
         This method will only add them once.
+
+        .. version-changed:: 11.8
+           Disable maxlag for meta queries and paraminfo action.
+           Use a new ``read_maxlag`` parameter for read requests.
         """
         if hasattr(self, '__defaulted'):
             return
 
-        if self.mime is not None and set(self._params) & set(self.mime):
+        if (self.mime is not None
+                and not self._params.keys().isdisjoint(self.mime)):
             raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
+        maxlag = config.write_maxlag if self.write else config.read_maxlag
+
         if self.action == 'query':
             meta = self._params.get('meta', [])
+            if meta:
+                maxlag = None
+
             # Special logic for private wikis (T153903).
             # If the wiki requires login privileges to read articles, pywikibot
             # will be blocked from accessing the userinfo.
@@ -448,17 +458,20 @@ class Request(MutableMapping, WaitingMixin):
                 prop = set(self['prop'] + ['proofread'])
                 self['prop'] = sorted(prop)
 
+        elif self.action == 'paraminfo':
+            maxlag = None
         elif self.action == 'help':
+            maxlag = None
             self['wrap'] = ''
 
-        if config.maxlag:
-            self._params.setdefault('maxlag', [str(config.maxlag)])
+        if maxlag:
+            self._params.setdefault('maxlag', [str(maxlag)])
         self._params.setdefault('format', ['json'])
         if self['format'] != ['json']:
             raise TypeError(
                 f'Query format {self["format"]!r} cannot be parsed.')
 
-        self.__defaulted = True  # skipcq: PTC-W0037
+        self.__defaulted = True
 
     def _encoded_items(self) -> dict[str, str | bytes]:
         """Build a dict of params with minimal encoding needed for the site.
@@ -475,36 +488,38 @@ class Request(MutableMapping, WaitingMixin):
         :return: Parameters either in the site encoding, or ASCII
             strings
         """
-        params = {}
+        params: dict[str, str | bytes] = {}
         for key, values in self._params.items():
             try:
                 iterator = values.api_iter()
             except AttributeError:
                 if len(values) == 1:
-                    value = values[0]
-                    if value is True:
+                    single_value = values[0]
+                    if single_value is True:
                         values = ['']
-                    elif value is False or value is None:
+                    elif single_value is False or single_value is None:
                         # False and None are not included in the http URI
                         continue
                 iterator = iter(values)
-            value = '|'.join(self._format_value(value) for value in iterator)
+            formatted_value = '|'.join(
+                self._format_value(item) for item in iterator)
+            param_value: str | bytes = formatted_value
             # If the value is encodable as ascii, do not encode it.
             # This means that any value which can be encoded as ascii
             # is presumed to be ascii, and servers using a site encoding
             # which is not a superset of ascii may be problematic.
             try:
-                value.encode('ascii')
+                formatted_value.encode('ascii')
             except UnicodeError:
                 try:
-                    value = value.encode(self.site.encoding())
+                    param_value = formatted_value.encode(self.site.encoding())
                 except Exception:
                     pywikibot.error(
                         f'_encoded_items: {key!r} could not be encoded as '
-                        f'{self.site.encoding()!r}: {value!r}')
+                        f'{self.site.encoding()!r}: {formatted_value!r}')
             assert key.encode('ascii')
             assert isinstance(key, str)
-            params[key] = value
+            params[key] = param_value
         return params
 
     def _http_param_string(self):
@@ -991,8 +1006,8 @@ The text message is:
             'readonly',  # T154011
         ]
 
-        pywikibot.error('Detected MediaWiki API exception {}{}'
-                        .format(e, '; retrying' if retry else '; raising'))
+        pywikibot.error('Detected MediaWiki API exception %s%s',
+                        e, '; retrying' if retry else '; raising')
         param_repr = str(self._params)
         pywikibot.log(f'MediaWiki exception {class_name} details:\n'
                       f'          query=\n{pprint.pformat(param_repr)}\n'
@@ -1224,7 +1239,10 @@ The text message is:
             except TypeError:
                 raise RuntimeError(result)
 
-        msg = 'Maximum retries attempted due to maxlag without success.'
+        msg = (
+            f'Maximum retries attempted due to maxlag on {self.site} without'
+            ' success.'
+        )
         if TEST_RUNNING:
             raise unittest.SkipTest(msg)
 
@@ -1399,11 +1417,14 @@ class CachedRequest(Request):
 def encode_url(query) -> str:
     """Encode parameters to pass with a url.
 
+    .. version-changed:: 11.8
+       Support immutable sequences with *query* parameter.
+
     Reorder parameters so that token parameters go last and call wraps
     :py:obj:`urlencode`. Return an HTTP URL query fragment which
     complies with :api:`Edit#Parameters` (See the 'token' bullet.)
 
-    :param query: keys and values to be uncoded for passing with a url
+    :param query: keys and values to be encoded for passing with a url
     :type query: mapping object or a sequence of two-element tuples
     :return: encoded parameters with token parameters at the end
     """
@@ -1412,6 +1433,6 @@ def encode_url(query) -> str:
 
     # parameters ending on 'token' should go last
     # wpEditToken should go very last
-    query.sort(key=lambda x: x[0].lower().endswith('token')
-               + (x[0] == 'wpEditToken'))
+    query = sorted(query, key=lambda x: x[0].lower().endswith('token')
+                   + (x[0] == 'wpEditToken'))
     return urlencode(query)

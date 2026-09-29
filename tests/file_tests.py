@@ -222,7 +222,7 @@ class TestFilePageLatestFileInfo(TestCase):
 
     file_name = 'File:Albert Einstein Head.jpg'
     pattern = (
-        r'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+        r'https://thumb.wikimedia.org/wikipedia/commons/thumb/'
         r'd/d3/Albert_Einstein_Head.jpg/(\d{1,3})px-Albert_Einstein_Head.jpg'
     )
 

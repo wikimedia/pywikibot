@@ -20,6 +20,7 @@ import sys
 from collections.abc import Callable
 from contextlib import suppress
 from functools import total_ordering, wraps
+from pathlib import Path
 from types import TracebackType
 from typing import IO, Any, Literal
 from warnings import catch_warnings, showwarning, warn
@@ -386,6 +387,22 @@ def as_filename(string: str, repl: str = '_') -> str:
     return re.sub(f'[{pattern}]', repl, string)
 
 
+_STR_TO_BOOL = {
+    'y': True,
+    'yes': True,
+    't': True,
+    'true': True,
+    'on': True,
+    '1': True,
+    'n': False,
+    'no': False,
+    'f': False,
+    'false': False,
+    'off': False,
+    '0': False,
+}
+
+
 def strtobool(val: str) -> bool:
     """Convert a string representation of truth to True or False.
 
@@ -410,11 +427,10 @@ def strtobool(val: str) -> bool:
     :raises ValueError: `val` is not a valid truth value
     """
     val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
-        return True
-    if val in ('n', 'no', 'f', 'false', 'off', '0'):
-        return False
-    raise ValueError(f'invalid truth value {val!r}')
+    try:
+        return _STR_TO_BOOL[val]
+    except KeyError:
+        raise ValueError(f'invalid truth value {val!r}')
 
 
 def normalize_username(username) -> str | None:
@@ -433,7 +449,7 @@ class MediaWikiVersion:
 
     """Version object to allow comparing 'wmf' versions with normal ones.
 
-    The version mainly consist of digits separated by periods. After
+    The version mainly consists of digits separated by periods. After
     that is a suffix which may only be 'wmf<number>', 'alpha',
     'beta<number>' or '-rc.<number>' (the - and . are optional). They
     are considered from old to new in that order with a version number
@@ -509,7 +525,7 @@ class MediaWikiVersion:
             raise ValueError(f'Generator string ({generator!r}) must start '
                              f'with "{prefix}"')
 
-        return MediaWikiVersion(generator[len(prefix):])
+        return MediaWikiVersion(generator.removeprefix(prefix))
 
     def __str__(self) -> str:
         """Return version number with optional suffix."""
@@ -728,7 +744,7 @@ class SevenZipFile(io.RawIOBase):
 
 
 @deprecated_signature(since='11.4.0')
-def open_archive(filename: str, /,
+def open_archive(filename: str | os.PathLike[str], /,
                  mode: str = 'rb', *,
                  use_extension: bool = True) -> IO[bytes]:
     """Open a file and uncompress it if needed.
@@ -748,8 +764,10 @@ def open_archive(filename: str, /,
        keyword only. Uses :class:`SevenZipFile` to open 7zip-files.
     .. version-changed:: 11.7
        Honor *mode* for uncompressed archives.
+    .. version-changed:: 11.8
+       Accept path-like filenames and detect suffixes case-insensitively.
 
-    :param filename: The filename.
+    :param filename: The filename or path-like object.
     :param mode: The mode in which the file should be opened. It may
         either be 'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the
         file in binary mode. It defaults to 'rb'.
@@ -785,10 +803,9 @@ def open_archive(filename: str, /,
     elif mode not in ('rb', 'ab', 'wb'):
         raise ValueError(f'Invalid mode: "{mode}"')
 
+    filename = os.fspath(filename)
     if use_extension:
-        # if '.' not in filename, it'll be 1 character long but otherwise
-        # contain the period
-        extension = filename[filename.rfind('.'):][1:]
+        extension = Path(filename).suffix.removeprefix('.').lower()
     else:
         if mode != 'rb':
             raise ValueError('Magic number detection only when reading')
@@ -838,9 +855,8 @@ def merge_unique_dicts(*args, **kwargs):
         conflicts.update(key for key in arg if key in result)
         result.update(arg)
     if conflicts:
-        raise ValueError('Multiple dicts contain the same keys: {}'
-                         .format(', '.join(sorted(str(key)
-                                                  for key in conflicts))))
+        keys = ', '.join(sorted(str(key) for key in conflicts))
+        raise ValueError(f'Multiple dicts contain the same keys: {keys}')
     return result
 
 
@@ -858,7 +874,7 @@ def file_mode_checker(
     :param mode: Requested file mode
     :param quiet: Warn about file mode change if False.
     :param create: Create the file if it does not exist already
-    :raise IOError: The file does not exist and `create` is False.
+    :raise OSError: The file does not exist and `create` is False.
     """
     try:
         st_mode = os.stat(filename).st_mode

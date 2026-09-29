@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 import unittest
+from unittest.mock import patch
 
 from pywikibot.login import LoginStatus
 from pywikibot.site import BaseSite
@@ -39,8 +40,11 @@ class RequestCacheTests(TestCase):
 
     def test_cache(self) -> None:
         """Test the apicache by doing _check_cache_entry over each entry."""
-        cache.process_entries(join_cache_path(), self._check_cache_entry,
-                              tests=25)
+        with patch.object(cache.APISite, 'login', return_value=None):
+            for tests in (None, 25):
+                with self.subTest(tests=tests):
+                    cache.process_entries(join_cache_path(),
+                                          self._check_cache_entry, tests=tests)
 
 
 if __name__ == '__main__':

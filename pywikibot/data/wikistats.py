@@ -15,7 +15,7 @@ from pywikibot.comms import http
 
 
 # cache the data
-_data: dict[str, list[Any]] = {}
+_data: dict[tuple[str, str], list[Any]] = {}
 
 
 class WikiStats:
@@ -92,13 +92,14 @@ class WikiStats:
 
         :param table: table of data to fetch
         """
-        if table in _data:
-            return _data[table]
+        table = self.FAMILY_MAPPING.get(table, table)
+        cache_key = (self.url, table)
+        if cache_key in _data:
+            return _data[cache_key]
 
         if table not in self.ALL_KEYS:
             pywikibot.warning('WikiStats unknown table ' + table)
 
-        table = self.FAMILY_MAPPING.get(table, table)
         path = '/api.php?action=dump&table={table}&format=csv'
         url = self.url + path
         r = http.fetch(url.format(table=table))
@@ -108,7 +109,7 @@ class WikiStats:
         f = StringIO(r.text)
         reader = DictReader(f)
         data = list(reader)
-        _data[table] = data
+        _data[cache_key] = data
         return data
 
     def get_dict(self, table: str) -> dict:

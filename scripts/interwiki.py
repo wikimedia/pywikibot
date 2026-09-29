@@ -477,9 +477,7 @@ class InterwikiBotConfig:
     nobackonly = False
     parenthesesonly = False
     quiet = False
-    rememberno = False
     remove = []
-    repository = False
     restore_all = False
     same = False
     select = False
@@ -751,7 +749,7 @@ class Subject(interwiki_graph.Subject):
         """Add the given translation hints to the todo collection."""
         if self.conf.same and self.origin:
             if hints:
-                hints += ['all:']
+                hints.append('all:')
             else:
                 hints = ['all:']
 
@@ -874,22 +872,27 @@ class Subject(interwiki_graph.Subject):
             # We have seen this page before, don't ask again.
             return False
 
-        if self.origin and self.origin.namespace() != linkedPage.namespace():
+        origin = self.origin
+        if not origin:
+            return False
+
+        origin_ns = origin.namespace()
+        linked_ns = linkedPage.namespace()
+        if origin_ns != linked_ns:
             # Allow for a mapping between different namespaces
-            crossFrom = self.origin.site.family.crossnamespace.get(
-                self.origin.namespace(), {})
-            crossTo = crossFrom.get(self.origin.site.code,
+            crossFrom = origin.site.family.crossnamespace.get(origin_ns, {})
+            crossTo = crossFrom.get(origin.site.code,
                                     crossFrom.get('_default', {}))
             nsmatch = crossTo.get(linkedPage.site.code,
                                   crossTo.get('_default', []))
-            if linkedPage.namespace() in nsmatch:
+            if linked_ns in nsmatch:
                 return False
 
             if self.conf.autonomous:
                 pywikibot.info(
                     f'NOTE: Ignoring link from page {linkingPage} in namespace'
                     f' {linkingPage.namespace()} to page {linkedPage} in '
-                    f'namespace {linkedPage.namespace()}.'
+                    f'namespace {linked_ns}.'
                 )
                 # Fill up found_in, so that we will not write this notice
                 self.found_in[linkedPage] = [linkingPage]
@@ -900,16 +903,16 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.info(
                     f'NOTE: Ignoring link from page {linkingPage} in '
                     f'namespace {linkingPage.namespace()} to page '
-                    f'{linkedPage} in namespace {linkedPage.namespace()} '
+                    f'{linkedPage} in namespace {linked_ns} '
                     f'because page {preferredPage} in the correct namespace'
                     ' has already been found.'
                 )
                 return True
 
             choice = pywikibot.input_choice(
-                f'WARNING: {self.origin} is in namespace '
-                f'"{self.origin.namespace()}", but {linkedPage} is in '
-                f'namespace "{linkedPage.namespace()}". Follow it anyway?',
+                f'WARNING: {origin} is in namespace "{origin_ns}", but '
+                f'{linkedPage} is in namespace "{linked_ns}". Follow it '
+                'anyway?',
                 [('Yes', 'y'), ('No', 'n'), ('Add an alternative', 'a'),
                  ('give up', 'g')],
                 automatic_quit=False)
@@ -930,7 +933,6 @@ class Subject(interwiki_graph.Subject):
                 return True
 
         # same namespaces, no problem
-        # or no origin page yet, also no problem
         return False
 
     def disambigMismatch(self, page, counter):
@@ -948,15 +950,18 @@ class Subject(interwiki_graph.Subject):
         if not self.origin:
             return (False, None)  # any page matches til we have an origin page
 
+        origin_disambig = self.origin.isDisambig()
+        page_disambig = page.isDisambig()
+
         if self.conf.autonomous:
-            if self.origin.isDisambig() and not page.isDisambig():
+            if origin_disambig and not page_disambig:
                 pywikibot.info(
                     'NOTE: Ignoring link from disambiguation page '
                     f'{self.origin} to non-disambiguation {page}'
                 )
                 return (True, None)
 
-            if not self.origin.isDisambig() and page.isDisambig():
+            if not origin_disambig and page_disambig:
                 pywikibot.info(
                     'NOTE: Ignoring link from non-disambiguation page '
                     f'{self.origin} to disambiguation {page}'
@@ -965,7 +970,7 @@ class Subject(interwiki_graph.Subject):
 
         else:
             choice = 'y'
-            if self.origin.isDisambig() and not page.isDisambig():
+            if origin_disambig and not page_disambig:
                 disambig = self.getFoundDisambig(page.site)
                 if disambig:
                     pywikibot.info(
@@ -983,7 +988,7 @@ class Subject(interwiki_graph.Subject):
                     automatic_quit=False
                 )
 
-            elif not self.origin.isDisambig() and page.isDisambig():
+            elif not origin_disambig and page_disambig:
                 nondisambig = self.getFoundNonDisambig(page.site)
                 if nondisambig:
                     pywikibot.info(

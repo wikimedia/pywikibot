@@ -9,10 +9,9 @@ from __future__ import annotations
 from pywikibot import family
 
 
-# The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
-    """Family module for Wikipedia."""
+    """Family class for Wikipedia."""
 
     name = 'wikipedia'
 

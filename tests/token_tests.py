@@ -78,7 +78,7 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
         """Test invalid token."""
         redirected_tokens = ['edit', 'move', 'delete']
         for ttype in [*redirected_tokens, 'invalidtype']:
-            with self.assertRaises(KeyError):
+            with self.assertRaisesRegex(KeyError, r'Invalid token'):
                 self.site.tokens['invalidtype']
 
 
@@ -131,7 +131,8 @@ class PatrolTestCase(TokenTestBase, TestCase):
         rc = rc[0]
 
         # site.patrol() needs params
-        with self.assertRaises(Error):
+        with self.assertRaisesRegex(
+                Error, r'No rcid, revid or revision provided\.'):
             list(mysite.patrol())
         try:
             result = list(mysite.patrol(rcid=rc['rcid']))

@@ -28,25 +28,27 @@ Pages to work on can be specified using any of:
 
 &params;
 
-Examples
---------
+.. admonition:: Examples
 
-Transfer all pages in category "Query service" from the English Wikipedia to
-the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
+   Transfer all pages in category "Query service" from the English
+   Wikipedia to the Arabic Wiktionary, adding "Wiktionary:Import enwp/"
+   as prefix:
 
-    python pwb.py transferbot -site:wikipedia:en -cat:"Query service" \\
-    -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
+       python pwb.py transferbot -site:wikipedia:en -cat:"Query service" \\
+       -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
 
-Copy the template "Query service" from the English Wikipedia to the
-Arabic Wiktionary:
+   Copy the template "Query service" from the English Wikipedia to the
+   Arabic Wiktionary:
 
-    python pwb.py transferbot -site:wikipedia:en -tofamily:wiktionary \\
-    -tolang:ar -page:"Template:Query service"
+       python pwb.py transferbot -site:wikipedia:en -tofamily:wiktionary \\
+       -tolang:ar -page:"Template:Query service"
 
-Copy 10 wanted templates of German Wikipedia from English Wikipedia to German:
+   Copy 10 wanted templates of German Wikipedia from English Wikipedia
+   to German:
 
-    python pwb.py transferbot -site:wikipedia:en -tolang:de \\
-    -wantedtemplates:10 -target
+       python pwb.py transferbot -site:wikipedia:en -tolang:de \\
+       -wantedtemplates:10 -target
+
 """
 from __future__ import annotations
 

@@ -29,6 +29,7 @@ from pywikibot.tools import (
     is_ip_network,
     suppress_warnings,
 )
+from pywikibot.tools.collections import GeneratorWrapper
 from pywikibot.tools.itertools import (
     filter_unique,
     intersect_generators,
@@ -39,6 +40,55 @@ from pywikibot.tools.itertools import (
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 from tests.utils import skipping
+
+
+class TestGeneratorWrapper(TestCase):
+
+    """Test lazy initialization of the wrapped generator."""
+
+    net = False
+
+    def setUp(self) -> None:
+        """Create a wrapper with a tracked generator property."""
+        super().setUp()
+
+        class Wrapper(GeneratorWrapper):
+
+            @property
+            def generator(self):
+                return (i for i in range(3))
+
+        self.wrapper = Wrapper()
+        patcher = mock.patch.object(
+            Wrapper, 'generator', new_callable=mock.PropertyMock)
+        self.generator = patcher.start()
+        self.addCleanup(patcher.stop)
+        self.generator.side_effect = lambda: (i for i in range(3))
+
+    def test_lifecycle(self) -> None:
+        """Fetch the generator once until explicitly restarted."""
+        self.generator.assert_not_called()
+        self.assertEqual(list(self.wrapper), [0, 1, 2])
+        with self.assertRaises(StopIteration):
+            next(self.wrapper)
+        self.generator.assert_called_once_with()
+        self.wrapper.restart()
+        self.assertEqual(next(self.wrapper), 0)
+        self.assertEqual(self.generator.call_count, 2)
+        self.wrapper.close()
+        with self.assertRaises(StopIteration):
+            next(self.wrapper)
+        self.assertEqual(self.generator.call_count, 2)
+
+    def test_invalid_generator(self) -> None:
+        """Reject an invalid result once and allow initialization to retry."""
+        self.generator.side_effect = [42, (i for i in range(3))]
+        with self.assertRaisesRegex(
+                TypeError, '^generator property is not a generator but int$'):
+            next(self.wrapper)
+        self.generator.assert_called_once_with()
+        self.assertEqual(next(self.wrapper), 0)
+        self.assertEqual(self.generator.call_count, 2)
 
 
 class OpenArchiveTestCase(TestCase):
@@ -461,9 +511,9 @@ class TestFilterUnique(TestCase):
 
         if key in (hash, passthrough):
             if isinstance(deduped, OrderedDict):
-                self.assertEqual(list(deduped.keys()), [1, 3])
+                self.assertEqual(list(deduped), [1, 3])
             elif isinstance(deduped, Mapping):
-                self.assertCountEqual(list(deduped.keys()), [1, 3])
+                self.assertCountEqual(list(deduped), [1, 3])
             else:
                 self.assertEqual(deduped, {1, 3})
 
@@ -472,9 +522,9 @@ class TestFilterUnique(TestCase):
 
         if key in (hash, passthrough):
             if isinstance(deduped, OrderedDict):
-                self.assertEqual(list(deduped.keys()), [1, 3, 2, 4])
+                self.assertEqual(list(deduped), [1, 3, 2, 4])
             elif isinstance(deduped, Mapping):
-                self.assertCountEqual(list(deduped.keys()), [1, 2, 3, 4])
+                self.assertCountEqual(list(deduped), [1, 2, 3, 4])
             else:
                 self.assertEqual(deduped, {1, 2, 3, 4})
 
@@ -553,7 +603,7 @@ class TestFilterUnique(TestCase):
 
     def test_obj_id(self) -> None:
         """Test filter_unique with objects using id as key, which fails."""
-        # Two objects which may be equal do not necessary have the same id.
+        # Two objects which may be equal do not necessarily have the same id.
         deduped = set()
         deduper = filter_unique(self.decs, container=deduped, key=id)
         self.assertIsEmpty(deduped)
@@ -822,6 +872,19 @@ class BasicGeneratorIntersectTestCase(GeneratorIntersectTestCase):
     def test_intersect_with_dups(self) -> None:
         """Test basic intersect with duplicates."""
         self.assertEqualItertools(['aabc', 'dddb', 'baa'])
+
+    def test_intersect_hash_collision(self) -> None:
+        """Test unequal items with the same hash are not deduplicated."""
+        class CollidingInt(int):
+
+            """Integer whose instances all share one hash value."""
+
+            def __hash__(self) -> int:
+                """Return a constant hash."""
+                return 1
+
+        values = [CollidingInt(1), CollidingInt(2)]
+        self.assertEqualItertools([values, values])
 
     def test_intersect_with_accepted_dups(self) -> None:
         """Test intersect with duplicates accepted."""

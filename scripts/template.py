@@ -62,47 +62,48 @@ other:       First argument is the old template name, second one is the
              new name. If you want to address a template which has
              spaces, put quotation marks around it, or use underscores.
 
-Examples
---------
+.. admonition:: Examples
 
-If you have a template called [[Template:Cities in Washington]] and want
-to change it to [[Template:Cities in Washington state]], start:
+   If you have a template called [[Template:Cities in Washington]] and
+   want to change it to [[Template:Cities in Washington state]], start::
 
-    python pwb.py template "Cities in Washington" "Cities in Washington state"
+       python pwb.py template "Cities in Washington" "Cities in Washington \\
+       state"
 
-Move the page [[Template:Cities in Washington]] manually afterwards.
+   Move the page [[Template:Cities in Washington]] manually afterwards.
 
+   If you have a template called [[Template:test]] and want to
+   substitute it only on pages in the User: and User talk: namespaces,
+   do::
 
-If you have a template called [[Template:test]] and want to substitute
-it only on pages in the User: and User talk: namespaces, do:
+       python pwb.py template test -subst -namespace:2 -namespace:3
 
-    python pwb.py template test -subst -namespace:2 -namespace:3
+   .. note:: -namespace: is a global Pywikibot parameter
 
-.. note:: -namespace: is a global Pywikibot parameter
+   This next example substitutes the template lived with a supplied edit
+   summary. It only performs substitutions in main article namespace and
+   doesn't prompt to start replacing. Note that -putthrottle: is a
+   global Pywikibot parameter::
 
-This next example substitutes the template lived with a supplied edit
-summary. It only performs substitutions in main article namespace and
-doesn't prompt to start replacing. Note that -putthrottle: is a global
-Pywikibot parameter:
+       python pwb.py template -putthrottle:30 -namespace:0 lived -subst \\
+       -always -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
-    python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \\
-    -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
+   This next example removes the templates {{cfr}}, {{cfru}}, and
+   {{cfr-speedy}} from five category pages as given::
 
-This next example removes the templates {{cfr}}, {{cfru}}, and
-{{cfr-speedy}} from five category pages as given:
+       python pwb.py template cfr cfru cfr-speedy -remove -always \\
+       -page:"Category:Mountain monuments and memorials" \\
+       -page:"Category:Indian family names" \\
+       -page:"Category:Tennis tournaments in Belgium" \\
+       -page:"Category:Tennis tournaments in Germany" \\
+       -page:"Category:Episcopal cathedrals in the United States" \\
+       -summary:"Removing Cfd templates from category pages that survived."
 
-    python pwb.py template cfr cfru cfr-speedy -remove -always \\
-    -page:"Category:Mountain monuments and memorials" \\
-    -page:"Category:Indian family names" \\
-    -page:"Category:Tennis tournaments in Belgium" \\
-    -page:"Category:Tennis tournaments in Germany" \\
-    -page:"Category:Episcopal cathedrals in the United States" \\
-    -summary:"Removing Cfd templates from category pages that survived."
+   This next example substitutes templates test1, test2, and space test
+   on all user talk pages (namespace #3)::
 
-This next example substitutes templates test1, test2, and space test on
-all user talk pages (namespace #3):
+       python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 
-    python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 """
 from __future__ import annotations
 
@@ -228,6 +229,7 @@ def main(*args: str) -> None:
     site = pywikibot.Site()
     gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
+        option, sep, value = arg.partition(':')
         if arg == '-remove':
             options['remove'] = True
         elif arg.startswith('-subst'):
@@ -244,17 +246,17 @@ def main(*args: str) -> None:
                     "Please enter the XML dump's filename: ")
             else:
                 xmlfilename = arg[5:]
-        elif arg.startswith('-addcat:'):
-            options['addcat'] = arg[len('-addcat:'):]
-        elif arg.startswith('-summary:'):
-            options['summary'] = arg[len('-summary:'):]
-        elif arg.startswith('-onlyuser:'):
-            user = arg[len('-onlyuser:'):]
-        elif arg.startswith('-skipuser:'):
-            user = arg[len('-skipuser:'):]
+        elif option == '-addcat' and sep:
+            options['addcat'] = value
+        elif option == '-summary' and sep:
+            options['summary'] = value
+        elif option == '-onlyuser' and sep:
+            user = value
+        elif option == '-skipuser' and sep:
+            user = value
             skip = True
-        elif arg.startswith('-timestamp:'):
-            timestamp = arg[len('-timestamp:'):]
+        elif option == '-timestamp' and sep:
+            timestamp = value
         elif not gen_factory.handle_arg(arg):
             template_name = pywikibot.Page(site, arg, ns=10)
             template_names.append(template_name.title(with_ns=False))

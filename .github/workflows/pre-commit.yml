@@ -20,7 +20,7 @@ jobs:
   pre-commit:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 10
+    timeout-minutes: 7
     strategy:
       fail-fast: false
       matrix:

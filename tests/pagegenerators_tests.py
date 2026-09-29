@@ -36,7 +36,7 @@ from tests.aspects import (
     require_modules,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
-from tests.utils import skipping
+from tests.utils import expected_failure_if, skipping
 
 
 en_wp_page_titles = (
@@ -84,6 +84,24 @@ class TestDryPageGenerators(TestCase):
     def test_module_import(self) -> None:
         """Test module import."""
         self.assertIn('pywikibot.pagegenerators', sys.modules)
+
+    def test_petscan_depth(self) -> None:
+        """Test the PetScan category depth option."""
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site)
+        self.assertEqual(gen.opts['depth'], 0)
+
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site, depth=1)
+        self.assertEqual(gen.opts['depth'], 1)
+        query = gen.buildQuery(
+            ['Pywikibot'], True, None, None, depth=2)
+        self.assertEqual(query['depth'], 2)
+
+        gen = pagegenerators.PetScanPageGenerator(
+            ['Pywikibot'], site=self.site, extra_options={'depth': 2},
+            depth=1)
+        self.assertEqual(gen.opts['depth'], 2)
 
     def test_PagesFromTitlesGenerator(self) -> None:
         """Test PagesFromTitlesGenerator."""
@@ -139,6 +157,33 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.NamespaceFilterPageGenerator(
             gen, ('Talk', 'Template'), site)
         self.assertLength(tuple(gen), 10)
+
+    def test_category_filter_enumerates_once(self) -> None:
+        """Test that categories are enumerated once for multiple filters."""
+        categories = [
+            pywikibot.Category(self.site, f'Category:{name}')
+            for name in ('First', 'Second')
+        ]
+        matching_page = mock.Mock()
+        matching_page.categories.side_effect = lambda: iter(categories)
+        missing_page = mock.Mock()
+        missing_page.categories.side_effect = lambda: iter(categories[:1])
+
+        pages = list(pagegenerators.CategoryFilterPageGenerator(
+            [matching_page, missing_page], categories))
+
+        self.assertLength(pages, 1)
+        self.assertIs(pages[0], matching_page)
+        matching_page.categories.assert_called_once_with()
+        missing_page.categories.assert_called_once_with()
+
+        unfiltered_page = mock.Mock()
+        pages = list(pagegenerators.CategoryFilterPageGenerator(
+            [unfiltered_page], []))
+
+        self.assertLength(pages, 1)
+        self.assertIs(pages[0], unfiltered_page)
+        unfiltered_page.categories.assert_not_called()
 
     def test_RegexFilterPageGenerator(self) -> None:
         """Test RegexFilterPageGenerator."""
@@ -607,6 +652,48 @@ class TestDayPageGenerator(DefaultSiteTestCase):
             self._run_test(12, 13)
 
 
+class TestDryPreloadingGenerator(TestCase):
+
+    """Dry tests for PreloadingGenerator."""
+
+    net = False
+
+    def test_groupsize_per_site(self) -> None:
+        """Test that each site keeps its own preload group size."""
+        low_site = mock.Mock(maxlimit=2)
+        high_site = mock.Mock(maxlimit=5)
+        low_site.preloadpages.side_effect = (
+            lambda pages, **kwargs: iter(pages))
+        high_site.preloadpages.side_effect = (
+            lambda pages, **kwargs: iter(pages))
+
+        low_pages = [mock.Mock(site=low_site) for _ in range(2)]
+        high_pages = [mock.Mock(site=high_site) for _ in range(3)]
+        pages = [low_pages[0], high_pages[0], low_pages[1],
+                 *high_pages[1:]]
+
+        list(PreloadingGenerator(pages, groupsize=5))
+
+        low_site.preloadpages.assert_called_once_with(
+            low_pages, groupsize=2, quiet=False)
+        high_site.preloadpages.assert_called_once_with(
+            high_pages, groupsize=5, quiet=False)
+
+    def test_preload_options(self) -> None:
+        """Test that preload options are passed to the site."""
+        site = mock.Mock(maxlimit=5)
+        site.preloadpages.side_effect = lambda pages, **kwargs: iter(pages)
+        page = mock.Mock(site=site)
+
+        pages = list(PreloadingGenerator(
+            [page], content=False, coordinates=True, pageprops=True))
+
+        self.assertEqual(pages, [page])
+        site.preloadpages.assert_called_once_with(
+            [page], groupsize=5, quiet=False, pageprops=True,
+            content=False, coordinates=True)
+
+
 class TestPreloadingGenerator(DefaultSiteTestCase):
 
     """Test preloading generator on lists."""
@@ -734,6 +821,29 @@ class DryFactoryGeneratorTest(TestCase):
     code = 'en'
 
     dry = True
+
+    def test_title_filters_run_before_redirect_filter(self) -> None:
+        """Test title filters discard pages before redirect checks."""
+        site = self.get_site()
+        keep = pywikibot.Page(site, 'Keep this')
+        pages = [
+            pywikibot.Page(site, 'Drop this'),
+            pywikibot.Page(site, 'Keep excluded'),
+            keep,
+        ]
+        gf = pagegenerators.GeneratorFactory(site=site)
+        gf.gens = [pages]
+        gf.titlefilter_list = ['^Keep']
+        gf.titlenotfilter_list = ['excluded']
+        gf.redirectfilter = False
+
+        with mock.patch.object(
+                pywikibot.Page, 'isRedirectPage', return_value=False
+        ) as is_redirect:
+            result = list(gf.getCombinedGenerator())
+
+        self.assertEqual(result, [keep])
+        is_redirect.assert_called_once_with()
 
     def test_one_namespace(self) -> None:
         """Test one namespace."""
@@ -1164,8 +1274,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_recentchanges_default(self) -> None:
         """Test recentchanges generator with default namespace setting."""
-        if (self.site.family.name == 'wpbeta'
-                or self.site.sitename == 'wikisource:beta'):
+        if self.site.family.name.startswith('beta'):
             self.skipTest(
                 f'Skipping {self.site} due to too many autoblocked users')
         gf = pagegenerators.GeneratorFactory(site=self.site)
@@ -1726,6 +1835,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
 
     """Test UnconnectedPageGenerator."""
 
+    @expected_failure_if(pywikibot.config.family == 'betawikipedia')  # T439358
     def test_unconnected_with_repo(self) -> None:
         """Test UnconnectedPageGenerator."""
         site = self.site.data_repository()

@@ -91,7 +91,7 @@ can be invoked like this:
 
          pwb <global options> show_entities <scripts options>
 
-.. note:: If you have several Pywikibot scripts installed, there script names
-   must be different; otherwise the started script might not that you have
+.. note:: If you have several Pywikibot scripts installed, their script names
+   must be different; otherwise the started script might not be the one you
    expected.
 .. warning:: This guide is not tested. Test it locally before uploading to pypi.

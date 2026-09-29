@@ -26,7 +26,7 @@ word is uppercase and the remaining characters and words are lowercase.
 casechecker script
 ==================
 
-**Bot to find all pages on the wiki with mixed latin and cyrilic alphabets**
+**Bot to find all pages on the wiki with mixed Latin and Cyrillic alphabets**
 
 catall script
 =============

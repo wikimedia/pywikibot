@@ -112,7 +112,8 @@ class TestHTMLComparator(TestCase):
         self.assertLength(output['deleted-context'], 1)
 
 
-@patch('builtins.__import__', side_effect=ImportError, autospec=True)
+@patch('builtins.__import__',
+       side_effect=ImportError("No module named 'bs4'"), autospec=True)
 class TestNoBeautifulSoup(TestCase):
 
     """Test functions when BeautifulSoup is not installed."""
@@ -121,7 +122,8 @@ class TestNoBeautifulSoup(TestCase):
 
     def test_html_comparator(self, mocked_import) -> None:
         """Test html_comparator when bs4 not installed."""
-        with self.assertRaises(ImportError):
+        with self.assertRaisesRegex(
+                ImportError, r"No module named ['\"]bs4['\"]"):
             html_comparator('')
         self.assertEqual(mocked_import.call_count, 1)
         self.assertIn('bs4', mocked_import.call_args[0])

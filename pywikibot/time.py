@@ -267,8 +267,7 @@ class Timestamp(datetime.datetime):
            the *strict* parameter was added which discards missing
            element tolerance.
 
-        Example
-        -------
+        **Example:**
 
         >>> Timestamp.fromtimestampformat('20220705082234')
         Timestamp(2022, 7, 5, 8, 22, 34)
@@ -482,8 +481,9 @@ def str2timedelta(
         duration *= 12
 
         if timestamp:
+            date = timestamp.date()
             return pywikibot.date.apply_month_delta(
-                timestamp.date(), month_delta=duration) - timestamp.date()
+                date, month_delta=duration) - date
         return datetime.timedelta(days=days)
 
     # days, seconds, hours, weeks

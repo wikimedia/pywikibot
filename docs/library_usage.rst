@@ -58,7 +58,7 @@ Explanation
       :class:`bot.ExistingPageBot`.
 :5:   The bot is derived from
       :class:`ExistingPageBot<bot.ExistingPageBot>`.
-      All pages from  generator which does not exists are skipped.
+      All pages from the generator that do not exist are skipped.
 :7:   Every Bot has an *always* option which autoconfirms any changes if
       set to True. To expand all available options of a bot and set the
       default values of them, use
@@ -90,7 +90,7 @@ Explanation
       :mod:`pywikibot.pagegenerators` are parsed here using
       :meth:`GeneratorFactory.handle_args()
       <pagegenerators.GeneratorFactory.handle_args>`.
-:25:  Local options which are are available for the current bot are
+:25:  Local options which are available for the current bot are
       parsed in this loop.
 :29:  Create the bot passing keyword only parameters and run it.
 

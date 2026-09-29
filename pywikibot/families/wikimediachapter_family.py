@@ -9,7 +9,7 @@ from __future__ import annotations
 from pywikibot import family
 
 
-class Family(family.SubdomainFamily, family.WikimediaFamily):
+class Family(family.WikimediaSubdomainFamily):
 
     """Family class for WCH, WTO and WUG wikis hosted on wikimedia.org."""
 

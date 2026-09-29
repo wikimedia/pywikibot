@@ -93,7 +93,8 @@ class TestInterwikiMap(TestCase):
         site = self.get_site(key)
         prefix = self.sites[key]['family']
         if prefix == 'mediawiki':
-            with self.assertRaises(KeyError):
+            with self.assertRaisesRegex(
+                    KeyError, "'mediawiki' is not an interwiki prefix"):
                 site.interwiki(prefix)
         else:
             iw_site = site.interwiki(prefix)
@@ -146,7 +147,8 @@ class TestInterwikiMapPrefix(TestCase):
     def test_invalid_prefix(self) -> None:
         """Test wrong interwiki prefix."""
         for prefix in ('foo', 'mediawiki', 'test'):
-            with self.subTest(prefix=prefix), self.assertRaises(KeyError):
+            with self.subTest(prefix=prefix), self.assertRaisesRegex(
+                    KeyError, f"'{prefix}' is not an interwiki prefix"):
                 self.iw_map[prefix]
 
 

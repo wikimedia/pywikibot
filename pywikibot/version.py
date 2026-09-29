@@ -142,8 +142,7 @@ def getversion_git(path=None):
         # some Windows git versions provide git.cmd instead of git.exe
         cmd = 'git.cmd'
 
-    with open(os.path.join(_program_dir, '.git/config')) as f:
-        tag = f.read()
+    tag = (Path(_program_dir) / '.git' / 'config').read_text()
     # Try 'origin' and then 'gerrit' as remote name; bail if can't find either.
     remote_pos = tag.find('[remote "origin"]')
     if remote_pos == -1:
@@ -167,11 +166,11 @@ def getversion_git(path=None):
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
-    dp = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
+    dp = subprocess.Popen([cmd, 'rev-list', '--count', 'HEAD'],
                           cwd=_program_dir,
                           stdout=subprocess.PIPE)
-    rev, stderr = dp.communicate()
-    rev = f'g{len(rev.splitlines())}'
+    rev, _ = dp.communicate()
+    rev = f'g{int(rev)}'
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
         raise VersionParseError
@@ -251,14 +250,18 @@ def get_module_filename(module) -> str | None:
     :param module: The module instance.
     :type module: module
     :return: The filename if it's a pywikibot module otherwise None.
+
+    .. version-changed:: 11.8
+       Path components are used to determine whether the module is
+       inside the Pywikibot program directory.
     """
     if hasattr(module, '__file__'):
         filename = module.__file__
         if not filename or not os.path.exists(filename):
             return None
 
-        program_dir = _get_program_dir()
-        if filename.startswith(program_dir):
+        program_dir = Path(_get_program_dir())
+        if Path(filename).is_relative_to(program_dir):
             return filename
     return None
 
@@ -297,9 +300,9 @@ def package_versions(
 
     std_lib_dir = pathlib.Path(sysconfig.get_paths()['stdlib'])
 
-    root_packages = {key.split('.')[0] for key in modules}
+    root_packages = {key.partition('.')[0] for key in modules}
 
-    builtin_packages = {name.split('.')[0] for name in root_packages
+    builtin_packages = {name for name in root_packages
                         if name in sys.builtin_module_names
                         or '_' + name in sys.builtin_module_names}
 

@@ -64,6 +64,7 @@ from pywikibot.time import Timestamp
 from pywikibot.tools import (
     PYTHON_VERSION,
     deprecated_signature,
+    issue_deprecation_warning,
     normalize_username,
 )
 
@@ -129,8 +130,8 @@ def _code_fam_from_url(url: str, name: str | None = None) -> tuple[str, str]:
         matched_sites.append((family.code, family))
 
     if len(matched_sites) > 1:
-        warning('Found multiple matches for URL "{}": {} (use first)'
-                .format(url, ', '.join(str(s) for s in matched_sites)))
+        warning('Found multiple matches for URL "%s": %s (use first)',
+                url, ', '.join(str(s) for s in matched_sites))
     return matched_sites[0]
 
 
@@ -248,6 +249,10 @@ def Site(code: str | None = None,  # noqa: N802
 
     # config.usernames is initialised with a defaultdict for each family name
     family_name = str(fam)
+
+    if code == 'beta' and family_name == 'wikisource':
+        issue_deprecation_warning(
+            'wikisource:beta', 'betawikisource:en', since='11.8.0')
 
     code_to_user = {}
     if '*' in _config.usernames:  # T253127: usernames is a defaultdict

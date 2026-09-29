@@ -7,6 +7,8 @@
 """Test i18n module."""
 from __future__ import annotations
 
+import os
+import tempfile
 import unittest
 from contextlib import suppress
 
@@ -206,7 +208,9 @@ class TestFallbackTranslate(TestCase):
     def testNoEnglish(self) -> None:
         """Test translate with missing English text."""
         for code in ('en', 'fy', 'nl'):
-            with self.subTest(code=code), self.assertRaises(KeyError):
+            with self.subTest(code=code), self.assertRaisesRegex(
+                    KeyError,
+                    'No fallback key found in lookup dict for "en"'):
                 i18n.translate(code, self.msg_no_english, fallback=True)
 
 
@@ -274,6 +278,19 @@ class TestTWTranslate(TWNTestCaseBase):
     net = False
     message_package = 'tests.i18n'
 
+    def testSwitchMessagesPackage(self) -> None:
+        """Test that switching packages clears cached translations."""
+        self.addCleanup(i18n._get_bundle.cache_clear)
+        i18n._get_bundle.cache_clear()
+        self.assertEqual(i18n.twtranslate('en', 'test-localized'),
+                         'test-localized EN')
+
+        i18n.set_messages_package('pywikibot.scripts.i18n')
+        with self.assertRaisesRegex(
+                TranslationError,
+                'No translation available for key test-localized'):
+            i18n.twtranslate('en', 'test-localized', fallback=False)
+
     def testLocalized(self) -> None:
         """Test fully localized entry."""
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
@@ -301,7 +318,9 @@ class TestTWTranslate(TWNTestCaseBase):
 
     def testNoEnglish(self) -> None:
         """Test translating into English with missing entry."""
-        with self.assertRaises(TranslationError):
+        with self.assertRaisesRegex(
+                TranslationError,
+                'No translation available for key test-no-english'):
             i18n.twtranslate('en', 'test-no-english')
 
 
@@ -402,6 +421,23 @@ class PywikibotPackageTestCase(TestCase):
         summary = f'Working on Test page at site {self.site}'
         msg = page._cosmetic_changes_hook(summary)
         self.assertEqual(msg, summary + '; kosmetische Änderungen')
+
+
+class BundlesTestCase(TestCase):
+
+    """Test message bundle discovery."""
+
+    net = False
+
+    def test_different_working_directory(self) -> None:
+        """Test bundle discovery outside the package parent directory."""
+        old_cwd = os.getcwd()
+        with tempfile.TemporaryDirectory() as directory:
+            try:
+                os.chdir(directory)
+                self.assertIn('pywikibot', i18n.bundles(stem=True))
+            finally:
+                os.chdir(old_cwd)
 
 
 class TestExtractPlural(TestCase):

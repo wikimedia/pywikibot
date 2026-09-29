@@ -48,6 +48,9 @@ class ThreadedGenerator(threading.Thread):
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
 
     .. version-added:: 3.0
+    .. version-changed:: 11.8
+       Exceptions from the producer are re-raised during iteration after
+       yielding any queued results.
     """
 
     def __init__(self, group=None, target=None, name: str = 'GeneratorThread',
@@ -71,6 +74,7 @@ class ThreadedGenerator(threading.Thread):
         super().__init__(group=group, name=name)
         self.queue: queue.Queue[Any] = queue.Queue(qsize)
         self.finished = threading.Event()
+        self._exception: BaseException | None = None
 
     def __iter__(self):
         """Iterate results from the queue."""
@@ -85,28 +89,35 @@ class ThreadedGenerator(threading.Thread):
             except KeyboardInterrupt:
                 self.stop()
 
+        if self._exception is not None:
+            raise self._exception
+
     def stop(self) -> None:
         """Stop the background thread."""
         self.finished.set()
 
     def run(self) -> None:
         """Run the generator and store the results on the queue."""
-        iterable = any(hasattr(self.generator, key)
-                       for key in ('__iter__', '__getitem__'))
-        if iterable and not self.args and not self.kwargs:
-            self.__gen = self.generator
-        else:
-            self.__gen = self.generator(*self.args, **self.kwargs)
-        for result in self.__gen:
-            while True:
-                if self.finished.is_set():
-                    return
-                try:
-                    self.queue.put_nowait(result)
-                except queue.Full:
-                    time.sleep(0.25)
-                    continue
-                break
+        try:
+            iterable = any(hasattr(self.generator, key)
+                           for key in ('__iter__', '__getitem__'))
+            if iterable and not self.args and not self.kwargs:
+                self.__gen = self.generator
+            else:
+                self.__gen = self.generator(*self.args, **self.kwargs)
+            for result in self.__gen:
+                while True:
+                    if self.finished.is_set():
+                        return
+                    try:
+                        self.queue.put_nowait(result)
+                    except queue.Full:
+                        time.sleep(0.25)
+                        continue
+                    break
+        except BaseException as e:  # noqa: B036
+            # Re-raised in the consumer thread by __iter__.
+            self._exception = e
         # wait for queue to be emptied, then kill the thread
         while not self.finished.is_set() and not self.queue.empty():
             time.sleep(0.25)
@@ -137,15 +148,27 @@ class ThreadList(list):
 
     .. version-changed:: 10.0
        the unintentional and undocumented *args* parameter was removed.
+    .. version-changed:: 11.8
+       Raise TypeError if *limit* is not an integer; raise ValueError if
+       *limit* is less than 1.
 
     .. seealso:: :class:`BoundedPoolExecutor`
 
-    :param limit: the number of simultaneous threads
+    :param limit: the positive integer number of simultaneous threads
     :param wait_time: how long to wait if active threads exceeds limit
+    :raises TypeError: limit is not an integer or is a boolean
+    :raises ValueError: limit is less than 1.
     """
 
     limit: int = 128  #: :meta private:
     wait_time: float = 2.0  #: :meta private:
+
+    def __post_init__(self) -> None:
+        """Validate the thread limit."""
+        if not isinstance(self.limit, int) or isinstance(self.limit, bool):
+            raise TypeError("'limit' must be an integer")
+        if self.limit < 1:
+            raise ValueError("Minimum 'limit' is 1")
 
     def active_count(self) -> int:
         """Return the number of alive threads and delete all non-alive ones."""
@@ -250,12 +273,16 @@ class BoundedPoolExecutor(futures.Executor):
                                      max_workers=1) as executor:
                future = executor.submit(pow, 323, 1235)
                print(future.result())
+
+        .. version-changed:: 11.8
+           Release bounded capacity when submission fails with any
+           Exception.
         """
         self._bound_semaphore.acquire()
 
         try:
             f = super().submit(fn, *args, **kwargs)
-        except futures.BrokenExecutor:
+        except BaseException:
             self._bound_semaphore.release()
             raise
 

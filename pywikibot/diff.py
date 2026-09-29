@@ -200,7 +200,7 @@ class Hunk:
 
     def __str__(self) -> str:
         """Return the diff as plain text."""
-        return ''.join(self.diff_plain_text)
+        return self.diff_plain_text
 
     def __repr__(self) -> str:
         """Return a reconstructable representation."""
@@ -368,10 +368,10 @@ class PatchManager:
         """Dynamically determine context range for a super hunk."""
         a0, a1 = super_hunk.a_rng
         b0, b1 = super_hunk.b_rng
-        return ((a0 - min(super_hunk.pre_context, self.context),
-                 a1 + min(super_hunk.post_context, self.context)),
-                (b0 - min(super_hunk.pre_context, self.context),
-                 b1 + min(super_hunk.post_context, self.context)))
+        pre_context = min(super_hunk.pre_context, self.context)
+        post_context = min(super_hunk.post_context, self.context)
+        return ((a0 - pre_context, a1 + post_context),
+                (b0 - pre_context, b1 + post_context))
 
     def _generate_diff(self, hunks: _SuperHunk) -> str:
         """Generate a diff text for the given hunks."""
@@ -382,17 +382,20 @@ class PatchManager:
 
         context_range = self._get_context_range(hunks)
 
-        output = (
-            f'<<aqua>>{Hunk.get_header_text(*context_range)}<<default>>\n'
-            f'{extend_context(context_range[0][0], hunks[0].a_rng[0])}'
-        )
+        diff_text = [
+            f'<<aqua>>{Hunk.get_header_text(*context_range)}<<default>>\n',
+            extend_context(context_range[0][0], hunks[0].a_rng[0]),
+        ]
         previous_hunk = None
         for hunk in hunks:
             if previous_hunk:
-                output += extend_context(previous_hunk.a_rng[1], hunk.a_rng[0])
+                diff_text.append(extend_context(previous_hunk.a_rng[1],
+                                                hunk.a_rng[0]))
             previous_hunk = hunk
-            output += hunk.diff_text
-        output += extend_context(hunks[-1].a_rng[1], context_range[0][1])
+            diff_text.append(hunk.diff_text)
+        diff_text.append(extend_context(hunks[-1].a_rng[1],
+                                        context_range[0][1]))
+        output = ''.join(diff_text)
         if self._replace_invisible:
             output = chars.replace_invisible(output)
 
@@ -487,11 +490,11 @@ class PatchManager:
                     else:
                         mode = '+'
                         first = self.b[super_hunk[0].b_rng[0]]
-                    hunk_list += [(status, index,
-                                   Hunk.get_header_text(
-                                       *self._get_context_range(super_hunk),
-                                       affix=''),
-                                   mode, first)]
+                    hunk_list.append((
+                        status, index,
+                        Hunk.get_header_text(
+                            *self._get_context_range(super_hunk), affix=''),
+                        mode, first))
                     rng_width = max(len(hunk_list[-1][2]), rng_width)
                 line_template = ('{0}{1} {2: >'
                                  + str(int(math.log10(len(super_hunks)) + 1))

@@ -221,7 +221,7 @@ class ImageTransferBot(SingleSiteBot, ExistingPageBot):
                                       'imagetransfer-nowcommons_notice')
             # try to delete the original image if we have a sysop account
             if sourceSite.has_right('delete') \
-               and sourceImagePage.delete(reason):
+               and sourceImagePage.delete(summary=reason):
                 return
 
             tmpl = i18n.translate(sourceSite.code, nowCommonsTemplate)
@@ -390,7 +390,7 @@ def main(*args: str) -> None:
         elif opt == '-tosite':
             options['target'] = value
         elif opt == '-chunk_size':
-            options['chunk_size'] = value
+            options['chunk_size'] = int(value)
         else:
             generator_factory.handle_arg(arg)
 

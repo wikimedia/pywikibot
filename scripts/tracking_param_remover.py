@@ -27,11 +27,16 @@ import mwparserfromhell
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot, SingleSiteBot
+from pywikibot.tools import THREADING_FREE
 
 
 docuReplacements = {  # noqa: N816
     '&params;': pagegenerators.parameterHelp,
 }
+
+if THREADING_FREE:
+    # The C tokenizer is not safe without the GIL (T435717).
+    mwparserfromhell.parser.use_c = False
 
 KNOWN_TRACKER_PARAMS = [
     'utm_.+',  # universal

@@ -7,7 +7,12 @@
 """Test setup.py."""
 from __future__ import annotations
 
+import sys
 import unittest
+from unittest.mock import patch
+
+from packaging.requirements import Requirement
+from packaging.version import Version
 
 import pywikibot
 import setup
@@ -29,6 +34,53 @@ class TestSetup(TestCase):
         """Test :func:`setup.get_validated_version` function."""
         self.assertEqual(setup.get_validated_version('pywikibot'),
                          pywikibot.__version__)
+
+    @patch('subprocess.run')
+    def test_get_validated_version_uses_latest_tag(self, mock_run) -> None:
+        """Test that version validation uses the latest repository tag."""
+        version = Version(pywikibot.__version__)
+        newer_version = f'{version.major + 1}.0.0'
+        older_version = f'{max(version.major - 1, 0)}.0.0'
+        mock_run.return_value.stdout = (
+            f'not-a-version\n{newer_version}\n{older_version}\n'
+        )
+
+        with patch.object(sys, 'argv', ['setup.py', 'sdist']):
+            with patch('builtins.print') as mock_print:
+                with self.assertRaisesRegex(
+                        SystemExit,
+                        r'Build of distribution package canceled'):
+                    setup.get_validated_version('pywikibot')
+
+        mock_print.assert_any_call(
+            f'\n\nNew version {str(version)!r} is not higher than last '
+            f'version {newer_version!r}.'
+        )
+
+    def test_requirements_file(self) -> None:
+        """Test that pip requirements use valid dependency specifiers."""
+        with open(setup.path / 'requirements.txt') as f:
+            lines = [line.partition('#')[0].strip() for line in f]
+
+        for requirement in lines:
+            if requirement and not requirement.startswith('-'):
+                with self.subTest(requirement=requirement):
+                    Requirement(requirement)
+
+    def test_all_no_gui_extra(self) -> None:
+        """Test that the all-no-gui extra excludes only Tkinter."""
+        expected = {
+            requirement
+            for name, requirements in setup.extra_deps.items()
+            if name not in {'all-no-gui', 'Tkinter'}
+            for requirement in requirements
+        }
+        self.assertSetEqual(set(setup.extra_deps['all-no-gui']), expected)
+        self.assertNotIn(
+            'pillow',
+            {Requirement(requirement).name.lower()
+             for requirement in setup.extra_deps['all-no-gui']},
+        )
 
     def test_read_desc(self) -> None:
         """Test :func:`setup.read_desc` function."""

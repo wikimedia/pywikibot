@@ -36,8 +36,9 @@ if TYPE_CHECKING:
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
 # nds_nl code alias requires "_"
+# vikidia uses "." for test codes
 # dash must be the last char to be reused as regex
-CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_-'
+CODE_CHARACTERS = string.ascii_lowercase + string.digits + '_.-'
 
 
 class Family:
@@ -408,7 +409,8 @@ class Family:
             if not all(x in CODE_CHARACTERS for x in code):
                 warnings.warn(
                     f'Family {cls.name} code {code} must be ASCII lowercase'
-                    ' letters and digits [a-z0-9] or underscore/dash [_-]',
+                    ' letters and digits [a-z0-9] or special characters '
+                    f'[{CODE_CHARACTERS[36:]}]',
                     FamilyMaintenanceWarning,
                     stacklevel=2,
                 )
@@ -669,8 +671,8 @@ class Family:
             return None
 
         raise RuntimeError(
-            'Found multiple matches for URL "{}": {}'
-            .format(url, ', '.join(str(s) for s in matched_sites)))
+            f'Found multiple matches for URL "{url}": '
+            f'{", ".join(str(s) for s in matched_sites)}')
 
     def dbName(self, code) -> str:
         """Return the name of the MySQL database."""
@@ -1101,6 +1103,29 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
     def domain(cls) -> str:
         """Return the parents domain with a subdomain prefix."""
         return f'{cls.name}.wikimedia.org'
+
+
+class WikimediaSubdomainFamily(SubdomainFamily, WikimediaFamily):
+
+    """Family class for Wikimedia projects using subdomains.
+
+    .. version-added:: 11.8
+    """
+
+
+class BetaSubdomainFamily(SubdomainFamily):
+
+    """Family class for Beta projects using subdomains.
+
+    .. version-added:: 11.8
+    """
+
+    codes = set()
+
+    @classproperty
+    def domain(cls) -> str:
+        """Return the parents domain with a subdomain prefix."""
+        return f"{cls.name.removeprefix('beta')}.beta.wmcloud.org"
 
 
 class WikibaseFamily(Family):

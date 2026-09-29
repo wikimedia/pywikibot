@@ -18,33 +18,34 @@ this script to work properly.
 
 This script understands various command-line arguments:
 
-    -always         run automatically, do not ask any questions. All files
-                    that qualify for deletion are deleted. Reduced screen
-                    output.
+-always         run automatically, do not ask any questions. All files
+                that qualify for deletion are deleted. Reduced screen
+                output.
 
-    -replace        replace links if the files are equal and the file names
-                    differ
+-replace        replace links if the files are equal and the file names
+                differ
 
-    -replacealways  replace links if the files are equal and the file names
-                    differ without asking for confirmation
+-replacealways  replace links if the files are equal and the file names
+                differ without asking for confirmation
 
-    -replaceloose   Do loose replacements. This will replace all occurrences
-                    of the name of the file (and not just explicit file
-                    syntax).  This should work to catch all instances of the
-                    file, including where it is used as a template parameter
-                    or in galleries. However, it can also make more mistakes.
+-replaceloose   Do loose replacements. This will replace all occurrences
+                of the name of the file (and not just explicit file
+                syntax).  This should work to catch all instances of the
+                file, including where it is used as a template parameter
+                or in galleries. However, it can also make more mistakes.
 
-    -replaceonly    Use this if you do not have a local sysop rights, but do
-                    wish to replace links from the NowCommons template.
+-replaceonly    Use this if you do not have a local sysop rights, but do
+                wish to replace links from the NowCommons template.
 
-Example
--------
+.. admonition:: Example
 
-    python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
+   ::
+
+       pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
 .. note:: This script is a
-   :py:obj:`ConfigParserBot <bot.ConfigParserBot>`. All options
-   can be set within a settings file which is scripts.ini by default.
+   :class:`ConfigParserBot <bot.ConfigParserBot>`. All options can be
+   set within a settings file which is scripts.ini by default.
 """
 from __future__ import annotations
 
@@ -290,42 +291,48 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
         commons_file_page = pywikibot.FilePage(self.commons,
                                                'File:' + file_on_commons)
-        if (local_file_page.title(with_ns=False)
-                != commons_file_page.title(with_ns=False)):
+        local_title = local_file_page.title(with_ns=False)
+        commons_title = commons_file_page.title(with_ns=False)
+
+        if local_title != commons_title:
             using_pages = list(local_file_page.using_pages())
 
             if using_pages and using_pages != [local_file_page]:
                 pywikibot.info(
-                    f'"<<lightred>>{local_file_page.title(with_ns=False)}'
+                    f'"<<lightred>>{local_title}'
                     f'<<default>>" is still used in {len(using_pages)} pages.'
                 )
 
                 if self.opt.replace:
                     pywikibot.info(
                         'Replacing "<<lightred>>'
-                        f'{local_file_page.title(with_ns=False)}'
+                        f'{local_title}'
                         '<<default>>" by "<<lightgreen>>'
-                        f'{commons_file_page.title(with_ns=False)}'
+                        f'{commons_title}'
                         '<<default>>".'
                     )
 
-                    bot = ImageBot(local_file_page.using_pages(),
-                                   local_file_page.title(with_ns=False),
-                                   commons_file_page.title(with_ns=False),
+                    bot = ImageBot(using_pages,
+                                   local_title,
+                                   commons_title,
                                    always=self.opt.replacealways,
                                    loose=self.opt.replaceloose)
                     bot.run()
 
                     # If the image is used with the urlname
                     # the previous function won't work
-                    if local_file_page.file_is_used and self.opt.replaceloose:
-                        bot = ImageBot(local_file_page.using_pages(),
-                                       local_file_page.title(with_ns=False,
-                                                             as_url=True),
-                                       commons_file_page.title(with_ns=False),
-                                       always=self.opt.replacealways,
-                                       loose=self.opt.replaceloose)
-                        bot.run()
+                    if self.opt.replaceloose:
+                        remaining_pages = list(
+                            local_file_page.using_pages())
+                        if remaining_pages:
+                            bot = ImageBot(
+                                remaining_pages,
+                                local_file_page.title(with_ns=False,
+                                                      as_url=True),
+                                commons_title,
+                                always=self.opt.replacealways,
+                                loose=self.opt.replaceloose)
+                            bot.run()
                     self.counter['replace'] += 1
                 else:
                     pywikibot.info('Please change them manually.')
@@ -333,7 +340,7 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
 
             pywikibot.info(
                 'No page is using "<<lightgreen>>'
-                f'{local_file_page.title(with_ns=False)}<<default>>" anymore.'
+                f'{local_title}<<default>>" anymore.'
             )
 
         try:
@@ -371,7 +378,8 @@ class NowCommonsDeleteBot(CurrentPageBot, ConfigParserBot):
                     'Does the description on Commons contain all required '
                         'source and license\ninformation?', default=False):
                     local_file_page.delete(
-                        f'{self.summary} [[:commons:File:{file_on_commons}]]',
+                        summary=f'{self.summary} '
+                                f'[[:commons:File:{file_on_commons}]]',
                         prompt=False)
                     self.counter['delete'] += 1
             else:

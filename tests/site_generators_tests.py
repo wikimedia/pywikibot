@@ -126,6 +126,51 @@ class TestDrySiteGenerators(DefaultSiteTestCase):
         self.assertTrue(result)
         namespace.assert_called_once_with()
 
+    def test_loadrevisions_step(self) -> None:
+        """Test that loadrevisions sets its API query increment."""
+        page = pywikibot.Page(self.site, 'Main Page')
+        with patch.object(self.site, '_generator') as generator:
+            rvgen = generator.return_value
+            set_query_increment = rvgen.set_query_increment
+            rvgen.request = {}
+            rvgen.__iter__.return_value = ()
+            self.site.loadrevisions(page, step=5)
+
+        set_query_increment.assert_called_once_with(5)
+
+    def test_preloadpages_coordinates(self) -> None:
+        """Test that coordinate preloading populates an empty cache."""
+        page = pywikibot.Page(self.site, 'Main Page')
+        pagedata = {'title': page.title(), 'ns': 0, 'pageid': 1}
+
+        with (
+            patch.object(type(self.site), 'maxlimit', 50),
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site, '_rvprops', return_value=['ids'])
+            as rvprops,
+            patch.object(api, 'PropertyGenerator') as generator,
+        ):
+            rvgen = generator.return_value
+            rvgen.request = {}
+            rvgen.props = frozenset(
+                {'revisions', 'info', 'categoryinfo', 'coordinates'})
+            rvgen.__iter__.return_value = iter((pagedata,))
+
+            pages = list(self.site.preloadpages(
+                [page], content=False, coordinates=True))
+
+        self.assertEqual(pages, [page])
+        generator.assert_called_once_with(
+            'revisions|info|categoryinfo|coordinates', site=self.site)
+        self.assertEqual(
+            rvgen.request['coprop'],
+            ['type', 'name', 'dim', 'country', 'region', 'globe'])
+        self.assertEqual(rvgen.request['coprimary'], 'all')
+        rvprops.assert_called_once_with(content=False)
+        with patch.object(self.site, 'loadcoordinfo') as loadcoordinfo:
+            self.assertEqual(page.coordinates(), [])
+        loadcoordinfo.assert_not_called()
+
 
 class TestSiteGenerators(DefaultSiteTestCase):
 
@@ -749,6 +794,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             func('m', 2, 1, True, is_ts=True)
 
 
+@expected_failure_if(pywikibot.config.family == 'betawikipedia')  # T439358
 class TestUnconnectedPages(DefaultSiteTestCase):
 
     """Test unconnected_pages method without cache enabled."""
@@ -1200,7 +1246,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.skipTest(
                     f'gsrsearch is disabled on site {mysite}:\n{e!r}')
             if (e.code == 'cirrussearch-backend-error'
-                    and mysite.family.name == 'wpbeta'):  # T426529
+                    and mysite.family.name == 'betawikipedia'):  # T426529
                 self.skipTest(
                     f'cirrussearch-backend-error on site {mysite}:\n{e!r}')
             raise
@@ -1223,7 +1269,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.assertEqual(hit.namespace(), 0)
         except APIError as e:  # pragma: no cover
             if (e.code == 'cirrussearch-backend-error'
-                    and self.site.family.name == 'wpbeta'):  # T426529
+                    and self.site.family.name == 'betawikipedia'):  # T426529
                 self.skipTest(
                     f'cirrussearch-backend-error on site {self.site}:\n{e!r}')
             raise
@@ -2201,13 +2247,11 @@ class TestPagePreloading(DefaultSiteTestCase):
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
-        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        links = list(mysite.pagelinks(mainpage, total=10))
+        link_count = len(links)
         if link_count < 2:
             self.skipTest('insufficient links on main page')
 
-        # get a fresh generator; we now know how many results it will have,
-        # if it is less than 10.
-        links = mysite.pagelinks(mainpage, total=10)
         count = 0
         for count, page in enumerate(
                 mysite.preloadpages(links, groupsize=50), start=1):
@@ -2226,13 +2270,11 @@ class TestPagePreloading(DefaultSiteTestCase):
 
         # Determine if there are enough links on the main page,
         # for the test to be useful.
-        link_count = len(list(mysite.pagelinks(mainpage, total=10)))
+        links = list(mysite.pagelinks(mainpage, total=10))
+        link_count = len(links)
         if link_count < 2:
             self.skipTest('insufficient links on main page')
 
-        # get a fresh generator; we now know how many results it will have,
-        # if it is less than 10.
-        links = mysite.pagelinks(mainpage, total=10)
         count = 0
         for count, page in enumerate(
                 mysite.preloadpages(links, groupsize=5), start=1):

@@ -196,7 +196,8 @@ class UI(ABUIC):
 
         # Add default before the last linefeed
         if text.endswith('\n'):
-            text_parts[-1] = re.sub(r'\r?\n\Z', '', text_parts[-1])
+            text_parts[-1] = (
+                text_parts[-1].removesuffix('\n').removesuffix('\r'))
             text_parts.extend(('default', '\n'))
 
         text_parts.append('default')
@@ -290,7 +291,7 @@ class UI(ABUIC):
                 codecedText = codecedText.encode(
                     self.transliteration_target,
                     'replace').decode(self.transliteration_target)
-            transliteratedText = ''
+            parts = []
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
             prev = '-'
@@ -307,8 +308,7 @@ class UI(ABUIC):
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText = (
-                        f'{transliteratedText}'
+                    parts.append(
                         f'<<lightyellow>>{transliterated}<<previous>>'
                     )
                     # memorize if we replaced a single letter by multiple
@@ -317,9 +317,9 @@ class UI(ABUIC):
                         prev = transliterated[-1]
                 else:
                     # no need to try to transliterate.
-                    transliteratedText += char
+                    parts.append(char)
                     prev = char
-            text = transliteratedText
+            text = ''.join(parts)
 
         if not targetStream:
             targetStream = self.stderr
@@ -511,14 +511,14 @@ class UI(ABUIC):
     def input_list_choice(self, question: str, answers: Sequence[Any],
                           default: int | str | None = None,
                           force: bool = False) -> Any:
-        """Ask the user to select one entry from a list of entries.
+        """Ask the user to select an entry or accept the default.
 
         :param question: The question, without trailing whitespace.
         :param answers: A sequence of options to be chosen.
         :param default: The default answer if no was entered. None to
             require an answer.
         :param force: Automatically use the default.
-        :return: Return a single Sequence entry.
+        :return: Return a single sequence entry or the default.
         """
         # lock stream output
         with self.lock:
@@ -535,6 +535,8 @@ class UI(ABUIC):
                 except (TypeError, ValueError):
                     if choice in answers:
                         return choice
+                    if default is not None and choice == default:
+                        return default
                     parsedchoice = -1
 
                 # User typed choice number

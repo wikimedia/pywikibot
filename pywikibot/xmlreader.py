@@ -164,7 +164,7 @@ class XmlDump:
                 since='9.0.0')
 
         if revisions not in self.rev_actions:
-            actions = str(list(self.rev_actions.keys())).strip('[]')
+            actions = str(list(self.rev_actions)).strip('[]')
             raise ValueError(f"'revisions' must be one of {actions}.")
 
         self._parse = self.rev_actions[revisions]
@@ -251,7 +251,7 @@ class XmlDump:
         """
         uri = self.uri
         headers = self._headers(elem)
-        for revision in elem.findall(f'{uri}revision'):
+        for revision in elem.iterfind(f'{uri}revision'):
             revid = int(revision.findtext(f'{uri}id')) if with_id else 0
             yield RawRev(headers, revision, revid)
 

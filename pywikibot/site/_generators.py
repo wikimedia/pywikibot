@@ -90,7 +90,7 @@ class GeneratorsMixin:
             pageids = [p.strip() for p in pageids]
 
         # Validate pageids.
-        gen = (str(int(p)) for p in pageids if int(p) > 0)
+        gen = (str(p) for p in map(int, pageids) if p > 0)
 
         for batch in batched(filter_unique(gen), self.maxlimit):
             # Store the order of the input data.
@@ -132,6 +132,7 @@ class GeneratorsMixin:
         pageprops: bool = False,
         categories: bool = False,
         content: bool = True,
+        coordinates: bool = False,
         quiet: bool = True,
     ) -> Generator[pywikibot.Page]:
         """Return a generator to a list of preloaded pages.
@@ -148,6 +149,8 @@ class GeneratorsMixin:
            *groupsize* is maxlimit by default. *quiet* parameter was
            added. No longer show the "Retrieving pages from site"
            message by default.
+        .. version-changed:: 11.8
+           *coordinates* parameter was added.
 
         :param pagelist: An iterable that returns Page objects
         :param groupsize: How many Pages to query at a time. If None
@@ -161,6 +164,8 @@ class GeneratorsMixin:
             content
         :param categories: Preload page categories
         :param content: Preload page content
+        :param coordinates: Preload page coordinates when the GeoData
+            extension is available
         :param quiet: If True (default), do not show the "Retrieving
             pages" message
         """
@@ -173,6 +178,9 @@ class GeneratorsMixin:
             props += '|pageprops'
         if categories:
             props += '|categories'
+        coordinates = coordinates and self.has_extension('GeoData')
+        if coordinates:
+            props += '|coordinates'
 
         groupsize_ = min(groupsize or self.maxlimit, self.maxlimit)
         for batch in batched(pagelist, groupsize_):
@@ -198,8 +206,12 @@ class GeneratorsMixin:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:
-                rvgen.request['titles'] = list(cache.keys())
+                rvgen.request['titles'] = list(cache)
             rvgen.request['rvprop'] = self._rvprops(content=content)
+            if coordinates:
+                rvgen.request['coprop'] = [
+                    'type', 'name', 'dim', 'country', 'region', 'globe']
+                rvgen.request['coprimary'] = 'all'
             if not quiet:
                 pywikibot.info(f'Retrieving {len(cache)} pages from {self}.')
 
@@ -226,7 +238,7 @@ class GeneratorsMixin:
                 except KeyError:
                     pywikibot.debug(f"No 'title' in {pagedata}\n"
                                     f'{pageids=!s}\n'
-                                    f'titles={list(cache.keys())}')
+                                    f'titles={list(cache)}')
                     continue
 
                 priority, page = cache[pagedata['title']]
@@ -278,7 +290,7 @@ class GeneratorsMixin:
         :raises TypeError: A namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        bltitle = page.title(with_section=False).encode(self.encoding())
+        bltitle = page.title(with_section=False)
         blargs: dict[str, Any] = {'gbltitle': bltitle}
         if filter_redirects is not None:
             blargs['gblfilterredir'] = ('redirects' if filter_redirects
@@ -346,7 +358,7 @@ class GeneratorsMixin:
             type such as NoneType or bool
         """
         eiargs: dict[str, Any] = {
-            'geititle': page.title(with_section=False).encode(self.encoding()),
+            'geititle': page.title(with_section=False),
         }
         if filter_redirects is not None:
             eiargs['geifilterredir'] = ('redirects' if filter_redirects
@@ -379,7 +391,7 @@ class GeneratorsMixin:
         :param content: Load the current content of each redirect
         """
         rdargs: dict[str, Any] = {
-            'titles': page.title(with_section=False).encode(self.encoding()),
+            'titles': page.title(with_section=False),
         }
         if filter_fragments is not None:
             rdargs['grdshow'] = ('' if filter_fragments else '!') + 'fragment'
@@ -469,7 +481,7 @@ class GeneratorsMixin:
         if hasattr(page, '_pageid'):
             plargs['pageids'] = str(page._pageid)
         else:
-            pltitle = page.title(with_section=False).encode(self.encoding())
+            pltitle = page.title(with_section=False)
             plargs['titles'] = pltitle
         return self._generator(api.PageGenerator, type_arg='links',
                                namespaces=namespaces, total=total,
@@ -507,8 +519,7 @@ class GeneratorsMixin:
         if hasattr(page, '_pageid'):
             clargs['pageids'] = str(page._pageid)
         else:
-            clargs['titles'] = page.title(
-                with_section=False).encode(self.encoding())
+            clargs['titles'] = page.title(with_section=False)
 
         if with_sort_key:
             page_dict = next(iter(self._generator(
@@ -546,7 +557,7 @@ class GeneratorsMixin:
             (default False); note that this means the content of the image
             description page, not the image itself
         """
-        imtitle = page.title(with_section=False).encode(self.encoding())
+        imtitle = page.title(with_section=False)
         return self._generator(api.PageGenerator, type_arg='images',
                                titles=imtitle, total=total,
                                g_content=content)
@@ -579,7 +590,7 @@ class GeneratorsMixin:
         :raises UnsupportedPageError: A Page object is not supported due
             to namespace restriction
         """
-        tltitle = page.title(with_section=False).encode(self.encoding())
+        tltitle = page.title(with_section=False)
         return self._generator(api.PageGenerator, type_arg='templates',
                                titles=tltitle, namespaces=namespaces,
                                total=total, g_content=content)
@@ -649,7 +660,7 @@ class GeneratorsMixin:
             raise TypeError(
                 f'categorymembers: non-Category page {category!r} specified')
 
-        cmtitle = category.title(with_section=False).encode(self.encoding())
+        cmtitle = category.title(with_section=False)
         cmargs: dict[str, Any] = {
             'type_arg': 'categorymembers',
             'gcmtitle': cmtitle,
@@ -686,7 +697,7 @@ class GeneratorsMixin:
                     excluded_namespaces.add(14)
 
                 if namespaces:
-                    if excluded_namespaces.intersection(namespaces):
+                    if not excluded_namespaces.isdisjoint(namespaces):
                         raise ValueError(
                             f'incompatible namespaces {namespaces!r} and '
                             f'member_type {member_type!r}')
@@ -845,7 +856,7 @@ class GeneratorsMixin:
             rvargs['rvsection'] = str(section)
 
         if revids is None:
-            rvtitle = page.title(with_section=False).encode(self.encoding())
+            rvtitle = page.title(with_section=False)
             rvargs['titles'] = rvtitle
         else:
             if isinstance(revids, (int, str)):
@@ -878,7 +889,7 @@ class GeneratorsMixin:
                                 total=kwargs.get('total'), **rvargs)
 
         if step:
-            rvgen.set_query_increment = step
+            rvgen.set_query_increment(step)
 
         if latest or 'revids' in rvgen.request:
             rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
@@ -914,7 +925,7 @@ class GeneratorsMixin:
         lltitle = page.title(with_section=False)
         llquery = self._generator(api.PropertyGenerator,
                                   type_arg='langlinks',
-                                  titles=lltitle.encode(self.encoding()),
+                                  titles=lltitle,
                                   total=total)
         for pageitem in llquery:
             if not self.sametitle(pageitem['title'], lltitle):
@@ -943,7 +954,7 @@ class GeneratorsMixin:
         """
         eltitle = page.title(with_section=False)
         elquery = self._generator(api.PropertyGenerator, type_arg='extlinks',
-                                  titles=eltitle.encode(self.encoding()),
+                                  titles=eltitle,
                                   total=total)
         for pageitem in elquery:
             if not self.sametitle(pageitem['title'], eltitle):
@@ -1595,7 +1606,7 @@ class GeneratorsMixin:
                    }
         if patrolled is not None and (
                 self.has_right('patrol') or self.has_right('patrolmarks')):
-            rcgen.request['rcprop'] += ['patrolled']
+            rcgen.request['rcprop'].append('patrolled')
             filters['patrolled'] = patrolled
         rcgen.request['rcshow'] = api.OptionSet(self, 'recentchanges', 'show',
                                                 filters)
@@ -2107,7 +2118,7 @@ class GeneratorsMixin:
         if hasattr(self, '_patroldisabled') and self._patroldisabled:
             return
 
-        if all(_ is None for _ in [rcid, revid, revision]):
+        if rcid is None and revid is None and revision is None:
             raise Error('No rcid, revid or revision provided.')
 
         if rcid is None:

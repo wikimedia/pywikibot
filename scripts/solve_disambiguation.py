@@ -472,8 +472,10 @@ class PrimaryIgnoreManager:
 
         # The file is stored in the disambiguation/ subdir.
         # Create if necessary.
-        with suppress(IOError):
+        try:
             text = filepath.read_text(encoding='utf-8')
+        except OSError:
+            return
 
         # skip empty lines
         self.ignorelist = {line for line in text.splitlines() if line}
@@ -502,7 +504,7 @@ class PrimaryIgnoreManager:
                 self.disamb_page.title(as_url=True) + '.txt')
 
             # Open file for appending. If none exists, create a new one.
-            with suppress(IOError), open(filename, 'a', encoding='utf-8') as f:
+            with suppress(OSError), open(filename, 'a', encoding='utf-8') as f:
                 f.write('\n'.join(page_titles) + '\n')
 
 
@@ -750,15 +752,18 @@ class DisambiguationRobot(SingleSiteBot):
         include = False
         unlink_counter = 0
         new_targets = []
+        ref_page_title = disamb_page_title = None
         try:
             text = ref_page.get()
         except IsRedirectPageError:
+            ref_page_title = ref_page.title()
+            disamb_page_title = disamb_page.title()
             pywikibot.info(
-                f'{ref_page.title()} is a redirect to {disamb_page.title()}')
+                f'{ref_page_title} is a redirect to {disamb_page_title}')
             if disamb_page.isRedirectPage():
                 target = self.opt.pos[0]
                 if pywikibot.input_yn(
-                    f'Do you want to make redirect {ref_page.title()} point '
+                    f'Do you want to make redirect {ref_page_title} point '
                     f'to {target}?',
                         default=False, automatic_quit=False):
                     redir_text = f'#{self.site.redirect()} [[{target}]]'
@@ -770,7 +775,7 @@ class DisambiguationRobot(SingleSiteBot):
             else:
                 choice = pywikibot.input_choice(
                     f'Do you want to work on pages linking to '
-                    f'{ref_page.title()}?',
+                    f'{ref_page_title}?',
                     [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
                     automatic_quit=False)
                 if choice == 'y':
@@ -816,8 +821,9 @@ class DisambiguationRobot(SingleSiteBot):
                     # There are links to change; stop loop and save page
                     break
 
+                match_start, match_end = m.span()
                 # Ensure that next time around we will not find this same hit.
-                curpos = m.start() + 1
+                curpos = match_start + 1
                 try:
                     foundlink = pywikibot.Link(m['title'], disamb_page.site)
                     foundlink.parse()
@@ -830,13 +836,16 @@ class DisambiguationRobot(SingleSiteBot):
 
                 # Check whether the link found is to disamb_page.
                 try:
-                    if foundlink.canonical_title() != disamb_page.title():
+                    disamb_page_title = (disamb_page_title
+                                         or disamb_page.title())
+                    if foundlink.canonical_title() != disamb_page_title:
                         continue
 
                 except Error:
                     # must be a broken link
+                    ref_page_title = ref_page_title or ref_page.title()
                     pywikibot.log('Invalid link [[{}]] in page [[{}]]'
-                                  .format(m['title'], ref_page.title()))
+                                  .format(m['title'], ref_page_title))
                     continue
 
                 n_links += 1  # new link found: increase link counter
@@ -845,16 +854,18 @@ class DisambiguationRobot(SingleSiteBot):
                 context = 60
 
                 # check if there's a dn-template here already
-                if (self.opt.dnskip and self.dn_template_str
-                        and self.dn_template_str[:-2] in text[
-                            m.end():m.end() + len(self.dn_template_str) + 8]):
-                    continue
+                if self.opt.dnskip and self.dn_template_str:
+                    dn_template_end = (match_end
+                                       + len(self.dn_template_str) + 8)
+                    if self.dn_template_str[:-2] in text[
+                            match_end:dn_template_end]:
+                        continue
 
-                edit = EditOption('edit page', 'e', text, m.start(),
-                                  disamb_page.title())
+                edit = EditOption('edit page', 'e', text, match_start,
+                                  disamb_page_title)
                 context_option = HighlightContextOption(
-                    'more context', 'm', text, 60, start=m.start(),
-                    end=m.end())
+                    'more context', 'm', text, 60, start=match_start,
+                    end=match_end)
                 context_option.before_question = True
 
                 options = [ListOption(self.opt.pos, ''),
@@ -867,13 +878,14 @@ class DisambiguationRobot(SingleSiteBot):
 
                 if self.dn_template_str:
                     # '?', '/' for old choice
-                    options += [AliasOption(
+                    options.append(AliasOption(
                         f'tag template {self.dn_template_str}',
-                        ['t', '?', '/'])]
-                options += [context_option]
+                        ['t', '?', '/']))
+                options.append(context_option)
                 if not edited:
-                    options += [ShowPageOption('show disambiguation page', 'd',
-                                               m.start(), disamb_page)]
+                    options.append(ShowPageOption(
+                        'show disambiguation page', 'd', match_start,
+                        disamb_page))
 
                 options += [
                     OutputProxyOption('list', 'l',
@@ -881,7 +893,7 @@ class DisambiguationRobot(SingleSiteBot):
                     AddAlternativeOption('add new', 'a',
                                          SequenceOutputter(self.opt.pos))]
                 if edited:
-                    options += [StandardOption('save in this form', 'x')]
+                    options.append(StandardOption('save in this form', 'x'))
 
                 # TODO: Output context on each question
                 answer = pywikibot.input_choice('Option', options,
@@ -931,7 +943,7 @@ class DisambiguationRobot(SingleSiteBot):
                 if answer == 't':
                     assert self.dn_template_str
                     # small chunk of text to search
-                    search_text = text[m.end():m.end() + context]
+                    search_text = text[match_end:match_end + context]
                     # figure out where the link (and sentence) ends, put note
                     # there
                     end_of_word_match = re.search(r'\s', search_text)
@@ -942,15 +954,15 @@ class DisambiguationRobot(SingleSiteBot):
                         position_split = 0
 
                     # insert dab needed template
-                    text = (text[:m.end() + position_split]
+                    text = (text[:match_end + position_split]
                             + self.dn_template_str
-                            + text[m.end() + position_split:])
+                            + text[match_end + position_split:])
                     dn = True
                     continue
 
                 if answer == 'u':
                     # unlink - we remove the section if there's any
-                    text = text[:m.start()] + link_text + text[m.end():]
+                    text = text[:match_start] + link_text + text[match_end:]
                     unlink_counter += 1
                     continue
 
@@ -994,7 +1006,7 @@ class DisambiguationRobot(SingleSiteBot):
                                f'{link_text[len(new_page_title):]}')
                 else:
                     newlink = f'[[{new_page_title}{section}|{link_text}]]'
-                text = text[:m.start()] + newlink + text[m.end():]
+                text = text[:match_start] + newlink + text[match_end:]
                 continue
 
             if text == original_text:
@@ -1130,6 +1142,8 @@ or press enter to quit:""")
             targets = i18n.twtranslate(self.site,
                                        'solve_disambiguation-unknown-page')
 
+        page_title = page.title()
+
         # first check whether user has customized the edit comment
         if (self.site.family.name in config.disambiguation_comment
                 and self.site.lang in config.disambiguation_comment[
@@ -1138,7 +1152,7 @@ or press enter to quit:""")
                 self.summary = i18n.translate(
                     self.site,
                     config.disambiguation_comment[self.site.family.name],
-                    fallback=True) % (page.title(), targets)
+                    fallback=True) % (page_title, targets)
 
             # Backwards compatibility, type error probably caused by too
             # many arguments for format string
@@ -1146,39 +1160,39 @@ or press enter to quit:""")
                 self.summary = i18n.translate(
                     self.site,
                     config.disambiguation_comment[self.site.family.name],
-                    fallback=True) % page.title()
+                    fallback=True) % page_title
         elif page.isRedirectPage():
             # when working on redirects, there's another summary message
             if unlink_counter and not new_targets:
                 self.summary = i18n.twtranslate(
                     self.site,
                     'solve_disambiguation-redirect-removed',
-                    {'from': page.title(),
+                    {'from': page_title,
                      'count': unlink_counter})
             elif dn and not new_targets:
                 self.summary = i18n.twtranslate(
                     self.site,
                     'solve_disambiguation-redirect-adding-dn-template',
-                    {'from': page.title()})
+                    {'from': page_title})
             else:
                 self.summary = i18n.twtranslate(
                     self.site, 'solve_disambiguation-redirect-resolved',
-                    {'from': page.title(),
+                    {'from': page_title,
                      'to': targets,
                      'count': len(new_targets)})
         elif unlink_counter and not new_targets:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-links-removed',
-                {'from': page.title(),
+                {'from': page_title,
                  'count': unlink_counter})
         elif dn and not new_targets:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-adding-dn-template',
-                {'from': page.title()})
+                {'from': page_title})
         else:
             self.summary = i18n.twtranslate(
                 self.site, 'solve_disambiguation-links-resolved',
-                {'from': page.title(),
+                {'from': page_title,
                  'to': targets,
                  'count': len(new_targets)})
 

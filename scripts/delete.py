@@ -45,12 +45,11 @@ Furthermore, the following command line parameters are supported:
                   -orphansonly:0,1
                   -orphansonly:,Talk
 
-Usage:
+**Usage:**
 
     python pwb.py delete [-category categoryName]
 
-Examples
---------
+**Examples:**
 
 Delete everything in the category "To delete" without prompting:
 
@@ -82,11 +81,7 @@ class PageWithRefs(Page):
     Supports the same interface as Page, with some added methods.
     """
 
-    def __init__(self, source, title: str = '', ns=0) -> None:
-        """Initializer."""
-        super().__init__(source, title, ns)
-        _cache_attrs = list(super()._cache_attrs)
-        _cache_attrs = tuple(_cache_attrs + ['_ref_table'])
+    _cache_attrs = (*Page._cache_attrs, '_ref_table')
 
     def get_ref_table(self, *args, **kwargs) -> RefTable:
         """Build mapping table with pages which links the current page."""
@@ -188,7 +183,7 @@ class DeletionRobot(CurrentPageBot):
     def treat_page(self) -> None:
         """Process one page from the generator."""
         if self.opt.undelete:
-            self.current_page.undelete(self.summary)
+            self.current_page.undelete(summary=self.summary)
             self.counter['undelete'] += 1
         else:
             if (self.opt.isorphan is not False
@@ -208,9 +203,9 @@ class DeletionRobot(CurrentPageBot):
 
             if self.current_page.site.user() is None:
                 self.current_page.site.login()
-            res = self.current_page.delete(self.summary,
-                                           not self.opt.always,
-                                           self.opt.always,
+            res = self.current_page.delete(summary=self.summary,
+                                           prompt=not self.opt.always,
+                                           mark=self.opt.always,
                                            automatic_quit=True)
             if res > 0:
                 self.counter['delete'] += 1

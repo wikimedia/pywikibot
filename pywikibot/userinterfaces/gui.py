@@ -89,18 +89,18 @@ class TextEditor(ScrolledText):
     @staticmethod
     def _initialize_config(theme):
         """Fix idleConf.GetHighlight method for different Python releases."""
+        normal = idleConf.GetHighlight(theme, 'normal')
+        hilite = idleConf.GetHighlight(theme, 'hilite')
         return {
             'padx': 5,
             'wrap': 'word',
             'undo': 'True',
             'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
-            'foreground': idleConf.GetHighlight(theme, 'normal')['foreground'],
-            'background': idleConf.GetHighlight(theme, 'normal')['background'],
-            'highlightcolor': idleConf.GetHighlight(
-                theme, 'hilite')['foreground'],
-            'highlightbackground': idleConf.GetHighlight(
-                theme, 'hilite')['background'],
+            'foreground': normal['foreground'],
+            'background': normal['background'],
+            'highlightcolor': hilite['foreground'],
+            'highlightbackground': hilite['background'],
             'insertbackground': idleConf.GetHighlight(
                 theme, 'cursor')['foreground'],
         }
@@ -402,8 +402,8 @@ class EditBoxWindow(Frame):
             self.find_all(highlight)
         if jumpIndex:
             # lines are indexed starting at 1
-            line = text[:jumpIndex].count('\n') + 1
-            column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
+            line = text.count('\n', 0, jumpIndex) + 1
+            column = jumpIndex - (text.rfind('\n', 0, jumpIndex) + 1)
             # don't know how to place the caret, but scrolling to the right
             # line should already be helpful.
             self.editbox.see(f'{line}.{column}')

@@ -8,9 +8,11 @@
 from __future__ import annotations
 
 import time
+import types
 import unittest
 from contextlib import suppress
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
+from unittest.mock import patch
 
 from pywikibot import version
 from tests.aspects import TestCase
@@ -40,6 +42,38 @@ class LocalVersionTestCase(TestCase):
         self.assertIsInstance(date, time.struct_time)
         self.assertEqual(hsh, '')
         self.assertEqual(dummy, [])
+
+    def test_module_filename_path_containment(self) -> None:
+        """Test module filenames are contained by path components."""
+        cases = (
+            (PurePosixPath,
+             '/srv/pywikibot',
+             '/srv/pywikibot/module.py',
+             '/srv/pywikibot-extra/module.py'),
+            (PureWindowsPath,
+             r'C:\Users\bot\pywikibot',
+             r'C:\Users\bot\pywikibot\module.py',
+             r'C:\Users\bot\pywikibot-extra\module.py'),
+            (PureWindowsPath,
+             r'\\server\share\pywikibot',
+             r'\\server\share\pywikibot\module.py',
+             r'\\server\share\pywikibot-extra\module.py'),
+        )
+
+        for path_type, program_dir, module_path, sibling_path in cases:
+            module = types.SimpleNamespace(__file__=module_path)
+            with self.subTest(path_type=path_type,
+                              program_dir=program_dir), \
+                    patch.object(version, 'Path', path_type), \
+                    patch.object(version, '_get_program_dir',
+                                 return_value=program_dir), \
+                    patch.object(version.os.path, 'exists',
+                                 return_value=True):
+                self.assertEqual(version.get_module_filename(module),
+                                 module_path)
+
+                module.__file__ = sibling_path
+                self.assertIsNone(version.get_module_filename(module))
 
 
 class RemoteVersionTestCase(TestCase):

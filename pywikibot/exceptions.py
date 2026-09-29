@@ -237,18 +237,15 @@ class APIError(Error):
 
     def __repr__(self) -> str:
         """Return internal representation."""
-        return '{name}("{code}", "{info}", {other})'.format(
-            name=self.__class__.__name__, **self.__dict__)
+        return (f'{self.__class__.__name__}("{self.code}", "{self.info}", '
+                f'{self.other})')
 
     def __str__(self) -> str:
         """Return a string representation."""
         if self.other:
-            return '{}: {}\n[{}]'.format(
-                self.code,
-                self.info,
-                ';\n '.join(
-                    f'{key}: {val}'
-                    for key, val in self.other.items()))
+            other = ';\n '.join(
+                f'{key}: {val}' for key, val in self.other.items())
+            return f'{self.code}: {self.info}\n[{other}]'
 
         return f'{self.code}: {self.info}'
 

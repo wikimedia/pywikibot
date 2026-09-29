@@ -34,19 +34,21 @@ optional arguments:
 .. seealso:: https://graphviz.org/doc/info/attrs.html
    for graphviz style definitions.
 
-Example
--------
+.. admonition:: Examples
 
-Visualizes main category:
+   Visualizes main category:
 
-    pwb.py -v category_graph -from
+   .. code-block:: bash
 
-Extended example with style settings:
+      pwb.py -v category_graph -from
 
-    pwb.py category_graph -from Life -downsize 1.5 \\
-    -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \\
-    fillcolor=green] edge[style=dashed penwidth=3]'
+   Extended example with style settings:
 
+   .. code-block:: bash
+
+      pwb.py category_graph -from Life -downsize 1.5 \\
+      -style 'graph[rankdir=BT ranksep=0.5] node[shape=circle style=filled \\
+      fillcolor=green] edge[style=dashed penwidth=3]'
 
 .. version-added:: 8.0
 """
@@ -106,6 +108,10 @@ class CategoryGraphBot(SingleSiteBot):
         self.rev = defaultdict(list)
         self.fw = defaultdict(list)
         self.leaves = set()
+        self._subcat_cache: dict[
+            tuple[pywikibot.site.BaseSite, str],
+            list[pywikibot.Category],
+        ] = {}
         self.counter = 0
         font = 'fontname="Helvetica,Arial,sans-serif"'
         style = f'graph [rankdir=LR ranksep=2 concentrate=true {font}] ' \
@@ -124,7 +130,12 @@ class CategoryGraphBot(SingleSiteBot):
         """
         title = cat.title(with_ns=False)
         size = float(self.args.downsize) ** level
-        subcats = sorted(cat.subcategories())
+        cache_key = cat.site, title
+        try:
+            subcats = self._subcat_cache[cache_key]
+        except KeyError:
+            subcats = sorted(cat.subcategories())
+            self._subcat_cache[cache_key] = subcats
 
         def node():
             subs = ', '.join([c.title(with_ns=False).replace(' ', '&nbsp;')
@@ -172,8 +183,10 @@ class CategoryGraphBot(SingleSiteBot):
             # repeat recursively
             self.scan_level(subcat, level - 1, h)
             # track graph's structure to reduce too big graph
-            self.rev[e.get_destination()].append(e.get_source())
-            self.fw[e.get_source()].append(e.get_destination())
+            source = e.get_source()
+            destination = e.get_destination()
+            self.rev[destination].append(source)
+            self.fw[source].append(destination)
 
     def run(self) -> None:
         """Main function of CategoryGraphBot."""

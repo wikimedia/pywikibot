@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json as jsonlib
 import re
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from contextlib import suppress
 from itertools import chain
 from typing import TYPE_CHECKING, Any, Literal, NoReturn
@@ -345,12 +345,11 @@ class WikibaseEntity:
 
                 updated_references = statement.get('references', [])
                 for ref_grp_idx, ref_grp in enumerate(updated_references):
-                    for ref_propid, reference in ref_grp['snaks'].items():
-                        for ref_index, ref_stat in enumerate(reference):
-                            target_ref_grp = claim.sources[ref_grp_idx]
-                            target_ref_prop = target_ref_grp[ref_propid]
-                            target_ref = target_ref_prop[ref_index]
-                            target_ref.hash = ref_stat['hash']
+                    target_ref_grp = claim.sources[ref_grp_idx]
+                    for ref_propid in ref_grp['snaks']:
+                        target_ref_prop = target_ref_grp[ref_propid]
+                        for target_ref in target_ref_prop:
+                            target_ref.hash = ref_grp['hash']
 
     def concept_uri(self) -> str:
         """Return the full concept URI.
@@ -428,11 +427,10 @@ class MediaInfo(WikibaseEntity):
 
             # avoid recursion with self.getID()
             page_id = int(self.id[1:])
-            result = list(self.repo.load_pages_from_pageids([page_id]))
-            if not result:
+            page = next(self.repo.load_pages_from_pageids([page_id]), None)
+            if page is None:
                 raise Error(f'There is no existing page with id "{page_id}"')
 
-            page = result.pop()
             if page.namespace() != page.site.namespaces.FILE:
                 raise Error(f'Page with id "{page_id}" is not a file')
 
@@ -642,9 +640,9 @@ class WikibasePage(BasePage, WikibaseEntity):
 
             if self._namespace:
                 if self._namespace != entity_type_ns:
-                    raise ValueError('Namespace "{}" is not valid for Wikibase'
-                                     ' entity type "{}"'
-                                     .format(int(kwargs['ns']), entity_type))
+                    raise ValueError(
+                        f'Namespace "{int(kwargs["ns"])}" is not valid for '
+                        f'Wikibase entity type "{entity_type}"')
             else:
                 self._namespace = entity_type_ns
                 kwargs['ns'] = self._namespace.id
@@ -1118,10 +1116,9 @@ class ItemPage(WikibasePage):
         base_uri, _, qid = uri.rpartition('/')
         if base_uri != site.concept_base_uri.rstrip('/'):
             raise ValueError(
-                'The supplied data repository ({repo}) does not correspond to '
-                'that of the item ({item})'.format(
-                    repo=site.concept_base_uri.rstrip('/'),
-                    item=base_uri))
+                'The supplied data repository '
+                f'({site.concept_base_uri.rstrip("/")}) does not correspond '
+                f'to that of the item ({base_uri})')
 
         item = cls(site, qid)
         if not lazy_load and not item.exists():
@@ -1166,8 +1163,8 @@ class ItemPage(WikibasePage):
 
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
 
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
 
         :raises CircularRedirectError: Page is a circular redirect
         :raises InterwikiRedirectPageError: The redirect target is on
@@ -1175,8 +1172,8 @@ class ItemPage(WikibasePage):
         :raises Error: Target page has wrong content model
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         target = super().getRedirectTarget(ignore_section=ignore_section)
         cmodel = target.content_model
@@ -1642,6 +1639,11 @@ class Claim(Property):
     """A Claim on a Wikibase entity.
 
     Claims are standard claims as well as references and qualifiers.
+
+    .. version-changed:: 11.8
+       Qualifiers and reference groups loaded from JSON use :class:`dict`
+       instead of :class:`collections.OrderedDict`. Insertion order is
+       preserved; mapping equality no longer depends on key order.
     """
 
     TARGET_CONVERTER = {
@@ -1705,7 +1707,7 @@ class Claim(Property):
         if self.isQualifier and self.isReference:
             raise ValueError('Claim cannot be both a qualifier and reference.')
         self.sources = []
-        self.qualifiers = OrderedDict()
+        self.qualifiers = {}
         self.target = None
         self.snaktype = 'value'
         self._on_item = None  # The item it's on
@@ -1876,7 +1878,7 @@ class Claim(Property):
         Reference objects are represented a bit differently, and require
         some more handling.
         """
-        source = OrderedDict()
+        source = {}
 
         # Before #84516 Wikibase did not implement snaks-order.
         # https://gerrit.wikimedia.org/r/c/84516/
@@ -1931,7 +1933,7 @@ class Claim(Property):
         else:
             if self.qualifiers:
                 data['qualifiers'] = {}
-                data['qualifiers-order'] = list(self.qualifiers.keys())
+                data['qualifiers-order'] = list(self.qualifiers)
                 for prop, qualifiers in self.qualifiers.items():
                     for qualifier in qualifiers:
                         assert qualifier.isQualifier is True
@@ -1942,7 +1944,7 @@ class Claim(Property):
                 data['references'] = []
                 for collection in self.sources:
                     reference = {
-                        'snaks': {}, 'snaks-order': list(collection.keys())}
+                        'snaks': {}, 'snaks-order': list(collection)}
                     for prop, val in collection.items():
                         reference['snaks'][prop] = []
                         for source in val:
@@ -2114,10 +2116,11 @@ class Claim(Property):
             self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             qualifier.on_item = self.on_item
         qualifier.isQualifier = True
-        if qualifier.getID() in self.qualifiers:
-            self.qualifiers[qualifier.getID()].append(qualifier)
+        qualifier_id = qualifier.getID()
+        if qualifier_id in self.qualifiers:
+            self.qualifiers[qualifier_id].append(qualifier)
         else:
-            self.qualifiers[qualifier.getID()] = [qualifier]
+            self.qualifiers[qualifier_id] = [qualifier]
 
     def removeQualifier(self, qualifier, **kwargs) -> None:
         """Remove the qualifier. Call removeQualifiers().
@@ -2198,27 +2201,29 @@ class Claim(Property):
 
         :return: JSON value
         """
+        target = self.getTarget()
+
         # TODO: eventually unify the following two groups
         if self.type in ('wikibase-item', 'wikibase-property'):
-            value = {'entity-type': self.getTarget().entity_type,
-                     'numeric-id': self.getTarget().getID(numeric=True)}
+            value = {'entity-type': target.entity_type,
+                     'numeric-id': target.getID(numeric=True)}
         elif self.type in (
                 'wikibase-lexeme', 'wikibase-form', 'wikibase-sense'):
-            value = {'entity-type': self.getTarget().entity_type,
-                     'id': self.getTarget().getID()}
+            value = {'entity-type': target.entity_type,
+                     'id': target.getID()}
         elif self.type in ('string', 'url', 'math', 'external-id',
                            'musical-notation'):
-            value = self.getTarget()
+            value = target
         elif self.type == 'commonsMedia':
-            value = self.getTarget().title(with_ns=False)
+            value = target.title(with_ns=False)
         elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
-            value = self.getTarget().toWikibase()
+            value = target.toWikibase()
         else:  # WbUnknown
             pywikibot.warning(
                 f'{self.type} datatype is not supported yet.')
-            value = self.getTarget().toWikibase()
+            value = target.toWikibase()
         return value
 
     def _formatDataValue(self) -> dict:
@@ -2319,8 +2324,9 @@ class LexemePage(WikibasePage):
             value = getattr(self, prop, None)
             if not value:
                 continue
-            if not diffto or diffto.get(prop) != value.getID():
-                data[prop] = value.getID()
+            value_id = value.getID()
+            if not diffto or diffto.get(prop) != value_id:
+                data[prop] = value_id
 
         return data
 

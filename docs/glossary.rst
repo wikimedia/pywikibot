@@ -16,7 +16,7 @@ Glossary
    compat
       The first Pywikibot package formerly known as *Pywikipediabot*
       also called :term:`trunk` was started in 2003. MediaWiki didn't
-      have an API so a :wiki:`screen scrapping<Screen_scraper>` was used.
+      have an API so a :wiki:`screen scraper<Screen_scraper>` was used.
 
    core
       In 2007 a new branch of Pywikibot formerly known as
@@ -44,7 +44,7 @@ Glossary
       **Py**\ thon Media\ **Wiki Bot** Framework, a Python library and
       collection of scripts that automate work on MediaWiki sites.
       Originally designed for Wikipedia, it is now used throughout the
-      Wikimedia Foundation's projects and on many other wikis based of
+      Wikimedia Foundation's projects and on many other wikis based on
       MediaWiki software.
 
    rewrite
@@ -52,7 +52,7 @@ Glossary
 
    stable
       A stable branch of Pywikibot updated roughly every month
-      after tests passes. This branch is preinstalled at :term:`PAWS`
+      after tests pass. This branch is preinstalled at :term:`PAWS`
       and should be used for production systems.
 
    tag

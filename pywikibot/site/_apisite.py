@@ -10,7 +10,7 @@ import datetime
 import re
 import time
 import webbrowser
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
@@ -43,6 +43,7 @@ from pywikibot.exceptions import (
     PageDeletedConflictError,
     PageRelatedError,
     PageSaveRelatedError,
+    ServerError,
     SiteDefinitionError,
     SpamblacklistError,
     TitleblacklistError,
@@ -53,9 +54,11 @@ from pywikibot.site._extensions import (
     EchoMixin,
     FlaggedRevsMixin,
     GeoDataMixin,
+    GlobalBlockingMixin,
     GlobalUsageMixin,
     LinterMixin,
     PageImagesMixin,
+    PageViewInfoMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
     ThanksMixin,
@@ -73,6 +76,7 @@ from pywikibot.tools import (
     cached,
     deprecate_arg,
     deprecated,
+    deprecated_args,
     deprecated_signature,
     issue_deprecation_warning,
     merge_unique_dicts,
@@ -92,6 +96,8 @@ __all__ = ('APISite', )
 
 _mw_msg_cache: defaultdict[str, dict[str, str]] = defaultdict(dict)
 
+CAPTCHA_TYPES = {'math', 'simple'}
+
 
 class _OnErrorExc(NamedTuple):
     exception: Exception
@@ -104,9 +110,11 @@ class APISite(
     FlaggedRevsMixin,
     GeneratorsMixin,
     GeoDataMixin,
+    GlobalBlockingMixin,
     GlobalUsageMixin,
     LinterMixin,
     PageImagesMixin,
+    PageViewInfoMixin,
     ProofreadPageMixin,
     TextExtractsMixin,
     ThanksMixin,
@@ -409,16 +417,12 @@ class APISite(
                 error_msg = ('No username has been defined in your '
                              'user config file: you have to add in this '
                              'file the following line:\n'
-                             "usernames['{family}'][{lang!r}]= {username!r}"
-                             .format(family=self.family,
-                                     lang=self.lang,
-                                     username=self.userinfo['name']))
+                             f"usernames['{self.family}'][{self.lang!r}]= "
+                             f"{self.userinfo['name']!r}")
             else:
-                error_msg = ('Logged in on {site} via OAuth as {wrong}, but '
-                             'expect as {right}'
-                             .format(site=self,
-                                     wrong=self.userinfo['name'],
-                                     right=self.username()))
+                error_msg = (f'Logged in on {self} via OAuth as '
+                             f"{self.userinfo['name']}, but "
+                             f'expect as {self.username()}')
 
             raise NoUsernameError(error_msg)
 
@@ -651,6 +655,9 @@ class APISite(
         .. seealso:: :api:`Userinfo`
         .. version-changed:: 8.0
            Use API formatversion 2.
+        .. version-changed:: 11.8
+           Raise ServerError instead of AttributeError if response lacks
+           'query' or 'userinfo' key.
 
         :return: A dict with the following keys and values:
 
@@ -661,6 +668,7 @@ class APISite(
           - rights: list of rights (could be empty)
           - messages: True if user has a new message on talk page (bool)
           - blockinfo: present if user is blocked (dict)
+        :raises ServerError: response lacks 'query' or 'userinfo' key.
         """
         if not hasattr(self, '_userinfo'):
             uirequest = self.simple_request(
@@ -670,10 +678,11 @@ class APISite(
                 formatversion=2,
             )
             uidata = uirequest.submit()
-            assert 'query' in uidata, \
-                   "API userinfo response lacks 'query' key"
-            assert 'userinfo' in uidata['query'], \
-                   "API userinfo response lacks 'userinfo' key"
+            if 'query' not in uidata:
+                raise ServerError("API userinfo response lacks 'query' key")
+            if 'userinfo' not in uidata['query']:
+                raise ServerError("API userinfo response lacks 'userinfo' key")
+
             self._userinfo = uidata['query']['userinfo']
             if self._loginstatus != login.LoginStatus.IN_PROGRESS \
                and ('anon' in self._userinfo or not self._userinfo.get('id')):
@@ -992,7 +1001,7 @@ class APISite(
         self,
         keys: Iterable[str],
         lang: str | None = None
-    ) -> OrderedDict[str, str]:
+    ) -> dict[str, str]:
         """Fetch the text of a set of MediaWiki messages.
 
         The returned dict uses each key to store the associated message.
@@ -1003,30 +1012,33 @@ class APISite(
         :param lang: A language code, default is self.lang
         """
         amlang = lang or self.lang
-        if not all(amlang in _mw_msg_cache
-                   and _key in _mw_msg_cache[amlang] for _key in keys):
+        keys = list(keys)
+        messages = _mw_msg_cache.get(amlang, {})
+        missing_keys = [key for key in keys if key not in messages]
+
+        if missing_keys:
             parameters = {'meta': 'allmessages',
-                          'ammessages': keys,
+                          'ammessages': missing_keys,
                           'amlang': amlang,
+                          'formatversion': 2,
                           }
             msg_query = api.QueryGenerator(site=self, parameters=parameters)
 
             for msg in msg_query:
                 if 'missing' not in msg:
-                    _mw_msg_cache[amlang][msg['name']] = msg['*']
+                    messages[msg['name']] = msg['content']
+                    _mw_msg_cache[amlang] = messages
 
-            # Check requested keys
-            result = OrderedDict()
-            for key in keys:
-                try:
-                    result[key] = _mw_msg_cache[amlang][key]
-                except KeyError:
-                    raise KeyError(
-                        f"No message '{key}' found for lang '{amlang}'")
+        # Check requested keys
+        result = {}
+        for key in keys:
+            try:
+                result[key] = messages[key]
+            except KeyError:
+                raise KeyError(
+                    f"No message '{key}' found for lang '{amlang}'")
 
-            return result
-
-        return OrderedDict((key, _mw_msg_cache[amlang][key]) for key in keys)
+        return result
 
     def mediawiki_message(
         self,
@@ -1231,8 +1243,8 @@ class APISite(
             try:
                 namespace = _namespaces[ns]
             except KeyError:
-                pywikibot.warning('Broken namespace alias "{}" (id: {}) on {}'
-                                  .format(item['alias'], ns, self))
+                pywikibot.warning('Broken namespace alias "%s" (id: %s) on %s',
+                                  item['alias'], ns, self)
             else:
                 if item['alias'] not in namespace:
                     namespace.aliases.append(item['alias'])
@@ -1493,7 +1505,7 @@ class APISite(
 
         query = self._generator(api.PropertyGenerator,
                                 type_arg='info',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 inprop=inprop)
         self._update_page(page, query)
 
@@ -1502,7 +1514,7 @@ class APISite(
         title = page.title(with_section=False)
         query = self._generator(api.PropertyGenerator,
                                 type_arg='pageprops',
-                                titles=title.encode(self.encoding()),
+                                titles=title,
                                 )
         self._update_page(page, query)
 
@@ -1630,8 +1642,8 @@ class APISite(
         .. seealso:: :meth:`page.BasePage.getRedirectTarget`
 
         :param page: Page to search redirects for
-        :param ignore_section: Do not include section to the target even
-            the link has one
+        :param ignore_section: Skip checking the target section against raw
+            wikitext headings.
         :return: Redirect target of page
 
         :raises CircularRedirectError: Page is a circular redirect
@@ -1639,8 +1651,8 @@ class APISite(
             another site
         :raises IsNotRedirectPageError: Page is not a redirect
         :raises RuntimeError: No redirects found
-        :raises SectionError: The section is not found on target page
-            and *ignore_section* is not set
+        :raises SectionError: The section does not match a raw wikitext
+            heading on the target page and *ignore_section* is not set
         """
         if not self.page_isredirect(page):
             raise IsNotRedirectPageError(page)
@@ -1723,8 +1735,7 @@ class APISite(
             target = pywikibot.Category(target)
 
         if not ignore_section:
-            # get the content; this raises SectionError if section is not found
-            target.text
+            target._check_section()
 
         page._redirtarget = target
         return page._redirtarget
@@ -1736,10 +1747,10 @@ class APISite(
 
         >>> site = pywikibot.Site()
         >>> tokens = site.get_tokens([])  # get all tokens
-        >>> list(tokens.keys())  # result depends on user
+        >>> list(tokens)  # result depends on user
         ['createaccount', 'login']
         >>> tokens = site.get_tokens(['csrf', 'patrol'])
-        >>> list(tokens.keys())  # doctest: +SKIP
+        >>> list(tokens)  # doctest: +SKIP
         ['csrf', 'patrol']
         >>> token = site.get_tokens(['csrf']).get('csrf')  # get a single token
         >>> token  # doctest: +SKIP
@@ -1856,7 +1867,7 @@ class APISite(
         cititle = category.title(with_section=False)
         ciquery = self._generator(api.PropertyGenerator,
                                   type_arg='categoryinfo',
-                                  titles=cititle.encode(self.encoding()))
+                                  titles=cititle)
         self._update_page(category, ciquery)
 
     def categoryinfo(
@@ -2087,11 +2098,13 @@ class APISite(
 
         if text_overrides:
             if 'text' in kwargs:
-                raise ValueError('text cannot be used with any of {}'
-                                 .format(', '.join(text_overrides)))
+                raise ValueError(
+                    'text cannot be used with any of '
+                    f'{", ".join(text_overrides)}')
             if len(text_overrides) > 1:
-                raise ValueError('Multiple text overrides used: {}'
-                                 .format(', '.join(text_overrides)))
+                raise ValueError(
+                    'Multiple text overrides used: '
+                    f'{", ".join(text_overrides)}')
             text = None
             basetimestamp = False
         elif 'text' in kwargs:
@@ -2226,7 +2239,7 @@ class APISite(
 
                         req['captchaid'] = captcha['id']
 
-                        if captcha['type'] in ['math', 'simple']:
+                        if captcha['type'] in CAPTCHA_TYPES:
                             req['captchaword'] = input(captcha['question'])
                             continue
 
@@ -2646,10 +2659,11 @@ class APISite(
     }  # other errors shouldn't occur because of pre-submission checks
 
     @need_right('delete')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def delete(
         self,
         page: BasePage | int | str,
-        reason: str,
+        summary: str,
         *,
         deletetalk: bool = False,
         oldimage: str | None = None
@@ -2677,13 +2691,16 @@ class APISite(
         .. version-changed:: 11.2
            *deletetalk* option was implemented for MediaWiki < 1.38wmf24.
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         .. seealso::
            - :api:`Delete`
            - :meth:`undelete`
            - :meth:`page.BasePage.delete`
 
         :param page: Page to be deleted or its pageid.
-        :param reason: Deletion reason.
+        :param summary: Deletion summary.
         :param deletetalk: Also delete the talk page, if it exists.
         :param oldimage: Oldimage id of the file version to be deleted.
             If a BasePage object is given with page parameter, it has to
@@ -2706,7 +2723,7 @@ class APISite(
         params = {
             'action': 'delete',
             'token': token,
-            'reason': reason,
+            'reason': summary,
             'oldimage': oldimage,
         }
 
@@ -2764,13 +2781,14 @@ class APISite(
                     'Cannot delete a non-existing associated talk page.'
                 )
             else:
-                self.delete(talk_page, reason)
+                self.delete(talk_page, summary=summary)
 
     @need_right('undelete')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def undelete(
         self,
         page: BasePage,
-        reason: str,
+        summary: str,
         *,
         revisions: list[str] | None = None,
         fileids: list[int | str] | None = None
@@ -2784,13 +2802,16 @@ class APISite(
            `fileids` parameter was added,
            keyword argument required for `revisions`.
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         .. seealso::
            - :api:`Undelete`
            - :meth:`delete`
            - :meth:`page.BasePage.undelete`
 
         :param page: Page to be deleted.
-        :param reason: Undeletion reason.
+        :param summary: Undeletion summary.
         :param revisions: List of timestamps to restore.
             If None, restores all revisions.
         :param fileids: List of fileids to restore.
@@ -2799,7 +2820,7 @@ class APISite(
         params = {
             'action': 'undelete',
             'title': page,
-            'reason': reason,
+            'reason': summary,
             'token': token,
             'timestamps': revisions,
             'fileids': fileids,
@@ -2892,11 +2913,12 @@ class APISite(
     }
 
     @need_right('protect')
+    @deprecated_args(reason='summary')  # since 11.8.0
     def protect(
         self,
         page: BasePage,
         protections: dict[str, str | None],
-        reason: str,
+        summary: str,
         expiry: datetime.datetime | str | None = None,
         **kwargs: Any
     ) -> None:
@@ -2908,11 +2930,14 @@ class APISite(
            - :meth:`page_restrictions`
            - :api:`Protect`
 
+        .. version-changed:: 11.8
+           The *reason* parameter was renamed to *summary*.
+
         :param protections: A dict mapping type of protection to
             protection level of that type. Refer :meth:`restrictions`
             for valid restriction types restriction levels. If None is
             given, however, that protection will be skipped.
-        :param reason: Reason for the action
+        :param summary: Summary for the action.
         :param expiry: When the block should expire. This expiry will be
             applied to all protections. If ``None``, ``'infinite'``,
             ``'indefinite'``, ``'never'``, or ``''`` is given, there is
@@ -2930,7 +2955,7 @@ class APISite(
             title=page,
             token=token,
             protections=protections_list,
-            reason=reason,
+            reason=summary,
             expiry=expiry or None,  # pass None instead of empty str
         )
 

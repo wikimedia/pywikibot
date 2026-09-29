@@ -100,7 +100,7 @@ class TestNonSysopSaveFailure(TestCase):
 
     def test_spam(self) -> None:
         """Test that spam in content raise the appropriate exception."""
-        page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
+        page = pywikibot.Page(self.site, 'Pywikibot')
         page.text = 'http://badsite.com'
         with skipping(OtherPageSaveError), self.assertRaisesRegex(
                 SpamblacklistError, 'badsite.com'):

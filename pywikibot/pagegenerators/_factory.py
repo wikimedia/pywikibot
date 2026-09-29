@@ -216,7 +216,7 @@ class GeneratorFactory:
            set the instance variable :attr:`is_preloading` to True or False.
         .. version-changed:: 8.0
            if ``limit`` option is set and multiple generators are given,
-           pages are yieded in a :func:`roundrobin
+           pages are yielded in a :func:`roundrobin
            <tools.itertools.roundrobin_generators>` way.
         .. version-changed:: 11.3
            If *preload* option is set, the preloading generators
@@ -225,6 +225,8 @@ class GeneratorFactory:
            with the *quiet* option.
            The generator specified by ``-start`` and ``-until`` is
            evaluated lazily by this method.
+        .. versionchanged:: 11.8
+           Avoid loading page data for titles rejected by title filters.
 
         :param gen: Another generator to be combined with
         :param preload: Preload pages using PreloadingGenerator
@@ -284,6 +286,15 @@ class GeneratorFactory:
             combine = roundrobin_generators if self.limit else itertools.chain
             dupfiltergen = _filter_unique_pages(combine(*self.gens))
 
+        # Apply title-only filters before filters which may load page data.
+        if self.titlefilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlefilter_list)
+
+        if self.titlenotfilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlenotfilter_list, 'none')
+
         # Add on subpage filter generator
         if self.subpage_max_depth is not None:
             dupfiltergen = SubpageFilterGenerator(
@@ -304,14 +315,6 @@ class GeneratorFactory:
         if self.qualityfilter_list:
             dupfiltergen = QualityFilterPageGenerator(
                 dupfiltergen, self.qualityfilter_list)
-
-        if self.titlefilter_list:
-            dupfiltergen = RegexFilterPageGenerator(
-                dupfiltergen, self.titlefilter_list)
-
-        if self.titlenotfilter_list:
-            dupfiltergen = RegexFilterPageGenerator(
-                dupfiltergen, self.titlenotfilter_list, 'none')
 
         if self.catfilter_list:
             dupfiltergen = CategoryFilterPageGenerator(
@@ -464,8 +467,8 @@ class GeneratorFactory:
 
         if start_ or end_:
             pywikibot.info(
-                'Fetching log events in range: {} - {}.'
-                .format(end or 'beginning of time', start or 'now'))
+                'Fetching log events in range: %s - %s.',
+                end or 'beginning of time', start or 'now')
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
@@ -535,7 +538,7 @@ class GeneratorFactory:
             max_w = max(len(p) for p in pages[::2]) + 4
             txt = 'Available special pages:\n'
             for a, b in zip_longest(pages[::2], pages[1::2], fillvalue=''):
-                txt += '    {a:<{max_w}}{b}\n'.format(a=a, b=b, max_w=max_w)
+                txt += f'    {a:<{max_w}}{b}\n'
             txt += ('\nMaximum number of pages to return is {max} '
                     '({highmax} for bots).\n'.format_map(limit))
             pywikibot.info(txt)
@@ -1045,7 +1048,7 @@ class GeneratorFactory:
         .. version-changed:: 11.4.1
            If preleading ``not:`` directive is given, special namespaces
            ``-1`` and ``-2`` are not included.
-           The ``-start`` or ``-until`` parameters appends a placeholder
+           The ``-start`` or ``-until`` parameters append a placeholder
            to :attr:`gens`, which indicates that a generator was
            specified.
 

@@ -676,7 +676,7 @@ class CheckImagesBot:
         # advise...
         try:
             curr_text = self.talk_page.get()
-            history = list(self.talk_page.revisions(total=10))
+            history = list(self.talk_page.revisions(total=2))
             latest_user = history[0]['user']
             pywikibot.info(
                 'The latest user that has written something is: '
@@ -839,8 +839,8 @@ class CheckImagesBot:
                 # project.
                 return False
 
-            if re.findall(r'\bstemma\b',
-                          self.image_name.lower()) and self.site.code == 'it':
+            if self.site.code == 'it' and re.search(
+                    r'\bstemma\b', self.image_name.lower()):
                 pywikibot.info(f"{self.image_name} has 'stemma' inside, means "
                                f"that it's ok.")
                 return True
@@ -884,6 +884,8 @@ class CheckImagesBot:
         if len(duplicates) <= 1:
             return bool(duplicates)
 
+        image_url_title = self.image.title(as_url=True)
+
         xdict = {'en':
                  '%(name)s has {{PLURAL:count'
                  '|a duplicate! Reporting it'
@@ -895,8 +897,8 @@ class CheckImagesBot:
             time_image_list = []
 
             for dup_page in duplicates:
-                if dup_page.title(as_url=True) != self.image.title(
-                        as_url=True) or self.timestamp is None:
+                if (dup_page.title(as_url=True) != image_url_title
+                        or self.timestamp is None):
                     try:
                         self.timestamp = dup_page.latest_file_info.timestamp
                     except PageRelatedError:
@@ -920,8 +922,8 @@ class CheckImagesBot:
                 except NoPageError:
                     continue
 
-                if not (re.findall(dup_regex, dup_page_text)
-                        or re.findall(dup_regex, older_page_text)):
+                if not (re.search(dup_regex, dup_page_text)
+                        or re.search(dup_regex, older_page_text)):
                     pywikibot.info(
                         f'{dup_page} is a duplicate and has to be tagged...')
                     images_to_tag_list.append(dup_page.title())
@@ -970,9 +972,10 @@ class CheckImagesBot:
             if images_to_tag_list and not only_report:
                 fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                 already_reported_in_past = fp.revision_count(self.bots)
-                image_title = re.escape(self.image.title(as_url=True))
+                escaped_image_title = re.escape(image_url_title)
                 from_regex = (
-                    rf'\n\*\[\[:{self.image_namespace}{image_title}\]\]')
+                    rf'\n\*\[\[:{self.image_namespace}'
+                    rf'{escaped_image_title}\]\]')
                 # Delete the image in the list where we're write on
                 text_for_the_report = re.sub(from_regex, '',
                                              text_for_the_report)
@@ -994,12 +997,11 @@ class CheckImagesBot:
                 self.site, 'checkimages-has-duplicates')
             forced_mode = ' ' + i18n.twtranslate(
                 self.site, 'checkimages-forced-mode') if only_report else ''
-            repme = self.list_entry % self.image.title(as_url=True)
+            repme = self.list_entry % image_url_title
             repme += has_duplicates % {'force': forced_mode}
 
             for dup_page in duplicates:
-                if dup_page.title(as_url=True) \
-                   == self.image.title(as_url=True):
+                if dup_page.title(as_url=True) == image_url_title:
                     # the image itself, not report also this as duplicate
                     continue
                 repme += (f'\n** [[:{self.image_namespace}'
@@ -1118,8 +1120,7 @@ class CheckImagesBot:
         if self.site.code == 'commons':
             no_licenses_to_skip = pywikibot.Category(self.site,
                                                      'License-related tags')
-            for license_given in no_licenses_to_skip.articles():
-                licenses.discard(license_given)
+            licenses.difference_update(no_licenses_to_skip.articles())
 
         # Add the licenses set in the default page as licenses to check
         if self.page_allowed:
@@ -1129,8 +1130,10 @@ class CheckImagesBot:
             except (NoPageError, IsRedirectPageError):
                 pass
             else:
-                for name_license in self.load(page_allowed_text):
-                    licenses.add(pywikibot.Page(self.site, name_license))
+                licenses.update(
+                    pywikibot.Page(self.site, name_license)
+                    for name_license in self.load(page_allowed_text)
+                )
 
         if not licenses:
             raise pywikibot.Error(
@@ -1202,7 +1205,7 @@ class CheckImagesBot:
             if not self.licenses_found and templates_in_the_image_raw:
                 # {{nameTemplate|something <- this is not a template, be sure
                 # that we haven't catch something like that.
-                licenses_test = regex_are_licenses.findall(
+                licenses_test = regex_are_licenses.search(
                     self.image_check_text)
                 if not self.licenses_found and licenses_test:
                     raise Error(
@@ -1358,8 +1361,7 @@ class CheckImagesBot:
                 regex_pattern = re.compile(
                     r'\{\{(?:template)?%s ?(?:\||\r?\n|\}|<|/) ?'
                     % i.split('{{')[1].replace(' ', '[ _]'), re.IGNORECASE)
-                result = regex_pattern.findall(self.image_check_text)
-                if result:
+                if regex_pattern.search(self.image_check_text):
                     return True
             elif i.lower() in self.image_check_text:
                 return True
@@ -1367,16 +1369,17 @@ class CheckImagesBot:
 
     def find_additional_problems(self) -> None:
         """Extract additional settings from configuration page."""
+        image_check_text_lower = self.image_check_text.lower()
         # In every tuple there's a setting configuration
         for tupla in self.settings_data:
             name = tupla[1]
             find_type = tupla[2]
             find = tupla[3]
             find_list = self.load(find)
-            imagechanges = tupla[4]
-            if imagechanges.lower() == 'false':
+            imagechanges = tupla[4].lower()
+            if imagechanges == 'false':
                 imagestatus = False
-            elif imagechanges.lower() == 'true':
+            elif imagechanges == 'true':
                 imagestatus = True
             else:
                 pywikibot.error('Imagechanges set wrongly!')
@@ -1388,12 +1391,13 @@ class CheckImagesBot:
                 head_2 = re.findall(r'\s*== *(.+?) *==\s*', head_2)[0]
             text = tupla[7] % self.image_name
             mex_catched = tupla[8]
+            find_type = find_type.lower()
             for k in find_list:
-                if find_type.lower() == 'findonly':
+                if find_type == 'findonly':
                     search_results = re.findall(fr'{k.lower()}',
-                                                self.image_check_text.lower())
+                                                image_check_text_lower)
                     if search_results \
-                       and search_results[0] == self.image_check_text.lower():
+                       and search_results[0] == image_check_text_lower:
                         self.some_problem = True
                         self.text_used = text
                         self.head_used = head_2
@@ -1402,9 +1406,9 @@ class CheckImagesBot:
                         self.summary_used = summary
                         self.mex_used = mex_catched
                         break
-                elif find_type.lower() == 'find' \
-                    and re.findall(fr'{k.lower()}',
-                                   self.image_check_text.lower()):
+                elif find_type == 'find' \
+                    and re.search(fr'{k.lower()}',
+                                  image_check_text_lower):
                     self.some_problem = True
                     self.text_used = text
                     self.head_used = head_2
@@ -1653,7 +1657,7 @@ def main(*args: str) -> bool:
             pywikibot.info(
                 f'Retrieving the latest {limit} files for checking...')
     while True:
-        # Defing the Main Class.
+        # Defining the Main Class.
         bot = CheckImagesBot(site, sendemail_active=sendemail_active,
                              duplicates_report=duplicates_report,
                              log_full_error=log_full_error,

@@ -538,7 +538,7 @@ class ShowingListOption(ListOption, OutputOption):
             text = self.pre + '\n'
         width = len(str(self.maximum))
         for i, item in enumerate(self._list, self.minimum):
-            text += '{:>{width}} - {}\n'.format(i, item, width=width)
+            text += f'{i:>{width}} - {item}\n'
         if self.post is not None:
             text += self.post + '\n'
         return text
@@ -744,11 +744,11 @@ class InteractiveReplace:
         choices = []
         for name, choice in self._own_choices:
             if getattr(self, 'allow_' + name):
-                choices += [choice]
+                choices.append(choice)
         if self.context_delta > 0:
-            choices += [HighlightContextOption(
+            choices.append(HighlightContextOption(
                 'more context', 'm', self.current_text, self.context,
-                self.context_delta, *self.current_range)]
+                self.context_delta, *self.current_range))
         choices += self.additional_choices
         return tuple(choices)
 

@@ -127,7 +127,6 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
-    @unittest.expectedFailure  # T367324
     def test_edit_entity_propagation(self) -> None:
         """Test that ``ItemPage.editEntity`` propagates changes to claims."""
         testsite = self.get_repo()
@@ -140,24 +139,25 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         ref.setTarget('test')
         claim.addQualifier(qual)
         claim.addSource(ref)
+        item.claims[claim.id] = [claim]
         item.editEntity()
         self.assertIsNotNone(claim.snak)
         self.assertIsNotNone(qual.hash)
         self.assertIsNotNone(ref.hash)
-        self.assertSame(claim.on_item, item)
-        self.assertSame(qual.on_item, item)
-        self.assertSame(ref.on_item, item)
-        qual = pywikibot.Claim(testsite, 'P97339')
-        qual.setTarget('test')
-        ref = pywikibot.Claim(testsite, 'P97339')
-        ref.setTarget('test')
+        self.assertIs(claim.on_item, item)
+        self.assertIs(qual.on_item, item)
+        self.assertIs(ref.on_item, item)
+        qual = pywikibot.Claim(testsite, 'P97339', is_qualifier=True)
+        qual.setTarget('test2')
+        ref = pywikibot.Claim(testsite, 'P97339', is_reference=True)
+        ref.setTarget('test2')
         claim.qualifiers[qual.id].append(qual)
         claim.sources[0][ref.id].append(ref)
         item.editEntity()
         self.assertIsNotNone(qual.hash)
         self.assertIsNotNone(ref.hash)
-        self.assertSame(qual.on_item, item)
-        self.assertSame(ref.on_item, item)
+        self.assertIs(qual.on_item, item)
+        self.assertIs(ref.on_item, item)
 
     @unittest.expectedFailure  # T367323
     def test_edit_entity_new_property(self) -> None:
@@ -290,7 +290,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    @unittest.expectedFailure  # T367326
+    @unittest.expectedFailure  # T439356
     def test_Coordinate_edit(self) -> None:
         """Attempt adding a Coordinate with globe set via item."""
         testsite = self.get_repo()
@@ -300,7 +300,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = pywikibot.page.Claim(testsite, 'P20480',
                                      datatype='globe-coordinate')
         target = pywikibot.Coordinate(site=testsite, lat=12.0, lon=13.0,
-                                      globe_item=item)
+                                      precision=0.1, globe_item=item)
         claim.setTarget(target)
         item.addClaim(claim)
 
@@ -378,7 +378,6 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P27199'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    @unittest.expectedFailure  # T367327
     def test_WbTabularData_edit(self) -> None:
         """Attempt adding a tabular-data with valid input."""
         # Clean the slate in preparation for test.
@@ -390,7 +389,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
             testsite, 'P30175', datatype='tabular-data')
         commons_site = pywikibot.Site('commons')
         page = pywikibot.Page(commons_site, 'Data:Bea.gov/GDP by state.tab')
-        target = pywikibot.WbGeoShape(page)
+        target = pywikibot.WbTabularData(page)
         claim.setTarget(target)
         item.addClaim(claim)
 
