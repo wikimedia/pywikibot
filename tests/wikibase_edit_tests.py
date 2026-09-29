@@ -159,7 +159,6 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertIs(qual.on_item, item)
         self.assertIs(ref.on_item, item)
 
-    @unittest.expectedFailure  # T367323
     def test_edit_entity_new_property(self) -> None:
         """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
@@ -168,7 +167,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
             'labels': {
                 'en': {
                     'language': 'en',
-                    'value': 'Pywikibot test new property',
+                    'value': 'Pywikibot test new property - ' + ts,
                 }
             },
             'descriptions': {
@@ -180,6 +179,8 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         }
         prop = pywikibot.PropertyPage(testsite, datatype='string')
         prop.editEntity(data)
+        prop.get(force=True)
+        self.assertEqual(prop.labels['en'], data['labels']['en']['value'])
 
     def test_edit_entity_new_linked_item(self) -> None:
         """Test linking a page using a new item."""
