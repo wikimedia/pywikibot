@@ -369,13 +369,15 @@ class History:
     def log(self, url, containing_page, archive_url) -> None:
         """Log an error report to a text file in the deadlinks subdirectory."""
         if archive_url:
-            error_report = f'* {url} ([{archive_url} archive])\n'
+            report_lines = [f'* {url} ([{archive_url} archive])\n']
         else:
-            error_report = f'* {url}\n'
+            report_lines = [f'* {url}\n']
         for (page_title, date, err) in self.history_dict[url]:
             # ISO 8601 formulation
             iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(date))
-            error_report += f'** In [[{page_title}]] on {iso_date}, {err}\n'
+            report_lines.append(
+                f'** In [[{page_title}]] on {iso_date}, {err}\n')
+        error_report = ''.join(report_lines)
         pywikibot.info('** Logging link for deletion.')
         txtfilename = pywikibot.config.datafilepath(
             'deadlinks',
