@@ -1290,13 +1290,15 @@ class CheckImagesBot:
     def load(raw) -> list[str]:
         """Load a list of objects from a string using regex."""
         list_loaded = []
+        seen = set()
         # I search with a regex how many user have not the talk page
         # and i put them in a list (i find it more easy and secure)
         regl = r"(\"|\')(.*?)\1(?:,|\])"
         pl = re.compile(regl)
         for xl in pl.finditer(raw):
             word = xl[2].replace('\\\\', '\\')
-            if word not in list_loaded:
+            if word not in seen:
+                seen.add(word)
                 list_loaded.append(word)
         return list_loaded
 
