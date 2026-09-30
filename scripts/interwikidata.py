@@ -246,7 +246,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         option, _, value = arg.partition(':')
         if option.startswith('-'):
-            option = option[1:]
+            option = option.removeprefix('-')
         else:
             continue
 

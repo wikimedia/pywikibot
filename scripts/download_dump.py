@@ -202,7 +202,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         option, _, value = arg.partition(':')
         if option.startswith('-'):
-            option = option[1:]
+            option = option.removeprefix('-')
 
             if option == 'filename':
                 opts[option] = value or pywikibot.input('Enter the filename: ')

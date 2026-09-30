@@ -193,7 +193,7 @@ def main(*args: str) -> None:
     for arg in local_args:
         if arg.startswith(('-pageage:', '-lastedit:')):
             key, val = arg.split(':', 1)
-            options[key[1:]] = int(val)
+            options[key.removeprefix('-')] = int(val)
         elif gen.handle_arg(arg):
             pass
         else:

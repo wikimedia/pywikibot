@@ -256,7 +256,7 @@ def main(*args: str) -> None:
         opt, _, value = arg.partition(':')
         if not opt.startswith('-'):
             continue
-        opt = opt[1:]
+        opt = opt.removeprefix('-')
         if opt == 'username':
             options['user'] = value or pywikibot.input(
                 'Please enter username of the person you want to revert:')

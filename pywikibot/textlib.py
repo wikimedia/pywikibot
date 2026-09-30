@@ -1381,9 +1381,9 @@ def extract_sections(
     if footer:
         if sections:
             sections[-1] = Section(
-                sections[-1].title, last_section_content[:-len(footer)])
+                sections[-1].title, last_section_content.removesuffix(footer))
         else:
-            header = header[:-len(footer)]
+            header = header.removesuffix(footer)
 
     return Content(header, sections, footer)
 
@@ -2295,7 +2295,7 @@ class TimeStripper:
                 # in some cases month in ~~~~ might end without dot even if
                 # site.months_names do not.
                 if short.endswith('.'):
-                    self.origNames2monthNum[func(short[:-1])] = n
+                    self.origNames2monthNum[func(short.removesuffix('.'))] = n
 
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')

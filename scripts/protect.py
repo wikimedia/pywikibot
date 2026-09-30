@@ -184,7 +184,7 @@ def main(*args: str) -> None:
         if not option.startswith('-'):
             continue
 
-        option = option[1:]
+        option = option.removeprefix('-')
         if option == 'always':
             options[option] = True
         elif option == 'summary':

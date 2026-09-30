@@ -319,7 +319,7 @@ def main(*args: str) -> None:
         if not opt.startswith('-'):
             continue
 
-        opt = opt[1:]
+        opt = opt.removeprefix('-')
         if opt == 'hours':
             opts[opt] = float(value)
         elif opt == 'delay':

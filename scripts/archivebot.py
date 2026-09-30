@@ -1060,7 +1060,7 @@ def main(*args: str) -> None:
         if not option.startswith('-'):
             templates.append(arg)
             continue
-        option = option[1:]
+        option = option.removeprefix('-')
         if option in ('file', 'filename'):
             filename = value
         elif option == 'locale':
