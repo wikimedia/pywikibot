@@ -1452,10 +1452,9 @@ class PetScanPageGenerator(GeneratorWrapper):
             for namespace in namespaces:
                 query[f'ns[{int(namespace)}]'] = 1
 
-        query_final = query.copy()
-        query_final.update(extra_options)
+        query |= extra_options
 
-        return query_final
+        return query
 
     def query(self) -> Generator[dict[str, Any]]:
         """Query PetScan.
