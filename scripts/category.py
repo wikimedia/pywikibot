@@ -1031,17 +1031,18 @@ class CategoryListifyRobot:
         if self.subcats:
             set_of_articles |= set(self.cat.subcategories())
 
-        list_string = ''
+        list_parts = []
         for article in sorted(set_of_articles):
             textlink = not (article.is_filepage() and self.show_images)
-            list_string += (
+            list_parts.append(
                 f'{self.prefix} '
                 f'{article.title(as_link=True, textlink=textlink)}'
             )
             if self.talk_pages and not article.isTalkPage():
-                list_string += (
+                list_parts.append(
                     f' -- [[{article.toggleTalkPage().title()}|talk]]')
-            list_string += '\n'
+            list_parts.append('\n')
+        list_string = ''.join(list_parts)
 
         if self.list.text and self.append:
             # append content by default at the bottom
