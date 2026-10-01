@@ -152,4 +152,8 @@ Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikim
 `learn <https://www.mediawiki.org/wiki/Developer_account>`_ how to get
 started.
 
-.. include:: CODE_OF_CONDUCT.rst
+Code of Conduct
+===============
+
+The development of this software is covered by a `MediaWiki Code of Conduct
+<https://www.mediawiki.org/wiki/Special:MyLanguage/Code_of_Conduct>`_.

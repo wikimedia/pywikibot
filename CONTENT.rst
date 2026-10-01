@@ -6,7 +6,7 @@ The contents of the package
     +===========================+===========================================================+
     | AUTHORS.rst               | List of major contributors to this module                 |
     +---------------------------+-----------------------------------------------------------+
-    | CODE_OF_CONDUCT.rst       | Code of conduct reference                                 |
+    | CODE_OF_CONDUCT.md        | Code of conduct reference                                 |
     +---------------------------+-----------------------------------------------------------+
     | conftest.py               | Local per-directory plugin for pytest-mypy                |
     +---------------------------+-----------------------------------------------------------+
@@ -35,6 +35,8 @@ The contents of the package
     | requirements.txt          | General PIP requirements file                             |
     +---------------------------+-----------------------------------------------------------+
     | ROADMAP.rst               | PyPI version roadmap file                                 |
+    +---------------------------+-----------------------------------------------------------+
+    | SECURITY.md               | Pywikibot Security Policy                                 |
     +---------------------------+-----------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot framework                  |
     +---------------------------+-----------------------------------------------------------+
