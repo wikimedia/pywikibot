@@ -1,7 +1,10 @@
 Release 11.9
 ============
 
-* (no changes yet)
+* Suggest installing all requirements for missing dependencies with
+  :mod:`pwb<pywikibot.scripts.wrapper>` wrapper.
+* Various performance, stability, and code quality improvements.
+* Support legacy encoded section titles. (:phab:`T133276`)
 
 
 Deprecations
