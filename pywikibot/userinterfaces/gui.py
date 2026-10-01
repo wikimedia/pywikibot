@@ -10,10 +10,12 @@ Useful for editing the contents of an article.
 .. note:: idlelib, tkinter and pillow modules are required.
 
 .. caution::
-   Pillow may not be installable on GraalPy.
+   Pillow may not be installable with GraalPy. For PyPy 3.11, use
+   pypy3.11-v7.x (Python 3.11.15); pypy3.11-v8.0 (Python 3.11.16) is
+   currently not supported.
 
 .. danger::
-   Due to security vulnerability, use Pillow >= 12.2.0.
+   Due to a security vulnerability, Pillow >= 12.2.0 is required.
    Requires PyPy >= 3.11 or CPython >= 3.10.
 
 .. seealso:: :mod:`editor`
