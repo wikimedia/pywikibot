@@ -8,7 +8,11 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | CODE_OF_CONDUCT.rst       | Code of conduct reference                                 |
     +---------------------------+-----------------------------------------------------------+
+    | conftest.py               | Local per-directory plugin for pytest-mypy                |
+    +---------------------------+-----------------------------------------------------------+
     | CONTENT.rst               | This Content description file                             |
+    +---------------------------+-----------------------------------------------------------+
+    | dev-requirements.txt      | PIP requirements file for development dependencies        |
     +---------------------------+-----------------------------------------------------------+
     | Dockerfile                | Assemble a Docker image, install all dependencies via pip |
     +---------------------------+-----------------------------------------------------------+
@@ -18,23 +22,19 @@ The contents of the package
     +---------------------------+-----------------------------------------------------------+
     | LICENSE                   | Reference to the MIT license                              |
     +---------------------------+-----------------------------------------------------------+
-    | MANIFEST.in               | Setup file for package data                               |
-    +---------------------------+-----------------------------------------------------------+
-    | README.rst                | Short info string used by Pywikibot Nightlies             |
-    +---------------------------+-----------------------------------------------------------+
-    | ROADMAP.rst               | PyPI version roadmap file                                 |
-    +---------------------------+-----------------------------------------------------------+
-    | conftest.py               | Local per-directory plugin for pytest-mypy                |
-    +---------------------------+-----------------------------------------------------------+
-    | dev-requirements.txt      | PIP requirements file for development dependencies        |
-    +---------------------------+-----------------------------------------------------------+
     | make_dist.py              | Script to create a Pywikibot distribution                 |
+    +---------------------------+-----------------------------------------------------------+
+    | MANIFEST.in               | Setup file for package data                               |
     +---------------------------+-----------------------------------------------------------+
     | pwb.py                    | Caller script for pwb wrapper script                      |
     +---------------------------+-----------------------------------------------------------+
     | pyproject.toml            | Configuration file used by packaging tools and tests      |
     +---------------------------+-----------------------------------------------------------+
+    | README.rst                | Short info string used by Pywikibot Nightlies             |
+    +---------------------------+-----------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                             |
+    +---------------------------+-----------------------------------------------------------+
+    | ROADMAP.rst               | PyPI version roadmap file                                 |
     +---------------------------+-----------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot framework                  |
     +---------------------------+-----------------------------------------------------------+
