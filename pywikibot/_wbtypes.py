@@ -737,9 +737,15 @@ class WbTime(WbRepresentation):
         """
         if not timezone and timestamp.tzinfo and copy_timezone:
             timezone = int(timestamp.utcoffset().total_seconds() / 60)
-        return cls.fromTimestr(timestamp.isoformat(), precision=precision,
-                               before=before, after=after, timezone=timezone,
-                               calendarmodel=calendarmodel, site=site)
+        return cls(
+            *timestamp.timetuple()[:6],
+            precision=precision,
+            before=before,
+            after=after,
+            timezone=timezone,
+            calendarmodel=calendarmodel,
+            site=site,
+        )
 
     @staticmethod
     def _normalize_millennium(year: int) -> int:

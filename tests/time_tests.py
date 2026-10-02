@@ -14,6 +14,7 @@ from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 
 from pywikibot.time import Timestamp, parse_duration, str2timedelta
+from pywikibot.tools import suppress_warnings
 from tests.aspects import TestCase
 
 
@@ -179,9 +180,12 @@ class TestTimestamp(TestCase):
 
     def test_iso_format_property(self) -> None:
         """Test iso format properties."""
-        self.assertEqual(Timestamp.ISO8601Format, Timestamp._ISO8601Format())
-        self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
-                         Timestamp.mediawikiTSFormat)
+        with suppress_warnings(
+            r'.+Timestamp\.ISO8601Format is deprecated since release 11\.9\.0',
+            category=RuntimeWarning
+        ):
+            self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
+                             Timestamp.mediawikiTSFormat)
 
     def test_mediawiki_format(self) -> None:
         """Test conversion from and to Timestamp format."""

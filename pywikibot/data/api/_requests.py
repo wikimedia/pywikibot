@@ -350,13 +350,13 @@ class Request(MutableMapping, WaitingMixin):
         Converts from Python datatypes to MediaWiki API parameter values.
 
         Supports:
-         * datetime.datetime (using strftime and ISO8601 format)
+         * datetime.datetime/Timestamp (using isoformat method)
          * pywikibot.page.BasePage (using title (+namespace; -section))
 
         All other datatypes are converted to string.
         """
         if isinstance(value, datetime.datetime):
-            return value.strftime(pywikibot.Timestamp.ISO8601Format)
+            return value.isoformat()
         if isinstance(value, pywikibot.page.BasePage):
             if value.site != self.site:
                 raise RuntimeError(f'value.site {value.site!r} is different '
