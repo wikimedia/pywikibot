@@ -173,7 +173,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
             'descriptions': {
                 'en': {
                     'language': 'en',
-                    'value': 'Pywikibot test new property - ' + ts,
+                    'value': 'Property created by Pywikibot test - ' + ts,
                 }
             }
         }
