@@ -257,6 +257,11 @@ def process_entries(cache_path, func, use_accesstime: bool | None = None,
 
         for filepath in filenames:
             filename = os.path.basename(filepath)
+
+            # Skip temporary files for normal parsing/operations
+            if filename.endswith('.tmp'):
+                continue
+
             cache_dir = os.path.dirname(filepath)
             if use_accesstime is not False:
                 stinfo = os.stat(filepath)

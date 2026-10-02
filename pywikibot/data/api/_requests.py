@@ -15,6 +15,7 @@ import pickle
 import pprint
 import re
 import sys
+import tempfile
 import traceback
 from collections.abc import Callable, MutableMapping
 from contextlib import suppress
@@ -1396,12 +1397,25 @@ class CachedRequest(Request):
     def _write_cache(self, data) -> None:
         """Write data to self._cachefile_path()."""
         data = self._uniquedescriptionstr(), data, pywikibot.Timestamp.nowutc()
-        path = self._cachefile_path()
-        with suppress(OSError), path.open('wb') as f:
-            pickle.dump(data, f, protocol=config.pickle_protocol)
-            return
-        # delete invalid cache entry
-        path.unlink()
+        path = None
+        try:
+            path = self._cachefile_path()
+            fd, temp_path_str = tempfile.mkstemp(prefix=path.name + '-',
+                                                 suffix='.tmp',
+                                                 dir=path.parent)
+            tmp_path = Path(temp_path_str)
+            try:
+                with open(fd, 'wb') as f:
+                    pickle.dump(data, f, protocol=config.pickle_protocol)
+                tmp_path.replace(path)
+            finally:
+                with suppress(OSError):
+                    tmp_path.unlink()
+        except OSError as e:
+            if path:
+                pywikibot.warning(f'Could not write cache file {path}: {e}')
+            else:
+                pywikibot.warning(f'Could not write cache file: {e}')
 
     def submit(self):
         """Submit cached request."""
