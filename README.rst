@@ -143,7 +143,7 @@ Roadmap
 Release history
 ===============
 
-See https://github.com/wikimedia/pywikibot/blob/stable/HISTORY.rst
+See https://doc.wikimedia.org/pywikibot/stable/changelog.html
 
 Contributing
 ============
