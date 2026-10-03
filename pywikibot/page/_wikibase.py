@@ -388,6 +388,39 @@ class MediaInfo(WikibaseEntity):
 
         return super().__getattr__(name)
 
+    def toJSON(self, diffto: dict | None = None) -> dict:
+        """Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences to the
+        provided data is created.
+
+        :param diffto: JSON containing entity data
+        """
+        data = super().toJSON(diffto=diffto)
+        if 'statements' in data:
+            data['claims'] = data.pop('statements')
+        return data
+
+    @classmethod
+    def _normalizeData(cls, data: dict) -> dict:
+        """Helper function to expand data into the Wikibase API structure.
+
+        :param data: The dict to normalize
+        :return: The dict with normalized data
+        :raise ValueError: If both 'claims' and 'statements' are present
+        """
+        if 'claims' in data and 'statements' in data:
+            raise ValueError(
+                "Cannot specify both 'claims' and 'statements' in data")
+
+        data = dict(data)
+        if 'claims' in data:
+            data['statements'] = data.pop('claims')
+        norm_data = super()._normalizeData(data)
+        if 'statements' in norm_data:
+            norm_data['claims'] = norm_data.pop('statements')
+        return norm_data
+
     def _assert_has_id(self) -> None:
         if self.id != '-1':
             return
