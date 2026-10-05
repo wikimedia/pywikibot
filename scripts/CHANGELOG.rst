@@ -76,6 +76,11 @@ clean_sandbox
 
 * Fix L10N for arzwiki.
 
+review
+^^^^^^
+
+* Script to review or unreview FlaggedRevs pages was added (:phab:`T439954`)
+
 solve_disambiguation
 ^^^^^^^^^^^^^^^^^^^^
 

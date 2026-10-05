@@ -152,6 +152,8 @@ Bots and scripts
 +--------------------------+---------------------------------------------------------+
 | revertbot.py             | Script that can be used for reverting certain edits.    |
 +--------------------------+---------------------------------------------------------+
+| review.py                | Review or unreview pages with FlaggedRevs extension.    |
++--------------------------+---------------------------------------------------------+
 | solve_disambiguation.py  | Interactive robot doing disambiguation.                 |
 +--------------------------+---------------------------------------------------------+
 | speedy_delete.py         | Help sysops to quickly check and/or delete pages listed |
