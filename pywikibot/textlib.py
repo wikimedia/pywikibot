@@ -470,7 +470,7 @@ def replaceExcept(text: str,
             # On the other hand, this approach does not work because it
             # can't handle lookahead or lookbehind (see bug T123185).
             # So we have to process the group references manually.
-            replacement = ''
+            replacement_parts = []
 
             group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
             last = 0
@@ -480,13 +480,14 @@ def replaceExcept(text: str,
                     group_id = int(group_id)
 
                 try:
-                    replacement += new[last:group_match.start()]
-                    replacement += match[group_id] or ''
+                    replacement_parts.append(new[last:group_match.start()])
+                    replacement_parts.append(match[group_id] or '')
                 except IndexError:
                     raise IndexError(f'Invalid group reference: {group_id}\n'
                                      f'Groups found: {match.groups()}')
                 last = group_match.end()
-            replacement += new[last:]
+            replacement_parts.append(new[last:])
+            replacement = ''.join(replacement_parts)
 
         text = text[:match_start] + replacement + text[match.end():]
 

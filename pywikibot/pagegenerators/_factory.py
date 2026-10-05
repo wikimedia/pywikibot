@@ -502,12 +502,11 @@ class GeneratorFactory:
                                       ) -> None:
             _i = ' ' * 4
             _2i = 2 * _i
-            txt = 'Available categories of lint errors:\n'
+            text_parts = ['Available categories of lint errors:\n']
             for prio, _list in cats.items():
-                txt += f'{_i}{prio}\n'
-                txt += ''.join(
-                    f'{_2i}{c}\n' for c in _list)
-            pywikibot.info(txt)
+                text_parts.append(f'{_i}{prio}\n')
+                text_parts.extend(f'{_2i}{c}\n' for c in _list)
+            pywikibot.info(''.join(text_parts))
 
         if cat == 'show':  # Display categories of lint errors.
             show_available_categories(cats)
@@ -536,12 +535,12 @@ class GeneratorFactory:
                                                    'limit')
 
             max_w = max(len(p) for p in pages[::2]) + 4
-            txt = 'Available special pages:\n'
-            for a, b in zip_longest(pages[::2], pages[1::2], fillvalue=''):
-                txt += f'    {a:<{max_w}}{b}\n'
-            txt += ('\nMaximum number of pages to return is {max} '
-                    '({highmax} for bots).\n'.format_map(limit))
-            pywikibot.info(txt)
+            text_parts = ['Available special pages:\n']
+            text_parts.extend(f'    {a:<{max_w}}{b}\n' for a, b in zip_longest(
+                pages[::2], pages[1::2], fillvalue=''))
+            text_parts.append('\nMaximum number of pages to return is {max} '
+                              '({highmax} for bots).\n'.format_map(limit))
+            pywikibot.info(''.join(text_parts))
             sys.exit(0)
 
         return self.site.querypage(value)
