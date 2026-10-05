@@ -188,7 +188,7 @@ class SyncSites:
         """Check one page."""
         pywikibot.info('\nChecking ' + pagename)
         page1 = Page(self.original, pagename)
-        txt1 = page1.text
+        source_text = page1.text
 
         if self.options.dest_namespace:
             dest_ns = int(self.options.dest_namespace)
@@ -196,6 +196,7 @@ class SyncSites:
             dest_ns = None
 
         for site in self.sites:
+            txt1 = source_text
             if dest_ns is not None:
                 page2 = Page(site, page1.title(with_ns=False), dest_ns)
                 pywikibot.info('\nCross namespace, new title: '
