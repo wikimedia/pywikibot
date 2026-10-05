@@ -39,6 +39,11 @@ jobs:
         code: [test]
         domain: [test.wikipedia.org]
         include:
+          - python-version: 3.16-dev
+            family: wikipedia
+            code: test
+            domain: test.wikipedia.org
+            experimental: true
           - python-version: '3.9'
             family: betawikipedia
             code: en
@@ -55,9 +60,15 @@ jobs:
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
+        if: matrix.python-version != '3.16-dev'
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: deadsnakes/action@v3.2.0
+        if: matrix.python-version == '3.16-dev'
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Get token name
         env:
           _oauth_token: OAUTH_TOKEN_${{ matrix.family }}_${{ matrix.code }}
