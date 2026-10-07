@@ -438,6 +438,8 @@ def fetch(uri: str,
         The *body* parameter was removed; use *data* instead.
     .. version-changed:: 11.8
        Avoid mutating headers inputs.
+    .. version-changed:: 11.9
+       Streamed responses no longer read the body to detect its encoding.
 
     See :py:obj:`requests.Session.request` for parameters.
 
@@ -450,9 +452,12 @@ def fetch(uri: str,
         overridden by domain in config.
 
     :keyword charset: Either a valid charset (usable for str.decode())
-        or None to automatically chose the charset from the returned
-        header (defaults to latin-1)
+        or None to automatically choose the charset from the returned
+        header (defaults to latin-1 when not streaming)
     :type charset: CodecInfo, str, None
+    :keyword bool stream: Defer reading the response body until consumed.
+        When True, use the explicit *charset* or retain the encoding chosen
+        by requests from the response headers, without inspecting the body.
     :keyword verify: Verify the SSL certificate (default is True)
     :type verify: bool or path to certificates
     :keyword callbacks: Methods to call once data is fetched
@@ -526,7 +531,11 @@ def fetch(uri: str,
     except Exception as e:
         response = e
     else:
-        response.encoding = _decide_encoding(response, charset)
+        if kwargs.get('stream'):
+            if charset is not None:
+                response.encoding = charset
+        else:
+            response.encoding = _decide_encoding(response, charset)
 
     for callback in callbacks:
         # Note: error_handling_callback raises the Exception
