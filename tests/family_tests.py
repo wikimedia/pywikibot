@@ -7,6 +7,7 @@
 """Tests for the family module."""
 from __future__ import annotations
 
+import pickle
 import unittest
 import warnings
 from collections.abc import Mapping
@@ -132,8 +133,11 @@ class TestFamily(TestCase):
         with suppress_warnings(msg, FutureWarning):
             self.assertIn('dk', family.interwiki_replacements)
 
+        self.assertIs(pickle.loads(pickle.dumps(family)), family)
+
     def test_obsolete_from_attributes(self) -> None:
         """Test obsolete property for given class attributes."""
+        self.assertEqual(Family.interwiki_removals, frozenset())
         # Construct a temporary family and instantiate it
         family = type('TempFamily', (Family,), {})()
 
@@ -147,9 +151,12 @@ class TestFamily(TestCase):
         family = type('TempFamily', (Family,),
                       {'code_aliases': {'a': 'b'}, 'closed_wikis': ['c']})()
         self.assertEqual(family.obsolete, {'a': 'b', 'c': None})
+        self.assertIs(type(family).obsolete, family.obsolete)
         with suppress_warnings(msg, FutureWarning):
             self.assertEqual(family.interwiki_replacements, {'a': 'b'})
         self.assertEqual(family.interwiki_removals, frozenset('c'))
+        self.assertIs(type(family).interwiki_removals,
+                      family.interwiki_removals)
 
     def test_obsolete_readonly(self) -> None:
         """Test obsolete result not updatable."""

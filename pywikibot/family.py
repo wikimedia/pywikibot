@@ -746,17 +746,22 @@ class Family:
         """
         return putText
 
-    @property
-    def obsolete(self) -> types.MappingProxyType[str, str | None]:
+    @classproperty
+    def obsolete(cls) -> types.MappingProxyType[str, str | None]:
         """Old codes that are not part of the family.
 
         Interwiki replacements override removals for the same code.
 
+        .. version-changed:: 11.9
+           Changed to a cached class property.
+
         :return: Mapping of old codes to new codes (or None)
         """
-        data = dict.fromkeys(self.interwiki_removals)
-        data.update(self.code_aliases)
-        return types.MappingProxyType(data)
+        if '_obsolete' not in cls.__dict__:
+            data = dict.fromkeys(cls.interwiki_removals)
+            data.update(cls.code_aliases)
+            cls._obsolete = types.MappingProxyType(data)
+        return cls._obsolete
 
     @classproperty
     def domains(cls) -> set[str]:
@@ -798,7 +803,10 @@ class Family:
         .. version-changed:: 8.2
            changed from list to invariant frozenset.
         """
-        return frozenset(cls.removed_wikis + cls.closed_wikis)
+        if '_interwiki_removals' not in cls.__dict__:
+            cls._interwiki_removals = frozenset(
+                cls.removed_wikis + cls.closed_wikis)
+        return cls._interwiki_removals
 
 
 class SingleSiteFamily(Family):
