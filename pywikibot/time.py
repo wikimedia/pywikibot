@@ -46,6 +46,9 @@ UTC = datetime.timezone.utc
 .. version-added:: 11.9
 """
 
+_API_TIMESTAMP = re.compile(
+    r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z', re.ASCII)
+
 
 class Timestamp(datetime.datetime):
 
@@ -150,6 +153,10 @@ class Timestamp(datetime.datetime):
 
         .. version-added:: 7.5
         """
+        if 'T' in separators and _API_TIMESTAMP.fullmatch(timestr):
+            # API timestamps are already UTC; keep the result naive.
+            return cls.fromisoformat(timestr.removesuffix('Z'))
+
         RE_ISO8601 = (rf'(?:\d{{4}}-\d{{2}}-\d{{2}})'  # noqa: N806
                       rf'(?P<sep>[{re.escape(separators)}])'
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
