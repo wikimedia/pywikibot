@@ -1568,6 +1568,30 @@ class TestMultiTemplateMatchBuilder(DefaultSiteTestCase):
                                  self._template_not_case_sensitive)
 
 
+class TestRemoveLanguageLinks(TestCase):
+
+    """Test language link removal with cached language data."""
+
+    net = False
+
+    def test_namespace_replacement(self) -> None:
+        """Refresh language data when the namespace mapping is replaced."""
+        site = pywikibot.site.BaseSite('en', 'wikipedia')
+        retained = '<nowiki>[[yo:Hidden]]</nowiki>\n[[:yo:Inline]]'
+        text = retained + '\n[[yo:Page]]'
+        self.assertEqual(textlib.removeLanguageLinks(text, site), retained)
+
+        links = site.validLanguageLinks()
+        links.remove('yo')
+        self.assertIn('yo', site.validLanguageLinks())
+
+        namespaces = pywikibot.site.Namespace.builtin_namespaces()
+        namespaces[100] = pywikibot.site.Namespace(100, 'Yo')
+        site._namespaces = pywikibot.site.NamespacesDict(namespaces)
+        self.assertNotIn('yo', site.validLanguageLinks())
+        self.assertEqual(textlib.removeLanguageLinks(text, site), text)
+
+
 class TestGetLanguageLinks(SiteAttributeTestCase):
 
     """Test :py:obj:`textlib.getLanguageLinks` function."""

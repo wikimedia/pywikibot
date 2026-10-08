@@ -13,6 +13,7 @@ from collections import OrderedDict, deque
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
+from functools import lru_cache
 from html.parser import HTMLParser
 from typing import NamedTuple
 from urllib.parse import quote
@@ -1475,6 +1476,14 @@ def getLanguageLinks(
     return result
 
 
+@lru_cache
+def _language_links_regex(languages: tuple[str, ...]) -> re.Pattern[str]:
+    """Cache the removal regex for a site's language codes."""
+    codes = '|'.join(languages)
+    return re.compile(rf'\[\[({codes})\s?:[^\[\]\n]*\]\][\s]*',
+                      re.IGNORECASE)
+
+
 def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     """Return text with all inter-language links removed.
 
@@ -1492,12 +1501,11 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
         site = pywikibot.Site()
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
-    languages = '|'.join(site.validLanguageLinks()
-                         + list(site.family.obsolete))
+    languages = (tuple(site.validLanguageLinks())
+                 + tuple(site.family.obsolete))
     if not languages:
         return text
-    interwikiR = re.compile(rf'\[\[({languages})\s?:[^\[\]\n]*\]\][\s]*',
-                            re.IGNORECASE)
+    interwikiR = _language_links_regex(languages)
     text = replaceExcept(text, interwikiR, '',
                          ['comment', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1701,7 +1709,7 @@ def interwikiSort(sites, insite=None):
     if putfirst:
         # In this case I might have to change the order
         firstsites = []
-        validlanglinks = insite.validLanguageLinks()
+        validlanglinks = frozenset(insite.validLanguageLinks())
         for code in putfirst:
             if code in validlanglinks:
                 site = insite.getSite(code=code)
