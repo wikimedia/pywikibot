@@ -20,6 +20,7 @@ import traceback
 from collections.abc import Callable, MutableMapping
 from contextlib import suppress
 from email.mime.nonmultipart import MIMENonMultipart
+from functools import cache
 from pathlib import Path
 from typing import Any, NoReturn
 from urllib.parse import unquote, urlencode
@@ -297,6 +298,20 @@ class Request(MutableMapping, WaitingMixin):
              '"parameters" parameter.', DeprecationWarning, 3)
 
     @classmethod
+    @cache
+    def _get_constructor_args(cls) -> frozenset[str]:
+        """Return cached constructor argument names for this request class."""
+        args = set()
+        for super_cls in inspect.getmro(cls):
+            if not super_cls.__name__.endswith('Request'):
+                break
+            args |= set(inspect.getfullargspec(super_cls.__init__).args)
+        else:
+            raise ValueError(f'Request was not a super class of {cls!r}')
+
+        return frozenset(args - {'self'})
+
+    @classmethod
     def clean_kwargs(cls, kwargs: dict) -> dict:
         """Convert keyword arguments into new parameters mode.
 
@@ -313,15 +328,7 @@ class Request(MutableMapping, WaitingMixin):
         if 'expiry' in kwargs and kwargs['expiry'] is None:
             del kwargs['expiry']
 
-        args = set()
-        for super_cls in inspect.getmro(cls):
-            if not super_cls.__name__.endswith('Request'):
-                break
-            args |= set(inspect.getfullargspec(super_cls.__init__).args)
-        else:
-            raise ValueError(f'Request was not a super class of {cls!r}')
-
-        args -= {'self'}
+        args = cls._get_constructor_args()
         old_kwargs = set(kwargs)
         # all kwargs defined above but not in args indicate 'kwargs' mode
         if old_kwargs - args:
