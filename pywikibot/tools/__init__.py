@@ -459,7 +459,8 @@ class MediaWikiVersion:
 
     The version mainly consists of digits separated by periods. After
     that is a suffix which may only be 'wmf<number>', 'alpha',
-    'beta<number>' or '-rc.<number>' (the - and . are optional). They
+    'beta<number>' or 'rc<number>'. Beta and rc suffixes may have a
+    leading hyphen and a period or hyphen before the number. They
     are considered from old to new in that order with a version number
     without suffix is considered the newest. This secondary difference
     is stored in an internal _dev_version attribute.
@@ -478,10 +479,15 @@ class MediaWikiVersion:
     .. version-changed:: 6.1
        Dependency of distutils was dropped because the package will be
        removed with Python 3.12.
+    .. version-changed:: 11.9
+       Beta and rc suffixes accept period and hyphen separators.
+       Malformed prerelease suffixes raise ValueError instead of
+       AssertionError, including when Python optimizations are enabled.
     """
 
     MEDIAWIKI_VERSION = re.compile(
-        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?')
+        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|'
+        r'-?beta[.-]?(\d+)|-?rc[.-]?(\d+)|.*)?')
 
     def __init__(self, version_str: str) -> None:
         """Initializer.
@@ -514,11 +520,12 @@ class MediaWikiVersion:
         else:
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
                 # if any of those pops up here our parser has failed
-                assert handled not in version_match[2], \
-                    f'Found "{handled}" in "{version_match[2]}"'
+                if handled in version_match[2]:
+                    raise ValueError(
+                        f'Found "{handled}" in "{version_match[2]}"')
             if version_match[2]:
                 pywikibot.logging.debug(
-                    'Additional unused version part {version_match[2]!r}')
+                    f'Additional unused version part {version_match[2]!r}')
             self._dev_version = (4, )
 
         self.suffix = version_match[2] or ''
