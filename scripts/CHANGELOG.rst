@@ -4,6 +4,12 @@ Scripts Changelog
 11.9.0
 ------
 
+archivebot
+^^^^^^^^^^
+
+* Accept equivalent namespace case, spaces, and underscores when locating
+  the configuration template for rewriting.
+
 category
 ^^^^^^^^
 

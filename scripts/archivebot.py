@@ -306,7 +306,8 @@ def template_title_regex(tpl_page: pywikibot.Page) -> re.Pattern:
     """Return a regex that matches to variations of the template title.
 
     It supports the transcluding variant as well as localized namespaces
-    and case-insensitivity depending on the namespace.
+    and case-insensitivity depending on the namespace. Spaces and
+    underscores are interchangeable.
 
     :param tpl_page: The template page
     :type tpl_page: pywikibot.page.Page
@@ -314,9 +315,12 @@ def template_title_regex(tpl_page: pywikibot.Page) -> re.Pattern:
     ns = tpl_page.site.namespaces[tpl_page.namespace()]
     marker = '?' if ns.id == 10 else ''
     title = tpl_page.title(with_ns=False)
-    title = case_escape(ns.case, title)
+    title = case_escape(ns.case, title, underscore=True)
+    namespaces = '|'.join(case_escape('case-sensitive', name, underscore=True)
+                          for name in ns)
 
-    return re.compile(r'(?:(?:{}):){}{}'.format('|'.join(ns), marker, title))
+    return re.compile(r'(?:(?i:{})[ _]*:[ _]*){}{}'.format(
+        namespaces, marker, title))
 
 
 def calc_md5_hexdigest(txt, salt) -> str:
@@ -929,7 +933,7 @@ class PageArchiver:
 
         if whys:
             # Search for the marker template
-            rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
+            rx = re.compile(r'\{\{\s*%s\s*?\n.*?\n\}\}'
                             % (template_title_regex(self.tpl).pattern),
                             re.DOTALL)
             if not rx.search(self.page.header):
