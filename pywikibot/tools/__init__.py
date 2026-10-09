@@ -919,6 +919,8 @@ def compute_file_hash(filename: str | os.PathLike,
     .. version-changed:: 8.2
        The *sha* parameter may also be a hash constructor, or a callable
        that returns a hash object.
+    .. version-changed:: 11.9
+       A zero *bytes_to_read* hashes no file contents.
 
 
     :param filename: Filename path
@@ -933,13 +935,14 @@ def compute_file_hash(filename: str | os.PathLike,
         ``lambda: hashlib.sha1()``.
     :param bytes_to_read: Only the first bytes_to_read will be
         considered; if file size is smaller, the whole file will be
-        considered.
+        considered. If None, the whole file is considered.
     """
     with open(filename, 'rb') as f:
         if PYTHON_VERSION < (3, 11) or bytes_to_read is not None:
             digest = sha() if callable(sha) else hashlib.new(sha)
             size = os.path.getsize(filename)
-            bytes_to_read = min(bytes_to_read or size, size)
+            bytes_to_read = (size if bytes_to_read is None
+                             else min(bytes_to_read, size))
             step = 1 << 20
             while bytes_to_read > 0:
                 read_bytes = f.read(min(bytes_to_read, step))
