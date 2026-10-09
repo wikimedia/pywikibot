@@ -29,6 +29,8 @@ Release 12
 
 **Code cleanups**
 
+* The *force* parameter of :class:`APISite<pywikibot.site._apisite.APISite>` methods was renamed
+  to *refresh*. (:phab:`T433225`)
 * Imports of :mod:`logging` functions from the :mod:`bot` module are are no longer supported.
 * Remove ``Page.main_authors()``, deprecated since 9.3. Use
   :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` instead.
@@ -179,3 +181,9 @@ Pending removal in Pywikibot 14
   deprecated; use a keyword argument instead.
 * 11.0.0: Keyword parameters for *text_a* and *text_b* of :class:`diff.PatchManager` are deprecated.
   Positional parameters for *by_letter* and *replace_invisible* are deprecated.
+
+Pending removal in Pywikibot 15
+-------------------------------
+
+* 12.0.0: The *force* parameter of :class:`APISite<pywikibot.site._apisite.APISite>` methods was
+  renamed to *refresh*. The old parameter name will be removed. (:phab:`T433225`)

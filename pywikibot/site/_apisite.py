@@ -725,16 +725,19 @@ class APISite(
         if hasattr(self, '_userinfo'):
             del self._userinfo
 
+    @deprecated_args(force='refresh')  # since 12.0.0
     def get_globaluserinfo(self,
                            user: str | int | None = None,
-                           force: bool = False) -> dict[str, Any]:
+                           refresh: bool = False) -> dict[str, Any]:
         """Retrieve globaluserinfo from site and cache it.
 
         .. version-added:: 7.0
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
 
         :param user: The user name or user ID whose global info is
             retrieved. Defaults to the current user.
-        :param force: Whether the cache should be discarded.
+        :param refresh: Whether the cache should be discarded.
         :return: A dict with the following keys and values:
 
           - id: user id (numeric str)
@@ -758,7 +761,7 @@ class APISite(
             raise TypeError("Inappropriate argument type of 'user' "
                             f'({type(user).__name__})')
 
-        if force or user not in self._globaluserinfo:
+        if refresh or user not in self._globaluserinfo:
             param.update(
                 action='query',
                 meta='globaluserinfo',
@@ -799,7 +802,8 @@ class APISite(
         with suppress(KeyError):
             del self._globaluserinfo[username]
 
-    def is_blocked(self, force: bool = False) -> bool:
+    @deprecated_args(force='refresh')  # since 12.0.0
+    def is_blocked(self, refresh: bool = False) -> bool:
         """Return True when logged in user is blocked.
 
         To check whether a user can perform an action,
@@ -812,14 +816,17 @@ class APISite(
 
         .. version-changed:: 7.0
            The *force* parameter was added.
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: Whether the cache should be discarded.
+        :param refresh: Whether the cache should be discarded.
         """
-        if force:
+        if refresh:
             del self.userinfo
         return 'blockinfo' in self.userinfo
 
-    def is_partial_blocked(self, *, force: bool = False) -> bool:
+    @deprecated_args(force='refresh')  # since 12.0.0
+    def is_partial_blocked(self, *, refresh: bool = False) -> bool:
         """Return True if the logged-in user is partially blocked.
 
         .. seealso::
@@ -829,16 +836,19 @@ class APISite(
            - :attr:`userinfo`
 
         .. version-added:: 11.0
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         """
-        if force:
+        if refresh:
             del self.userinfo
         return 'partial' in self.userinfo.get('blockinfo', {})
 
+    @deprecated_args(force='refresh')  # since 12.0.0
     def is_locked(self,
                   user: str | int | None = None,
-                  force: bool = False) -> bool:
+                  refresh: bool = False) -> bool:
         """Return True when given user is locked globally.
 
         .. seealso::
@@ -846,14 +856,17 @@ class APISite(
            - :attr:`globaluserinfo`
 
         .. version-added:: 7.0
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
 
         :param user: The user name or user ID. Defaults to the current
             user.
-        :param force: Whether the cache should be discarded.
+        :param refresh: Whether the cache should be discarded.
         """
-        return 'locked' in self.get_globaluserinfo(user, force)
+        return 'locked' in self.get_globaluserinfo(user, refresh)
 
-    def get_searched_namespaces(self, force: bool = False) -> set[Namespace]:
+    @deprecated_args(force='refresh')  # since 12.0.0
+    def get_searched_namespaces(self, refresh: bool = False) -> set[Namespace]:
         """Retrieve the default searched namespaces for the user.
 
         If no user is logged in, it returns the namespaces used by
@@ -861,11 +874,14 @@ class APISite(
         the last result and returns it, if the username or login status
         hasn't changed.
 
-        :param force: Whether the cache should be discarded.
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: Whether the cache should be discarded.
         :return: The namespaces which are searched by default.
         """
         # TODO: Integrate into _userinfo
-        if (force or not hasattr(self, '_useroptions')
+        if (refresh or not hasattr(self, '_useroptions')
                 or self.user() != self._useroptions['_name']):
             uirequest = self.simple_request(
                 action='query',
@@ -3253,14 +3269,18 @@ class APISite(
 
         return Uploader(self, filepage, **kwargs).upload()
 
-    def get_property_names(self, force: bool = False) -> list[str]:
+    @deprecated_args(force='refresh')  # since 12.0.0
+    def get_property_names(self, refresh: bool = False) -> list[str]:
         """Get property names for pages_with_property().
 
         .. seealso:: :api:`Pagepropnames`
 
-        :param force: Force to retrieve userinfo ignoring cache
+        .. version-changed:: 12.0
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: Force to retrieve userinfo ignoring cache
         """
-        if force or not hasattr(self, '_property_names'):
+        if refresh or not hasattr(self, '_property_names'):
             ppngen = self._generator(api.ListGenerator, 'pagepropnames')
             self._property_names = [pn['propname'] for pn in ppngen]
         return self._property_names

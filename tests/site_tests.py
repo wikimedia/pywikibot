@@ -724,6 +724,49 @@ class TestActionSummaryParameters(DeprecationTestCase):
         )
 
 
+class TestRefreshParameters(DeprecationTestCase):
+
+    """Test cache refresh parameters in APISite methods."""
+
+    net = False
+
+    methods = (
+        pywikibot.site.APISite.get_globaluserinfo,
+        pywikibot.site.APISite.is_blocked,
+        pywikibot.site.APISite.is_partial_blocked,
+        pywikibot.site.APISite.is_locked,
+        pywikibot.site.APISite.get_searched_namespaces,
+        pywikibot.site.APISite.get_property_names,
+    )
+
+    def test_signatures(self) -> None:
+        """Public signatures expose the new name and deprecated alias."""
+        for method in self.methods:
+            with self.subTest(method=method.__name__):
+                parameters = inspect.signature(method).parameters
+                self.assertIn('refresh', parameters)
+                self.assertIn('force', parameters)
+
+    def test_refresh(self) -> None:
+        """The public refresh is forwarded without a deprecation."""
+        mock_site = mock.MagicMock()
+        pywikibot.site.APISite.is_locked(mock_site, 'User', refresh=True)
+
+        mock_site.get_globaluserinfo.assert_called_once_with('User', True)
+        self.assertNoDeprecation()
+
+    def test_force_alias(self) -> None:
+        """The deprecated force alias maps to the new public parameter."""
+        mock_site = mock.MagicMock()
+        pywikibot.site.APISite.is_locked(mock_site, 'User', force=True)
+
+        mock_site.get_globaluserinfo.assert_called_once_with('User', True)
+        self.assertOneDeprecationParts(
+            'force argument of pywikibot.site._apisite.APISite.is_locked',
+            'refresh',
+        )
+
+
 class TestSiteSysopWrite(TestCase):
 
     """Test site methods that require writing rights."""
