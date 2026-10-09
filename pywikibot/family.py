@@ -385,7 +385,9 @@ class Family:
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore', RuntimeWarning)
-                sys.path.append(dirname(family_file))
+                family_dir = dirname(family_file)
+                if family_dir not in sys.path:
+                    sys.path.append(family_dir)
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
             raise UnknownFamilyError(f'Family {fam} does not exist')
