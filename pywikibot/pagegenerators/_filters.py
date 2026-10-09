@@ -16,6 +16,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import normalize_username
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -456,6 +457,7 @@ def UserEditFilterGenerator(
         by max_revision_depth
     :param show_filtered: Output a message for each page not yielded
     """
+    username = normalize_username(username) or ''
     if timestamp is None:
         ts = None
     else:

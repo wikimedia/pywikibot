@@ -10,6 +10,7 @@ import calendar
 import datetime
 import sys
 import unittest
+from collections import Counter
 from contextlib import suppress
 from unittest import mock
 
@@ -184,6 +185,19 @@ class TestDryPageGenerators(TestCase):
         self.assertLength(pages, 1)
         self.assertIs(pages[0], unfiltered_page)
         unfiltered_page.categories.assert_not_called()
+
+    def test_user_edit_filter_normalizes_username(self) -> None:
+        """Test matching a noncanonical username in both filter modes."""
+        edited_page = mock.Mock()
+        edited_page.contributors.return_value = Counter({'John doe': 1})
+        other_page = mock.Mock()
+        other_page.contributors.return_value = Counter({'Other user': 1})
+        pages = [edited_page, other_page]
+
+        self.assertEqual(list(pagegenerators.UserEditFilterGenerator(
+            pages, 'john_doe')), [edited_page])
+        self.assertEqual(list(pagegenerators.UserEditFilterGenerator(
+            pages, 'john_doe', skip=True)), [other_page])
 
     def test_RegexFilterPageGenerator(self) -> None:
         """Test RegexFilterPageGenerator."""
