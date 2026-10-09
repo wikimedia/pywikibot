@@ -102,7 +102,7 @@ def AllpagesPageGenerator(
             filterredir = True
 
         issue_deprecation_warning(
-            'includeredirects parameter ({includeredirects})',
+            f'includeredirects parameter ({includeredirects})',
             f'filterredir={filterredir}',
             since='10.0.0'
         )
@@ -165,7 +165,7 @@ def PrefixingPageGenerator(
             filterredir = True
 
         issue_deprecation_warning(
-            'includeredirects parameter ({includeredirects})',
+            f'includeredirects parameter ({includeredirects})',
             f'filterredir={filterredir}',
             since='10.0.0'
         )
