@@ -172,9 +172,12 @@ class classproperty:  # noqa: N801
             def bar(cls):  # a class property method
                 return cls._bar
 
-    Foo.bar gives 'baz'.
+    Accessing :code:`Foo.bar` gives :code:`'baz'`. Setting a class
+    property on an instance raises :exc:`AttributeError`.
 
     .. version-added:: 3.0
+    .. version-changed:: 11.9
+       Prevent setting a class property on an instance.
     """
 
     def __init__(self, cls_method) -> None:
@@ -201,6 +204,11 @@ class classproperty:  # noqa: N801
             return self
 
         return self.method(owner)
+
+    def __set__(self, instance, value) -> None:
+        """Prevent setting a class property on an instance."""
+        raise AttributeError(
+            f"can't set attribute {self.method.__name__!r}")
 
 
 class suppress_warnings(catch_warnings):  # noqa: N801
