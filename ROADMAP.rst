@@ -1,11 +1,22 @@
 Release 11.9
 ============
 
+* Prevent setting a class property on an instance with :class:`tools.classproperty`.
+* Make API cache writes of :class:`data.api.CachedRequest` atomic and failure-safe. (:phab:`T438266`)
+* Map claims for wbeditentity of :class:`page.MediaInfo`. (:phab:`T376955`)
+* Avoid reading streamed HTTP responses to detect encoding in :func:`comms.http.fetch`.
+* Various performance, stability, and code quality improvements.
+* Add *timespec* parameter to :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>`
+  method. (:phab:`T439983`, :phab:`T440120`)
+* Allow :ref:`global -user option<Global options>` to override OAuth authentication.
+  (:phab:`T420084`)
 * The *force* parameter of :class:`pywikibot.User` methods was renamed to
   *refresh* (:phab:`T433225`)
+* Support custom Timestamp ISO separators and restores round-trip compatibility
+  between :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>` and
+  :meth:`Timestamp.fromISOformat()<pywikibot.time.Timestamp.fromISOformat>`. (:phab:`T396723`)
 * Suggest installing all requirements for missing dependencies with
   :mod:`pwb<pywikibot.scripts.wrapper>` wrapper.
-* Various performance, stability, and code quality improvements.
 * Support legacy encoded section titles. (:phab:`T133276`)
 
 
@@ -111,6 +122,8 @@ Pending removal in Pywikibot 14
 
 * 11.9.0: The *force* parameter of :class:`pywikibot.User` methods was renamed to
   *refresh*. The old parameter name will be removed. (:phab:`T433225`)
+* 11.8.0: The ``config.maxlag`` setting was renamed to :ref:`write_maxlag
+  <Settings to Avoid Server Overload>`. The old setting variable will be dropped. (:phab:`T421642`)
 * 11.8.0: Public *reason* and *comment* parameters used for page-action and
   upload summaries were renamed to *summary*. The old parameter names will
   be removed. (:phab:`T62442`)

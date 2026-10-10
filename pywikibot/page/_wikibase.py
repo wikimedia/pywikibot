@@ -394,6 +394,9 @@ class MediaInfo(WikibaseEntity):
         When diffto is provided, JSON representing differences to the
         provided data is created.
 
+        .. version-changed:: 11.9
+           Rename ``statements`` to ``claims`` in the returned JSON.
+
         :param diffto: JSON containing entity data
         """
         data = super().toJSON(diffto=diffto)

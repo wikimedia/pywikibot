@@ -7,12 +7,18 @@ Scripts Changelog
 category
 ^^^^^^^^
 
-* Extract bot construction.  (:phab:`T434526`)
+* Extract bot construction. (:phab:`T434526`)
 
 clean_sandbox
 ^^^^^^^^^^^^^
 
 * Fix L10N for arzwiki.
+
+solve_disambiguation
+^^^^^^^^^^^^^^^^^^^^
+
+* Handle replacement sections. (:phab:`T394622`)
+
 
 11.8.0
 ------

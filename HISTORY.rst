@@ -9,6 +9,9 @@ Release History
 * Various performance, stability, and code quality improvements.
 * Raise ServerError instead of AssertionError for invalid :meth:`APISite.userinfo()
   <pywikibot.site._apisite.APISite.userinfo>` API response. (:phab:`T423061`)
+* Use a separate :ref:`read_maxlag<Settings to Avoid Server Overload>` threshold
+  for read requests. The ``config.maxlag`` setting was renamed to :ref:`write_maxlag
+  <Settings to Avoid Server Overload>`. (:phab:`T421642`)
 * Load only current revision ID with :attr:`page.BasePage.latest_revision_id`.
 * Return non-option defaults with :func:`bot.input_list_choice`. (:phab:`T305937`)
 * Add :meth:`APISite.geosearch()<pywikibot.site._extensions.GeoDataMixin.geosearch>`
@@ -31,7 +34,8 @@ Release History
 * Add :attr:`page.BasePage.flagged_state` and :meth:`APSite.flagged_state()
   <pywikibot.site._extensions.FlaggedRevsMixin.flagged_state>` site method
   for :ext:`FlaggedRevs` info. (:phab:`T410893`)
-* Disable ``maxlag`` for meta queries, paraminfo and help. (:phab:`T421642`)
+* Disable :ref:`maxlag<Settings to Avoid Server Overload>` for meta queries, paraminfo
+  and help. (:phab:`T421642`)
 * Added Ukrainian Vikidia and updated testing subdomains for that family.
 * Correctly propagate reference group hashes after
   :meth:`page.WikibaseEntity.editEntity`. (:phab:`T367324`)
