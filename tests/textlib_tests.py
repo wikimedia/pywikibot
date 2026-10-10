@@ -287,6 +287,23 @@ class TestCategoryRearrangement(DefaultSiteTestCase):
         self.assertEqual(orig_sortkey, new_dummy.sortKey)
 
 
+class TestReplaceCategoryLinks(TestCase):
+
+    """Test replacing category links."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_remove_last_category(self) -> None:
+        """Test removing the last category leaves the stub template intact."""
+        self.assertEqual(
+            textlib.replaceCategoryLinks(
+                'foo\n[[Category:Foo]]\n{{foo-stub}}', [], site=self.site),
+            'foo\n{{foo-stub}}')
+
+
 class TestTemplatesInCategory(TestCase):
 
     """Tests to verify that templates in category links are handled."""
