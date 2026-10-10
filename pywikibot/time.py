@@ -199,9 +199,9 @@ class Timestamp(datetime.datetime):
         sec = int(m['S'])
         usec = m['u']
         usec = int(usec.ljust(6, '0')) if usec else 0
-        if sec < 0 < usec:
-            sec -= 1
-            usec = 1_000_000 - usec
+        # the sign applies to the fraction too, even if seconds are -0
+        if m['S'].startswith('-'):
+            usec = -usec
 
         return cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
                                                     microseconds=usec)

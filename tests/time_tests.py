@@ -57,6 +57,8 @@ class TestTimestamp(TestCase):
             ['-1234567890.123456', '-1234567890.123456'],
             ['1234567890.000001', '1234567890.000001'],
             ['-1234567890.000001', '-1234567890.000001'],
+            ['-0.5', '-0.500000'],
+            ['-0.000001', '-0.000001'],
         ],
         'INVALID': [
             ['200902132331309999', None],
@@ -95,13 +97,10 @@ class TestTimestamp(TestCase):
     @staticmethod
     def _compute_posix(timestr):
         """Compute POSIX timestamp with independent method."""
-        sec, usec = map(int, timestr.split('.'))
-
-        if sec < 0 < usec:
-            sec -= 1
-            usec = 1000000 - usec
-
-        return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
+        sign = -1 if timestr.startswith('-') else 1
+        sec, usec = map(int, timestr.lstrip('-').split('.'))
+        delta = timedelta(seconds=sec, microseconds=usec)
+        return datetime(1970, 1, 1) + sign * delta
 
     def _test_set_from_string_fmt(self, fmt) -> None:
         """Test creating instance from <FMT> string."""
