@@ -2620,7 +2620,8 @@ class BasePage(ComparableMixin):
                 cats.pop(old_cat_pos)
 
             try:
-                newtext = textlib.replaceCategoryLinks(oldtext, cats)
+                newtext = textlib.replaceCategoryLinks(oldtext, cats,
+                                                       site=self.site)
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.

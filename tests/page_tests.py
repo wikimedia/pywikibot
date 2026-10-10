@@ -776,6 +776,41 @@ class TestPageCategories(TestCase):
                         self.assertIsNone(p.sortKey)
 
 
+class TestPageChangeCategory(TestCase):
+
+    """Test changing categories on a page."""
+
+    sites = {
+        'de': {'family': 'wikipedia', 'code': 'de'},
+        'fr': {'family': 'wikipedia', 'code': 'fr'},
+    }
+
+    dry = True
+
+    @mock.patch.dict('pywikibot.textlib._regex_cache', clear=True)
+    def test_different_default_site(self) -> None:
+        """Test category replacement uses the page's localized namespace."""
+        site = self.get_site('de')
+        namespaces = site._build_namespaces()
+        namespaces[14].custom_name = 'Kategorie'
+        site._namespaces = pywikibot.site.NamespacesDict(namespaces)
+        page = pywikibot.Page(site, 'Test page')
+        page._text = 'Text.\n\n[[Kategorie:Alt]]\n[[Kategorie:Bleibt]]'
+        old_cat = pywikibot.Category(site, 'Alt')
+        new_cat = pywikibot.Category(site, 'Neu')
+
+        with mock.patch.object(pywikibot, 'Site',
+                               return_value=self.get_site('fr')), \
+                mock.patch.object(page, 'has_permission', return_value=True), \
+                mock.patch.object(page, 'put') as put:
+            self.assertTrue(page.change_category(old_cat, new_cat,
+                                                 in_place=False))
+
+        put.assert_called_once_with(
+            'Text.\n\n[[Kategorie:Neu]]\n[[Kategorie:Bleibt]]',
+            None, show_diff=False)
+
+
 class TestPageCoordinates(TestCase):
 
     """Test Page Object using German Wikipedia."""
