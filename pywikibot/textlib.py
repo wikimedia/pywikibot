@@ -2005,15 +2005,15 @@ def replaceCategoryLinks(oldtext: str,
 
     if under_categories:
         category = get_regexes('category', site)[0]
-        last = deque(category.finditer(newtext), maxlen=1)
-        if not last:
+        if not category.search(newtext):
             return newtext.strip()
-        last_category = last[0]
         for reg in under_categories:
             special = reg.search(newtext)
             if special and not isDisabled(newtext, special.start()):
                 newtext = (newtext[:special.start()].strip()
                            + newtext[special.end():])
+                last_category = deque(
+                    category.finditer(newtext), maxlen=1)[0]
                 newtext = (newtext[:last_category.end()].strip() + '\n' * 2
                            + special.group() + newtext[last_category.end():])
 

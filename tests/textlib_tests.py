@@ -302,6 +302,17 @@ class TestReplaceCategoryLinks(TestCase):
                 'foo\n[[Category:Foo]]\n{{foo-stub}}', [], site=self.site),
             'foo\n{{foo-stub}}')
 
+    def test_stub_before_categories(self) -> None:
+        """Test moving a stub preserves the following interwiki links."""
+        stub = '{{US-bio-stub}}'
+        categories = '[[Category:Alpha]]\n[[Category:Beta]]'
+        interwiki = '[[de:Artikel]]\n[[fr:Article]]'
+        old = f'foo\n\n{stub}\n\n{categories}\n\n{interwiki}'
+        self.assertEqual(
+            textlib.replaceCategoryLinks(
+                old, [], site=self.site, add_only=True),
+            f'foo\n\n{categories}\n\n{stub}\n\n{interwiki}')
+
 
 class TestTemplatesInCategory(TestCase):
 
