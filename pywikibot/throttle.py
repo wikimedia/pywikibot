@@ -386,27 +386,29 @@ class Throttle:
     def lag(self, lagtime: float | None = None) -> None:
         """Seize the throttle lock due to server lag.
 
-        Usually the `self.retry-after` value from `response_header` of the
-        last request if available which will be used for wait time.
-        Otherwise `lagtime` from api `maxlag` is used. If neither
-        `self.retry_after` nor `lagtime` is set, fallback to
-        `config.retry_wait`.
+        The wait time is determined by the *lagtime* parameter, which
+        usually contains the lag reported by the API in a maxlag error.
+        If *lagtime* is not set, ``config.retry_wait`` is used instead.
 
-        If the `lagtime` is disproportionately high compared to
-        `self.retry_after` value, the wait time will be increased.
+        If ``self.retry_after`` is set, the wait time is at least that
+        value, as recommended by the server. The actual wait time is
+        capped at ``config.retry_max`` seconds.
 
-        This method is used by `api.request`. It will prevent any thread
-        from accessing this site.
+        This method is used by :class:`data.api.Request`. It prevents
+        any thread from accessing this site while waiting.
+
+        .. version-changed:: 11.10
+           Prioritize the API-reported *lagtime* over the ``Retry-After``
+           header when determining the wait time.
 
         :param lagtime: The time to wait for the next request which is
-            the last `maxlag` time from api warning. This is only used
-            as a fallback if `self.retry_after` isn't set.
+            the last `maxlag` time from api warning.
         """
         started = time.time()
         with self.lock:
             waittime = lagtime or config.retry_wait
             if self.retry_after:
-                waittime = max(self.retry_after, waittime / 5)
+                waittime = max(self.retry_after, waittime)
             # wait not more than retry_max seconds
             delay = min(waittime, config.retry_max)
             # account for any time we waited while acquiring the lock
