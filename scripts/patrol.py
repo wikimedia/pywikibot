@@ -321,9 +321,9 @@ class PatrolBot(BaseBot):
         # Patrol the page
         if choice:
             # list() iterates over patrol() which returns a generator
-            list(self.site.patrol(rcid))
-            pywikibot.info(
-                f'Patrolled {title} (rcid {rcid}) by user {username}')
+            if list(self.site.patrol(rcid)):
+                pywikibot.info(
+                    f'Patrolled {title} (rcid {rcid}) by user {username}')
         else:
             verbose_output('Skipped')
 

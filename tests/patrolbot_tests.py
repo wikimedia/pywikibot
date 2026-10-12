@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from unittest.mock import patch
 
 from scripts.patrol import PatrolBot
 from tests.aspects import DefaultSiteTestCase
@@ -71,6 +72,36 @@ class TestPatrolBot(DefaultSiteTestCase):
         self.assertTrue(self.bot.in_list({''}, 'Foo'))
         self.assertTrue(self.bot.in_list({'', 'Foobar'}, 'Foo'))
         self.assertTrue(self.bot.in_list({'', 'Foo'}, 'Foo'))
+
+    def _treat_page(self, patrol_result):
+        """Treat a whitelisted page and return the info mock."""
+        page = {
+            'user': 'Test user',
+            'rcid': 1,
+            'title': 'Page 1',
+            'ns': 0,
+        }
+        self.bot.last_rcid = 1
+        self.bot.whitelist = {'Test user': {'Page 1'}}
+
+        with patch.object(
+            self.bot.site, 'patrol', return_value=iter(patrol_result)
+        ) as patrol, patch('pywikibot.info') as info:
+            self.bot.treat(page)
+
+        patrol.assert_called_once_with(1)
+        return info
+
+    def test_treat_reports_successful_patrol(self) -> None:
+        """Test that a successful patrol is reported."""
+        info = self._treat_page([{'rcid': 1}])
+        info.assert_called_once_with(
+            'Patrolled Page 1 (rcid 1) by user Test user')
+
+    def test_treat_does_not_report_disabled_patrol(self) -> None:
+        """Test that a disabled patrol is not reported as successful."""
+        info = self._treat_page([])
+        info.assert_not_called()
 
 
 if __name__ == '__main__':
