@@ -16,6 +16,8 @@ permissions:
   contents: read
 
 env:
+  GIT_HTTP_USER_AGENT: >-
+    Pywikibot-CI/1.0 (https://www.mediawiki.org/wiki/Manual:Pywikibot)
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
