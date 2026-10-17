@@ -80,8 +80,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
-          submodules: true
           persist-credentials: false
+      # Fetch separately because checkout overrides GIT_HTTP_USER_AGENT.
+      - name: Fetch submodules
+        shell: bash
+        run: |
+          git submodule sync
+          git -c protocol.version=2 submodule update --init --force --depth=1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
         if: matrix.python-version != '3.16-dev'
