@@ -1176,7 +1176,7 @@ class BasePage(ComparableMixin):
                       follow_redirects: bool = True,
                       with_template_inclusion: bool = True,
                       only_template_inclusion: bool = False,
-                      filter_redirects: bool = False,
+                      filter_redirects: bool | None = False,
                       namespaces=None,
                       total: int | None = None,
                       content: bool = False) -> Iterable[pywikibot.Page]:
@@ -1195,7 +1195,8 @@ class BasePage(ComparableMixin):
             is used as a template.
         :param only_template_inclusion: If True, only iterate pages where self
             is used as a template.
-        :param filter_redirects: If True, only iterate redirects to self.
+        :param filter_redirects: If True, only iterate redirects; if False,
+            omit redirects; if None, do not filter.
         :param namespaces: Only iterate pages in these namespaces
         :param total: Iterate no more than this number of unique pages in total
         :param content: If True, retrieve the content of the current version

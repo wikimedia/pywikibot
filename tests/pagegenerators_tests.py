@@ -856,6 +856,18 @@ class DryFactoryGeneratorTest(TestCase):
 
     dry = True
 
+    def test_ref_includes_redirects(self) -> None:
+        """Test -ref generator includes redirects before filtering."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        with mock.patch.object(
+                pywikibot.Page, 'getReferences', autospec=True,
+                return_value=iter(())
+        ) as get_references:
+            self.assertTrue(gf.handle_arg('-ref:Main Page'))
+
+        get_references.assert_called_once_with(
+            mock.ANY, filter_redirects=None)
+
     def test_title_filters_run_before_redirect_filter(self) -> None:
         """Test title filters discard pages before redirect checks."""
         site = self.get_site()
