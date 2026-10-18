@@ -468,6 +468,18 @@ FILTER OPTIONS
                     Case insensitive regular expressions will be used and
                     dot matches any character, including a newline.
 
+                    You may use a preleading "not" to return the page only
+                    if the regular expression does not match.
+
+                    Examples::
+
+                    -grep:not:regexpr
+
+                    .. note:: If a regular expression pattern starts with
+                       literal ``not:``, wrap it in a group (e.g.
+                       ``-grep:(?:not:foo)``) to avoid triggering the ``:not``
+                       negation modifier.
+
 -grepnot            Like -grep, but return the page only if the regular
                     expression does not match.
 
@@ -531,6 +543,13 @@ FILTER OPTIONS
                     page will be returned only if all claims are present.
                     Argument can be also given as "-onlyif:expression".
 
+                    You may use a preleading "not" to return the item only
+                    if the claim does not match.
+
+                    Examples::
+
+                    -onlyif:not:expression
+
 -onlyifnot          A claim the page must not contain, otherwise the
                     item won't be returned. For usage and examples, see
                     `-onlyif` above.
@@ -557,6 +576,18 @@ FILTER OPTIONS
                     provided.
                     Case insensitive regular expressions will be used and
                     dot matches any character.
+
+                    You may use a preleading "not" to return the page only
+                    if the regular expression does not match.
+
+                    Examples::
+
+                    -titleregex:not:regexpr
+
+                    .. note:: If a regular expression pattern starts with
+                       literal ``not:``, wrap it in a group (e.g.
+                       ``-titleregex:(?:not:foo)``) to avoid triggering the
+                       ``:not`` negation modifier.
 
 -titleregexnot      Like -titleregex, but return the page only if the regular
                     expression does not match.

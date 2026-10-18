@@ -533,15 +533,15 @@ class ShowingListOption(ListOption, OutputOption):
     @property
     def out(self) -> str:
         """Output text of the enumerated list."""
-        text = ''
+        text_parts = []
         if self.pre is not None:
-            text = self.pre + '\n'
+            text_parts.append(self.pre + '\n')
         width = len(str(self.maximum))
-        for i, item in enumerate(self._list, self.minimum):
-            text += f'{i:>{width}} - {item}\n'
+        text_parts.extend(f'{i:>{width}} - {item}\n'
+                          for i, item in enumerate(self._list, self.minimum))
         if self.post is not None:
-            text += self.post + '\n'
-        return text
+            text_parts.append(self.post + '\n')
+        return ''.join(text_parts)
 
 
 class MultipleChoiceList(ListOption):

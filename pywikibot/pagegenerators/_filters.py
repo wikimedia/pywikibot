@@ -16,6 +16,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.exceptions import NoPageError
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import normalize_username
 from pywikibot.tools.itertools import filter_unique
 
 
@@ -448,6 +449,9 @@ def UserEditFilterGenerator(
     ignored. If skip is set, pages edited by the given user are ignored
     otherwise only pages edited by this user are given back.
 
+    .. version-changed:: 11.9
+       Normalize *username* to match canonical API names.
+
     :param generator: A generator object
     :param username: User name which edited the page
     :param timestamp: Ignore edits which are older than this timestamp
@@ -456,6 +460,7 @@ def UserEditFilterGenerator(
         by max_revision_depth
     :param show_filtered: Output a message for each page not yielded
     """
+    username = normalize_username(username) or ''
     if timestamp is None:
         ts = None
     else:

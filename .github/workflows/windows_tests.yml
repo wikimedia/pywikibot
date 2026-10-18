@@ -14,6 +14,8 @@ permissions:
   contents: read
 
 env:
+  GIT_HTTP_USER_AGENT: >-
+    Pywikibot-CI/1.0 (https://www.mediawiki.org/wiki/Manual:Pywikibot)
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_USERNAME: Pywikibot-test
 
@@ -21,7 +23,7 @@ jobs:
   build:
     runs-on: windows-latest
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 60
+    timeout-minutes: 55
     strategy:
       fail-fast: false
       matrix:
@@ -32,8 +34,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
-          submodules: true
           persist-credentials: false
+      # Fetch separately because checkout overrides GIT_HTTP_USER_AGENT.
+      - name: Fetch submodules
+        shell: bash
+        run: |
+          git submodule sync
+          git -c protocol.version=2 submodule update --init --force --depth=1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
         with:
@@ -43,7 +50,6 @@ jobs:
       - name: Install dependencies
         shell: powershell
         run: |
-          git submodule update --init
           python --version
           python -c "import struct; print('PYTHON_ARCH:', struct.calcsize('P') << 3)"
           python -m pip install --upgrade pip

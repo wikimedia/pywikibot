@@ -434,12 +434,6 @@ def register_families_folder(folder_path: str | os.PathLike[str],
     suffix = '_family.py'
 
     folder = Path(folder_path)
-    if not folder.exists():
-        if not_exists_ok:
-            return
-        raise FileNotFoundError(
-            f'Family folder {folder_path!r} does not exist')
-
     if folder.is_dir():
         for file_path in folder.iterdir():
             if file_path.name.endswith(suffix):
@@ -452,20 +446,33 @@ def register_families_folder(folder_path: str | os.PathLike[str],
     path = folder
     if not is_zipfile(path):
         for parent in path.parents:
-            if is_zipfile(path):
+            if is_zipfile(parent):
                 path = parent
                 break
         else:
+            if not folder.exists():
+                if not_exists_ok:
+                    return
+                raise FileNotFoundError(
+                    f'Family folder {folder_path!r} does not exist')
             raise NotADirectoryError('20', 'Not a directory', folder_path)
 
     # read the family files from zip folder
-    # assume that all files ending with suffix reside in family folder
-    zip_file = ZipFile(path)
-    for file_name in zip_file.namelist():
+    with ZipFile(path) as zip_file:
+        file_names = zip_file.namelist()
+    if folder != path:
+        prefix = folder.relative_to(path).as_posix() + '/'
+        file_names = [name for name in file_names if name.startswith(prefix)]
+        if not file_names:
+            if not_exists_ok:
+                return
+            raise FileNotFoundError(
+                f'Family folder {folder_path!r} does not exist')
+    for file_name in file_names:
         if file_name.endswith(suffix):
             file_path = Path(file_name)
             family_name = file_path.name.removesuffix(suffix)
-            family_files[family_name] = str(folder / file_path.name)
+            family_files[family_name] = str(path / file_path)
 
 
 # Get the names of all known families, and initialize with empty dictionaries.

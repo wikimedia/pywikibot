@@ -231,7 +231,7 @@ def main(*args: str) -> None:
         opt, _, value = arg.partition(':')
         if not opt.startswith('-'):
             continue
-        opt = opt[1:]
+        opt = opt.removeprefix('-')
         if opt == 'pairsfile':
             filename = value or pywikibot.input(
                 'Enter the name of the file containing pairs:')

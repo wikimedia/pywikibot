@@ -789,6 +789,12 @@ class TestFileShaCalculator(TestCase):
             '617ce7d539848885b52355ed597a042dae1e726f',
         ))
 
+    def test_zero_byte_calculation(self) -> None:
+        """Test that a zero-byte limit hashes no file contents."""
+        self.assertEqual(
+            tools.compute_file_hash(self.filename, bytes_to_read=0),
+            hashlib.sha1(b'').hexdigest())
+
     def test_sha224_complete_calculation(self) -> None:
         """Test SHA224 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha224')

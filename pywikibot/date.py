@@ -404,37 +404,35 @@ def escapePattern2(
     compiled regex object and a list of digit decoders.
     """
     @singledispatch
-    def decode(dec: decoder_type, subpattern: str, newpattern: str,
-               strpattern: str) -> tuple[str, str]:
+    def decode(dec: decoder_type, subpattern: str) -> tuple[str, str]:
 
         if len(subpattern) == 3:
             # enforce mandatory field size
-            newpattern += f'([{dec[0]}]{{{subpattern[1]}}})'
+            newpattern = f'([{dec[0]}]{{{subpattern[1]}}})'
             # add the number of required digits as the last (4th)
             # part of the tuple
             decoders.append((*dec, int(s[1])))
         else:
-            newpattern += f'([{dec[0]}]+)'
+            newpattern = f'([{dec[0]}]+)'
             decoders.append(dec)
 
-        # All encoders produce a string for strpattern.
+        # All encoders produce a string for the format placeholder.
         # This causes problem with the zero padding.
         # Need to rethink
 
-        return newpattern, strpattern + '%s'
+        return newpattern, '%s'
 
     @decode.register(str)
-    def _(dec: str, subpattern: str, newpattern: str,
-          strpattern: str) -> tuple[str, str]:
+    def _(dec: str, subpattern: str) -> tuple[str, str]:
         # Special case for strings that are replaced instead of decoded
-        # Keep the original text for strPattern
+        # Keep the original text for the format placeholder
         assert len(subpattern) < 3, (
             f'Invalid pattern {pattern}: Cannot use zero padding size '
             f'in {subpattern}!')
-        return newpattern + re.escape(dec), strpattern + subpattern
+        return re.escape(dec), subpattern
 
-    newPattern = ''  # match starts at the beginning of the string
-    strPattern = ''
+    regex_parts = []  # match starts at the beginning of the string
+    string_parts = []
     decoders: list[decoder_type] = []
     for s in _reParameters.split(pattern):
         if s is None:
@@ -444,14 +442,15 @@ def escapePattern2(
                 and (len(s) == 2 or s[1] in _decimalDigits)):
             # Must match a "%2d" or "%d" style
             dec = _digitDecoders[s[-1]]
-            newPattern, strPattern = decode(dec, s, newPattern, strPattern)
+            regex_part, string_part = decode(dec, s)
         else:
-            newPattern += re.escape(s)
-            strPattern += s
+            regex_part, string_part = re.escape(s), s
+        regex_parts.append(regex_part)
+        string_parts.append(string_part)
 
-    newPattern += '$'  # end of the string
-    compiledPattern = re.compile(newPattern)
-    return compiledPattern, strPattern, decoders
+    regex_parts.append('$')  # end of the string
+    compiledPattern = re.compile(''.join(regex_parts))
+    return compiledPattern, ''.join(string_parts), decoders
 
 
 @singledispatch

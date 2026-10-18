@@ -406,11 +406,9 @@ def main(*args: str) -> None:
         if arg == '-replacealways':
             options['replace'] = True
             options['replacealways'] = True
-        elif arg.startswith('-') and arg[1:] in ('always',
-                                                 'replace',
-                                                 'replaceloose',
-                                                 'replaceonly'):
-            options[arg[1:]] = True
+        elif arg.startswith('-') and (option := arg.removeprefix('-')) in (
+                'always', 'replace', 'replaceloose', 'replaceonly'):
+            options[option] = True
 
     bot = NowCommonsDeleteBot(**options)
     bot.run()

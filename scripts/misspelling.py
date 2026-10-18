@@ -171,7 +171,7 @@ def main(*args: str) -> None:
         opt, _, value = arg.partition(':')
         if not opt.startswith('-'):
             continue
-        opt = opt[1:]
+        opt = opt.removeprefix('-')
         if opt == 'always':
             # the option that's always selected when the bot wonders
             # what to do with a link. If it's None, the user is prompted

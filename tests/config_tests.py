@@ -7,12 +7,16 @@
 """Test cases for the :mod:`config` module."""
 from __future__ import annotations
 
+import sys
 import unittest
 from contextlib import suppress
 from pathlib import Path, PurePosixPath, PureWindowsPath
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
+from zipfile import ZipFile
 
 from pywikibot import config
+from pywikibot.family import Family
 from tests.aspects import TestCase
 
 
@@ -21,6 +25,57 @@ class ConfigPathTestCase(TestCase):
     """Test configuration path helpers."""
 
     net = False
+
+    def test_register_families_zip(self) -> None:
+        """Discover and load archived families without duplicate paths."""
+        with TemporaryDirectory() as tmp, \
+                patch.dict(config.family_files, {}, clear=True), \
+                patch.dict(Family._families, {}, clear=True), \
+                patch.dict(sys.modules), \
+                patch.object(sys, 'path', sys.path.copy()):
+            archive = Path(tmp) / 'families.zip'
+            folder = archive / 'families'
+            expected = {}
+            with ZipFile(archive, 'w') as zip_file:
+                for name in ('zipalpha', 'zipbeta'):
+                    filename = name + '_family.py'
+                    zip_file.writestr(
+                        'families/' + filename,
+                        'from pywikibot.family import Family as BaseFamily\n'
+                        'class Family(BaseFamily):\n'
+                        f'    name = {name!r}\n'
+                        "    langs = {'en': 'example.invalid'}\n")
+                    expected[name] = str(folder / filename)
+                zip_file.writestr('other/unused_family.py', '')
+
+            config.register_families_folder(folder, not_exists_ok=True)
+            self.assertEqual(config.family_files, expected)
+            for name in expected:
+                self.assertEqual(Family.load(name).name, name)
+            self.assertEqual(sys.path.count(str(folder)), 1)
+
+            config.register_families_folder(archive)
+            expected['unused'] = str(archive / 'other/unused_family.py')
+            self.assertEqual(config.family_files, expected)
+
+    def test_register_families_missing_folder(self) -> None:
+        """Retain missing-folder and non-directory error handling."""
+        with TemporaryDirectory() as tmp, \
+                patch.dict(config.family_files, {}, clear=True):
+            archive = Path(tmp) / 'families.zip'
+            with ZipFile(archive, 'w') as zip_file:
+                zip_file.writestr('families/example_family.py', '')
+            for folder in (Path(tmp) / 'missing', archive / 'missing'):
+                with self.subTest(folder=folder):
+                    with self.assertRaises(FileNotFoundError):
+                        config.register_families_folder(folder)
+                    config.register_families_folder(folder,
+                                                    not_exists_ok=True)
+            file_path = Path(tmp) / 'plain.txt'
+            file_path.touch()
+            with self.assertRaises(NotADirectoryError):
+                config.register_families_folder(file_path)
+            self.assertEqual(config.family_files, {})
 
     def test_shortpath_path_containment(self) -> None:
         """Test shortpath uses path components for containment."""

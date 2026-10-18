@@ -187,7 +187,7 @@ class TestUploaderStateTransitions(TestCase):
     def test_final_warning_recovers_stash(self) -> None:
         """Test accepting a final warning validates and reuses its stash."""
         sha1 = compute_file_hash(self.source)
-        for response_offset in (None, 1276):
+        for response_offset in (None, False, 1276):
             warning = {
                 'result': 'Warning',
                 'warnings': {'exists': 'Test.png'},

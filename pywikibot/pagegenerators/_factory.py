@@ -502,12 +502,11 @@ class GeneratorFactory:
                                       ) -> None:
             _i = ' ' * 4
             _2i = 2 * _i
-            txt = 'Available categories of lint errors:\n'
+            text_parts = ['Available categories of lint errors:\n']
             for prio, _list in cats.items():
-                txt += f'{_i}{prio}\n'
-                txt += ''.join(
-                    f'{_2i}{c}\n' for c in _list)
-            pywikibot.info(txt)
+                text_parts.append(f'{_i}{prio}\n')
+                text_parts.extend(f'{_2i}{c}\n' for c in _list)
+            pywikibot.info(''.join(text_parts))
 
         if cat == 'show':  # Display categories of lint errors.
             show_available_categories(cats)
@@ -536,12 +535,12 @@ class GeneratorFactory:
                                                    'limit')
 
             max_w = max(len(p) for p in pages[::2]) + 4
-            txt = 'Available special pages:\n'
-            for a, b in zip_longest(pages[::2], pages[1::2], fillvalue=''):
-                txt += f'    {a:<{max_w}}{b}\n'
-            txt += ('\nMaximum number of pages to return is {max} '
-                    '({highmax} for bots).\n'.format_map(limit))
-            pywikibot.info(txt)
+            text_parts = ['Available special pages:\n']
+            text_parts.extend(f'    {a:<{max_w}}{b}\n' for a, b in zip_longest(
+                pages[::2], pages[1::2], fillvalue=''))
+            text_parts.append('\nMaximum number of pages to return is {max} '
+                              '({highmax} for bots).\n'.format_map(limit))
+            pywikibot.info(''.join(text_parts))
             sys.exit(0)
 
         return self.site.querypage(value)
@@ -889,7 +888,11 @@ class GeneratorFactory:
         return True
 
     def _handle_titleregexnot(self, value: str) -> Literal[True]:
-        """Handle `-titleregexnot` argument."""
+        """Handle `-titleregexnot` and `-titleregex:not` argument.
+
+        .. version-changed:: 11.9
+           Support ``-titleregex:not`` syntax.
+        """
         if not value:
             value = pywikibot.input(
                 'All pages except which ones?')
@@ -904,7 +907,11 @@ class GeneratorFactory:
         return True
 
     def _handle_grepnot(self, value: str) -> Literal[True]:
-        """Handle `-grepnot` argument."""
+        """Handle `-grepnot` and `-grep:not` argument.
+
+        .. version-changed:: 11.9
+           Support ``-grep:not`` syntax.
+        """
         if not value:
             value = pywikibot.input('Which pattern do you want to skip?')
         self.articlenotfilter_list.append(value)
@@ -931,7 +938,11 @@ class GeneratorFactory:
         return self._onlyif_onlyifnot_handler(value, False)
 
     def _handle_onlyifnot(self, value: str) -> Literal[True]:
-        """Handle `-onlyifnot` argument."""
+        """Handle `-onlyifnot` and `-onlyif:not` argument.
+
+        .. version-changed:: 11.9
+           Support ``-onlyif:not`` syntax.
+        """
         return self._onlyif_onlyifnot_handler(value, True)
 
     def _onlyif_onlyifnot_handler(self, value: str, ifnot: bool
@@ -1053,6 +1064,10 @@ class GeneratorFactory:
            specified.
 
 
+        .. version-changed:: 11.9
+           Support ``:not`` suffix for negative filter options (e.g.
+           ``-titleregex:not``, ``-grep:not``, ``-onlyif:not``).
+
         :param arg: Pywikibot argument consisting of -name:value
         :return: True if the argument supplied was recognised by the factory
         """
@@ -1068,10 +1083,19 @@ class GeneratorFactory:
             value = None
 
         opt = arg[1:]
-        if opt in self.disabled_options:
+        base_opt = opt
+        if value and (value == 'not' or value.startswith('not:')):
+            not_opt = opt + 'not'
+            if hasattr(self, '_handle_' + not_opt):
+                opt = not_opt
+                value = value[4:] if value.startswith('not:') else None
+
+        if opt in self.disabled_options or base_opt in self.disabled_options:
             return False
 
-        if self.enabled_options and opt not in self.enabled_options:
+        if (self.enabled_options
+                and opt not in self.enabled_options
+                and base_opt not in self.enabled_options):
             return False
 
         handler = getattr(self, '_handle_' + opt, None)

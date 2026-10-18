@@ -11,6 +11,7 @@ import copy
 import json
 import unittest
 from contextlib import suppress
+from unittest.mock import MagicMock
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -21,7 +22,14 @@ from pywikibot.exceptions import (
     NoPageError,
     WikiBaseError,
 )
-from pywikibot.page import ItemPage, PropertyPage, WikibasePage
+from pywikibot.page import (
+    Claim,
+    ItemPage,
+    MediaInfo,
+    PropertyPage,
+    WikibasePage,
+)
+from pywikibot.page._collections import ClaimCollection, LanguageDict
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import suppress_warnings
 from tests import WARN_SITE_CODE, join_pages_path
@@ -1145,6 +1153,85 @@ class TestWriteNormalizeData(TestCase):
         with self.assertRaisesRegex(TypeError,
                                     "Unsupported value type 'tuple'"):
             ItemPage._normalizeData(data)
+
+
+class TestMediaInfoNormalizeData(TestCase):
+
+    """Test cases for MediaInfo._normalizeData and MediaInfo.toJSON."""
+
+    net = False
+
+    def setUp(self) -> None:
+        """Set up tests."""
+        super().setUp()
+        self.claim_dict = {
+            'mainsnak': {
+                'snaktype': 'value',
+                'property': 'P7384',
+                'datavalue': {'value': '2295284', 'type': 'string'},
+            },
+            'type': 'statement',
+            'rank': 'normal',
+        }
+
+    def test_both_claims_and_statements_raises_value_error(self) -> None:
+        """Test _normalizeData raises ValueError if both keys are present."""
+        data_in = {
+            'claims': [self.claim_dict],
+            'statements': [self.claim_dict],
+        }
+        with self.assertRaisesRegex(
+                ValueError,
+                "Cannot specify both 'claims' and 'statements' in data"):
+            MediaInfo._normalizeData(data_in)
+
+    def test_claims_input(self) -> None:
+        """Test _normalizeData with claims input produces claims out."""
+        data_in = {'claims': [self.claim_dict]}
+        response = MediaInfo._normalizeData(data_in)
+        self.assertEqual(response, {'claims': [self.claim_dict]})
+        self.assertIn('claims', data_in)
+        self.assertNotIn('statements', data_in)
+
+    def test_statements_input(self) -> None:
+        """Test _normalizeData with statements input produces claims out."""
+        data_in = {'statements': [self.claim_dict]}
+        response = MediaInfo._normalizeData(data_in)
+        self.assertEqual(response, {'claims': [self.claim_dict]})
+
+    def test_labels_and_claims_preserved(self) -> None:
+        """Test _normalizeData with labels and claims preserves both."""
+        data_in = {
+            'labels': {'en': 'Test label'},
+            'claims': [self.claim_dict],
+        }
+        expected = {
+            'labels': {'en': {'language': 'en', 'value': 'Test label'}},
+            'claims': [self.claim_dict],
+        }
+        response = MediaInfo._normalizeData(data_in)
+        self.assertEqual(response, expected)
+
+    def test_to_json_key_is_claims(self) -> None:
+        """Test MediaInfo.toJSON returns 'claims' instead of 'statements'."""
+        repo = MagicMock()
+        item = MediaInfo(repo, 'M123')
+        item.labels = LanguageDict.new_empty(repo)
+        col = ClaimCollection(repo)
+        claim = Claim(repo, 'P123', datatype='string')
+        claim.setTarget('foo')
+        col['P123'] = [claim]
+        item.statements = col
+
+        json_data = item.toJSON()
+        self.assertIn('claims', json_data)
+        self.assertNotIn('statements', json_data)
+        self.assertEqual(json_data['claims'], {'P123': [claim.toJSON()]})
+
+        # Test diffing against _content with statements
+        claim.snak = 'M123$guid'
+        diffto = {'statements': {'P123': [claim.toJSON()]}}
+        self.assertEqual(item.toJSON(diffto=diffto), {})
 
 
 class TestPreloadingEntityGenerator(TestCase):

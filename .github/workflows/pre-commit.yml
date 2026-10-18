@@ -13,6 +13,8 @@ permissions:
   contents: read
 
 env:
+  GIT_HTTP_USER_AGENT: >-
+    Pywikibot-CI/1.0 (https://www.mediawiki.org/wiki/Manual:Pywikibot)
   PYWIKIBOT_TEST_RUNNING: 1
   PYWIKIBOT_NO_USER_CONFIG: 2
 
@@ -20,7 +22,7 @@ jobs:
   pre-commit:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 7
+    timeout-minutes: 8
     strategy:
       fail-fast: false
       matrix:
@@ -39,8 +41,13 @@ jobs:
       - name: checkout
         uses: actions/checkout@v7
         with:
-          submodules: true
           persist-credentials: false
+      # Fetch separately because checkout overrides GIT_HTTP_USER_AGENT.
+      - name: Fetch submodules
+        shell: bash
+        run: |
+          git submodule sync
+          git -c protocol.version=2 submodule update --init --force --depth=1
       - name: run pre-commit
         uses: pre-commit/action@v3.0.1
         env:

@@ -22,7 +22,7 @@ from pywikibot.page._links import Link
 from pywikibot.page._page import Page
 from pywikibot.page._revision import Revision
 from pywikibot.time import Timestamp
-from pywikibot.tools import is_ip_address, is_ip_network
+from pywikibot.tools import deprecated_args, is_ip_address, is_ip_network
 from pywikibot.tools.collections import DataRecord
 
 
@@ -101,7 +101,8 @@ class User(Page):
             return '#' + self.title(with_ns=False)
         return self.title(with_ns=False)
 
-    def isRegistered(self, force: bool = False) -> bool:  # noqa: N802
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def isRegistered(self, refresh: bool = False) -> bool:  # noqa: N802
         """Determine if the user is registered on the site.
 
         It is possible to have a page named ``User:xyz`` and not have a
@@ -117,13 +118,16 @@ class User(Page):
            - :meth:`is_temporary`
            - :meth:`is_named`
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         :return: True if the user is either a named (regular) user or a
             temporary account.
         """
         # T135828: the registration timestamp may be None but the key exists
         return (not self.isAnonymous()
-                and 'registration' in self.getprops(force))
+                and 'registration' in self.getprops(refresh))
 
     def isAnonymous(self) -> bool:  # noqa: N802
         """Determine if the user is editing as an IP address.
@@ -148,7 +152,8 @@ class User(Page):
         """
         return is_ip_network(self.username)
 
-    def is_named(self, *, force: bool = False) -> bool:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def is_named(self, *, refresh: bool = False) -> bool:
         """Determine if the user is a regular named account.
 
         A named account is neither an IP nor a temporary account.
@@ -159,9 +164,12 @@ class User(Page):
            - :meth:`isAnonymous`
            - :meth:`is_temporary`
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         """
-        return self.isRegistered(force) and not self.is_temporary()
+        return self.isRegistered(refresh) and not self.is_temporary()
 
     def is_temporary(self) -> bool:
         """Determine if the user is a temporary account.
@@ -175,7 +183,8 @@ class User(Page):
         """
         return 'temp' in self.groups()
 
-    def temp_expired(self, force: bool = False) -> bool | None:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def temp_expired(self, refresh: bool = False) -> bool | None:
         """Indicates whether the temporary account has expired or not.
 
         If account isn't temporary, None is returned.
@@ -183,16 +192,20 @@ class User(Page):
         .. version-added:: 11.4
         .. seealso:: :meth:`is_temporary`
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         """
         if not self.is_temporary():
             return None
 
-        return 'tempexpired' in self.getprops(force, ['tempexpired'])
+        return 'tempexpired' in self.getprops(refresh, ['tempexpired'])
 
+    @deprecated_args(force='refresh')  # since 11.9.0
     def getprops(
         self,
-        force: bool = False,
+        refresh: bool = False,
         extra_props: Iterable[str] = ()
     ) -> dict[str, Any]:
         """Return user properties.
@@ -201,8 +214,10 @@ class User(Page):
            detect range blocks
         .. version-changed:: 11.4
            Added the *extra_props* parameter.
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         :param extra_props: Additional user properties to request.
         """
         if not hasattr(self, '_additional_props'):
@@ -214,7 +229,7 @@ class User(Page):
             new_props = bool(missing)
             self._additional_props.update(missing)
 
-        if (force or new_props) and hasattr(self, '_userprops'):
+        if (refresh or new_props) and hasattr(self, '_userprops'):
             self._userprops: dict[str, Any]
             del self._userprops
 
@@ -230,28 +245,37 @@ class User(Page):
 
         return self._userprops
 
+    @deprecated_args(force='refresh')  # since 11.9.0
     def registration(self,
-                     force: bool = False) -> pywikibot.Timestamp | None:
+                     refresh: bool = False) -> pywikibot.Timestamp | None:
         """Fetch registration date for this user.
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         """
         if not self.isAnonymous():
-            reg = self.getprops(force).get('registration')
+            reg = self.getprops(refresh).get('registration')
             if reg:
                 return pywikibot.Timestamp.fromISOformat(reg)
         return None
 
-    def editCount(self, force: bool = False) -> int:  # noqa: N802
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def editCount(self, refresh: bool = False) -> int:  # noqa: N802
         """Return edit count for a registered user.
 
         Always returns 0 for 'anonymous' users.
 
-        :param force: If True, forces reloading the data from API
-        """
-        return self.getprops(force).get('editcount', 0)
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-    def is_blocked(self, force: bool = False) -> bool:
+        :param refresh: If True, forces reloading the data from API
+        """
+        return self.getprops(refresh).get('editcount', 0)
+
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def is_blocked(self, refresh: bool = False) -> bool:
         """Determine whether the user is currently blocked.
 
         .. seealso::
@@ -262,12 +286,15 @@ class User(Page):
            renamed from :meth:`isBlocked` method
         .. version-changed:: 9.0
            can also detect range blocks.
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         """
-        return 'blockedby' in self.getprops(force)
+        return 'blockedby' in self.getprops(refresh)
 
-    def is_partial_blocked(self, *, force: bool = False) -> bool:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def is_partial_blocked(self, *, refresh: bool = False) -> bool:
         """Return True if this user is partially blocked, False otherwise.
 
         .. seealso::
@@ -276,12 +303,17 @@ class User(Page):
              <pywikibot.site._apisite.APISite.is_partial_blocked>`
 
         .. version-added:: 11.0
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         """
-        return 'blockpartial' in self.getprops(force)
+        return 'blockpartial' in self.getprops(refresh)
 
-    def get_block_info(self, *, force: bool = False) -> dict[str, Any] | None:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def get_block_info(
+        self, *, refresh: bool = False
+    ) -> dict[str, Any] | None:
         """Return a dictionary of block information if the user is blocked.
 
         Returns None if the user is not blocked.
@@ -298,23 +330,28 @@ class User(Page):
            - :meth:`is_partial_blocked`
 
         .. version-added:: 11.0
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         """
-        props = self.getprops(force)
+        props = self.getprops(refresh)
         if 'blockid' not in props:
             return None
 
         return {k: v for k, v in props.items() if k.startswith('block')}
 
-    def is_locked(self, force: bool = False) -> bool:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def is_locked(self, refresh: bool = False) -> bool:
         """Determine whether the user is currently locked globally.
 
         .. version-added:: 7.0
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-        :param force: If True, forces reloading the data from API
+        :param refresh: If True, forces reloading the data from API
         """
-        return self.site.is_locked(self.username, force)
+        return self.site.is_locked(self.username, refresh)
 
     def is_globally_blocked(self) -> bool:
         """Return whether an active global block matches this user.
@@ -339,40 +376,56 @@ class User(Page):
         """
         return self.site.is_globally_blocked(self.username)
 
-    def isEmailable(self, force: bool = False) -> bool:  # noqa: N802
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def isEmailable(self, refresh: bool = False) -> bool:  # noqa: N802
         """Determine whether emails may be sent to this user through MediaWiki.
 
-        :param force: If True, forces reloading the data from API
-        """
-        return not self.isAnonymous() and 'emailable' in self.getprops(force)
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
 
-    def groups(self, force: bool = False) -> list:
+        :param refresh: If True, forces reloading the data from API
+        """
+        return not self.isAnonymous() and 'emailable' in self.getprops(refresh)
+
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def groups(self, refresh: bool = False) -> list:
         """Return a list of groups to which this user belongs.
 
         The list of groups may be empty.
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         :return: Groups property
         """
-        return self.getprops(force).get('groups', [])
+        return self.getprops(refresh).get('groups', [])
 
-    def gender(self, force: bool = False) -> str:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def gender(self, refresh: bool = False) -> str:
         """Return the gender of the user.
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         :return: Return 'male', 'female', or 'unknown'
         """
         if self.isAnonymous():
             return 'unknown'
-        return self.getprops(force).get('gender', 'unknown')
+        return self.getprops(refresh).get('gender', 'unknown')
 
-    def rights(self, force: bool = False) -> list:
+    @deprecated_args(force='refresh')  # since 11.9.0
+    def rights(self, refresh: bool = False) -> list:
         """Return user rights.
 
-        :param force: If True, forces reloading the data from API
+        .. version-changed:: 11.9
+           The *force* parameter was renamed to *refresh*.
+
+        :param refresh: If True, forces reloading the data from API
         :return: Return user rights
         """
-        return self.getprops(force).get('rights', [])
+        return self.getprops(refresh).get('rights', [])
 
     def getUserPage(self, subpage: str = '') -> Page:  # noqa: N802
         """Return a Page object relative to this user's main page.

@@ -88,7 +88,8 @@ class TestLink(DefaultSiteTestCase):
     def test_valid(self) -> None:
         """Test that valid titles are correctly normalized."""
         title_tests = ['Sandbox', 'A "B"', "A 'B'", '.com', '~', '"', "'",
-                       'Foo/.../Sandbox', 'Sandbox/...', 'A~~', 'X' * 252]
+                       'Foo/.../Sandbox', 'Sandbox/...', 'A~~', 'X' * 252,
+                       'Я' * 127 + 'A']
 
         extended_title_tests = [
             ('Talk:Sandbox', 'Sandbox'),
@@ -174,7 +175,7 @@ class TestLink(DefaultSiteTestCase):
             (['A ~~~ Name', 'A ~~~~ Signature', 'A ~~~~~ Timestamp'],
              generate_contains_tilde_exc_regex),
 
-            ([('x' * 256), ('Invalid:' + 'X' * 248)],
+            ([('x' * 256), ('Invalid:' + 'X' * 248), ('Я' * 128)],
              generate_overlength_exc_regex),
 
             (['Talk:'],

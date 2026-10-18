@@ -102,7 +102,7 @@ def AllpagesPageGenerator(
             filterredir = True
 
         issue_deprecation_warning(
-            'includeredirects parameter ({includeredirects})',
+            f'includeredirects parameter ({includeredirects})',
             f'filterredir={filterredir}',
             since='10.0.0'
         )
@@ -165,7 +165,7 @@ def PrefixingPageGenerator(
             filterredir = True
 
         issue_deprecation_warning(
-            'includeredirects parameter ({includeredirects})',
+            f'includeredirects parameter ({includeredirects})',
             f'filterredir={filterredir}',
             since='10.0.0'
         )
@@ -1452,10 +1452,9 @@ class PetScanPageGenerator(GeneratorWrapper):
             for namespace in namespaces:
                 query[f'ns[{int(namespace)}]'] = 1
 
-        query_final = query.copy()
-        query_final.update(extra_options)
+        query |= extra_options
 
-        return query_final
+        return query
 
     def query(self) -> Generator[dict[str, Any]]:
         """Query PetScan.

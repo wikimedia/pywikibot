@@ -56,7 +56,7 @@ Contents
    global_options
    faq
    getting_help
-   SECURITY
+   security
 
 .. toctree::
    :maxdepth: 1

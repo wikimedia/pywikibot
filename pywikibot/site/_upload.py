@@ -237,7 +237,9 @@ class Uploader:
                 # The SHA1 was also requested so calculate and compare it
                 assert 'sha1' in stash_info, \
                     f'sha1 not in stash info: {stash_info}'
-                sha1 = compute_file_hash(self.filename, bytes_to_read=offset)
+                sha1 = compute_file_hash(
+                    self.filename,
+                    bytes_to_read=None if offset is False else offset)
                 if sha1 != stash_info['sha1']:
                     raise ValueError(
                         f'The SHA1 of {offset} bytes of the stashed '

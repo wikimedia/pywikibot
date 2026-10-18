@@ -423,6 +423,22 @@ class QueryGenTests(DefaultSiteTestCase):
 
     dry = True
 
+    def test_cached_constructor_args(self) -> None:
+        """Reuse constructor arguments without sharing subclass results."""
+        kwargs = {'site': self.site, 'parameters': {'action': 'query'}}
+        cached_kwargs = dict(kwargs, expiry=1)
+        Request._get_constructor_args.cache_clear()
+        self.addCleanup(Request._get_constructor_args.cache_clear)
+        self.assertEqual(Request.clean_kwargs(kwargs), kwargs)
+        self.assertEqual(CachedRequest.clean_kwargs(cached_kwargs),
+                         cached_kwargs)
+
+        with patch('pywikibot.data.api._requests.inspect.getfullargspec',
+                   side_effect=AssertionError('Repeated introspection')):
+            self.assertEqual(Request.clean_kwargs(kwargs), kwargs)
+            self.assertEqual(CachedRequest.clean_kwargs(cached_kwargs),
+                             cached_kwargs)
+
     def test_query_constructor(self) -> None:
         """Test QueryGenerator constructor."""
         q_gen1 = QueryGenerator(

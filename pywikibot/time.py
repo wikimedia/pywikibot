@@ -17,7 +17,7 @@ import types
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.tools import PYTHON_VERSION, classproperty
+from pywikibot.tools import PYTHON_VERSION, classproperty, deprecated
 
 
 __all__ = (
@@ -25,7 +25,8 @@ __all__ = (
     'str2timedelta',
     'MW_KEYS',
     'Timestamp',
-    'TZoneFixedOffset'
+    'TZoneFixedOffset',
+    'UTC',
 )
 
 #: .. version-added:: 7.5
@@ -37,6 +38,13 @@ MW_KEYS = types.MappingProxyType({
     'y': 'years',
     # 'months' and 'minutes' were removed because confusion outweighs merit
 })
+
+UTC = datetime.timezone.utc
+"""Alias for the UTC time zone singleton :attr:`datetime.timezone.utc`.
+
+.. note:: :attr:`datetime.UTC` is an alias for it since Python 3.11.
+.. version-added:: 11.9
+"""
 
 
 class Timestamp(datetime.datetime):
@@ -133,7 +141,8 @@ class Timestamp(datetime.datetime):
         return cls.strptime(timestr, cls.mediawikiTSFormat)
 
     @classmethod
-    def _from_iso8601(cls, timestr: str) -> Timestamp:
+    def _from_iso8601(cls, timestr: str,
+                      separators: str = 'T ') -> Timestamp:
         """Convert a string in ISO8601 format to a Timestamp object.
 
         ISO8601 format:
@@ -141,7 +150,8 @@ class Timestamp(datetime.datetime):
 
         .. version-added:: 7.5
         """
-        RE_ISO8601 = (r'(?:\d{4}-\d{2}-\d{2})(?P<sep>[T ])'  # noqa: N806
+        RE_ISO8601 = (rf'(?:\d{{4}}-\d{{2}}-\d{{2}})'  # noqa: N806
+                      rf'(?P<sep>[{re.escape(separators)}])'
                       r'(?:\d{2}:\d{2}:\d{2})(?P<u>[.,]\d{1,6})?'
                       r'(?P<tz>Z|[+\-]\d{2}:?\d{,2})?'
                       )
@@ -158,14 +168,12 @@ class Timestamp(datetime.datetime):
             strpfmt += '.%f'
             strpstr += m['u'].replace(',', '.')  # .ljust(7, '0')
 
-        if m['tz']:
-            if m['tz'] == 'Z':
-                strpfmt += 'Z'
-                strpstr += 'Z'
-            else:
-                strpfmt += '%z'
-                # strptime wants HHMM, without ':'
-                strpstr += (m['tz'].replace(':', '')).ljust(5, '0')
+        if tz := m['tz']:
+            strpfmt += '%z'
+            if tz != 'Z':
+                # Complete abbreviated offsets, preserving any colon.
+                tz = tz.ljust(6 if ':' in tz else 5, '0')
+            strpstr += tz
 
         ts = cls.strptime(strpstr, strpfmt)
         if ts.tzinfo is not None:
@@ -191,9 +199,9 @@ class Timestamp(datetime.datetime):
         sec = int(m['S'])
         usec = m['u']
         usec = int(usec.ljust(6, '0')) if usec else 0
-        if sec < 0 < usec:
-            sec -= 1
-            usec = 1_000_000 - usec
+        # the sign applies to the fraction too, even if seconds are -0
+        if m['S'].startswith('-'):
+            usec = -usec
 
         return cls(1970, 1, 1) + datetime.timedelta(seconds=sec,
                                                     microseconds=usec)
@@ -217,20 +225,13 @@ class Timestamp(datetime.datetime):
         raise ValueError(f'time data {timestr!r} does not match any format.')
 
     @classproperty
+    @deprecated(since='11.9.0')
     def ISO8601Format(cls) -> str:  # noqa: N802
-        """ISO8601 format string class property for compatibility purpose."""
-        return cls._ISO8601Format()
+        """ISO8601 format string class property for compatibility purpose.
 
-    @classmethod
-    def _ISO8601Format(cls, sep: str = 'T') -> str:  # noqa: N802
-        """ISO8601 format string.
-
-        :param sep: One-character separator, placed between the date and
-            time
-        :return: ISO8601 format string
+        .. version-deprecated:: 11.9
         """
-        assert len(sep) == 1
-        return f'%Y-%m-%d{sep}%H:%M:%SZ'
+        return '%Y-%m-%dT%H:%M:%SZ'
 
     @classmethod
     def fromISOformat(cls,  # noqa: N802
@@ -253,7 +254,8 @@ class Timestamp(datetime.datetime):
                 f'ts argument must be a string or a Timestamp object,'
                 f' not {type(ts).__name__}')
 
-        return cls._from_iso8601(f'{ts[:10]}{sep}{ts[11:]}')
+        assert len(sep) == 1
+        return cls._from_iso8601(ts, sep)
 
     @classmethod
     def fromtimestampformat(cls,
@@ -300,14 +302,49 @@ class Timestamp(datetime.datetime):
             ts += '000000'
         return cls._from_mw(ts)
 
-    def isoformat(self, sep: str = 'T') -> str:  # type: ignore[override]
-        """Convert object to an ISO 8601 timestamp accepted by MediaWiki.
+    def isoformat(self, sep: str = 'T', timespec: str = 'seconds') -> str:
+        """Return a string representing the date and time in ISO 8601 format.
 
-        datetime.datetime.isoformat does not postfix the ISO formatted
-        date with a 'Z' unless a timezone is included, which causes
-        MediaWiki ~1.19 and earlier to fail.
+        Unlike :meth:`datetime.datetime.isoformat`, this method appends
+        a 'Z' to naive timestamps and uses 'Z' instead of '+00:00' for
+        timestamps with a zero UTC offset. For other timezone offsets,
+        the offset specified by the timestamp is preserved. The default
+        *timespec* is 'seconds' rather than 'auto'.
+
+        **Example:**
+
+        >>> from pywikibot.time import Timestamp, TZoneFixedOffset
+        >>> Timestamp(2026, 10, 4, 11, 22, 8, 132263).isoformat()
+        '2026-10-04T11:22:08Z'
+        >>> Timestamp(2026, 10, 4, 11, 22, 8, tzinfo=UTC).isoformat()
+        '2026-10-04T11:22:08Z'
+        >>> tzo = TZoneFixedOffset(-399, 'UTC')
+        >>> Timestamp(2026, 10, 4, tzinfo=tzo).isoformat(' ')
+        '2026-10-04 00:00:00-06:39'
+        >>> ts = Timestamp(2026, 10, 4, microsecond=100, tzinfo=tzo)
+        >>> ts.isoformat()
+        '2026-10-04T00:00:00-06:39'
+        >>> ts.isoformat(timespec='auto')
+        '2026-10-04T00:00:00.000100-06:39'
+
+        .. version-changed:: 3.0.20171212
+           *sep* parameter was added.
+        .. version-changed:: 11.9
+           *timespec* parameter was added. Timezone offsets are now
+           preserved.
+
+        :param sep: A one-character separator, placed between the date
+            and time portions of the result.
+        :param timespec: specifies the number of additional components
+            of the time to include. Refer :pylib:`datetime.isoformat
+            <datetime#datetime.datetime.isoformat>` for valid values.
         """
-        return self.strftime(self._ISO8601Format(sep))
+        ts = super().isoformat(sep, timespec)
+        if self.utcoffset() is None:
+            ts += 'Z'
+        elif self.utcoffset() == datetime.timedelta():
+            ts = ts.replace('+00:00', 'Z')
+        return ts
 
     def totimestampformat(self) -> str:
         """Convert object to a MediaWiki internal timestamp."""
@@ -338,7 +375,13 @@ class Timestamp(datetime.datetime):
         return f'{type(self).__name__}{s[s.find("("):]}'
 
     def __str__(self) -> str:
-        """Return a string format recognized by the API."""
+        """Return a string format recognized by the API.
+
+        For a :class:`Timestamp` instance ``t``, ``str(t)`` is
+        equivalent to :meth:`t.isoformat()<isoformat>`, which includes
+        the 'T' separator unlike the :meth:`datetime.datetime`
+        equivalent.
+        """
         return self.isoformat()
 
     @classmethod

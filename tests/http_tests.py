@@ -12,6 +12,7 @@ import unittest
 import warnings
 from contextlib import suppress
 from http import HTTPStatus
+from io import BytesIO
 from platform import python_implementation
 from unittest.mock import Mock, patch
 
@@ -85,6 +86,19 @@ class TestGetAuthenticationConfig(TestCase):
         ):
             for url, auth in pairs.items():
                 self.assertEqual(http.get_authentication(url), auth)
+
+    @patch.object(http.session, 'request')
+    def test_disable_url_authentication(self, request) -> None:
+        """Test configured authentication can be explicitly disabled."""
+        response = requests.Response()
+        response.request = requests.Request(headers={})
+        response.url = 'https://en.wikipedia.beta.wmcloud.org'
+        response._content = b''
+        request.return_value = response
+        http.fetch('https://en.wikipedia.beta.wmcloud.org', auth=None,
+                   default_error_handling=False)
+
+        self.assertIsNone(request.call_args.kwargs['auth'])
 
 
 class HttpsCertificateTestCase(TestCase):
@@ -237,6 +251,27 @@ class FetchInputTestCase(TestCase):
     """Test input handling by :func:`http.fetch`."""
 
     net = False
+
+    def test_streaming_does_not_read_body(self) -> None:
+        """Leave streamed bodies unread until the caller consumes them."""
+        content = b'<?xml version="1.0" encoding="UTF-8"?><test />'
+        for charset in (None, 'latin1'):
+            with self.subTest(charset=charset):
+                response = requests.Response()
+                response.status_code = HTTPStatus.OK
+                response.headers['content-type'] = 'application/xml'
+                response.request = requests.Request()
+                response.encoding = 'utf-8'
+                response.raw = BytesIO(content)
+
+                with patch.object(http.session, 'request',
+                                  return_value=response):
+                    with http.fetch('https://example.test', stream=True,
+                                    charset=charset) as result:
+                        self.assertEqual(response.raw.tell(), 0)
+                        self.assertEqual(result.encoding, charset or 'utf-8')
+                        self.assertEqual(b''.join(result.iter_content(8)),
+                                         content)
 
     def test_inputs_are_not_modified(self) -> None:
         """Test that headers and callbacks remain unchanged."""

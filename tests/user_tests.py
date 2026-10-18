@@ -18,7 +18,7 @@ from pywikibot.exceptions import (
     AutoblockUserError,
     UnknownExtensionError,
 )
-from tests.aspects import DefaultSiteTestCase, TestCase
+from tests.aspects import DefaultSiteTestCase, DeprecationTestCase, TestCase
 
 
 class TestUserClass(TestCase):
@@ -353,6 +353,35 @@ class TestUserMethods(DefaultSiteTestCase):
         self.assertEqual(last, user.last_event)
         for event in le:
             self.assertEqual(event.user(), user.username)
+
+
+class TestUserRefreshParameter(DeprecationTestCase):
+
+    """Test the rename of the *force* parameter to *refresh*."""
+
+    family = 'wikipedia'
+    code = 'de'
+    dry = True
+
+    def test_refresh(self) -> None:
+        """Test that refresh is forwarded without a deprecation."""
+        user = User(self.site, 'Example')
+        with patch.object(
+            User, 'getprops', return_value={'editcount': 7}
+        ) as getprops:
+            self.assertEqual(user.editCount(refresh=True), 7)
+        getprops.assert_called_once_with(True)
+        self.assertNoDeprecation()
+
+    def test_force_is_deprecated(self) -> None:
+        """Test that force still works but warns."""
+        user = User(self.site, 'Example')
+        with patch.object(
+            User, 'getprops', return_value={'editcount': 7}
+        ) as getprops:
+            self.assertEqual(user.editCount(force=True), 7)
+        getprops.assert_called_once_with(True)
+        self.assertOneDeprecation()
 
 
 if __name__ == '__main__':

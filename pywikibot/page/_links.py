@@ -366,6 +366,9 @@ class Link(BaseLink):
         """Parse wikitext of the link.
 
         Called internally when accessing attributes.
+
+        .. version-changed:: 11.9
+           Validate :attr:`title` length in UTF-8 bytes.
         """
         self._site = self._source
         self._namespace = self._defaultns
@@ -465,7 +468,7 @@ class Link(BaseLink):
         if '~~~' in t:
             raise InvalidTitleError(f"(contains ~~~): '{self._text}'")
 
-        if self._namespace != -1 and len(t) > 255:
+        if self._namespace != -1 and len(t.encode('utf-8')) > 255:
             raise InvalidTitleError(f"(over 255 bytes): '{t}'")
 
         # "empty" local links can only be self-links

@@ -2560,8 +2560,12 @@ class BasePage(ComparableMixin):
                         show_diff: bool = False) -> bool:
         """Remove page from oldCat and add it to newCat.
 
-        .. version-added:: 7.0
-           The `show_diff` parameter
+        .. version-changed:: 7.0
+           The `show_diff` parameter was added.
+        .. version-changed:: 11.9
+           Use :attr:`site` when calling
+           :func:`textlib.replaceCategoryLinks` to respect category
+           namespaces and footer rules.
 
         :param old_cat: Category to be removed
         :type old_cat: pywikibot.page.Category
@@ -2620,7 +2624,8 @@ class BasePage(ComparableMixin):
                 cats.pop(old_cat_pos)
 
             try:
-                newtext = textlib.replaceCategoryLinks(oldtext, cats)
+                newtext = textlib.replaceCategoryLinks(oldtext, cats,
+                                                       site=self.site)
             except ValueError:
                 # Make sure that the only way replaceCategoryLinks() can return
                 # a ValueError is in the case of interwiki links to self.

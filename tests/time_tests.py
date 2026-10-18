@@ -14,6 +14,7 @@ from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 
 from pywikibot.time import Timestamp, parse_duration, str2timedelta
+from pywikibot.tools import suppress_warnings
 from tests.aspects import TestCase
 
 
@@ -56,6 +57,8 @@ class TestTimestamp(TestCase):
             ['-1234567890.123456', '-1234567890.123456'],
             ['1234567890.000001', '1234567890.000001'],
             ['-1234567890.000001', '-1234567890.000001'],
+            ['-0.5', '-0.500000'],
+            ['-0.000001', '-0.000001'],
         ],
         'INVALID': [
             ['200902132331309999', None],
@@ -94,13 +97,10 @@ class TestTimestamp(TestCase):
     @staticmethod
     def _compute_posix(timestr):
         """Compute POSIX timestamp with independent method."""
-        sec, usec = map(int, timestr.split('.'))
-
-        if sec < 0 < usec:
-            sec -= 1
-            usec = 1000000 - usec
-
-        return datetime(1970, 1, 1) + timedelta(seconds=sec, microseconds=usec)
+        sign = -1 if timestr.startswith('-') else 1
+        sec, usec = map(int, timestr.lstrip('-').split('.'))
+        delta = timedelta(seconds=sec, microseconds=usec)
+        return datetime(1970, 1, 1) + sign * delta
 
     def _test_set_from_string_fmt(self, fmt) -> None:
         """Test creating instance from <FMT> string."""
@@ -163,7 +163,6 @@ class TestTimestamp(TestCase):
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
 
-    @unittest.expectedFailure  # T396723
     def test_iso_format_with_sep(self) -> None:
         """Test conversion from and to ISO format with separator."""
         sep = '*'
@@ -180,9 +179,12 @@ class TestTimestamp(TestCase):
 
     def test_iso_format_property(self) -> None:
         """Test iso format properties."""
-        self.assertEqual(Timestamp.ISO8601Format, Timestamp._ISO8601Format())
-        self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
-                         Timestamp.mediawikiTSFormat)
+        with suppress_warnings(
+            r'.+Timestamp\.ISO8601Format is deprecated since release 11\.9\.0',
+            category=RuntimeWarning
+        ):
+            self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
+                             Timestamp.mediawikiTSFormat)
 
     def test_mediawiki_format(self) -> None:
         """Test conversion from and to Timestamp format."""

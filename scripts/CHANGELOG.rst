@@ -1,6 +1,32 @@
 Scripts Changelog
 =================
 
+11.9.0
+------
+
+archivebot
+^^^^^^^^^^
+
+* Recreate async executor per template.
+* Accept equivalent namespace case, spaces, and underscores when locating
+  the configuration template for rewriting.
+
+category
+^^^^^^^^
+
+* Extract bot construction. (:phab:`T434526`)
+
+clean_sandbox
+^^^^^^^^^^^^^
+
+* Fix L10N for arzwiki.
+
+solve_disambiguation
+^^^^^^^^^^^^^^^^^^^^
+
+* Handle replacement sections. (:phab:`T394622`)
+
+
 11.8.0
 ------
 

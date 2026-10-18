@@ -10,6 +10,7 @@ from __future__ import annotations
 import io
 import sys
 import unittest
+from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 from platform import python_implementation
 from unittest.mock import patch
@@ -151,6 +152,64 @@ class TestPwb(PwbTestCase):
                 self.assertEqual(stderr.readline().strip(), line)
         remaining = stderr.readlines()
         self.assertLength(remaining, 3)  # always 3 lines remaining after list
+
+    def test_console_scripts_entry_point(self) -> None:
+        """Test that the pwb console_scripts entry point is registered.
+
+        Verifies the site-package ``pwb`` entry point maps to
+        :func:`pywikibot.scripts.wrapper.run` (T420109).
+        """
+        eps = entry_points()
+        try:
+            console = eps.select(group='console_scripts')
+        except AttributeError:  # Python < 3.10 compatibility path
+            console = eps.get('console_scripts', [])  # type: ignore[arg-type]
+
+        pwb_eps = [ep for ep in console if ep.name == 'pwb']
+
+        if not pwb_eps:
+            if sys.version_info >= (3, 11):
+                import tomllib
+            else:
+                try:
+                    import tomli as tomllib
+                except ImportError:
+                    self.skipTest('tomli is not installed')
+
+            pyproject = Path(__file__).parent.parent / 'pyproject.toml'
+
+            with open(pyproject, 'rb') as f:
+                value = tomllib.load(f)['project']['scripts']['pwb']
+
+            if value:
+                pwb_eps = [EntryPoint(
+                    name='pwb', value=value, group='console_scripts')]
+
+        self.assertTrue(pwb_eps, 'console_scripts entry point "pwb" not found')
+        self.assertEqual(pwb_eps[0].value, 'pywikibot.scripts.wrapper:run')
+        self.assertIs(pwb_eps[0].load(), wrapper.run)
+
+    def test_site_package_run_entry_point(self) -> None:
+        """Test wrapper.run() site-package entry point behavior (T420109)."""
+        with (
+            patch.object(wrapper, 'site_package', False),
+            patch.object(wrapper, 'execute', return_value=False) as execute,
+            patch('builtins.print') as mock_print,
+        ):
+            wrapper.run()
+            self.assertTrue(wrapper.site_package)
+            execute.assert_called_once_with()
+            mock_print.assert_called_once_with(wrapper.__doc__)
+
+        with (
+            patch.object(wrapper, 'site_package', False),
+            patch.object(wrapper, 'execute', return_value=True) as execute,
+            patch('builtins.print') as mock_print,
+        ):
+            wrapper.run()
+            self.assertTrue(wrapper.site_package)
+            execute.assert_called_once_with()
+            mock_print.assert_not_called()
 
 
 if __name__ == '__main__':

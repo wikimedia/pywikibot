@@ -12,10 +12,11 @@ import unittest
 from contextlib import suppress
 from tempfile import TemporaryDirectory
 from textwrap import dedent
+from unittest.mock import patch
 
 import pywikibot
 import pywikibot.bot
-from pywikibot import i18n
+from pywikibot import config, i18n
 from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 from tests.utils import execute
 
@@ -76,6 +77,31 @@ class TWNBotTestCase(TestCase):
                 f'i18n messages package {i18n._messages_package_name!r} not'
                 ' available.')
         super().setUpClass()
+
+
+class TestHandleArgs(TestCase):
+
+    """Test global argument handling."""
+
+    net = False
+
+    @patch('pywikibot.bot.init_handlers')
+    @patch('pywikibot.bot.writeToCommandLogFile')
+    @patch('pywikibot.bot.calledModuleName',
+           return_value='generate_user_files')
+    def test_user_override(self, *unused) -> None:
+        """Test that an explicit username override is retained."""
+        with patch.object(config, 'family', 'wikipedia'), \
+             patch.object(config, 'mylang', 'test'), \
+             patch.object(pywikibot.bot, '_user_override', None), \
+             patch.object(pywikibot, '_sites', {}), \
+             patch.dict(config.usernames['wikipedia'], {}, clear=True):
+            result = pywikibot.handle_args(['-user:Xqt'], do_help=False)
+
+            self.assertIsEmpty(result)
+            self.assertEqual(pywikibot.bot._user_override,
+                             ('wikipedia', 'test', 'Xqt'))
+            self.assertEqual(config.usernames['wikipedia']['test'], 'Xqt')
 
 
 class TestBotTreatExit:

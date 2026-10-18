@@ -15,7 +15,7 @@ from unittest.mock import Mock, patch
 
 import pywikibot
 from pywikibot.exceptions import Error
-from pywikibot.textlib import TimeStripper
+from pywikibot.textlib import TimeStripper, extract_templates_and_params
 from scripts import archivebot
 from tests.aspects import TestCase
 
@@ -109,6 +109,23 @@ class TestArchiveBotFunctions(TestCase):
         self.assertEqual(environ['TZ'], 'UTC')
         tzset.assert_called_once_with()
 
+    @patch.object(archivebot.pywikibot, 'handle_args',
+                  side_effect=lambda args: args)
+    @patch.object(archivebot.signal, 'signal')
+    @patch.object(archivebot, 'process_page')
+    @patch.object(archivebot.pywikibot, 'Page')
+    @patch.object(archivebot.pywikibot, 'Site')
+    def test_async_processes_multiple_templates(
+        self, site_mock, page_mock, process_page_mock, signal_mock,
+        handle_args_mock,
+    ) -> None:
+        """Test async processing with more than one template."""
+        archivebot.main(
+            '-async', '-page:Talk:Sandbox', 'Template:One', 'Template:Two')
+
+        self.assertEqual(process_page_mock.call_count, 2)
+        signal_mock.assert_called_once()
+
     def test_get_params_reuses_isocalendar(self) -> None:
         """Test that the ISO calendar is calculated once."""
         date = datetime(2024, 12, 30)
@@ -161,6 +178,61 @@ class TestArchiveBotFunctions(TestCase):
                 archivebot.MalformedConfigError,
                 "Couldn't parse size: 1234 567"):
             archivebot.str2size('1234 567')
+
+
+class TestArchiveBotConfigSpelling(TestCase):
+
+    """Test equivalent spellings when reading and rewriting config."""
+
+    family = 'wikipedia'
+    code = 'en'
+    dry = True
+
+    def test_config_spelling(self) -> None:
+        """Test that accepted config names can also be rewritten."""
+        for title, spelling in (
+            ('User:MiszaBot/config', 'user:MiszaBot/config'),
+            ('Template:Auto archiving', 'Auto_archiving'),
+            ('Template:Auto archiving', 'template:Auto archiving'),
+            ('User:MiszaBot/config', ' \nUser : MiszaBot/config'),
+        ):
+            with self.subTest(spelling=spelling):
+                header = ('{{' + spelling + '\n|archive = Talk:Test/Archive'
+                          '\n|algo = old(24h)\n}}')
+                archiver = object.__new__(archivebot.PageArchiver)
+                archiver.site = self.site
+                archiver.tpl = pywikibot.Page(self.site, title)
+                archiver.page = Mock(
+                    header=header,
+                    raw_extracted_templates=extract_templates_and_params(
+                        header, strip=True),
+                )
+                archiver.attributes = {}
+                archiver.load_config()
+                archiver.set_attr('counter', '2')
+                archiver.archived_threads = 2
+                archiver.archives = {}
+                archiver.comment_params = {}
+                archiver.asynchronous = False
+                archiver.info = Mock()
+                archiver.analyze_page = Mock(
+                    return_value={('duration', 'one day')})
+                with patch.object(self.site, 'mediawiki_message',
+                                  return_value=', '), \
+                        patch.object(archivebot.i18n, 'twtranslate',
+                                     return_value='Archived'):
+                    archiver.run()
+                self.assertEqual(archiver.page.header, archiver.attr2text())
+                archiver.page.update.assert_called_once_with(
+                    'Archived', asynchronous=False)
+
+    def test_title_case(self) -> None:
+        """Test that namespace case does not relax title case matching."""
+        template = pywikibot.Page(self.site, 'User:MiszaBot/config')
+        pattern = archivebot.template_title_regex(template)
+        self.assertIsNotNone(pattern.fullmatch('user:miszaBot/config'))
+        self.assertIsNone(pattern.fullmatch('User:Miszabot/config'))
+        self.assertIsNone(pattern.fullmatch('MiszaBot/config'))
 
 
 class TestArchiveBot(TestCase):

@@ -282,6 +282,8 @@ subpackage."""
 
 #: global args used by tests via pwb wrapper
 global_args: list[str] | None = None
+#: site and username selected with the global ``-user`` option
+_user_override: tuple[str, str, str] | None = None
 
 
 def set_interface(module_name: str) -> None:
@@ -780,7 +782,7 @@ def handle_args(args: Iterable[str] | None = None,
         # not the one in pywikibot.bot.
         args = pywikibot.argvu[1:]
 
-    global global_args
+    global global_args, _user_override
     global_args = args
 
     # get the name of the module calling this function. This is
@@ -883,6 +885,7 @@ def handle_args(args: Iterable[str] | None = None,
                 non_global_args.append(arg)
 
     if username:
+        _user_override = (config.family, config.mylang, username)
         config.usernames[config.family][config.mylang] = username
 
     init_handlers()

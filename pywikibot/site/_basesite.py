@@ -276,8 +276,15 @@ class BaseSite(ComparableMixin):
 
     def validLanguageLinks(self):  # noqa: N802
         """Return list of language codes to be used in interwiki links."""
-        return [lang for lang in sorted(self.codes)
-                if self.namespaces.lookup_normalized_name(lang) is None]
+        namespaces = self.namespaces
+        cached_links = getattr(self, '_valid_language_links', None)
+        if cached_links is None or cached_links[0] is not namespaces:
+            links = tuple(
+                lang for lang in sorted(self.codes)
+                if namespaces.lookup_normalized_name(lang) is None)
+            cached_links = (namespaces, links)
+            self._valid_language_links = cached_links
+        return list(cached_links[1])
 
     def _interwiki_urls(self, only_article_suffixes: bool = False):
         base_path = self.path()

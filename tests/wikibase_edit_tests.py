@@ -159,7 +159,6 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertIs(qual.on_item, item)
         self.assertIs(ref.on_item, item)
 
-    @unittest.expectedFailure  # T367323
     def test_edit_entity_new_property(self) -> None:
         """Test creating a new property using ``PropertyPage.editEntity``."""
         testsite = self.get_repo()
@@ -168,18 +167,20 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
             'labels': {
                 'en': {
                     'language': 'en',
-                    'value': 'Pywikibot test new property',
+                    'value': 'Pywikibot test new property - ' + ts,
                 }
             },
             'descriptions': {
                 'en': {
                     'language': 'en',
-                    'value': 'Pywikibot test new property - ' + ts,
+                    'value': 'Property created by Pywikibot test - ' + ts,
                 }
             }
         }
         prop = pywikibot.PropertyPage(testsite, datatype='string')
         prop.editEntity(data)
+        prop.get(force=True)
+        self.assertEqual(prop.labels['en'], data['labels']['en']['value'])
 
     def test_edit_entity_new_linked_item(self) -> None:
         """Test linking a page using a new item."""
@@ -290,17 +291,18 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
-    @unittest.expectedFailure  # T439356
     def test_Coordinate_edit(self) -> None:
         """Attempt adding a Coordinate with globe set via item."""
         testsite = self.get_repo()
         item = self._clean_item(testsite, 'P20480')
+        # Test Wikidata requires globe items from production Wikidata.
+        globe = pywikibot.ItemPage(pywikibot.Site('wikidata'), 'Q2')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P20480',
                                      datatype='globe-coordinate')
         target = pywikibot.Coordinate(site=testsite, lat=12.0, lon=13.0,
-                                      precision=0.1, globe_item=item)
+                                      precision=0.1, globe_item=globe)
         claim.setTarget(target)
         item.addClaim(claim)
 

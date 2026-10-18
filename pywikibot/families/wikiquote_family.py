@@ -50,7 +50,7 @@ class Family(family.WikimediaSubdomainFamily):
 
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
-    # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+    # & https://meta.wikimedia.org/wiki/Special:WikiSets/14
     cross_allowed = [
         'af', 'ar', 'as', 'az', 'bcl', 'be', 'bg', 'bn', 'br', 'bs', 'ca',
         'cs', 'cy', 'da', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl',

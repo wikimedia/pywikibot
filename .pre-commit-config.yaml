@@ -51,6 +51,11 @@ repos:
       - id: rst-directive-colons
       - id: rst-inline-touching-normal
       - id: text-unicode-replacement-char
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: v0.2.79
+    hooks:
+      - id: rumdl  # Lint only; add args [--fix] to auto-fix
+      - id: rumdl-fmt  # Pure format, always exits 0
   - repo: local
     hooks:
       - id: copyright
@@ -64,7 +69,7 @@ repos:
     hooks:
       - id: yamlfix
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.4
+    rev: v0.16.9
     hooks:
       - id: ruff-check
         alias: ruff
@@ -75,7 +80,7 @@ repos:
       - id: pyupgrade
         args: [--py39-plus]
   - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.3
+    rev: v2.4.0
     hooks:
       - id: autoflake
         args:
@@ -86,7 +91,7 @@ repos:
           - --remove-unused-variables
         exclude: ^pywikibot/backports\.py$
   - repo: https://github.com/PyCQA/isort
-    rev: 9.0.0b5
+    rev: 9.0.2
     hooks:
       - id: isort
         name: isort
@@ -101,7 +106,7 @@ repos:
       - id: docsig
         exclude: ^(tests|scripts)
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
+    rev: 7.4.1
     hooks:
       - id: flake8
         args:

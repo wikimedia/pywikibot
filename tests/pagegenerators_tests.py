@@ -10,6 +10,7 @@ import calendar
 import datetime
 import sys
 import unittest
+from collections import Counter
 from contextlib import suppress
 from unittest import mock
 
@@ -184,6 +185,19 @@ class TestDryPageGenerators(TestCase):
         self.assertLength(pages, 1)
         self.assertIs(pages[0], unfiltered_page)
         unfiltered_page.categories.assert_not_called()
+
+    def test_user_edit_filter_normalizes_username(self) -> None:
+        """Test matching a noncanonical username in both filter modes."""
+        edited_page = mock.Mock()
+        edited_page.contributors.return_value = Counter({'John doe': 1})
+        other_page = mock.Mock()
+        other_page.contributors.return_value = Counter({'Other user': 1})
+        pages = [edited_page, other_page]
+
+        self.assertEqual(list(pagegenerators.UserEditFilterGenerator(
+            pages, 'john_doe')), [edited_page])
+        self.assertEqual(list(pagegenerators.UserEditFilterGenerator(
+            pages, 'john_doe', skip=True)), [other_page])
 
     def test_RegexFilterPageGenerator(self) -> None:
         """Test RegexFilterPageGenerator."""
@@ -955,6 +969,145 @@ class DryFactoryGeneratorTest(TestCase):
         self.assertFalse(gf.handle_arg('-ì'))
         self.assertFalse(gf.handle_arg('ì'))
 
+    def test_titleregex_filter(self) -> None:
+        """Test -titleregex, -titleregex:not, and -titleregexnot arguments."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertTrue(gf.handle_arg('-titleregex:foo'))
+        self.assertEqual(gf.titlefilter_list, ['foo'])
+        self.assertTrue(gf.handle_arg('-titleregex:not:bar'))
+        self.assertEqual(gf.titlenotfilter_list, ['bar'])
+        self.assertTrue(gf.handle_arg('-titleregexnot:baz'))
+        self.assertEqual(gf.titlenotfilter_list, ['bar', 'baz'])
+        # Positive filter with pattern starting with literal 'not:'
+        self.assertTrue(gf._handle_titleregex('not:foo'))
+        self.assertEqual(gf.titlefilter_list, ['foo', 'not:foo'])
+        with mock.patch('pywikibot.input', return_value='not:prompted'):
+            self.assertTrue(gf.handle_arg('-titleregex'))
+        self.assertEqual(gf.titlefilter_list,
+                         ['foo', 'not:foo', 'not:prompted'])
+        # Interactive -titleregex:not
+        with mock.patch('pywikibot.input', return_value='qux'):
+            self.assertTrue(gf.handle_arg('-titleregex:not'))
+        self.assertEqual(gf.titlenotfilter_list, ['bar', 'baz', 'qux'])
+
+    def test_grep_filter(self) -> None:
+        """Test -grep, -grep:not, and -grepnot arguments."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertTrue(gf.handle_arg('-grep:foo'))
+        self.assertEqual(gf.articlefilter_list, ['foo'])
+        self.assertTrue(gf.handle_arg('-grep:not:bar'))
+        self.assertEqual(gf.articlenotfilter_list, ['bar'])
+        self.assertTrue(gf.handle_arg('-grepnot:baz'))
+        self.assertEqual(gf.articlenotfilter_list, ['bar', 'baz'])
+        # Positive filter with pattern starting with literal 'not:'
+        self.assertTrue(gf._handle_grep('not:foo'))
+        self.assertEqual(gf.articlefilter_list, ['foo', 'not:foo'])
+        with mock.patch('pywikibot.input', return_value='not:prompted'):
+            self.assertTrue(gf.handle_arg('-grep'))
+        self.assertEqual(gf.articlefilter_list,
+                         ['foo', 'not:foo', 'not:prompted'])
+        # Interactive -grep:not
+        with mock.patch('pywikibot.input', return_value='qux'):
+            self.assertTrue(gf.handle_arg('-grep:not'))
+        self.assertEqual(gf.articlenotfilter_list, ['bar', 'baz', 'qux'])
+
+    def test_onlyif_filter(self) -> None:
+        """Test -onlyif, -onlyif:not, and -onlyifnot arguments."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertTrue(gf.handle_arg('-onlyif:P1=Q2'))
+        self.assertEqual(gf.claimfilter_list, [('P1', 'Q2', {}, False)])
+        self.assertTrue(gf.handle_arg('-onlyif:not:P3=Q4'))
+        self.assertEqual(gf.claimfilter_list, [
+            ('P1', 'Q2', {}, False),
+            ('P3', 'Q4', {}, True),
+        ])
+        self.assertTrue(gf.handle_arg('-onlyifnot:P5=Q6'))
+        self.assertEqual(gf.claimfilter_list, [
+            ('P1', 'Q2', {}, False),
+            ('P3', 'Q4', {}, True),
+            ('P5', 'Q6', {}, True),
+        ])
+        # Positive filter with claim starting with literal 'not:'
+        self.assertTrue(gf._handle_onlyif('not:P7=Q8'))
+        self.assertEqual(gf.claimfilter_list, [
+            ('P1', 'Q2', {}, False),
+            ('P3', 'Q4', {}, True),
+            ('P5', 'Q6', {}, True),
+            ('not:P7', 'Q8', {}, False),
+        ])
+        # Interactive -onlyif:not
+        with mock.patch('pywikibot.input', return_value='P9=Q10'):
+            self.assertTrue(gf.handle_arg('-onlyif:not'))
+        self.assertEqual(gf.claimfilter_list, [
+            ('P1', 'Q2', {}, False),
+            ('P3', 'Q4', {}, True),
+            ('P5', 'Q6', {}, True),
+            ('not:P7', 'Q8', {}, False),
+            ('P9', 'Q10', {}, True),
+        ])
+
+    def test_grep_filter_generator(self) -> None:
+        """Test -grep, -grep:not, and -grepnot content filtering."""
+        page1 = mock.MagicMock()
+        page2 = mock.MagicMock()
+        page1.text = 'The quick brown fox'
+        page2.text = 'jumps over the lazy dog'
+
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2]]
+        gf.nopreload = True
+        self.assertTrue(gf.handle_arg('-grep:fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page1])
+
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2]]
+        gf.nopreload = True
+        self.assertTrue(gf.handle_arg('-grep:not:fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page2])
+
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2]]
+        gf.nopreload = True
+        self.assertTrue(gf.handle_arg('-grepnot:fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page2])
+
+        # Positive filter with pattern starting with literal 'not:'
+        page3 = mock.MagicMock()
+        page3.text = 'This has not:fox in it'
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2, page3]]
+        gf.nopreload = True
+        self.assertTrue(gf._handle_grep('not:fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page3])
+
+    def test_titleregex_filter_generator(self) -> None:
+        """Test -titleregex and -titleregex:not content filtering."""
+        page1 = mock.MagicMock()
+        page2 = mock.MagicMock()
+        page3 = mock.MagicMock()
+        page1.title.return_value = 'The quick brown Fox'
+        page2.title.return_value = 'jumps over the lazy dog'
+        page3.title.return_value = 'not:fox'
+
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2]]
+        gf.nopreload = True
+        self.assertTrue(gf.handle_arg('-titleregex:Fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page1])
+
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2]]
+        gf.nopreload = True
+        self.assertTrue(gf.handle_arg('-titleregex:not:Fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page2])
+
+        # Positive filter with pattern starting with literal 'not:'
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.gens = [[page1, page2, page3]]
+        gf.nopreload = True
+        self.assertTrue(gf._handle_titleregex('not:fox'))
+        self.assertEqual(list(gf.getCombinedGenerator()), [page3])
+
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
@@ -1206,6 +1359,46 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertTrue(gf.handle_arg('-start'))
         gf.handle_arg('-ns:1')
         self.assertTrue(gf.handle_arg('-titleregexnot:zzzz'))
+        gf.handle_arg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(pages, 1)
+
+    def test_titleregex_not_default(self) -> None:
+        """Test allpages generator with titleregex:not filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handle_arg('-start'))
+        # matches titles with less than 11 characters
+        self.assertTrue(gf.handle_arg('-titleregex:not:.{11,}'))
+        gf.handle_arg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertNotRegex(page.title().lower(), '.{11,}')
+
+    def test_titleregex_not_ns_after(self) -> None:
+        """Test allpages generator with titleregex:not and namespace filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handle_arg('-start'))
+        self.assertTrue(gf.handle_arg('-titleregex:not:zzzz'))
+        gf.handle_arg('-ns:1')
+        gf.handle_arg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(pages, 1)
+
+    def test_titleregex_not_ns_before(self) -> None:
+        """Test allpages generator with namespace and titleregex:not filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handle_arg('-start'))
+        gf.handle_arg('-ns:1')
+        self.assertTrue(gf.handle_arg('-titleregex:not:zzzz'))
         gf.handle_arg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
@@ -1653,6 +1846,16 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handle_arg('-page:Q15745378')
         gf.handle_arg('-onlyifnot:P1476=International Journal of Minerals\\, '
+                      'Metallurgy\\, and Materials')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertIsEmpty(set(gen))
+
+    def test_onlyif_not(self) -> None:
+        """Test -onlyif:not without qualifiers."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handle_arg('-page:Q15745378')
+        gf.handle_arg('-onlyif:not:P1476=International Journal of Minerals\\, '
                       'Metallurgy\\, and Materials')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)

@@ -254,10 +254,9 @@ def Site(code: str | None = None,  # noqa: N802
         issue_deprecation_warning(
             'wikisource:beta', 'betawikisource:en', since='11.8.0')
 
-    code_to_user = {}
-    if '*' in _config.usernames:  # T253127: usernames is a defaultdict
-        code_to_user = _config.usernames['*'].copy()
-    code_to_user.update(_config.usernames[family_name])
+    # T253127: Do not insert a missing wildcard into the defaultdict.
+    code_to_user = (_config.usernames.get('*', {})
+                    | _config.usernames[family_name])
     user = user or code_to_user.get(code) or code_to_user.get('*')
 
     if not isinstance(interface, type):

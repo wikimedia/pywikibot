@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 import pywikibot
 from pywikibot.site import BaseSite
@@ -205,6 +205,207 @@ class TestCategoryArguments(TestCase):
         self.assertIsNone(result)
         factory_class.assert_not_called()
         self.assertEqual(settings.unknown, ['-page:Example'])
+
+
+class TestCategoryBotConstruction(TestCase):
+
+    """Test construction of category action bots."""
+
+    net = False
+
+    @patch.object(category, 'CategoryAddBot')
+    def test_build_add_bot(self, bot_class) -> None:
+        """Test add bot construction and its default generator."""
+        generator = object()
+        generator_factory = Mock()
+        generator_factory.getCombinedGenerator.side_effect = [
+            None, generator]
+        settings = category._CategorySettings(
+            action='add',
+            options={'to': 'New'},
+            summary='summary',
+            sort_by_last_name=True,
+            create_pages=True,
+            follow_redirects=True,
+        )
+
+        result = category._build_add_bot(settings, generator_factory)
+
+        self.assertIs(result, bot_class.return_value)
+        self.assertEqual(
+            generator_factory.getCombinedGenerator.call_args_list,
+            [call(preload=True), call(preload=True)],
+        )
+        generator_factory.handle_arg.assert_called_once_with('-links')
+        bot_class.assert_called_once_with(
+            generator,
+            newcat='New',
+            sort_by_last_name=True,
+            create=True,
+            comment='summary',
+            follow_redirects=True,
+        )
+
+    @patch.object(category, 'CategoryMoveRobot')
+    @patch.object(category.pywikibot, 'input', return_value='Old')
+    def test_build_remove_bot(self, input_mock, bot_class) -> None:
+        """Test remove bot construction and its source prompt."""
+        generator = object()
+        generator_factory = Mock()
+        generator_factory.getCombinedGenerator.return_value = generator
+        settings = category._CategorySettings(
+            action='remove',
+            batch=True,
+            summary='summary',
+            inplace=True,
+            delete_empty_cat=False,
+            title_regex='title',
+            history=True,
+            pagesonly=True,
+            use_deletion_summary=False,
+        )
+
+        result = category._build_remove_bot(settings, generator_factory)
+
+        self.assertIs(result, bot_class.return_value)
+        input_mock.assert_called_once_with(
+            'Please enter the name of the category that should be removed:')
+        bot_class.assert_called_once_with(
+            oldcat='Old',
+            batch=True,
+            comment='summary',
+            inplace=True,
+            delete_oldcat=False,
+            title_regex='title',
+            history=True,
+            pagesonly=True,
+            deletion_comment=False,
+            generator=generator,
+        )
+
+    @patch.object(category.pywikibot, 'error')
+    @patch.object(category.pywikibot, 'input', side_effect=['Old', 'New'])
+    def test_resolve_equal_move_categories(
+        self,
+        input_mock,
+        error_mock,
+    ) -> None:
+        """Test prompting again for equal move categories."""
+        settings = category._CategorySettings(
+            action='move', options={'from': 'Same', 'to': 'Same'})
+
+        result = category._resolve_move_categories(settings)
+
+        self.assertTrue(result)
+        self.assertEqual(settings.options, {'from': 'Old', 'to': 'New'})
+        error_mock.assert_called_once_with(
+            '-from and -to arguments are equal, please retry.')
+        self.assertEqual(input_mock.call_count, 2)
+
+        settings = category._CategorySettings(action='move')
+        with patch.object(category.pywikibot, 'input', return_value=''):
+            result = category._resolve_move_categories(settings)
+        self.assertFalse(result)
+
+    def test_build_move_bot(self) -> None:
+        """Test move bot construction."""
+        original_class = category.CategoryMoveRobot
+        bot = Mock()
+        bot_class = Mock(return_value=bot)
+        bot_class.DELETION_COMMENT_SAME_AS_EDIT_COMMENT = (
+            original_class.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
+        )
+        bot_class.DELETION_COMMENT_AUTOMATIC = (
+            original_class.DELETION_COMMENT_AUTOMATIC
+        )
+        generator = object()
+        generator_factory = Mock()
+        generator_factory.getCombinedGenerator.return_value = generator
+        settings = category._CategorySettings(
+            action='move',
+            options={'from': 'Old', 'to': 'New'},
+            batch=True,
+            summary='summary',
+            inplace=True,
+            delete_empty_cat=False,
+            title_regex='title',
+            history=True,
+            pagesonly=True,
+            wikibase=False,
+            allow_split=True,
+            move_together=True,
+            keep_sortkey=True,
+        )
+
+        with patch.object(category, 'CategoryMoveRobot', bot_class):
+            result = category._build_move_bot(settings, generator_factory)
+
+            self.assertIs(result, bot)
+            bot_class.assert_called_once_with(
+                oldcat='Old',
+                newcat='New',
+                batch=True,
+                comment='summary',
+                inplace=True,
+                delete_oldcat=False,
+                title_regex='title',
+                history=True,
+                pagesonly=True,
+                deletion_comment=(
+                    original_class.DELETION_COMMENT_SAME_AS_EDIT_COMMENT),
+                wikibase=False,
+                allow_split=True,
+                move_together=True,
+                keep_sortkey=True,
+                generator=generator,
+            )
+
+            bot_class.reset_mock()
+            settings.use_deletion_summary = False
+            result = category._build_move_bot(settings, generator_factory)
+
+        self.assertIs(result, bot)
+        self.assertEqual(
+            bot_class.call_args.kwargs['deletion_comment'],
+            original_class.DELETION_COMMENT_AUTOMATIC,
+        )
+
+    def test_build_bot_dispatch(self) -> None:
+        """Test dispatching every category action to its builder."""
+        generator_factory = Mock()
+        category_database = Mock()
+        builder_names = {
+            'add': '_build_add_bot',
+            'clean': '_build_clean_bot',
+            'listify': '_build_listify_bot',
+            'move': '_build_move_bot',
+            'remove': '_build_remove_bot',
+            'tidy': '_build_tidy_bot',
+            'tree': '_build_tree_bot',
+        }
+
+        for action, builder_name in builder_names.items():
+            with (
+                self.subTest(action=action),
+                patch.object(category, builder_name) as builder,
+            ):
+                settings = category._CategorySettings(action=action)
+
+                result = category._build_bot(
+                    settings, generator_factory, category_database)
+
+                self.assertIs(result, builder.return_value)
+                if action == 'tidy':
+                    builder.assert_called_once_with(
+                        settings, generator_factory, category_database)
+                elif action == 'tree':
+                    builder.assert_called_once_with(
+                        settings, category_database)
+                elif action in category._GENERATOR_ACTIONS:
+                    builder.assert_called_once_with(
+                        settings, generator_factory)
+                else:
+                    builder.assert_called_once_with(settings)
 
 
 if __name__ == '__main__':

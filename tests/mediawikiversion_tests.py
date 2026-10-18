@@ -76,9 +76,11 @@ class TestMediaWikiVersion(TestCase):
         self._version_check('1.33alpha', (1, 33), (1, ), 'alpha')
         self._version_check('1.27.0-alpha', (1, 27, 0), (1, ), '-alpha')
         self._version_check('1.33beta1', (1, 33), (2, 1), 'beta1')
+        self._version_check('1.35-beta.1', (1, 35), (2, 1), '-beta.1')
         self._version_check('1.33rc1', (1, 33), (3, 1), 'rc1')
         self._version_check('1.33-rc1', (1, 33), (3, 1), '-rc1')
         self._version_check('1.33-rc.1', (1, 33), (3, 1), '-rc.1')
+        self._version_check('1.35-rc-1', (1, 35), (3, 1), '-rc-1')
         self._version_check('1.33text', (1, 33), (4, ), 'text')
 
     def test_invalid_versions(self) -> None:
@@ -96,7 +98,7 @@ class TestMediaWikiVersion(TestCase):
                 self.INVALID_VERSION_RE):
             MediaWikiVersion('1.missing')
         with self.assertRaisesRegex(
-                AssertionError,
+                ValueError,
                 'Found "wmf" in "wmf-1"'):
             MediaWikiVersion('1.33wmf-1')
 

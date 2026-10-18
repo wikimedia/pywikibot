@@ -7,6 +7,7 @@
 """Test setup.py."""
 from __future__ import annotations
 
+import re
 import sys
 import unittest
 from unittest.mock import patch
@@ -85,8 +86,15 @@ class TestSetup(TestCase):
     def test_read_desc(self) -> None:
         """Test :func:`setup.read_desc` function."""
         desc = setup.read_desc('README.rst')
-        coc = setup.read_desc('CODE_OF_CONDUCT.rst')
-        self.assertIn(coc, desc)
+        road = setup.read_desc('ROADMAP.rst')
+        # read_desc() removes Sphinx roles.
+        # Test text before the first and after the last occurrence.
+        matches = list(re.finditer(r':[a-z]+:`[^`]+`', road, flags=re.DOTALL))
+        self.assertIsNotNone(matches)
+        first = matches[0].start()
+        last = matches[-1].end()
+        self.assertIn(road[:first], desc)
+        self.assertIn(road[last:], desc)
 
     def test_get_pywikibot_packages(self) -> None:
         """Test :func:`setup.get_packages` function for pywikibot."""

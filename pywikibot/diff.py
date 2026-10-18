@@ -170,7 +170,7 @@ class Hunk:
                 return f'<<{self.colors[color]}>>{line}<<default>>'
             return line
 
-        colored_line = ''
+        colored_line = []
         color_closed = True
         for char, char_ref in zip_longest(
             line, line_ref.strip(), fillvalue=' '
@@ -187,12 +187,12 @@ class Hunk:
             elif char_ref == ' ':
                 char_tagged = f'<<default>>{char}'
                 color_closed = True
-            colored_line += char_tagged
+            colored_line.append(char_tagged)
 
         if not color_closed:
-            colored_line += '<<default>>'
+            colored_line.append('<<default>>')
 
-        return colored_line
+        return ''.join(colored_line)
 
     def apply(self) -> Sequence[str]:
         """Turn a into b for this hunk."""

@@ -172,9 +172,12 @@ class classproperty:  # noqa: N801
             def bar(cls):  # a class property method
                 return cls._bar
 
-    Foo.bar gives 'baz'.
+    Accessing :code:`Foo.bar` gives :code:`'baz'`. Setting a class
+    property on an instance raises :exc:`AttributeError`.
 
     .. version-added:: 3.0
+    .. version-changed:: 11.9
+       Prevent setting a class property on an instance.
     """
 
     def __init__(self, cls_method) -> None:
@@ -201,6 +204,11 @@ class classproperty:  # noqa: N801
             return self
 
         return self.method(owner)
+
+    def __set__(self, instance, value) -> None:
+        """Prevent setting a class property on an instance."""
+        raise AttributeError(
+            f"can't set attribute {self.method.__name__!r}")
 
 
 class suppress_warnings(catch_warnings):  # noqa: N801
@@ -451,7 +459,8 @@ class MediaWikiVersion:
 
     The version mainly consists of digits separated by periods. After
     that is a suffix which may only be 'wmf<number>', 'alpha',
-    'beta<number>' or '-rc.<number>' (the - and . are optional). They
+    'beta<number>' or 'rc<number>'. Beta and rc suffixes may have a
+    leading hyphen and a period or hyphen before the number. They
     are considered from old to new in that order with a version number
     without suffix is considered the newest. This secondary difference
     is stored in an internal _dev_version attribute.
@@ -470,10 +479,15 @@ class MediaWikiVersion:
     .. version-changed:: 6.1
        Dependency of distutils was dropped because the package will be
        removed with Python 3.12.
+    .. version-changed:: 11.9
+       Beta and rc suffixes accept period and hyphen separators.
+       Malformed prerelease suffixes raise ValueError instead of
+       AssertionError, including when Python optimizations are enabled.
     """
 
     MEDIAWIKI_VERSION = re.compile(
-        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?')
+        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|'
+        r'-?beta[.-]?(\d+)|-?rc[.-]?(\d+)|.*)?')
 
     def __init__(self, version_str: str) -> None:
         """Initializer.
@@ -506,11 +520,12 @@ class MediaWikiVersion:
         else:
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
                 # if any of those pops up here our parser has failed
-                assert handled not in version_match[2], \
-                    f'Found "{handled}" in "{version_match[2]}"'
+                if handled in version_match[2]:
+                    raise ValueError(
+                        f'Found "{handled}" in "{version_match[2]}"')
             if version_match[2]:
                 pywikibot.logging.debug(
-                    'Additional unused version part {version_match[2]!r}')
+                    f'Additional unused version part {version_match[2]!r}')
             self._dev_version = (4, )
 
         self.suffix = version_match[2] or ''
@@ -904,6 +919,8 @@ def compute_file_hash(filename: str | os.PathLike,
     .. version-changed:: 8.2
        The *sha* parameter may also be a hash constructor, or a callable
        that returns a hash object.
+    .. version-changed:: 11.9
+       A zero *bytes_to_read* hashes no file contents.
 
 
     :param filename: Filename path
@@ -918,13 +935,14 @@ def compute_file_hash(filename: str | os.PathLike,
         ``lambda: hashlib.sha1()``.
     :param bytes_to_read: Only the first bytes_to_read will be
         considered; if file size is smaller, the whole file will be
-        considered.
+        considered. If None, the whole file is considered.
     """
     with open(filename, 'rb') as f:
         if PYTHON_VERSION < (3, 11) or bytes_to_read is not None:
             digest = sha() if callable(sha) else hashlib.new(sha)
             size = os.path.getsize(filename)
-            bytes_to_read = min(bytes_to_read or size, size)
+            bytes_to_read = (size if bytes_to_read is None
+                             else min(bytes_to_read, size))
             step = 1 << 20
             while bytes_to_read > 0:
                 read_bytes = f.read(min(bytes_to_read, step))

@@ -71,11 +71,26 @@ class TestSectionFunctions(TestCase):
         self.assertNotContains('Minor_Edits',
                                'section hashes are case-sensitive')
 
-    @unittest.expectedFailure  # T133276
     def test_encoded_chars_in_section(self) -> None:
         """Test encoded chars in section."""
         self.assertContains('Talk_.28discussion.29_pages',
                             'As used in the TOC')
+        self.assertContains('.5B.5BWiki_markup.5D.5D')
+        self.assertTrue(textlib.does_text_contain_section(
+            '== آزمون ==', '.D8.A2.D8.B2.D9.85.D9.88.D9.86'))
+        self.assertTrue(textlib.does_text_contain_section(
+            '== Literal .28 title ==', 'Literal_.28_title'))
+        self.assertTrue(textlib.does_text_contain_section(
+            '== Version .28 (notes) ==', 'Version_.28_.28notes.29'))
+        self.assertTrue(textlib.does_text_contain_section(
+            '== Invalid .FF title ==', 'Invalid_.FF_title'))
+        self.assertFalse(textlib.does_text_contain_section(
+            '== .27Version (notes) ==', 'Version_.28notes.29'))
+        self.assertFalse(textlib.does_text_contain_section(
+            '== .5B.5B:Help (notes) ==', '.5B.5BHelp_.28notes.29'))
+        self.assertTrue(textlib.does_text_contain_section(
+            '===Version (notes)====', 'Version_.28notes.29.3D'))
+        self.assertNotContains('Talk_%28discussion%29_pages')
 
     def test_underline_characters_in_section(self) -> None:
         """Test with underline chars in section."""
@@ -1551,6 +1566,30 @@ class TestMultiTemplateMatchBuilder(DefaultSiteTestCase):
                 self.assertEqual(bool(re.search(builder.pattern('Quick'),
                                                 string % (t, q))),
                                  self._template_not_case_sensitive)
+
+
+class TestRemoveLanguageLinks(TestCase):
+
+    """Test language link removal with cached language data."""
+
+    net = False
+
+    def test_namespace_replacement(self) -> None:
+        """Refresh language data when the namespace mapping is replaced."""
+        site = pywikibot.site.BaseSite('en', 'wikipedia')
+        retained = '<nowiki>[[yo:Hidden]]</nowiki>\n[[:yo:Inline]]'
+        text = retained + '\n[[yo:Page]]'
+        self.assertEqual(textlib.removeLanguageLinks(text, site), retained)
+
+        links = site.validLanguageLinks()
+        links.remove('yo')
+        self.assertIn('yo', site.validLanguageLinks())
+
+        namespaces = pywikibot.site.Namespace.builtin_namespaces()
+        namespaces[100] = pywikibot.site.Namespace(100, 'Yo')
+        site._namespaces = pywikibot.site.NamespacesDict(namespaces)
+        self.assertNotIn('yo', site.validLanguageLinks())
+        self.assertEqual(textlib.removeLanguageLinks(text, site), text)
 
 
 class TestGetLanguageLinks(SiteAttributeTestCase):

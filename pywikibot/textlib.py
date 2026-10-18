@@ -13,8 +13,10 @@ from collections import OrderedDict, deque
 from collections.abc import Callable, Container, Iterable, Mapping, Sequence
 from contextlib import closing, suppress
 from dataclasses import dataclass
+from functools import lru_cache
 from html.parser import HTMLParser
 from typing import NamedTuple
+from urllib.parse import quote
 
 import pywikibot
 from pywikibot.backports import pairwise
@@ -469,7 +471,7 @@ def replaceExcept(text: str,
             # On the other hand, this approach does not work because it
             # can't handle lookahead or lookbehind (see bug T123185).
             # So we have to process the group references manually.
-            replacement = ''
+            replacement_parts = []
 
             group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
             last = 0
@@ -479,13 +481,14 @@ def replaceExcept(text: str,
                     group_id = int(group_id)
 
                 try:
-                    replacement += new[last:group_match.start()]
-                    replacement += match[group_id] or ''
+                    replacement_parts.append(new[last:group_match.start()])
+                    replacement_parts.append(match[group_id] or '')
                 except IndexError:
                     raise IndexError(f'Invalid group reference: {group_id}\n'
                                      f'Groups found: {match.groups()}')
                 last = group_match.end()
-            replacement += new[last:]
+            replacement_parts.append(new[last:])
+            replacement = ''.join(replacement_parts)
 
         text = text[:match_start] + replacement + text[match.end():]
 
@@ -1380,9 +1383,9 @@ def extract_sections(
     if footer:
         if sections:
             sections[-1] = Section(
-                sections[-1].title, last_section_content[:-len(footer)])
+                sections[-1].title, last_section_content.removesuffix(footer))
         else:
-            header = header[:-len(footer)]
+            header = header.removesuffix(footer)
 
     return Content(header, sections, footer)
 
@@ -1473,6 +1476,14 @@ def getLanguageLinks(
     return result
 
 
+@lru_cache
+def _language_links_regex(languages: tuple[str, ...]) -> re.Pattern[str]:
+    """Cache the removal regex for a site's language codes."""
+    codes = '|'.join(languages)
+    return re.compile(rf'\[\[({codes})\s?:[^\[\]\n]*\]\][\s]*',
+                      re.IGNORECASE)
+
+
 def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
     """Return text with all inter-language links removed.
 
@@ -1490,12 +1501,11 @@ def removeLanguageLinks(text: str, site=None, marker: str = '') -> str:
         site = pywikibot.Site()
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
-    languages = '|'.join(site.validLanguageLinks()
-                         + list(site.family.obsolete))
+    languages = (tuple(site.validLanguageLinks())
+                 + tuple(site.family.obsolete))
     if not languages:
         return text
-    interwikiR = re.compile(rf'\[\[({languages})\s?:[^\[\]\n]*\]\][\s]*',
-                            re.IGNORECASE)
+    interwikiR = _language_links_regex(languages)
     text = replaceExcept(text, interwikiR, '',
                          ['comment', 'math', 'nowiki', 'pre',
                           'syntaxhighlight'],
@@ -1699,7 +1709,7 @@ def interwikiSort(sites, insite=None):
     if putfirst:
         # In this case I might have to change the order
         firstsites = []
-        validlanglinks = insite.validLanguageLinks()
+        validlanglinks = frozenset(insite.validLanguageLinks())
         for code in putfirst:
             if code in validlanglinks:
                 site = insite.getSite(code=code)
@@ -2190,15 +2200,33 @@ def does_text_contain_section(pagetext: str, section: str) -> bool:
     section with or without a preceding colon which is required for a
     text link e.g. for categories and files.
 
+    Legacy dot-escaped titles are matched literally against encoded
+    heading wikitext, treating spaces and underscores alike.
+
+    .. version-changed:: 11.9
+       Legacy dot-escaped section titles are supported.
+
     :param pagetext: The wikitext of a page
     :param section: A section of a page including wikitext markups
     """
     # match preceding colon for text links
-    section = re.sub(r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
+    section_regex = re.sub(
+        r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
-    section = re.sub(r'\\?[ _]', '[ _]', section)
-    m = re.search(f"=+[ ']*{section}[ ']*=+", pagetext)
-    return bool(m)
+    section_regex = re.sub(r'\\?[ _]', '[ _]', section_regex)
+    if re.search(f"=+[ ']*{section_regex}[ ']*=+", pagetext):
+        return True
+
+    # Encode headings instead of decoding ambiguous literal dot sequences.
+    section = section.replace(' ', '_')
+    for match in get_regexes('header')[0].finditer(pagetext):
+        heading = Section(match[1], '').heading.replace(' ', '_')
+        # Legacy anchors escape '~', which quote() always leaves safe.
+        encoded = quote(heading, safe=':').replace('~', '%7E')
+        if encoded.replace('%', '.') == section:
+            return True
+
+    return False
 
 
 def reformat_ISBNs(text: str, match_func) -> str:
@@ -2276,7 +2304,7 @@ class TimeStripper:
                 # in some cases month in ~~~~ might end without dot even if
                 # site.months_names do not.
                 if short.endswith('.'):
-                    self.origNames2monthNum[func(short[:-1])] = n
+                    self.origNames2monthNum[func(short.removesuffix('.'))] = n
 
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')
@@ -2326,13 +2354,13 @@ class TimeStripper:
 
         It does so to prevent spurious earlier matches.
         """
-        all_matches = list(pat.finditer(txt))
-        cnt = len(all_matches)
+        cnt = 0
+        m = None
+        for m in pat.finditer(txt):
+            cnt += 1
 
-        if not cnt:
+        if m is None:
             return (txt, None)
-
-        m = all_matches[-1]
 
         def marker(m: re.Match[str]):
             """Replace exactly the same number of matched characters.
