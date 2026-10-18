@@ -141,6 +141,7 @@ H
 ::
 
     Harshita
+    Harshy
     Hazard-SJ
     Huji
     Homeboy445
@@ -268,6 +269,7 @@ P
     Philip Tzou
     pietrodn
     Platonides
+    Prakhar0804
     Priyanka
     Priyankar Shukla
     Purodha B Blissenbach
@@ -303,6 +305,7 @@ S
 ::
 
     Sanjai Siddharthan
+    Sanskar Dubey
     Sarthak Singh
     Sébastien Santoro
     Sergio Santoro
@@ -356,6 +359,7 @@ V
 
     Vadiraja K
     Vadivelu Murali Pranavan
+    Varshitha
     VcamX
     Victor Vasiliev
     Vldandrew
