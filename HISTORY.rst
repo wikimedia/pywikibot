@@ -1,9 +1,46 @@
 Release History
 ===============
 
+11.9.0
+------
+*18 October 2026*
+
+* Add support for mlwwikivoyage. (:phab:`T441175`)
+* Update translations (i18n).
+* Various performance, stability, and code quality improvements.
+* Fix ZIP discovery and duplicate import paths in :func:`config.register_families_folder`.
+* Unify negative :ref:`page generator options<GENERATOR OPTIONS>`. (:phab:`T219282`)
+* Keep the sign of negative POSIX :class:`timestamps<<pywikibot.time.Timestamp>`.
+* Use the :attr:`page.BasePage.site` in :meth:`page.BasePage.change_category` when calling
+  :func:`textlib.replaceCategoryLinks` to respect category namespaces and footer rules.
+* Validate :attr:`pywikibot.Link.title` length in UTF-8 bytes within :meth:`pywikibot.Link.parse`.
+* Normalize usernames in :func:`pagegenerators.UserEditFilterGenerator` to match
+  canonical API names.
+* Verify zero-byte stashes against the empty hash in :func:`tools.compute_file_hash`.
+* Accept optional leading hyphens and period or hyphen separators in beta/rc suffixes
+  in :class:`tools.MediaWikiVersion`. Raise ValueError instead of AssertionError
+  for malformed suffixes.
+* Prevent setting a class property on an instance with :class:`tools.classproperty`.
+* Make API cache writes of :class:`data.api.CachedRequest` atomic and failure-safe.
+  (:phab:`T438266`)
+* Map claims for wbeditentity of :class:`page.MediaInfo`. (:phab:`T376955`)
+* Avoid reading streamed HTTP responses to detect encoding in :func:`comms.http.fetch`.
+* Add *timespec* parameter to :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>`
+  method. (:phab:`T439983`, :phab:`T440120`)
+* Allow :ref:`global -user option<Global options>` to override OAuth authentication.
+  (:phab:`T420084`)
+* The *force* parameter of :class:`pywikibot.User` methods was renamed to
+  *refresh* (:phab:`T433225`)
+* Support custom Timestamp ISO separators and restores round-trip compatibility
+  between :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>` and
+  :meth:`Timestamp.fromISOformat()<pywikibot.time.Timestamp.fromISOformat>`. (:phab:`T396723`)
+* Suggest installing all requirements for missing dependencies with
+  :mod:`pwb<pywikibot.scripts.wrapper>` wrapper.
+* Support legacy encoded section titles. (:phab:`T133276`)
+
+
 11.8.0
 ------
-
 *29 September 2026*
 
 * Various performance, stability, and code quality improvements.

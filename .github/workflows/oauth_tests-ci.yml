@@ -23,20 +23,11 @@ jobs:
   build:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     continue-on-error: ${{ matrix.experimental || false }}
-    timeout-minutes: 6
+    timeout-minutes: 7
     strategy:
       fail-fast: false
       matrix:
-        python-version:
-          - pypy3.9
-          - pypy3.11
-          - '3.9'
-          - '3.10'
-          - '3.11'
-          - '3.12'
-          - '3.13'
-          - '3.14'
-          - 3.15-dev
+        python-version: [pypy3.9, pypy3.11, '3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
         family: [wikipedia]
         code: [test]
         domain: [test.wikipedia.org]
