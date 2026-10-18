@@ -449,6 +449,9 @@ def UserEditFilterGenerator(
     ignored. If skip is set, pages edited by the given user are ignored
     otherwise only pages edited by this user are given back.
 
+    .. version-changed:: 11.9
+       Normalize *username* to match canonical API names.
+
     :param generator: A generator object
     :param username: User name which edited the page
     :param timestamp: Ignore edits which are older than this timestamp

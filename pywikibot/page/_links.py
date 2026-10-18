@@ -366,6 +366,9 @@ class Link(BaseLink):
         """Parse wikitext of the link.
 
         Called internally when accessing attributes.
+
+        .. version-changed:: 11.9
+           Validate :attr:`title` length in UTF-8 bytes.
         """
         self._site = self._source
         self._namespace = self._defaultns

@@ -7,6 +7,7 @@ Scripts Changelog
 archivebot
 ^^^^^^^^^^
 
+* Recreate async executor per template.
 * Accept equivalent namespace case, spaces, and underscores when locating
   the configuration template for rewriting.
 
