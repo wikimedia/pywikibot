@@ -1,7 +1,8 @@
 Release 11.10
 =============
 
-* (no changes yet)
+* Avoid mutating class attribute :attr:`BaseBot.available_options<bot.BaseBot.available_options>`
+  with :attr:`BaseBot.update_options<bot.BaseBot.update_options>`. (:phab:`T439883`)
 
 Deprecations
 ============

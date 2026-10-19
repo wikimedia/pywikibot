@@ -17,6 +17,7 @@ from unittest.mock import patch
 import pywikibot
 import pywikibot.bot
 from pywikibot import config, i18n
+from pywikibot.specialbots import UploadRobot
 from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 from tests.utils import execute
 
@@ -383,6 +384,109 @@ class TestOptionHandler(TestCase):
         self.assertEqual(oh.opt.baz, 'Hey')
         self.assertEqual(oh.opt['baz'], 'Hey')
         self.assertNotIn('baz', oh.opt.__dict__)
+
+
+class BotWithUpdateOptions(pywikibot.bot.BaseBot):
+
+    """A derived BaseBot class with update_options."""
+
+    update_options = {
+        'always': True,
+        'custom_opt': 42,
+    }
+
+
+class BotWithAvailableAndUpdateOptions(pywikibot.bot.BaseBot):
+
+    """A derived BaseBot class with available_options and update_options."""
+
+    available_options = {
+        'sub_opt': 1,
+    }
+    update_options = {
+        'sub_opt': 2,
+        'new_opt': 3,
+    }
+
+
+class TestBotOptions(TestCase):
+
+    """Test BaseBot available_options and update_options isolation."""
+
+    dry = True
+    family = 'wikipedia'
+    code = 'test'
+
+    def setUp(self) -> None:
+        """Capture BaseBot.available_options state before test."""
+        super().setUp()
+        self._orig_basebot_options = (
+            pywikibot.bot.BaseBot.available_options.copy())
+
+    def tearDown(self) -> None:
+        """Restore BaseBot.available_options state after test."""
+        pywikibot.bot.BaseBot.available_options = self._orig_basebot_options
+        super().tearDown()
+
+    def test_update_options_isolation(self) -> None:
+        """Test that update_options does not mutate available_options."""
+        self.assertIn('always', pywikibot.bot.BaseBot.available_options)
+        self.assertFalse(pywikibot.bot.BaseBot.available_options['always'])
+        self.assertNotIn('custom_opt', pywikibot.bot.BaseBot.available_options)
+
+        bot1 = BotWithUpdateOptions()
+        self.assertTrue(bot1.opt.always)
+        self.assertEqual(bot1.opt.custom_opt, 42)
+
+        # BaseBot.available_options must remain unmutated (T439883)
+        self.assertFalse(pywikibot.bot.BaseBot.available_options['always'])
+        self.assertNotIn('custom_opt', pywikibot.bot.BaseBot.available_options)
+
+        # A subsequently instantiated bot retains the default
+        bot2 = pywikibot.bot.BaseBot()
+        self.assertFalse(bot2.opt.always)
+        self.assertNotIn('custom_opt', bot2.opt)
+
+        # Subclass-specific and caller-provided options behave as intended
+        bot3 = BotWithUpdateOptions(always=False, custom_opt=100)
+        self.assertFalse(bot3.opt.always)
+        self.assertEqual(bot3.opt.custom_opt, 100)
+        self.assertFalse(pywikibot.bot.BaseBot.available_options['always'])
+
+    def test_upload_robot_after_update_options(self) -> None:
+        """Test UploadRobot initialization after bot with update_options."""
+        # Instantiate a bot that overrides 'always' in update_options
+        BotWithUpdateOptions()
+
+        # Simulate UploadRobot initialization from data_ingestion.py (T439883)
+        bot = UploadRobot(url='https://example.com/test.png',
+                          description='test description',
+                          use_filename='Test.png',
+                          keep_filename=True,
+                          verify_description=False,
+                          target_site=self.get_site())
+        self.assertFalse(bot.opt.always)
+
+    def test_subclass_options_isolation(self) -> None:
+        """Test subclass with available_options and update_options."""
+        self.assertEqual(
+            BotWithAvailableAndUpdateOptions.available_options,
+            {'sub_opt': 1})
+
+        bot1 = BotWithAvailableAndUpdateOptions()
+        self.assertEqual(bot1.opt.sub_opt, 2)
+        self.assertEqual(bot1.opt.new_opt, 3)
+        self.assertEqual(
+            BotWithAvailableAndUpdateOptions.available_options,
+            {'sub_opt': 1})
+        self.assertFalse(pywikibot.bot.BaseBot.available_options['always'])
+
+        bot2 = BotWithAvailableAndUpdateOptions(sub_opt=99, new_opt=100)
+        self.assertEqual(bot2.opt.sub_opt, 99)
+        self.assertEqual(bot2.opt.new_opt, 100)
+        self.assertEqual(
+            BotWithAvailableAndUpdateOptions.available_options,
+            {'sub_opt': 1})
 
 
 if __name__ == '__main__':

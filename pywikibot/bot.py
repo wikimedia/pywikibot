@@ -1192,6 +1192,10 @@ class BaseBot(OptionHandler):
     `self.available_options.update(<dict>)` initializer in such case.
 
     .. version-added:: 6.4
+    .. version-changed:: 11.10
+       :attr:`available_options` is copied in :meth:`__init__` before updating
+       with :attr:`update_options` to prevent modifying class attributes
+       (:phab:`T439883`).
     """
 
     _current_page: pywikibot.page.BasePage | None = None
@@ -1211,6 +1215,7 @@ class BaseBot(OptionHandler):
             else:
                 self.generator: Iterable = gen
 
+        self.available_options = self.available_options.copy()
         self.available_options.update(self.update_options)
         super().__init__(**kwargs)
 
