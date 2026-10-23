@@ -55,6 +55,7 @@ from collections import Counter
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.tools import cached
 
 
 class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
@@ -107,6 +108,7 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
         self.summary = editcomment.get(lang, editcomment['en'])
 
     @property
+    @cached
     def generator(self):
         """Generator."""
         gen = self.site.allpages(start=self.opt.start, namespace=10,
@@ -138,7 +140,7 @@ class ParserFunctionCountBot(SingleSiteBot, ExistingPageBot):
 
         if self.opt.nosort and self.opt.first \
            and len(self.results) >= self.opt.first:
-            self.stop()
+            self.generator.close()
 
     def teardown(self) -> None:
         """Final processing."""
