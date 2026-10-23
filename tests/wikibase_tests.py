@@ -27,6 +27,7 @@ from pywikibot.page import (
     ItemPage,
     LexemeForm,
     LexemePage,
+    LexemeSense,
     MediaInfo,
     PropertyPage,
     WikibasePage,
@@ -1305,6 +1306,67 @@ class TestLexemeSave(WikidataTestCase):
         self.assertIs(claim.on_item, item)
         self.assertEqual(item.latest_revision_id, 2)
         self.assertNotIn('_content', item.__dict__)
+
+
+class TestLexemeSubEntityJSON(WikidataTestCase):
+
+    """Test API serialization of forms and senses."""
+
+    dry = True
+
+    def test_term_removal(self) -> None:
+        """Use removal markers only for deleted representations or glosses."""
+        for cls, entity_id, key in (
+            (LexemeForm, 'L1-F1', 'representations'),
+            (LexemeSense, 'L1-S1', 'glosses'),
+        ):
+            with self.subTest(cls=cls):
+                baseline = {
+                    'id': entity_id, 'grammaticalFeatures': [],
+                    key: {'en': {'language': 'en', 'value': 'colour'},
+                          'fr': {'language': 'fr', 'value': 'couleur'}},
+                    'claims': {},
+                }
+                entity = cls.fromJSON(self.get_repo(), baseline)
+                self.assertEqual(entity.toJSON(diffto=baseline),
+                                 {'id': entity_id})
+                del getattr(entity, key)['fr']
+                getattr(entity, key)['en'] = 'changed'
+                self.assertEqual(entity.toJSON(diffto=baseline), {
+                    'id': entity_id,
+                    key: {'en': {'language': 'en', 'value': 'changed'},
+                          'fr': {'language': 'fr', 'remove': ''}},
+                })
+                self.assertIn('fr', baseline[key])
+
+    def test_features_and_new_form(self) -> None:
+        """Preserve new form fields and serialize feature clearing."""
+        form = LexemeForm(self.get_repo())
+        form.representations['en'] = 'colour'
+        expected = {
+            'representations': {'en': {'language': 'en', 'value': 'colour'}},
+            'grammaticalFeatures': [],
+        }
+        self.assertEqual(form.toJSON(), expected)
+        self.assertEqual(form.toJSON(), expected)
+        form.grammaticalFeatures.update(
+            ItemPage(self.get_repo(), qid) for qid in ('Q2', 'Q1'))
+        baseline = form.toJSON()
+        self.assertEqual(baseline['grammaticalFeatures'], ['Q1', 'Q2'])
+        baseline['grammaticalFeatures'].reverse()
+        self.assertEqual(form.toJSON(diffto=baseline), {})
+        form.grammaticalFeatures.clear()
+        self.assertEqual(form.toJSON(diffto=baseline),
+                         {'grammaticalFeatures': []})
+        baseline['id'] = 'L1-F1'
+        for assign in (False, True):
+            saved = LexemeForm.fromJSON(self.get_repo(), baseline)
+            if assign:
+                saved.grammaticalFeatures = set()
+            else:
+                saved.grammaticalFeatures.clear()
+            self.assertEqual(saved.toJSON(diffto=baseline),
+                             {'id': 'L1-F1', 'grammaticalFeatures': []})
 
 
 class TestMediaInfoNormalizeData(TestCase):

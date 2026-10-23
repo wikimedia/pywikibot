@@ -2540,6 +2540,8 @@ class LexemeSubEntity(WikibaseEntity):
         """Initializer."""
         super().__init__(repo, id_)
         self._on_lexeme = None
+        if self.id == '-1':
+            self._initialize_empty()
 
     @classmethod
     def fromJSON(cls, repo, data):
@@ -2548,7 +2550,27 @@ class LexemeSubEntity(WikibaseEntity):
         return new
 
     def toJSON(self, diffto=None) -> dict:
+        """Serialize fields and explicit representation or gloss removals.
+
+        :param diffto: Original child data, or None for all current fields
+        """
+        fields = tuple(self.DATA_ATTRIBUTES)
+        if self.entity_type == 'form':
+            fields += ('grammaticalFeatures',)
+        if self.id != '-1' and any(key not in self.__dict__ for key in fields):
+            # Loading missing fields must not overwrite local assignments.
+            pending = {key: self.__dict__[key] for key in fields
+                       if key in self.__dict__}
+            self.get()
+            for key, value in pending.items():
+                setattr(self, key, value)
         data = super().toJSON(diffto)
+        if diffto:
+            for key in ('representations', 'glosses'):
+                for language in diffto.get(key, {}):
+                    if language not in getattr(self, key, {}):
+                        data.setdefault(key, {})[language] = {
+                            'language': language, 'remove': ''}
         if self.id != '-1':
             data['id'] = self.id
         return data
@@ -2615,14 +2637,27 @@ class LexemeForm(LexemeSubEntity):
         'claims': ClaimCollection,
     }
 
+    def __getattr__(self, name):
+        if name == 'grammaticalFeatures':
+            return self.get()[name]
+        return super().__getattr__(name)
+
+    def _initialize_empty(self) -> None:
+        super()._initialize_empty()
+        self.grammaticalFeatures = set()
+
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """Create dict suitable for the MediaWiki API."""
+        """Serialize form changes, including an empty list to clear features.
+
+        :param diffto: Original form data, or None for all current fields
+        """
         data = super().toJSON(diffto=diffto)
 
         key = 'grammaticalFeatures'
-        if getattr(self, key, None):
-            # could also avoid if no change wrt. diffto
-            data[key] = [value.getID() for value in self.grammaticalFeatures]
+        features = sorted(value.getID() for value in self.grammaticalFeatures)
+        if diffto is None or key not in diffto \
+                or set(features) != set(diffto[key]):
+            data[key] = features
 
         return data
 
