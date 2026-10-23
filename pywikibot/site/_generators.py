@@ -33,6 +33,7 @@ from pywikibot.tools import (
     deprecated_args,
     deprecated_signature,
     is_ip_address,
+    is_ip_network,
 )
 from pywikibot.tools.itertools import filter_unique, union_generators
 
@@ -1728,7 +1729,11 @@ class GeneratorsMixin:
            All parameters are keyword-only now. The *new*, *patrolled*,
            and *autopatrolled* parameters were added.
 
-        :param user: Iterate contributions by this user (name or IP).
+        .. version-changed:: 11.10
+           An IP range in CIDR notation is accepted as *user*.
+
+        :param user: Iterate contributions by this user (name, IP or IP
+            range in CIDR notation).
         :param userprefix: Iterate contributions by all users whose
             names or IPs start with this substring.
         :param start: Iterate contributions starting at this Timestamp.
@@ -1784,7 +1789,11 @@ class GeneratorsMixin:
             formatversion=formatversion
         )
         if user:
-            ucgen.request['ucuser'] = user
+            # the API expects an IP range in uciprange, not in ucuser
+            if '/' in user and is_ip_network(user, strict=False):
+                ucgen.request['uciprange'] = user
+            else:
+                ucgen.request['ucuser'] = user
         if userprefix:
             ucgen.request['ucuserprefix'] = userprefix
         if reverse:

@@ -355,6 +355,41 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertEqual(event.user(), user.username)
 
 
+class TestUsercontribsUserParameter(TestCase):
+
+    """Test how usercontribs() passes the user to the API."""
+
+    family = 'wikipedia'
+    code = 'test'
+    dry = True
+
+    def get_request(self, user: str) -> dict:
+        """Return the request parameters set by usercontribs()."""
+        with patch.object(self.site, '_generator') as generator, \
+                patch('pywikibot.data.api.OptionSet'):
+            generator.return_value.request = {}
+            self.site.usercontribs(user=user)
+        return generator.return_value.request
+
+    def test_ip_range(self) -> None:
+        """Test that an IP range is passed as uciprange."""
+        for user in ('5.119.0.0/16', '5.119.174.237/16', '1.2.3.4/32',
+                     '2001:db8::/32'):
+            with self.subTest(user=user):
+                request = self.get_request(user)
+                self.assertEqual(request['uciprange'], user)
+                self.assertNotIn('ucuser', request)
+
+    def test_user_and_ip(self) -> None:
+        """Test that a name or a single IP is passed as ucuser."""
+        for user in ('Example', 'Example/Subpage', '5.119.174.237',
+                     '2001:db8::1'):
+            with self.subTest(user=user):
+                request = self.get_request(user)
+                self.assertEqual(request['ucuser'], user)
+                self.assertNotIn('uciprange', request)
+
+
 class TestUserRefreshParameter(DeprecationTestCase):
 
     """Test the rename of the *force* parameter to *refresh*."""

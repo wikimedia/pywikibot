@@ -117,16 +117,21 @@ def is_ip_address(value: str) -> bool:
     return False
 
 
-def is_ip_network(value: str) -> bool:
+def is_ip_network(value: str, *, strict: bool = True) -> bool:
     """Check if a value is a valid range of IPv4 or IPv6 addresses.
 
     .. version-added:: 9.0
+    .. version-changed:: 11.10
+       The *strict* parameter was added.
     .. seealso:: :func:`is_ip_address`
 
     :param value: Value to check
+    :param strict: If ``True`` (default), the host bits of the address
+        must be zero; if ``False``, they are ignored, so
+        ``'1.2.3.4/24'`` is accepted
     """
     with suppress(ValueError):
-        ipaddress.ip_network(value)
+        ipaddress.ip_network(value, strict=strict)
         return True
 
     return False
