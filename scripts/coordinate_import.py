@@ -132,20 +132,13 @@ class CoordImportRobot(ConfigParserBot, WikidataBot):
 
         newclaim = pywikibot.Claim(self.repo, self.prop)
         newclaim.setTarget(coordinate)
-        source = self.getSource(page.site)
-        if source:
-            newclaim.addSource(source)
-        pywikibot.info(
-            f'Adding {coordinate.lat}, {coordinate.lon} to {item.title()}')
-
-        # TODO: handle exceptions using self.user_add_claim
         try:
-            item.addClaim(newclaim)
+            # Wait for the save result, including unsupported-globe errors.
+            return self.user_add_claim(item, newclaim, source=page.site,
+                                       asynchronous=False)
         except CoordinateGlobeUnknownError as e:
             pywikibot.info(f'Skipping unsupported globe: {e.args}')
             return False
-
-        return True
 
 
 def main(*args: str) -> None:
