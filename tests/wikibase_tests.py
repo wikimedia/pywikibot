@@ -25,6 +25,8 @@ from pywikibot.exceptions import (
 from pywikibot.page import (
     Claim,
     ItemPage,
+    LexemeForm,
+    LexemePage,
     MediaInfo,
     PropertyPage,
     WikibasePage,
@@ -1153,6 +1155,49 @@ class TestWriteNormalizeData(TestCase):
         with self.assertRaisesRegex(TypeError,
                                     "Unsupported value type 'tuple'"):
             ItemPage._normalizeData(data)
+
+
+class TestLexemeNormalizeData(WikidataTestCase):
+
+    """Test normalization of Lexeme and form fields."""
+
+    dry = True
+
+    def test_lexeme_fields(self) -> None:
+        """Preserve lemmas and claims and normalize item-valued fields."""
+        data = {
+            'lemmas': {'en': 'colour'},
+            'claims': [],
+            'language': ItemPage(self.get_repo(), 'Q1860'),
+            'lexicalCategory': 'Q1084',
+        }
+        original = copy.deepcopy(data)
+        expected = {
+            'lemmas': {'en': {'language': 'en', 'value': 'colour'}},
+            'claims': [],
+            'language': 'Q1860',
+            'lexicalCategory': 'Q1084',
+        }
+        self.assertEqual(LexemePage._normalizeData(data), expected)
+        self.assertEqual(data, original)
+        self.assertEqual(LexemePage._normalizeData(expected), expected)
+
+    def test_form_fields(self) -> None:
+        """Preserve representations and claims alongside features."""
+        data = {
+            'representations': {'en': 'colours'},
+            'claims': [],
+            'grammaticalFeatures': [ItemPage(self.get_repo(), 'Q146786')],
+        }
+        original = copy.deepcopy(data)
+        expected = {
+            'representations': {'en': {'language': 'en', 'value': 'colours'}},
+            'claims': [],
+            'grammaticalFeatures': ['Q146786'],
+        }
+        self.assertEqual(LexemeForm._normalizeData(data), expected)
+        self.assertEqual(data, original)
+        self.assertEqual(LexemeForm._normalizeData(expected), expected)
 
 
 class TestMediaInfoNormalizeData(TestCase):

@@ -2410,9 +2410,9 @@ class LexemePage(WikibasePage):
         :param data: The dict to normalize
         :return: The altered dict from parameter data.
         """
-        new_data = WikibasePage._normalizeData(data)
+        new_data = super()._normalizeData(data)
         for prop in ('language', 'lexicalCategory'):
-            value = new_data.get(prop)
+            value = data.get(prop)
             if value:
                 if isinstance(value, ItemPage):
                     new_data[prop] = value.getID()
@@ -2585,7 +2585,7 @@ class LexemeForm(LexemeSubEntity):
 
     @classmethod
     def _normalizeData(cls, data):
-        new_data = LexemeSubEntity._normalizeData(data)
+        new_data = super()._normalizeData(data)
         if 'grammaticalFeatures' in data:
             value = []
             for feat in data['grammaticalFeatures']:
