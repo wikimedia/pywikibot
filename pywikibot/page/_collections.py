@@ -6,6 +6,7 @@
 """Structures holding data for Wikibase entities."""
 from __future__ import annotations
 
+import operator
 import reprlib
 from collections import defaultdict
 from collections.abc import MutableMapping, MutableSequence
@@ -533,9 +534,14 @@ class SubEntityCollection(MutableSequence):
                 index = self._by_key[index]
             except KeyError as e:
                 raise ValueError(f'No entity with id {index} was found') from e
+        index = operator.index(index)
         obj = self._data[index]
+        # Reindex from the nonnegative position after validating the index.
+        if index < 0:
+            index += len(self._data)
         del self._data[index]
         del self._by_key[obj.id]
+        self._reindex(index)
 
     def __len__(self) -> int:
         return len(self._data)
@@ -543,8 +549,17 @@ class SubEntityCollection(MutableSequence):
     def insert(self, index, obj) -> None:
         """Insert a sub-entity to the collection."""
         self._validate_isinstance(obj)
+        index = operator.index(index)
         self._data.insert(index, obj)
-        self._by_key[obj.id] = index
+        # Normalize the insertion index as list.insert does.
+        length = len(self._data) - 1
+        index = max(0, length + index) if index < 0 else min(index, length)
+        self._reindex(index)
+
+    def _reindex(self, start: int) -> None:
+        """Update ID positions for items shifted by a mutation."""
+        for index in range(start, len(self._data)):
+            self._by_key[self._data[index].id] = index
 
     @classmethod
     def new_empty(cls, repo):

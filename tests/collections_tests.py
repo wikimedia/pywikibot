@@ -16,7 +16,31 @@ from pywikibot.page._collections import (
     LanguageDict,
     SiteLinkCollection,
 )
-from tests.aspects import WikidataTestCase
+from pywikibot.page._wikibase import LexemeSense, LexemeSenseCollection
+from tests.aspects import TestCase, WikidataTestCase
+
+
+class TestSubEntityCollection(TestCase):
+
+    """Test sub-entity collection indexing."""
+
+    net = False
+
+    def test_id_index_after_mutation(self) -> None:
+        """Keep ID lookup consistent after deletion and insertion."""
+        first = LexemeSense(None, 'L1-S1')
+        second = LexemeSense(None, 'L1-S2')
+        collection = LexemeSenseCollection(None, [first, second])
+
+        del collection[first.id]
+        self.assertIs(collection[second.id], second)
+
+        collection.insert(0, first)
+        self.assertIs(collection[first.id], first)
+        self.assertIs(collection[second.id], second)
+
+        del collection[-len(collection)]
+        self.assertIs(collection[second.id], second)
 
 
 class DataCollectionTestCase(WikidataTestCase):
