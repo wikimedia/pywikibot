@@ -1270,6 +1270,28 @@ class TestLexemeSave(WikidataTestCase):
             self.assertIsNot(lexeme.forms, old_forms)
             self.assertEqual(lexeme.forms[0].id, 'L1-F1')
 
+    def test_repeated_save(self) -> None:
+        """Reload assigned IDs so a second save does not repeat additions."""
+        form = LexemeForm(self.repo)
+        form.representations['en'] = 'colours'
+        self.lexeme.forms.append(form)
+        response = copy.deepcopy(self.content)
+        response['lastrevid'] = 2
+        response['forms'] = [dict(form.toJSON(), id='L1-F1')]
+        with patch.object(self.repo, 'editEntity', return_value={
+                'entity': response}) as save, patch.object(
+                self.repo, 'loadcontent', side_effect=lambda *args: {
+                    'L1': copy.deepcopy(response)}):
+            self.lexeme.editEntity()
+            self.assertIn('add', save.call_args.args[1]['forms'][0])
+            self.lexeme.editEntity()
+            self.assertEqual(save.call_args.args[1], {})
+            self.assertEqual(save.call_args.kwargs['baserevid'], 2)
+            self.lexeme.lemmas = LanguageDict({'en': 'new local edit'})
+            self.lexeme.editEntity()
+            self.assertEqual(save.call_args.args[1], {'lemmas': {
+                'en': {'language': 'en', 'value': 'new local edit'}}})
+
     def test_failed_save_and_reload(self) -> None:
         """Rejected edits preserve changes; failed reloads prevent writes."""
         lexeme = self.lexeme

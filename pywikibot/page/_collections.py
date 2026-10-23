@@ -541,7 +541,8 @@ class SubEntityCollection(MutableSequence):
             index += len(self._data)
         del self._data[index]
         del self._by_key[obj.id]
-        self._reindex(index)
+        # Other unsaved children can still share the temporary ID.
+        self._reindex(0 if obj.id == '-1' else index)
 
     def __len__(self) -> int:
         return len(self._data)
@@ -575,20 +576,65 @@ class SubEntityCollection(MutableSequence):
         return this
 
     @classmethod
-    def normalizeData(cls, data: list) -> dict:
-        """Helper function to expand data into the Wikibase API structure.
+    def normalizeData(cls, data: list[dict]) -> list[dict]:
+        """Normalize explicit API operations without inferring removals.
 
-        :param data: Data to normalize
-        :return: The altered dict from parameter data.
+        Each operation must identify an existing child by id, add a child
+        with ``add``, or delete one with both ``id`` and ``remove``.
+
+        :param data: List of child operation dictionaries
+        :return: Normalized operations in their original order
+        :raises TypeError: Input is not a list of dictionaries
+        :raises ValueError: Operation markers are missing or conflicting
         """
-        raise NotImplementedError  # TODO
+        if not isinstance(data, list):
+            raise TypeError('Subentity operations must be a list')
+        result = []
+        for entity in data:
+            if not isinstance(entity, dict):
+                raise TypeError('Subentity operations must be dictionaries')
+            markers = entity.keys() & {'id', 'add', 'remove'}
+            if markers not in ({'id'}, {'add'}, {'id', 'remove'}):
+                raise ValueError(
+                    'Subentities require id, add, or id with remove')
+            normalized = cls.type_class._normalizeData(entity)
+            normalized.update((key, entity[key]) for key in markers)
+            result.append(normalized)
+        return result
 
-    def toJSON(self, diffto: dict | None = None) -> dict:
-        """Create JSON suitable for Wikibase API.
+    def toJSON(self, diffto: list[dict] | None = None) -> list[dict]:
+        """Serialize current children or changes against a complete baseline.
 
-        When diffto is provided, JSON representing differences to the
-        provided data is created.
+        Full serialization is API edit data, not replacement of server
+        content. Unsaved children carry an ``add`` marker. Only a supplied
+        baseline allows missing children to become explicit removals.
+        An empty result makes no changes; it does not clear the collection.
 
-        :param diffto: JSON containing entity data
+        :param diffto: Complete original collection, or None for all fields
+        :return: Child edits followed by removals in baseline order
+        :raises ValueError: Saved child IDs occur more than once
         """
-        raise NotImplementedError  # TODO
+        previous = {}
+        for entity in diffto or []:
+            entity_id = entity['id']
+            if entity_id in previous:
+                raise ValueError(f'Duplicate subentity ID: {entity_id}')
+            previous[entity_id] = entity
+
+        result = []
+        retained = set()
+        for entity in self:
+            entity_id = entity.id
+            if entity_id != '-1':
+                if entity_id in retained:
+                    raise ValueError(f'Duplicate subentity ID: {entity_id}')
+                retained.add(entity_id)
+            data = entity.toJSON(diffto=previous.get(entity_id))
+            if entity_id == '-1':
+                data['add'] = ''
+            if entity_id not in previous or data != {'id': entity_id}:
+                result.append(data)
+
+        result.extend({'id': entity_id, 'remove': ''}
+                      for entity_id in previous if entity_id not in retained)
+        return result

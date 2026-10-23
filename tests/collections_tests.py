@@ -7,6 +7,7 @@
 """Tests for the Wikidata parts of the page module."""
 from __future__ import annotations
 
+import copy
 import unittest
 from contextlib import suppress
 
@@ -16,7 +17,11 @@ from pywikibot.page._collections import (
     LanguageDict,
     SiteLinkCollection,
 )
-from pywikibot.page._wikibase import LexemeSense, LexemeSenseCollection
+from pywikibot.page._wikibase import (
+    LexemeFormCollection,
+    LexemeSense,
+    LexemeSenseCollection,
+)
 from tests.aspects import TestCase, WikidataTestCase
 
 
@@ -256,6 +261,90 @@ class TestAliasesDict(DataCollectionTestCase):
     def test_new_empty(self) -> None:
         """Test that new_empty method returns empty collection."""
         self._test_new_empty()
+
+
+class TestSubEntityJSON(DataCollectionTestCase):
+
+    """Test full serialization, diffs and explicit child operations."""
+
+    dry = True
+
+    def test_collection_diff(self) -> None:
+        """Match saved IDs and keep multiple unsaved children distinct."""
+        for cls, prefix, key in (
+            (LexemeFormCollection, 'L1-F', 'representations'),
+            (LexemeSenseCollection, 'L1-S', 'glosses'),
+        ):
+            with self.subTest(cls=cls):
+                baseline = [
+                    {'id': prefix + str(index), key: {
+                        'en': {'language': 'en', 'value': str(index)}}}
+                    for index in (1, 2)
+                ]
+                if cls is LexemeFormCollection:
+                    for entry in baseline:
+                        entry['grammaticalFeatures'] = []
+                original = copy.deepcopy(baseline)
+                collection = cls.fromJSON(baseline, self.get_repo())
+                self.assertEqual(collection.toJSON(), baseline)
+                self.assertEqual(collection.toJSON(diffto=[]), baseline)
+                self.assertEqual(collection.toJSON(diffto=baseline), [])
+                getattr(collection[0], key)['en'] = 'changed'
+                del collection[1]
+                for value in ('new one', 'new two'):
+                    entity = cls.type_class(self.get_repo())
+                    getattr(entity, key)['en'] = value
+                    collection.append(entity)
+                changes = collection.toJSON(diffto=baseline)
+                self.assertEqual(changes[0], {
+                    'id': prefix + '1', key: {
+                        'en': {'language': 'en', 'value': 'changed'}}})
+                self.assertEqual([entry[key]['en']['value']
+                                  for entry in changes[1:3]],
+                                 ['new one', 'new two'])
+                for entry in changes[1:3]:
+                    self.assertEqual(entry['add'], '')
+                    self.assertNotIn('id', entry)
+                self.assertEqual(changes[-1],
+                                 {'id': prefix + '2', 'remove': ''})
+                self.assertEqual(baseline, original)
+                pending = cls(self.get_repo(), list(collection)[1:])
+                pending.clear()
+                self.assertEqual(pending.toJSON(), [])
+                empty = cls.new_empty(self.get_repo())
+                self.assertEqual(empty.toJSON(diffto=baseline), [
+                    {'id': entry['id'], 'remove': ''} for entry in baseline])
+                with self.assertRaisesRegex(ValueError, 'Duplicate'):
+                    collection.toJSON(diffto=baseline + baseline)
+                collection.append(collection[0])
+                with self.assertRaisesRegex(ValueError, 'Duplicate'):
+                    collection.toJSON()
+
+    def test_normalize_operations(self) -> None:
+        """Preserve operation markers and reject ambiguous operations."""
+        data = [
+            {'id': 'L1-F1', 'representations': {'en': 'changed'}},
+            {'add': '', 'representations': {'en': 'new'},
+             'grammaticalFeatures': []},
+            {'id': 'L1-F2', 'remove': ''},
+        ]
+        original = copy.deepcopy(data)
+        normalized = LexemeFormCollection.normalizeData(data)
+        self.assertEqual(normalized, [
+            {'id': 'L1-F1', 'representations': {
+                'en': {'language': 'en', 'value': 'changed'}}},
+            {'add': '', 'representations': {
+                'en': {'language': 'en', 'value': 'new'}},
+             'grammaticalFeatures': []},
+            {'id': 'L1-F2', 'remove': ''},
+        ])
+        self.assertEqual(data, original)
+        self.assertEqual(LexemeFormCollection.normalizeData(normalized),
+                         normalized)
+        for invalid in ({}, {'remove': ''}, {'add': '', 'remove': ''},
+                        {'id': 'L1-F1', 'add': ''}):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                LexemeFormCollection.normalizeData([invalid])
 
 
 class TestClaimCollection(DataCollectionTestCase):
