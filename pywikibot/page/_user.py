@@ -37,11 +37,15 @@ class Contribution(DataRecord):
     for the current Site and Page object of the contribution.
 
     .. version-added:: 11.6
+    .. version-changed:: 11.10
+       The *comment* is always set. It is an empty string if the API
+       does not return a comment, for example if it is hidden.
     """
 
     @staticmethod
     def normalize(data: dict[str, Any]) -> None:
         """Upcast dictionary values."""
+        data.setdefault('comment', '')
         if 'timestamp' in data:
             data['timestamp'] = Timestamp.fromISOformat(data['timestamp'])
         if 'title' in data:
