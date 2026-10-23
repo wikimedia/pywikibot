@@ -11,7 +11,7 @@ import copy
 import json
 import unittest
 from contextlib import suppress
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -1198,6 +1198,113 @@ class TestLexemeNormalizeData(WikidataTestCase):
         self.assertEqual(LexemeForm._normalizeData(data), expected)
         self.assertEqual(data, original)
         self.assertEqual(LexemeForm._normalizeData(expected), expected)
+
+
+class TestLexemeSave(WikidataTestCase):
+
+    """Test Lexeme save state without writing to a wiki."""
+
+    dry = True
+
+    def setUp(self) -> None:
+        """Provide a repository with a Lexeme namespace and cached data."""
+        super().setUp()
+        self.repo = self.get_repo()
+        namespace = Namespace(146, canonical_name='Lexeme',
+                              case='first-letter',
+                              defaultcontentmodel='wikibase-lexeme')
+        namespaces = dict(self.repo.namespaces)
+        namespaces[146] = namespace
+        for attribute, value in (
+            ('_namespaces', NamespacesDict(namespaces)),
+            ('_entity_namespaces', {'item': namespaces[0],
+                                    'lexeme': namespace}),
+            ('entity_sources', MagicMock(return_value={})),
+        ):
+            patcher = patch.object(self.repo, attribute, value, create=True)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.content = {
+            'id': 'L1', 'lastrevid': 1,
+            'lemmas': {'en': {'language': 'en', 'value': 'colour'}},
+            'language': 'Q1860', 'lexicalCategory': 'Q1084', 'claims': {},
+            'forms': [], 'senses': [],
+        }
+        self.lexeme = LexemePage(self.repo, 'L1')
+        self.lexeme._content = copy.deepcopy(self.content)
+        self.lexeme.get()
+
+    def test_save_reload(self) -> None:
+        """Successful saves discard snapshots and reload before diffing."""
+        lexeme = self.lexeme
+        old_forms = lexeme.forms
+        response = dict(self.content, lastrevid=2)
+        response['forms'] = [{
+            'id': 'L1-F1', 'representations': {
+                'en': {'language': 'en', 'value': 'colours'}},
+            'grammaticalFeatures': [], 'claims': {},
+        }]
+        with patch.object(self.repo, 'editEntity', return_value={
+                'entity': response}) as save, patch.object(
+                self.repo, 'loadcontent',
+                side_effect=lambda *args: {'L1': copy.deepcopy(response)}) \
+                as load, patch.object(lexeme, 'toJSON', return_value={}) \
+                as serialize:
+            callback = MagicMock()
+            with patch.object(pywikibot, 'async_request',
+                              side_effect=lambda func, *args, **kwargs:
+                              func(*args, **kwargs)):
+                lexeme.editEntity({'lemmas': {'en': 'colour'}},
+                                  asynchronous=True, callback=callback)
+            callback.assert_called_once_with(lexeme, None)
+            load.assert_not_called()
+            self.assertEqual(lexeme.latest_revision_id, 2)
+            self.assertNotIn('forms', lexeme.__dict__)
+            self.assertNotIn('claims', lexeme.__dict__)
+            lexeme.editEntity()
+            load.assert_called_once()
+            serialize.assert_called_once_with(diffto=response)
+            self.assertEqual(save.call_args.kwargs['baserevid'], 2)
+            self.assertEqual(lexeme.language.id, 'Q1860')
+            self.assertIsNot(lexeme.forms, old_forms)
+            self.assertEqual(lexeme.forms[0].id, 'L1-F1')
+
+    def test_failed_save_and_reload(self) -> None:
+        """Rejected edits preserve changes; failed reloads prevent writes."""
+        lexeme = self.lexeme
+        lexeme.lemmas['en'] = 'changed'
+        with patch.object(self.repo, 'editEntity',
+                          side_effect=ValueError('rejected')):
+            with self.assertRaisesRegex(ValueError, 'rejected'):
+                lexeme.editEntity({'lemmas': {'en': 'changed'}})
+        self.assertEqual(lexeme.lemmas['en'], 'changed')
+        self.assertEqual(lexeme.latest_revision_id, 1)
+        lexeme._update_from_edit_response({'lastrevid': 2}, True)
+        with patch.object(self.repo, 'loadcontent',
+                          side_effect=ValueError('reload failed')), \
+                patch.object(self.repo, 'editEntity') as save:
+            with self.assertRaisesRegex(ValueError, 'reload failed'):
+                lexeme.editEntity()
+            save.assert_not_called()
+        self.assertTrue(lexeme._needs_reload)
+
+    def test_item_response(self) -> None:
+        """Other entities still receive statement IDs from edit responses."""
+        item = ItemPage(self.repo, 'Q1')
+        item._content = {'id': 'Q1', 'lastrevid': 1}
+        item.get()
+        claim = Claim(self.repo, 'P1', datatype='string')
+        claim.setTarget('value')
+        item.claims['P1'] = [claim]
+        statement = dict(claim.toJSON(), id='Q1$statement')
+        with patch.object(self.repo, 'editEntity', return_value={
+                'entity': {'id': 'Q1', 'lastrevid': 2,
+                           'claims': {'P1': [statement]}}}):
+            item.editEntity()
+        self.assertEqual(claim.snak, 'Q1$statement')
+        self.assertIs(claim.on_item, item)
+        self.assertEqual(item.latest_revision_id, 2)
+        self.assertNotIn('_content', item.__dict__)
 
 
 class TestMediaInfoNormalizeData(TestCase):

@@ -317,6 +317,16 @@ class WikibaseEntity:
         if getattr(self, 'id', '-1') == '-1':
             self.__init__(self.repo, updates['entity']['id'])
 
+        self._update_from_edit_response(updates['entity'], update_self)
+
+    def _update_from_edit_response(
+        self, data: dict, update_self: bool
+    ) -> None:
+        """Update cached state after a successful edit.
+
+        :param data: Entity data returned by the edit API
+        :param update_self: Whether the edit used the local entity state
+        """
         # the response also contains some data under the 'entity' key
         # but it is NOT the actual content
         # see also [[d:Special:Diff/1356933963]]
@@ -324,12 +334,12 @@ class WikibaseEntity:
         # the content can be safely reused
         if hasattr(self, '_content'):
             del self._content
-        self.latest_revision_id = updates['entity'].get('lastrevid')
+        self.latest_revision_id = data.get('lastrevid')
 
-        if not update_self or 'claims' not in updates['entity']:
+        if not update_self or 'claims' not in data:
             return
 
-        updated_claims = updates['entity']['claims']
+        updated_claims = data['claims']
         for claim_prop_id, statements in updated_claims.items():
             for claim_index, statement in enumerate(statements):
                 claim = self.claims[claim_prop_id][claim_index]
@@ -2342,6 +2352,38 @@ class LexemePage(WikibasePage):
         super().__init__(site, title, entity_type='lexeme')
         assert self.id == self._link.title
 
+    def __getattr__(self, name):
+        if name in ('language', 'lexicalCategory') \
+                and self.__dict__.get('_needs_reload', False):
+            return self.get()[name]
+        return super().__getattr__(name)
+
+    @allow_asynchronous
+    def editEntity(
+        self, data: ENTITY_DATA_TYPE | None = None, **kwargs
+    ) -> None:
+        """Edit the Lexeme and invalidate its cached data on success.
+
+        Forms, senses and claims must be reacquired from this Lexeme after
+        saving. Existing references are snapshots and are not updated with
+        server-assigned identifiers. Data is reloaded on the next access.
+
+        :param data: API changes, or None to save local changes
+        """
+        if data is None and getattr(self, '_needs_reload', False):
+            self.get()
+        super().editEntity(data, **kwargs)
+
+    def _update_from_edit_response(
+        self, data: dict, update_self: bool
+    ) -> None:
+        """Invalidate Lexeme data without matching response IDs by position."""
+        for attr in (*self.DATA_ATTRIBUTES, 'language', 'lexicalCategory',
+                     '_content'):
+            self.__dict__.pop(attr, None)
+        self.latest_revision_id = data.get('lastrevid')
+        self._needs_reload = True
+
     def get_data_for_new_entity(self) -> NoReturn:
         """Return data required for creation of a new lexeme."""
         raise NotImplementedError  # TODO
@@ -2400,6 +2442,7 @@ class LexemePage(WikibasePage):
 
         data['language'] = self.language
         data['lexicalCategory'] = self.lexicalCategory
+        self._needs_reload = False
 
         return data
 
