@@ -121,6 +121,8 @@ class Timestamp(datetime.datetime):
         """Convert a datetime.datetime timestamp to a Timestamp object.
 
         .. version-added:: 7.5
+
+        :meta public:
         """
         return Timestamp(dt.year, dt.month, dt.day, dt.hour,
                          dt.minute, dt.second, dt.microsecond,
@@ -133,6 +135,8 @@ class Timestamp(datetime.datetime):
         Mediwiki timestamp format: YYYYMMDDHHMMSS
 
         .. version-added:: 7.5
+
+        :meta public:
         """
         RE_MW = r'\d{14}'  # noqa: N806
         m = re.fullmatch(RE_MW, timestr)
@@ -152,6 +156,8 @@ class Timestamp(datetime.datetime):
         ``YYYY-MM-DD[T ]HH:MM:SS[[.,]ffffff][Z|±HH[MM[SS[.ffffff]]]]``
 
         .. version-added:: 7.5
+
+        :meta public:
         """
         if 'T' in separators and _API_TIMESTAMP.fullmatch(timestr):
             # API timestamps are already UTC; keep the result naive.
@@ -195,6 +201,8 @@ class Timestamp(datetime.datetime):
         POSIX format: ``SECONDS[.ffffff]]``
 
         .. version-added:: 7.5
+
+        :meta public:
         """
         RE_POSIX = r'(?P<S>-?\d{1,13})(?:\.(?P<u>\d{1,6}))?'  # noqa: N806
         m = re.fullmatch(RE_POSIX, timestr)
@@ -218,6 +226,8 @@ class Timestamp(datetime.datetime):
         """Convert a string to a Timestamp object.
 
         .. version-added:: 7.5
+
+        :meta public:
         """
         handlers = [
             cls._from_mw,

@@ -40,20 +40,23 @@ except ModuleNotFoundError:
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache: dict[str, re.Pattern[str]] = {}
 
-# The regex below collects nested templates, providing simpler
-# identification of templates used at the top-level of wikitext.
-# It doesn't match {{{1|...}}}, however it also does not match templates
-# with a numerical name. e.g. {{1|..}}. It will correctly match {{{x}} as
-# being {{x}} with leading '{' left in the wikitext.
-# Prefix msg: is not included in the 'name' group, but all others are
-# included for backwards compatibility with TEMP_REGEX.
-# Only parser functions using # are excluded.
-# When more than two levels of templates are found, this regex will
-# capture from the beginning of the first {{ to the end of the last }},
-# with wikitext between templates as part of the parameters of the first
-# template in the wikitext.
-# This ensures it fallsback to a safe mode for replaceExcept, as it
-# ensures that any replacement will not occur within template text.
+#: The regex below collects nested templates, providing simpler
+#: identification of templates used at the top-level of wikitext. It
+#: doesn't match ``{{{1|...}}}``, however it also does not match
+#: templates with a numerical name. e.g. ``{{1|..}}``. It will correctly
+#: match ``{{{x}}`` as being ``{{x}}`` with leading ``'{'`` left in the
+#: wikitext. The outdated prefix ``msg:`` is not included in the *name*
+#: group. Only parser functions using ``#`` are excluded. When more than
+#: two levels of templates are found, this regex will capture from the
+#: beginning of the first ``{{`` to the end of the last ``}}``, with
+#: wikitext between templates as part of the parameters of the first
+#: template in the wikitext. This ensures it fallsback to a safe mode
+#: for replaceExcept, as it ensures that any replacement will not occur
+#: within template text.
+#:
+#: .. important::
+#:    Don't use this regex directly; use
+#:    :func:`extract_templates_and_params_regex_simple` instead.
 NESTED_TEMPLATE_REGEX = re.compile(r"""
 {{\s*(?:msg:\s*)?
   (?P<name>[^{\|#0-9][^{\|#]*?)\s*
@@ -70,18 +73,22 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 (?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
 """, re.VERBOSE | re.DOTALL)
 
-# Regex matching file links with optional parameters.
-#
-# Captures the filename and parameters, including links within the
-# parameters. Inner wikilinks cannot contain nested wikilinks.
-# The Namespace names must be substituted into the pattern, e.g.:
-#     FILE_LINK_REGEX % 'File'
-# or: FILE_LINK_REGEX % '|'.join(site.namespaces[6])
-#
-# Don't use this regex directly; use textlib.get_regexes('file', site)`
-# instead.
-#
-# 10.7: Exclude empty filename
+#: Regex matching file links with optional parameters.
+#:
+#: Captures the filename and parameters, including links within the
+#: parameters. Inner wikilinks cannot contain nested wikilinks.
+#: The Namespace names must be substituted into the pattern, e.g.:
+#: `FILE_LINK_REGEX % 'File'` or
+#: `FILE_LINK_REGEX % '|'.join(site.namespaces[6])`
+#:
+#: .. important::
+#:    Don't use this regex directly; use :func:`get_regexes('file', site)
+#:    <get_regexes>` instead.
+#:
+#: .. version-changed:: 10.7
+#:    Exclude empty filename
+#: .. version-changed:: 11.10
+#:    Reject nested wikilinks in file captions.
 FILE_LINK_REGEX = r"""
     \[\[\s*
     (?:%s)  # namespace aliases
@@ -108,9 +115,9 @@ FILE_LINK_REGEX = r"""
     \]\]
 """
 
-# Used in TimeStripper. When a timestamp-like line has longer gaps
-# than this between year, month, etc in it, then the line will not be
-# considered to contain a timestamp.
+#: Used in :class:`TimeStripper`. When a timestamp-like line has longer
+#: gaps than this between year, month, etc in it, then the line will not
+#: be considered to contain a timestamp.
 TIMESTAMP_GAP_LIMIT = 10
 
 

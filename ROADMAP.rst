@@ -3,6 +3,11 @@ Release 11.10
 
 * Avoid mutating class attribute :attr:`BaseBot.available_options<bot.BaseBot.available_options>`
   with :attr:`BaseBot.update_options<bot.BaseBot.update_options>`. (:phab:`T439883`)
+* Update translations (i18n).
+* Reject nested wikilinks in file captions with :attr:`textlib.FILE_LINK_REGEX`. (:phab:`T396721`)
+* Various performance, stability, and code quality improvements.
+* Speed up parsing of API ISO timestamps in :meth:`Timestamp._from_iso8601()
+  <pywikibot.time.Timestamp._from_iso8601>`.
 
 Deprecations
 ============

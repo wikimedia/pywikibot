@@ -10,7 +10,7 @@ Release History
 * Various performance, stability, and code quality improvements.
 * Fix ZIP discovery and duplicate import paths in :func:`config.register_families_folder`.
 * Unify negative :ref:`page generator options<GENERATOR OPTIONS>`. (:phab:`T219282`)
-* Keep the sign of negative POSIX :class:`timestamps<<pywikibot.time.Timestamp>`.
+* Keep the sign of negative POSIX :class:`timestamps<pywikibot.time.Timestamp>`.
 * Use the :attr:`page.BasePage.site` in :meth:`page.BasePage.change_category` when calling
   :func:`textlib.replaceCategoryLinks` to respect category namespaces and footer rules.
 * Validate :attr:`pywikibot.Link.title` length in UTF-8 bytes within :meth:`pywikibot.Link.parse`.

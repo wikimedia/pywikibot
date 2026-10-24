@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+11.10.0
+-------
+
+next_version
+^^^^^^^^^^^^
+
+* This maintenance script was added to update Sphinx version directives. (:phab:`T440810`)
+
 11.9.0
 ------
 
