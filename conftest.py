@@ -46,7 +46,7 @@ EXCLUDE_PATTERN = re.compile(
     r'families/[a-z][a-z\d]+_family|'
     r'page/(__init__|_decorators|_page|_revision|_user)|'
     r'pagegenerators/(__init__|_filters)|'
-    r'scripts/(i18n/)?__init__|'
+    r'scripts/((i18n/)?__init__|shell)|'
     r'site/(__init__|_basesite|_decorators|_interwikimap|'
     r'_tokenwallet|_upload)|'
     r'tools/(_deprecate|_logging|_unidata|chars|formatter|itertools)|'

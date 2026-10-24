@@ -136,7 +136,7 @@ repos:
             families/[a-z][a-z\d]+_family|
             page/(__init__|_decorators|_page|_revision|_user)|
             pagegenerators/(__init__|_filters)|
-            scripts/(?:i18n/)?__init__|
+            scripts/((?:i18n/)?__init__|shell)|
             site/(__init__|_basesite|_decorators|_interwikimap|_tokenwallet|_upload)|
             tools/(_deprecate|_logging|_unidata|chars|formatter|itertools)|
             userinterfaces/(__init__|_interface_base|buffer_interface|terminal_interface|transliteration)
