@@ -1182,6 +1182,22 @@ class BaseBot(OptionHandler):
     .. version-added:: 7.2
     """
 
+    ignore_save_related_errors: bool = False
+    """Attribute to determine whether errors related to page save are
+    reported and ignored by :meth:`userPut` instead of being raised. The
+    *ignore_save_related_errors* keyword of :meth:`userPut` overrides it.
+
+    .. version-added:: 11.10
+    """
+
+    ignore_server_errors: bool = False
+    """Attribute to determine whether server errors are reported and
+    ignored by :meth:`userPut` instead of being raised. The
+    *ignore_server_errors* keyword of :meth:`userPut` overrides it.
+
+    .. version-added:: 11.10
+    """
+
     available_options = {
         'always': False,  # By default ask for confirmation when putting a page
     }
@@ -1324,9 +1340,15 @@ class BaseBot(OptionHandler):
         :keyword asynchronous: Passed to page.save
         :keyword summary: Passed to page.save
         :keyword show_diff: Show changes between oldtext and newtext (enabled)
-        :keyword ignore_save_related_errors: Report and ignore (disabled)
-        :keyword ignore_server_errors: Report and ignore (disabled)
+        :keyword ignore_save_related_errors: Report and ignore (default:
+            :attr:`ignore_save_related_errors`)
+        :keyword ignore_server_errors: Report and ignore (default:
+            :attr:`ignore_server_errors`)
         :return: Whether the page was saved successfully
+
+        .. version-changed:: 11.10
+           *ignore_save_related_errors* and *ignore_server_errors*
+           default to the class attributes of the same name.
         """
         if oldtext.rstrip() == newtext.rstrip():
             pywikibot.info(f'No changes were needed on {page}')
@@ -1356,10 +1378,11 @@ class BaseBot(OptionHandler):
         :param args: Passed to the function
         :param kwargs: Passed to the function
         :keyword ignore_server_errors: If True, server errors will be reported
-            and ignored (default: False)
+            and ignored (default: :attr:`ignore_server_errors`)
         :kwtype ignore_server_errors: bool
         :keyword ignore_save_related_errors: If True, errors related to
-            page save will be reported and ignored (default: False)
+            page save will be reported and ignored (default:
+            :attr:`ignore_save_related_errors`)
         :kwtype ignore_save_related_errors: bool
         :return: Whether the page was saved successfully
 
@@ -1371,9 +1394,10 @@ class BaseBot(OptionHandler):
         if 'asynchronous' not in kwargs and self.opt.always:
             kwargs['asynchronous'] = True
 
-        ignore_save_related_errors = kwargs.pop('ignore_save_related_errors',
-                                                False)
-        ignore_server_errors = kwargs.pop('ignore_server_errors', False)
+        ignore_save_related_errors = kwargs.pop(
+            'ignore_save_related_errors', self.ignore_save_related_errors)
+        ignore_server_errors = kwargs.pop('ignore_server_errors',
+                                          self.ignore_server_errors)
 
         try:
             func(*args, **kwargs)
@@ -1870,7 +1894,6 @@ class CurrentPageBot(BaseBot):
     """
 
     ignore_save_related_errors = True
-    ignore_server_errors = False
 
     def treat_page(self) -> None:
         """Process one page (Abstract method)."""
@@ -2131,9 +2154,10 @@ class WikidataBot(Bot, ExistingPageBot):
         :param source: Site where the claim comes from
         :param bot: Whether to flag as bot (if possible)
         :keyword ignore_server_errors: If True, server errors will be reported
-          and ignored (default: False)
+          and ignored (default: :attr:`ignore_server_errors`)
         :keyword ignore_save_related_errors: If True, errors related to
-          page save will be reported and ignored (default: False)
+          page save will be reported and ignored (default:
+          :attr:`ignore_save_related_errors`)
         :return: Whether the item was saved successfully
 
         .. note:: calling this method sets the current_page property

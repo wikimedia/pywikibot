@@ -12,11 +12,12 @@ import unittest
 from contextlib import suppress
 from tempfile import TemporaryDirectory
 from textwrap import dedent
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pywikibot
 import pywikibot.bot
 from pywikibot import config, i18n
+from pywikibot.exceptions import OtherPageSaveError, ServerError
 from pywikibot.specialbots import UploadRobot
 from tests.aspects import DefaultSiteTestCase, SiteAttributeTestCase, TestCase
 from tests.utils import execute
@@ -487,6 +488,53 @@ class TestBotOptions(TestCase):
         self.assertEqual(
             BotWithAvailableAndUpdateOptions.available_options,
             {'sub_opt': 1})
+
+
+class TestIgnoreSaveErrors(TestCase):
+
+    """Test the ignore_*_errors attributes of bots in userPut()."""
+
+    net = False
+
+    @staticmethod
+    def put(bot, error, **kwargs) -> bool:
+        """Call userPut with a page whose save raises an error."""
+        page = MagicMock(spec=pywikibot.Page)
+        if error is OtherPageSaveError:
+            error = OtherPageSaveError(
+                page, 'Editing restricted by {{bots}} template')
+        page.save.side_effect = error
+        return bot.userPut(page, 'old', 'new', show_diff=False, **kwargs)
+
+    def test_base_bot(self) -> None:
+        """Test that BaseBot raises errors by default."""
+        bot = pywikibot.bot.BaseBot(always=True)
+        with self.assertRaises(OtherPageSaveError):
+            self.put(bot, OtherPageSaveError)
+        with self.assertRaises(ServerError):
+            self.put(bot, ServerError('server error'))
+        self.assertFalse(
+            self.put(bot, OtherPageSaveError,
+                     ignore_save_related_errors=True))
+
+    def test_current_page_bot(self) -> None:
+        """Test that CurrentPageBot ignores save related errors."""
+        bot = pywikibot.bot.CurrentPageBot(always=True)
+        self.assertFalse(self.put(bot, OtherPageSaveError))
+        with self.assertRaises(OtherPageSaveError):
+            self.put(bot, OtherPageSaveError,
+                     ignore_save_related_errors=False)
+        with self.assertRaises(ServerError):
+            self.put(bot, ServerError('server error'))
+
+    def test_ignore_server_errors(self) -> None:
+        """Test a bot which ignores server errors."""
+        bot = pywikibot.bot.CurrentPageBot(always=True)
+        bot.ignore_server_errors = True
+        self.assertFalse(self.put(bot, ServerError('server error')))
+        with self.assertRaises(ServerError):
+            self.put(bot, ServerError('server error'),
+                     ignore_server_errors=False)
 
 
 if __name__ == '__main__':
