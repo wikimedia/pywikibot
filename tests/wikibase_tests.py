@@ -16,6 +16,7 @@ from unittest.mock import MagicMock, patch
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.exceptions import (
+    APIError,
     InvalidTitleError,
     IsNotRedirectPageError,
     IsRedirectPageError,
@@ -1245,6 +1246,7 @@ class TestLexemeSave(WikidataTestCase):
             ('_entity_namespaces', {'item': namespaces[0],
                                     'lexeme': namespace}),
             ('entity_sources', MagicMock(return_value={})),
+            ('_userinfo', {'rights': ['edit']}),
         ):
             patcher = patch.object(self.repo, attribute, value, create=True)
             patcher.start()
@@ -1334,6 +1336,84 @@ class TestLexemeSave(WikidataTestCase):
                 lexeme.editEntity()
             save.assert_not_called()
         self.assertTrue(lexeme._needs_reload)
+
+    def test_create(self) -> None:
+        """Create from local fields and reuse assigned IDs on another save."""
+        lexeme = LexemePage(self.repo)
+        lexeme.lemmas['en'] = 'colour'
+        lexeme.language = ItemPage(self.repo, 'Q1860')
+        lexeme.lexicalCategory = ItemPage(self.repo, 'Q1084')
+        form = LexemeForm(self.repo)
+        form.representations['en'] = 'colours'
+        lexeme.forms.append(form)
+        response = copy.deepcopy(self.content)
+        response['forms'] = [dict(form.toJSON(), id='L1-F1')]
+        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
+                patch.object(self.repo, 'simple_request') as request, \
+                patch.object(self.repo, 'loadcontent',
+                             side_effect=lambda *args: {
+                                 'L1': copy.deepcopy(response)}):
+            request.return_value.submit.return_value = {'entity': response}
+            lexeme.editEntity()
+            params = request.call_args.kwargs
+            self.assertEqual(params['action'], 'wbeditentity')
+            self.assertEqual(params['new'], 'lexeme')
+            self.assertNotIn('id', params)
+            payload = json.loads(params['data'])
+            self.assertEqual(payload['language'], 'Q1860')
+            self.assertEqual(payload['lexicalCategory'], 'Q1084')
+            self.assertEqual(payload['lemmas'], response['lemmas'])
+            self.assertEqual(payload['forms'], [dict(form.toJSON(), add='')])
+            self.assertEqual(lexeme.id, 'L1')
+            self.assertEqual(lexeme.latest_revision_id, 1)
+            lexeme.editEntity()
+            params = request.call_args.kwargs
+            self.assertEqual(params['id'], 'L1')
+            self.assertNotIn('new', params)
+            self.assertEqual(params['baserevid'], 1)
+            self.assertEqual(json.loads(params['data']), {})
+            self.assertEqual(lexeme.forms[0].id, 'L1-F1')
+            self.assertEqual(form.id, '-1')
+
+    def test_create_explicit(self) -> None:
+        """Explicit creation data wins over local fields; callbacks see IDs."""
+        lexeme = LexemePage(self.repo)
+        lexeme.lemmas['en'] = 'unused local lemma'
+        lexeme.language = ItemPage(self.repo, 'Q1')
+        data = {'lemmas': {'en': 'colour'}, 'language': 'Q1860',
+                'lexicalCategory': 'Q1084'}
+        original = copy.deepcopy(data)
+        callback = MagicMock()
+        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
+                patch.object(self.repo, 'simple_request') as request, \
+                patch.object(pywikibot, 'async_request',
+                             side_effect=lambda func, *args, **kwargs:
+                             func(*args, **kwargs)):
+            request.return_value.submit.return_value = {'entity': self.content}
+            lexeme.editEntity(data, asynchronous=True, callback=callback)
+        self.assertEqual(request.call_args.kwargs['new'], 'lexeme')
+        self.assertEqual(json.loads(request.call_args.kwargs['data']), {
+            **original, 'lemmas': self.content['lemmas']})
+        self.assertEqual(data, original)
+        self.assertEqual(lexeme.id, 'L1')
+        self.assertNotIn('lemmas', lexeme.__dict__)
+        callback.assert_called_once_with(lexeme, None)
+
+    def test_create_rejected(self) -> None:
+        """Rejected creation preserves unsaved data and reports the error."""
+        lexeme = LexemePage(self.repo)
+        lexeme.lemmas['en'] = 'colour'
+        error = APIError('missing-field', 'language is required')
+        callback = MagicMock()
+        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
+                patch.object(self.repo, 'simple_request') as request:
+            request.return_value.submit.side_effect = error
+            lexeme.editEntity(callback=callback)
+        self.assertEqual(lexeme.id, '-1')
+        self.assertEqual(lexeme.lemmas, {'en': 'colour'})
+        callback.assert_called_once()
+        self.assertIs(callback.call_args.args[0], lexeme)
+        self.assertIn('missing-field', str(callback.call_args.args[1]))
 
     def test_item_response(self) -> None:
         """Other entities still receive statement IDs from edit responses."""

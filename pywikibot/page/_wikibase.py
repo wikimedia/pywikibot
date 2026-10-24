@@ -2364,7 +2364,11 @@ class LexemePage(WikibasePage):
     def editEntity(
         self, data: ENTITY_DATA_TYPE | None = None, **kwargs
     ) -> None:
-        """Edit the Lexeme and invalidate its cached data on success.
+        """Create or edit the Lexeme and invalidate cached data on success.
+
+        New Lexemes require lemmas, language and lexicalCategory. Pass
+        explicit API data or populate the Lexeme before saving. Explicit
+        data is not combined with local fields.
 
         Forms, senses and claims must be reacquired from this Lexeme after
         saving. Existing references are snapshots and are not updated with
@@ -2385,10 +2389,6 @@ class LexemePage(WikibasePage):
             self.__dict__.pop(attr, None)
         self.latest_revision_id = data.get('lastrevid')
         self._needs_reload = True
-
-    def get_data_for_new_entity(self) -> NoReturn:
-        """Return data required for creation of a new lexeme."""
-        raise NotImplementedError  # TODO
 
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
