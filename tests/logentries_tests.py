@@ -72,6 +72,12 @@ class TestLogentriesBase(TestCase):
                 raise unittest.SkipTest(f'API timeout on Lobbypedia: {e}')
             raise
 
+    def setUp(self) -> None:
+        """Skip Lobbypedia tests while the wiki is offline."""
+        if self._testMethodName.endswith('_old'):
+            self.skipTest('Lobbypedia is temporarily offline (T442266).')
+        super().setUp()
+
     def _get_logentry(self, logtype):
         """Retrieve a single log entry."""
         if self.site_key == 'old':
