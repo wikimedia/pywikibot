@@ -10,6 +10,7 @@ A
     Aaron Hill
     adiyetichaves
     Ævar Arnfjörð Bjarmason
+    Akash Kumar
     akashagarwal
     Akaza24
     AkshitKumar
