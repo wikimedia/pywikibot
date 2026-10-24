@@ -130,10 +130,6 @@ jobs:
         continue-on-error: true
         timeout-minutes: 2
         env:
-          HTTP_PROXY: socks5h://127.0.0.1:1080
-          HTTPS_PROXY: socks5h://127.0.0.1:1080
-          ALL_PROXY: socks5h://127.0.0.1:1080
-          NO_PROXY: ""
         run: |
           python pwb.py version
           coverage run -m unittest -vv tests/site_login_logout_tests.py
