@@ -282,7 +282,8 @@ def _create_default_regexes() -> None:
         # section headers
         'header': re.compile(
             r'(?:(?<=\n)|\A)(?s:<!--.*?-->)*'
-            r'(=(?:[^\n]|(?s:<!--.*?-->))+=)'
+            # a comment is only matched as a whole (T209712)
+            r'(=(?:[^\n<]|<(?!!--)|(?s:<!--.*?-->))+=)'
             r' *(?s:<!--.*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
