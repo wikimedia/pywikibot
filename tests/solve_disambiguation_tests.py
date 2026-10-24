@@ -12,8 +12,70 @@ from contextlib import suppress
 from unittest.mock import patch
 
 import pywikibot
-from scripts.solve_disambiguation import DisambiguationRobot
+from scripts.solve_disambiguation import (
+    DisambiguationRobot,
+    ReferringPageGeneratorWithIgnore,
+)
 from tests.aspects import TestCase
+
+
+class TestReferringPageGenerator(TestCase):
+
+    """Test streaming and the minimum eligible reference count."""
+
+    family = 'wikipedia'
+    code = 'de'
+    dry = True
+
+    def test_streaming(self) -> None:
+        """Yield the first reference without consuming the remaining ones."""
+        page = pywikibot.Page(self.site, 'Disambiguation')
+        ignored = pywikibot.Page(self.site, 'Primary')
+        ref = pywikibot.Page(self.site, 'Article')
+
+        def references():
+            yield ignored
+            yield ref
+            self.fail(
+                'References were consumed before yielding the first page')
+
+        with patch('scripts.solve_disambiguation.ignore_title', {}), \
+                patch.object(page, 'getReferences',
+                             return_value=references()) as get_refs, \
+                patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
+                      '.isIgnored', side_effect=lambda page: page == ignored):
+            gen = iter(ReferringPageGeneratorWithIgnore(page, main_only=True))
+            self.assertEqual(next(gen), ref)
+            get_refs.assert_called_once_with(with_template_inclusion=False,
+                                             namespaces=0)
+            gen.close()
+
+    def test_minimum_after_filtering(self) -> None:
+        """Buffer eligible pages only, and skip if the minimum is unmet."""
+        page = pywikibot.Page(self.site, 'Disambiguation')
+        refs = [
+            pywikibot.Page(self.site, title)
+            for title in ('Ignored', 'Primary', 'First', 'Second', 'Third')]
+        consumed = []
+
+        def references():
+            for ref in refs:
+                consumed.append(ref)
+                yield ref
+
+        with patch('scripts.solve_disambiguation.ignore_title',
+                   {'wikipedia': {'de': ['Ignored']}}), \
+                patch.object(page, 'getReferences',
+                             side_effect=lambda **kwargs: references()), \
+                patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
+                      '.isIgnored', side_effect=lambda ref: ref == refs[1]):
+            gen = iter(ReferringPageGeneratorWithIgnore(page, minimum=2))
+            self.assertEqual(next(gen), refs[2])
+            self.assertEqual(consumed, refs[:4])
+            self.assertEqual(list(gen), refs[3:])
+
+            self.assertEqual(
+                list(ReferringPageGeneratorWithIgnore(page, minimum=4)), [])
 
 
 class TestDisambiguationRobot(TestCase):

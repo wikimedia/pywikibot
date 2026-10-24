@@ -82,7 +82,7 @@ from __future__ import annotations
 import re
 from collections.abc import Generator
 from contextlib import suppress
-from itertools import chain
+from itertools import chain, islice
 from pathlib import Path
 
 import pywikibot
@@ -411,28 +411,31 @@ class ReferringPageGeneratorWithIgnore:
         self.main_only = main_only
 
     def __iter__(self) -> Generator[pywikibot.Page]:
-        """Yield pages."""
-        # TODO: start yielding before all referring pages have been found
-        refs = list(self.page.getReferences(with_template_inclusion=False,
-                                            namespaces=0 if self.main_only
-                                            else None))
-        pywikibot.info(f'Found {len(refs)} references.')
-        # Remove ignorables
+        """Yield eligible pages, buffering only enough to check the minimum."""
         site = self.page.site
-        if site.family.name in ignore_title \
-           and site.lang in ignore_title[site.family.name]:
-            for ig in ignore_title[site.family.name][site.lang]:
-                for i in range(len(refs) - 1, -1, -1):
-                    if re.match(ig, refs[i].title()):
-                        pywikibot.log('Ignoring page ' + refs[i].title())
-                        del refs[i]
-                    elif self.primaryIgnoreManager.isIgnored(refs[i]):
-                        del refs[i]
-        if len(refs) < self.minimum:
+        patterns = ignore_title.get(site.family.name, {}).get(site.lang, [])
+
+        def eligible_pages():
+            for ref in self.page.getReferences(
+                    with_template_inclusion=False,
+                    namespaces=0 if self.main_only else None):
+                for pattern in patterns:
+                    if re.match(pattern, ref.title()):
+                        pywikibot.log('Ignoring page ' + ref.title())
+                        break
+                else:
+                    if not self.primaryIgnoreManager.isIgnored(ref):
+                        yield ref
+
+        refs = eligible_pages()
+        buffered = list(islice(refs, max(0, self.minimum)))
+        if len(buffered) < self.minimum:
             pywikibot.info(
-                f'Found only {len(refs)} pages to work on; skipping.')
+                f'Found only {len(buffered)} pages to work on; skipping.')
             return
-        pywikibot.info(f'Will work on {len(refs)} pages.')
+        pywikibot.info('Working on referring pages.')
+        yield from buffered
+        del buffered
         yield from refs
 
 
