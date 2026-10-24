@@ -182,7 +182,9 @@ class APISite(
         """
         assert site is not None, 'Site must not be None'
         prefixes = set()
-        for url in site._interwiki_urls():
+        for path in site._interwiki_urls():
+            # the interwiki map holds full URLs with a $1 placeholder
+            url = site.base_url(path.replace('{}', '$1'))
             prefixes.update(self._interwikimap.get_by_url(url))
         if not prefixes:
             raise KeyError(
