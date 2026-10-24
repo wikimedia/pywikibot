@@ -1158,6 +1158,30 @@ class TestWriteNormalizeData(TestCase):
             ItemPage._normalizeData(data)
 
 
+class TestLexemePage(WikidataTestCase):
+
+    """Test Lexeme initialization without accessing a wiki."""
+
+    dry = True
+
+    def test_unsaved_fields(self) -> None:
+        """Collection access must preserve directly assigned lemmas."""
+        repo = self.get_repo()
+        namespace = Namespace(146, canonical_name='Lexeme',
+                              case='first-letter',
+                              defaultcontentmodel='wikibase-lexeme')
+        namespaces = NamespacesDict({**repo.namespaces, 146: namespace})
+        with patch.object(repo, '_namespaces', namespaces), \
+                patch.object(repo, '_entity_namespaces',
+                             {'lexeme': namespace}, create=True):
+            lexeme = LexemePage(repo)
+        lexeme.lemmas = LanguageDict({'en': 'colour'})
+        self.assertIsEmpty(lexeme.forms)
+        self.assertIsEmpty(lexeme.senses)
+        self.assertIsEmpty(lexeme.claims)
+        self.assertEqual(lexeme.lemmas, {'en': 'colour'})
+
+
 class TestLexemeNormalizeData(WikidataTestCase):
 
     """Test normalization of Lexeme and form fields."""

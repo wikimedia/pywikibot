@@ -2333,7 +2333,7 @@ class LexemePage(WikibasePage):
     }
 
     def __init__(self, site, title: str | None = None) -> None:
-        """Initializer.
+        """Initialize a Lexeme, with empty collections for a new entity.
 
         :param site: Data repository
         :type site: Pywikibot.site.DataSite
@@ -2344,6 +2344,7 @@ class LexemePage(WikibasePage):
         if title is None or title == '-1':
             super().__init__(site, '-1', entity_type='lexeme')
             assert self.id == '-1'
+            self._initialize_empty()
             return
 
         # we don't want empty titles
