@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import ipaddress
 import re
 import unicodedata
 from html.entities import name2codepoint
@@ -369,6 +370,9 @@ class Link(BaseLink):
 
         .. version-changed:: 11.9
            Validate :attr:`title` length in UTF-8 bytes.
+        .. version-changed:: 11.10
+           IPv6 addresses in user namespaces are written in full and
+           without leading zeros, as MediaWiki does.
         """
         self._site = self._source
         self._namespace = self._defaultns
@@ -480,6 +484,12 @@ class Link(BaseLink):
         # MediaWiki uses uppercase IP addresses
         if self._namespace in (2, 3) and is_ip_address(t):
             t = t.upper()
+            # and writes IPv6 addresses in full without leading zeros;
+            # addresses with an IPv4 part or a zone index are left as
+            # they are (T329819)
+            if re.fullmatch('[0-9A-F:]+', t):
+                words = ipaddress.IPv6Address(t).exploded.split(':')
+                t = ':'.join(f'{int(word, 16):X}' for word in words)
         elif self._site.namespaces[self._namespace].case == 'first-letter':
             t = first_upper(t)
 
