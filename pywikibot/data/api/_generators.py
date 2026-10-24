@@ -1086,6 +1086,9 @@ def _update_langlinks(page, langlinks) -> None:
 
 def _update_coordinates(page, coordinates) -> None:
     """Update page coordinates."""
+    # use the data repository of the page's site; the default site may
+    # be another wiki where the user cannot log in (T363303)
+    repo = page.site.data_repository()
     coords = []
     for co in coordinates:
         coord = pywikibot.Coordinate(lat=co['lat'],
@@ -1094,7 +1097,8 @@ def _update_coordinates(page, coordinates) -> None:
                                      name=co.get('name', ''),
                                      dim=int(co.get('dim', 0)) or None,
                                      globe=co['globe'],  # See [[gerrit:67886]]
-                                     primary='primary' in co
+                                     primary='primary' in co,
+                                     site=repo,
                                      )
         coords.append(coord)
     page._coords = coords

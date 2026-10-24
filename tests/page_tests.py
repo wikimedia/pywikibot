@@ -19,6 +19,7 @@ from unittest import mock
 import pywikibot
 import pywikibot.page
 from pywikibot import config
+from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
     ApiTimeoutError,
@@ -825,6 +826,47 @@ class TestPageCoordinates(TestCase):
             coord = page.coordinates(primary_only=True)
             self.assertIsInstance(coord, pywikibot.Coordinate)
             self.assertTrue(coord.primary)
+
+
+class TestPageCoordinatesRepository(TestCase):
+
+    """Test the data repository of Page coordinates."""
+
+    family = 'wikipedia'
+    code = 'de'
+    dry = True
+
+    def test_coordinates_repository(self) -> None:
+        """Test that coordinates do not use the default site (T363303)."""
+        page = pywikibot.Page(self.site, 'Wien')
+        repo = self.site.data_repository()
+        pagedict = {
+            'pageid': 1,
+            'coordinates': [
+                {'lat': 48.208333, 'lon': 16.373056, 'globe': 'earth',
+                 'primary': ''},
+                {'lat': 48.2, 'lon': 16.3, 'globe': 'earth'},
+            ],
+        }
+
+        def loadcoordinfo(page) -> None:
+            api.update_page(page, pagedict, ['coordinates'])
+
+        with mock.patch.object(self.site, 'loadcoordinfo', loadcoordinfo), \
+                mock.patch.object(self.site, 'data_repository',
+                                  return_value=repo), \
+                mock.patch.object(pywikibot, 'Site',
+                                  side_effect=AssertionError(
+                                      'default site was used')):
+            coords = page.coordinates()
+
+        self.assertLength(coords, 2)
+        for coord in coords:
+            self.assertIs(coord.site, repo)
+        self.assertEqual((coords[0].lat, coords[0].lon),
+                         (48.208333, 16.373056))
+        self.assertTrue(coords[0].primary)
+        self.assertFalse(coords[1].primary)
 
 
 class TestPageGetFileHistory(DefaultSiteTestCase):
