@@ -56,6 +56,7 @@ __all__ = (
     'LexemeForm',
     'LexemePage',
     'LexemeSense',
+    'LexemeSubEntity',
     'MediaInfo',
     'Property',
     'PropertyPage',

@@ -9,6 +9,23 @@ next_version
 
 * This maintenance script was added to update Sphinx version directives. (:phab:`T440810`)
 
+noreferences
+^^^^^^^^^^^^
+
+* Don't add a second blank line before bottom templates (:phab:`T365340`)
+
+redirect
+^^^^^^^^
+
+* Support Scribunto redirects (:phab:`T417129`)
+
+
+solve_disambiguation
+^^^^^^^^^^^^^^^^^^^^
+
+* Stream referring pages lazily.
+
+
 11.9.0
 ------
 
