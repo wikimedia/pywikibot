@@ -13,7 +13,6 @@ from pywikibot.titletranslate import translate
 from tests.aspects import TestCase
 
 
-@unittest.skip('WikiStats is offline due to T442188 and T441908')
 class TestTitleTranslate(TestCase):
 
     """Tests for titletranslate module."""

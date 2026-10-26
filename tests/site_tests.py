@@ -1244,7 +1244,6 @@ class TestLinktrails(TestCase):
     family = 'wikipedia'
     code = 'test'
 
-    @unittest.skip('WikiStats is offline due to T442188 and T441908')
     def test_has_linktrail(self) -> None:
         """Verify that every code has a linktrail.
 
