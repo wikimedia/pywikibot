@@ -114,7 +114,7 @@ repos:
           - --config=tox.ini
         # Due to incompatibilities between packages the order matters.
         additional_dependencies:
-          - flake8-bugbear>=25.11.29
+          - flake8-bugbear>=26.10.27
           - flake8-print>=5.0.0
           - pep8-naming>=0.15.1
   - repo: https://github.com/pre-commit/mirrors-mypy
