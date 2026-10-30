@@ -22,7 +22,7 @@ import pywikibot
 from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._page import Page
-from pywikibot.tools import compute_file_hash
+from pywikibot.tools import compute_file_hash, is_url
 
 
 if TYPE_CHECKING:
@@ -298,6 +298,10 @@ class FilePage(Page):
 
         .. version-changed:: 11.8
            The *comment* keyword was renamed to *summary*.
+        .. version-changed:: next
+           *source* is only taken as URL if it starts with a URL scheme;
+           a local path like ``C://image.png`` is no longer uploaded as
+           URL.
 
         :keyword summary: Edit summary; if this is not provided, then
             filepage.text will be used. An empty summary is not
@@ -335,7 +339,7 @@ class FilePage(Page):
             otherwise.
         """
         filename = url = None
-        if '://' in source:
+        if is_url(source):
             url = source
         else:
             filename = source

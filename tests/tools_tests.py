@@ -26,6 +26,7 @@ from pywikibot.tools import (
     has_module,
     is_ip_address,
     is_ip_network,
+    is_url,
     suppress_warnings,
 )
 from pywikibot.tools.collections import GeneratorWrapper
@@ -1093,6 +1094,33 @@ class TestIsIpNetworkNotStrict(TestCase):
                          '2001:db8::aaaa::1/128'):
             with self.subTest(ip_network=ip_range):
                 self.assertFalse(is_ip_network(ip_range, strict=False))
+
+
+class TestIsUrl(TestCase):
+
+    """Unit test class for is_url."""
+
+    net = False
+
+    def test_urls(self) -> None:
+        """Check values starting with a URL scheme."""
+        for value in ('https://upload.wikimedia.org/image.png',
+                      'http://example.org/image.png',
+                      'HTTPS://example.org/image.png',
+                      'ftp://example.org/image.png',
+                      'svn+ssh://example.org/image.png'):
+            with self.subTest(value=value):
+                self.assertTrue(is_url(value))
+
+    def test_paths(self) -> None:
+        """Check local paths, also those containing ``://``."""
+        for value in ('', 'image.png', '/home/user/image.png',
+                      'C://Windows/image.png', r'C:\Windows\image.png',
+                      '/home/user/a://b/image.png', './a://image.png',
+                      '://image.png', '1http://example.org/image.png',
+                      'abc:def.png', 'File:image.png'):
+            with self.subTest(value=value):
+                self.assertFalse(is_url(value))
 
 
 class TestHasModule(TestCase):

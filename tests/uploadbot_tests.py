@@ -192,6 +192,29 @@ class TestUploadbotTempFiles(TestCase):
             self.assertEqual(result, 'mahveo.png')
             self.assertTrue(path.exists())
 
+    def test_local_path_with_scheme_separator(self) -> None:
+        """Test that a local path containing ``://`` is not downloaded."""
+        for path in ('C://Windows/mahveo.png', '/home/user/a://mahveo.png'):
+            with self.subTest(path=path):
+                site = mock.Mock(file_extensions=['png'])
+                site.has_right.return_value = False
+                imagepage = mock.Mock()
+                imagepage.exists.return_value = False
+                imagepage.file_is_shared.return_value = False
+                imagepage.upload.return_value = True
+                bot = UploadRobot(url=[path], target_site=site,
+                                  description='test', keep_filename=True,
+                                  verify_description=False, always=False)
+                with mock.patch.object(bot, 'read_file_content') as fetch, \
+                        mock.patch('pywikibot.FilePage',
+                                   return_value=imagepage):
+                    result = bot.upload_file(path)
+
+                self.assertEqual(result, 'mahveo.png')
+                fetch.assert_not_called()
+                imagepage.upload.assert_called_once()
+                self.assertEqual(imagepage.upload.call_args.args, (path, ))
+
     def test_downloaded_file_cleanup_after_retry(self) -> None:
         """Test cleanup after falling back from URL to file upload."""
         file_url = 'https://yo.wikipedia.org/mahveo.png'

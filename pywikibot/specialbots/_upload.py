@@ -24,6 +24,7 @@ from pywikibot import config
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
+from pywikibot.tools import is_url
 
 
 if TYPE_CHECKING:
@@ -283,7 +284,7 @@ class UploadRobot(BaseBot):
         """
         # Isolate the pure name
         filename = file_url
-        if '://' in filename:
+        if is_url(filename):
             # extract the path portion of the URL
             filename = urlparse(filename).path
         filename = os.path.basename(filename)
@@ -453,7 +454,7 @@ class UploadRobot(BaseBot):
         temp_filename: str | None = None
         try:
             while True:
-                if '://' in file_url \
+                if is_url(file_url) \
                    and (not site.has_right('upload_by_url') or download):
                     try:
                         temp_filename = self.read_file_content(file_url)
@@ -475,7 +476,7 @@ class UploadRobot(BaseBot):
                             f'Upload error: Local file uploads are disabled '
                             f'on {site}.')
                     elif error.code == 'copyuploadbaddomain' and not download \
-                            and '://' in file_url:
+                            and is_url(file_url):
                         pywikibot.error(error)
                         pywikibot.info('Downloading the file and retry...')
                         download = True

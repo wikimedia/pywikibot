@@ -1,6 +1,14 @@
 Scripts Changelog
 =================
 
+12.0.0
+------
+
+upload
+^^^^^^
+
+* Accept a local path containing ``://`` if it is not a URL (:phab:`T164450`)
+
 11.10.0
 -------
 

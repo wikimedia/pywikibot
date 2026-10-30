@@ -12,6 +12,7 @@ import re
 import unittest
 from contextlib import suppress
 from itertools import chain
+from unittest import mock
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -284,6 +285,35 @@ class TestFilePageLatestFileInfo(TestCase):
             self.image.get_file_url(url_param='100px'), self.pattern)
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
+
+
+class TestFilePageUpload(TestCase):
+
+    """Dry tests for FilePage.upload source handling."""
+
+    net = False
+
+    def _upload(self, source: str) -> dict:
+        """Call FilePage.upload with a mocked site and return kwargs."""
+        page = mock.Mock()
+        pywikibot.FilePage.upload(page, source, summary='test')
+        page.site.upload.assert_called_once()
+        return page.site.upload.call_args.kwargs
+
+    def test_url(self) -> None:
+        """Test that a URL is passed as source_url."""
+        url = 'https://upload.wikimedia.org/image.png'
+        kwargs = self._upload(url)
+        self.assertEqual(kwargs['source_url'], url)
+        self.assertIsNone(kwargs['source_filename'])
+
+    def test_path_with_scheme_separator(self) -> None:
+        """Test that local paths containing ``://`` are passed as file."""
+        for path in ('C://Windows/image.png', '/home/user/a://b/image.png'):
+            with self.subTest(path=path):
+                kwargs = self._upload(path)
+                self.assertEqual(kwargs['source_filename'], path)
+                self.assertIsNone(kwargs['source_url'])
 
 
 class TestFilePageDownload(TestCase):

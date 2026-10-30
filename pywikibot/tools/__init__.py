@@ -21,6 +21,7 @@ from contextlib import suppress
 from functools import total_ordering, wraps
 from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Literal
+from urllib.parse import urlsplit
 from warnings import catch_warnings, showwarning, warn
 
 import packaging.version
@@ -78,6 +79,7 @@ __all__ = (
     'as_filename',
     'is_ip_address',
     'is_ip_network',
+    'is_url',
     'has_module',
     'classproperty',
     'suppress_warnings',
@@ -138,6 +140,44 @@ def is_ip_network(value: str, *, strict: bool = True) -> bool:
         return True
 
     return False
+
+
+def is_url(value: str) -> bool:
+    """Check if a value starts with a URL scheme like ``https://``.
+
+    The scheme is found with :func:`urllib.parse.urlsplit`. A single
+    letter is not taken as a scheme because it is a Windows drive
+    letter like in ``C://Windows/image.png``, and the scheme must be
+    followed by ``://``, so a file name like ``abc:def.png`` or a path
+    which only contains ``://`` somewhere else is not a URL either.
+
+    >>> is_url('https://upload.wikimedia.org/image.png')
+    True
+    >>> is_url('C://Windows/image.png')
+    False
+    >>> is_url('/home/user/a://b/image.png')
+    False
+    >>> is_url('abc:def.png')
+    False
+
+    .. version-added:: next
+
+    :param value: Value to check
+    """
+    value = value.lstrip()
+    try:
+        scheme = urlsplit(value).scheme
+    except ValueError:
+        return False
+
+    # Python 3.10 urlsplit() does not check that a scheme starts with an
+    # ASCII letter like Python 3.11+ does.
+    # TODO: remove this check with Pywikibot 13
+    if PYTHON_VERSION < (3, 11) and scheme and not (
+            scheme[0].isascii() and scheme[0].isalpha()):
+        return False
+
+    return len(scheme) > 1 and value[len(scheme):].startswith('://')
 
 
 def has_module(module: str, version: str | None = None) -> bool:

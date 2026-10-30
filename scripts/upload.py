@@ -81,6 +81,7 @@ from pathlib import Path
 import pywikibot
 from pywikibot.bot import suggest_help
 from pywikibot.specialbots import UploadRobot
+from pywikibot.tools import is_url
 
 
 CHUNK_SIZE_REGEX = re.compile(
@@ -193,7 +194,7 @@ def main(*args: str) -> None:
         description = filepath.read_text(
             encoding='utf-8').replace('\r\n', '\n')
 
-    while not ('://' in url or os.path.exists(url)):
+    while not (is_url(url) or os.path.exists(url)):
         if not url:
             error = 'No input filename given.'
         else:

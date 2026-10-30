@@ -7,7 +7,10 @@ Release 12
 
 **Bugfixes**
 
-* (No changes yet)
+* Only take a source starting with a URL scheme as URL in :meth:`FilePage.upload()
+  <pywikibot.FilePage.upload>` and :class:`specialbots.UploadRobot`; a local path
+  containing ``://`` like ``C://image.png`` is uploaded as file. :func:`tools.is_url`
+  was added for this check. (:phab:`T164450`)
 
 **Code cleanups**
 
