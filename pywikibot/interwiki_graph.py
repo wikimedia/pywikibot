@@ -120,17 +120,19 @@ class GraphDrawer:
         node.set_fillcolor('white')
         node.set_fontsize('11')
         if not page.exists():
-            node.set_fillcolor('red')
+            node.set_fillcolor('#aaa')
+            node.set_style('filled,bold')  # non exists page
         elif page.isRedirectPage():
-            node.set_fillcolor('blue')
+            node.set_fillcolor('#aff')  # redirect
         elif page.isDisambig():
-            node.set_fillcolor('orange')
+            node.set_fillcolor('#fda')  # disambig
+        elif page.site in self.octagon_sites:
+            node.set_fillcolor('pink')  # conflicted page
         if page.namespace() != self.subject.origin.namespace():
             node.set_color('green')
-            node.set_style('filled,bold')
+            node.set_style('filled,bold')  # diffs NS
         if page.site in self.octagon_sites:
-            # mark conflict by octagonal node
-            node.set_shape('octagon')
+            node.set_shape('octagon')  # conflicted page
         self.graph.add_node(node)
 
     def addDirectedEdge(self, page: pywikibot.page.Page,
@@ -147,6 +149,10 @@ class GraphDrawer:
             if oppositeEdge:
                 oppositeEdge = oppositeEdge[0]
                 oppositeEdge.set_dir('both')
+                oppositeEdge.set_color('black')
+                oppositeEdge.set_tooltip(
+                    f'{targetLabel[1:-1]} <-> {sourceLabel[1:-1]}'
+                )
             # workaround for sf.net bug 401: prevent duplicate edges
             # (it is unclear why duplicate edges occur)
             # https://sourceforge.net/p/pywikipediabot/bugs/401/
@@ -157,18 +163,21 @@ class GraphDrawer:
                 # give a list of edges, not a single edge when we handle the
                 # opposite edge.
             else:
+                edge.set_color('#990')  # one-way links
                 # add edge
                 if refPage.site == page.site:
-                    edge.set_color('blue')
+                    edge.set_color('blue')  # mark redirect
                 elif not page.exists():
-                    # mark dead links
-                    edge.set_color('red')
+                    edge.set_color('red')  # mark dead links
                 elif refPage.isDisambig() != page.isDisambig():
-                    # mark links between disambiguation and non-disambiguation
-                    # pages
-                    edge.set_color('orange')
-                if refPage.namespace() != page.namespace():
-                    edge.set_color('green')
+                    edge.set_color('orange')  # disambig and non-disambig
+                elif (
+                    refPage.site in self.octagon_sites
+                    or page.site in self.octagon_sites
+                ):
+                    edge.set_color('red')  # conflicted pages
+                elif refPage.namespace() != page.namespace():
+                    edge.set_color('green')  # pages in diffs NS
                 self.graph.add_edge(edge)
 
     def saveGraphFile(self) -> None:
