@@ -54,5 +54,41 @@ class TestAddingReferences(TestCase):
         self.assertEqual(new_text, expected)
 
 
+class TestReferencesSpacing(TestCase):
+
+    """Test the blank lines around a newly created references section."""
+
+    family = 'wikipedia'
+    code = 'cs'
+    dry = True
+
+    def add_references(self, text: str) -> str:
+        """Return text with a references section added."""
+        bot = NoReferencesBot(site=self.site)
+        return bot.addReferences(text)
+
+    def test_bottom_template(self) -> None:
+        """Test one blank line before a bottom template."""
+        expected = 'Text.\n\n== Reference ==\n<references />\n\n{{tmpl}}\n'
+        for newlines in ('\n', '\n\n', '\n\n\n'):
+            with self.subTest(newlines=newlines):
+                text = f'Text.{newlines}{{{{tmpl}}}}\n'
+                self.assertEqual(self.add_references(text), expected)
+
+    def test_category(self) -> None:
+        """Test one blank line before a category."""
+        expected = ('Text.\n\n== Reference ==\n<references />\n\n'
+                    '[[Category:Foo]]\n')
+        for newlines in ('\n', '\n\n'):
+            with self.subTest(newlines=newlines):
+                text = f'Text.{newlines}[[Category:Foo]]\n'
+                self.assertEqual(self.add_references(text), expected)
+
+    def test_no_following_text(self) -> None:
+        """Test that nothing is added after the references section."""
+        self.assertEqual(self.add_references('Text.'),
+                         'Text.\n\n== Reference ==\n<references />\n')
+
+
 if __name__ == '__main__':
     unittest.main()

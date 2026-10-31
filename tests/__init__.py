@@ -210,7 +210,6 @@ script_test_modules = {
 }
 
 disabled_test_modules = {
-    'tests',  # tests of the tests package
     'site_login_logout',  # separate Login CI action
 }
 

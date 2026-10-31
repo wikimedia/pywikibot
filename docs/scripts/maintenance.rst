@@ -30,6 +30,13 @@ make\_i18n\_dict script
    :no-members:
    :noindex:
 
+next\_version script
+====================
+
+.. automodule:: scripts.maintenance.next_version
+   :no-members:
+   :noindex:
+
 unidata script
 ==============
 

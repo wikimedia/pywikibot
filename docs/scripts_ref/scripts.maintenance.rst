@@ -30,6 +30,11 @@ scripts.maintenance.make\_i18n\_dict
 
 .. automodule:: scripts.maintenance.make_i18n_dict
 
+scripts.maintenance.next\_version
+---------------------------------
+
+.. automodule:: scripts.maintenance.next_version
+
 scripts.maintenance.unidata
 ---------------------------
 

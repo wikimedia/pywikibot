@@ -56,6 +56,7 @@ __all__ = (
     'LexemeForm',
     'LexemePage',
     'LexemeSense',
+    'LexemeSubEntity',
     'MediaInfo',
     'Property',
     'PropertyPage',
@@ -317,6 +318,16 @@ class WikibaseEntity:
         if getattr(self, 'id', '-1') == '-1':
             self.__init__(self.repo, updates['entity']['id'])
 
+        self._update_from_edit_response(updates['entity'], update_self)
+
+    def _update_from_edit_response(
+        self, data: dict, update_self: bool
+    ) -> None:
+        """Update cached state after a successful edit.
+
+        :param data: Entity data returned by the edit API
+        :param update_self: Whether the edit used the local entity state
+        """
         # the response also contains some data under the 'entity' key
         # but it is NOT the actual content
         # see also [[d:Special:Diff/1356933963]]
@@ -324,12 +335,12 @@ class WikibaseEntity:
         # the content can be safely reused
         if hasattr(self, '_content'):
             del self._content
-        self.latest_revision_id = updates['entity'].get('lastrevid')
+        self.latest_revision_id = data.get('lastrevid')
 
-        if not update_self or 'claims' not in updates['entity']:
+        if not update_self or 'claims' not in data:
             return
 
-        updated_claims = updates['entity']['claims']
+        updated_claims = data['claims']
         for claim_prop_id, statements in updated_claims.items():
             for claim_index, statement in enumerate(statements):
                 claim = self.claims[claim_prop_id][claim_index]
@@ -2322,7 +2333,7 @@ class LexemePage(WikibasePage):
     }
 
     def __init__(self, site, title: str | None = None) -> None:
-        """Initializer.
+        """Initialize a Lexeme, with empty collections for a new entity.
 
         :param site: Data repository
         :type site: Pywikibot.site.DataSite
@@ -2333,6 +2344,7 @@ class LexemePage(WikibasePage):
         if title is None or title == '-1':
             super().__init__(site, '-1', entity_type='lexeme')
             assert self.id == '-1'
+            self._initialize_empty()
             return
 
         # we don't want empty titles
@@ -2342,15 +2354,56 @@ class LexemePage(WikibasePage):
         super().__init__(site, title, entity_type='lexeme')
         assert self.id == self._link.title
 
-    def get_data_for_new_entity(self) -> NoReturn:
-        """Return data required for creation of a new lexeme."""
-        raise NotImplementedError  # TODO
+    def __getattr__(self, name):
+        if name in ('language', 'lexicalCategory') \
+                and self.__dict__.get('_needs_reload', False):
+            return self.get()[name]
+        return super().__getattr__(name)
+
+    @allow_asynchronous
+    def editEntity(
+        self, data: ENTITY_DATA_TYPE | None = None, **kwargs
+    ) -> None:
+        """Create or edit the Lexeme and invalidate cached data on success.
+
+        New Lexemes require lemmas, language and lexicalCategory. Pass
+        explicit API data or populate the Lexeme before saving. Explicit
+        data is not combined with local fields.
+
+        Forms, senses and claims must be reacquired from this Lexeme
+        after saving. Existing references are snapshots and are not
+        updated with server-assigned identifiers. Data is reloaded on
+        the next access.
+
+        .. seealso:: :ref:`Creating Lexemes`: How to create lexemes with
+           either an explicit creation dictionary or fields populated on
+           the object
+
+        :param data: API changes, or None to save local changes
+        """
+        if data is None and getattr(self, '_needs_reload', False):
+            self.get()
+        super().editEntity(data, **kwargs)
+
+    def _update_from_edit_response(
+        self, data: dict, update_self: bool
+    ) -> None:
+        """Invalidate Lexeme data without matching response IDs by position."""
+        for attr in (*self.DATA_ATTRIBUTES, 'language', 'lexicalCategory',
+                     '_content'):
+            self.__dict__.pop(attr, None)
+        self.latest_revision_id = data.get('lastrevid')
+        self._needs_reload = True
 
     def toJSON(self, diffto: dict | None = None) -> dict:
         """Create JSON suitable for Wikibase API.
 
         When diffto is provided, JSON representing differences to the
         provided data is created.
+
+        Forms and senses use API edit operations, not replacement of the
+        server's collections. Removing children requires a complete
+        original collection in diffto.
 
         :param diffto: JSON containing entity data
         """
@@ -2382,6 +2435,13 @@ class LexemePage(WikibasePage):
             redirect, do not raise an exception.
         :raise NotImplementedError: a value in args or kwargs
         """
+        pending = {}
+        if not force and self.__dict__.get('_needs_reload', False):
+            # Fields assigned since invalidation are new local changes.
+            pending = {key: self.__dict__[key]
+                       for key in (*self.DATA_ATTRIBUTES, 'language',
+                                   'lexicalCategory')
+                       if key in self.__dict__}
         data = super().get(force, *args, **kwargs)
 
         if self.isRedirectPage() and not get_redirect:
@@ -2400,6 +2460,10 @@ class LexemePage(WikibasePage):
 
         data['language'] = self.language
         data['lexicalCategory'] = self.lexicalCategory
+        self._needs_reload = False
+        for key, value in pending.items():
+            setattr(self, key, value)
+            data[key] = value
 
         return data
 
@@ -2410,9 +2474,9 @@ class LexemePage(WikibasePage):
         :param data: The dict to normalize
         :return: The altered dict from parameter data.
         """
-        new_data = WikibasePage._normalizeData(data)
+        new_data = super()._normalizeData(data)
         for prop in ('language', 'lexicalCategory'):
-            value = new_data.get(prop)
+            value = data.get(prop)
             if value:
                 if isinstance(value, ItemPage):
                     new_data[prop] = value.getID()
@@ -2497,6 +2561,8 @@ class LexemeSubEntity(WikibaseEntity):
         """Initializer."""
         super().__init__(repo, id_)
         self._on_lexeme = None
+        if self.id == '-1':
+            self._initialize_empty()
 
     @classmethod
     def fromJSON(cls, repo, data):
@@ -2505,7 +2571,27 @@ class LexemeSubEntity(WikibaseEntity):
         return new
 
     def toJSON(self, diffto=None) -> dict:
+        """Serialize fields and explicit representation or gloss removals.
+
+        :param diffto: Original child data, or None for all current fields
+        """
+        fields = tuple(self.DATA_ATTRIBUTES)
+        if self.entity_type == 'form':
+            fields += ('grammaticalFeatures',)
+        if self.id != '-1' and any(key not in self.__dict__ for key in fields):
+            # Loading missing fields must not overwrite local assignments.
+            pending = {key: self.__dict__[key] for key in fields
+                       if key in self.__dict__}
+            self.get()
+            for key, value in pending.items():
+                setattr(self, key, value)
         data = super().toJSON(diffto)
+        if diffto:
+            for key in ('representations', 'glosses'):
+                for language in diffto.get(key, {}):
+                    if language not in getattr(self, key, {}):
+                        data.setdefault(key, {})[language] = {
+                            'language': language, 'remove': ''}
         if self.id != '-1':
             data['id'] = self.id
         return data
@@ -2572,20 +2658,33 @@ class LexemeForm(LexemeSubEntity):
         'claims': ClaimCollection,
     }
 
+    def __getattr__(self, name):
+        if name == 'grammaticalFeatures':
+            return self.get()[name]
+        return super().__getattr__(name)
+
+    def _initialize_empty(self) -> None:
+        super()._initialize_empty()
+        self.grammaticalFeatures = set()
+
     def toJSON(self, diffto: dict | None = None) -> dict:
-        """Create dict suitable for the MediaWiki API."""
+        """Serialize form changes, including an empty list to clear features.
+
+        :param diffto: Original form data, or None for all current fields
+        """
         data = super().toJSON(diffto=diffto)
 
         key = 'grammaticalFeatures'
-        if getattr(self, key, None):
-            # could also avoid if no change wrt. diffto
-            data[key] = [value.getID() for value in self.grammaticalFeatures]
+        features = sorted(value.getID() for value in self.grammaticalFeatures)
+        if diffto is None or key not in diffto \
+                or set(features) != set(diffto[key]):
+            data[key] = features
 
         return data
 
     @classmethod
     def _normalizeData(cls, data):
-        new_data = LexemeSubEntity._normalizeData(data)
+        new_data = super()._normalizeData(data)
         if 'grammaticalFeatures' in data:
             value = []
             for feat in data['grammaticalFeatures']:

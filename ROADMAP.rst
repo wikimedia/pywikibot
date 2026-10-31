@@ -1,39 +1,46 @@
-Release 11.9
-============
+Release 11.10
+=============
 
-* Add support for mlwwikivoyage. (:phab:`T441175`)
-* Update translations (i18n).
+* Enable lexeme creation through :class:`LexemePage.editEntity()<pywikibot.LexemePage.editEntity>`.
+  See :ref:`Creating Lexemes` for further information. (:phab:`T442295`)
+* Initialize :class:`LexemePage<pywikibot.LexemePage>` collections for unsaved entities.
+  (:phab:`T442290`)
 * Various performance, stability, and code quality improvements.
-* Fix ZIP discovery and duplicate import paths in :func:`config.register_families_folder`.
-* Unify negative :ref:`page generator options<GENERATOR OPTIONS>`. (:phab:`T219282`)
-* Keep the sign of negative POSIX :class:`timestamps<<pywikibot.time.Timestamp>`.
-* Use the :attr:`page.BasePage.site` in :meth:`page.BasePage.change_category` when calling
-  :func:`textlib.replaceCategoryLinks` to respect category namespaces and footer rules.
-* Validate :attr:`pywikibot.Link.title` length in UTF-8 bytes within :meth:`pywikibot.Link.parse`.
-* Normalize usernames in :func:`pagegenerators.UserEditFilterGenerator` to match
-  canonical API names.
-* Verify zero-byte stashes against the empty hash in :func:`tools.compute_file_hash`.
-* Accept optional leading hyphens and period or hyphen separators in beta/rc suffixes
-  in :class:`tools.MediaWikiVersion`. Raise ValueError instead of AssertionError
-  for malformed suffixes.
-* Prevent setting a class property on an instance with :class:`tools.classproperty`.
-* Make API cache writes of :class:`data.api.CachedRequest` atomic and failure-safe.
-  (:phab:`T438266`)
-* Map claims for wbeditentity of :class:`page.MediaInfo`. (:phab:`T376955`)
-* Avoid reading streamed HTTP responses to detect encoding in :func:`comms.http.fetch`.
-* Add *timespec* parameter to :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>`
-  method. (:phab:`T439983`, :phab:`T440120`)
-* Allow :ref:`global -user option<Global options>` to override OAuth authentication.
-  (:phab:`T420084`)
-* The *force* parameter of :class:`pywikibot.User` methods was renamed to
-  *refresh* (:phab:`T433225`)
-* Support custom Timestamp ISO separators and restores round-trip compatibility
-  between :meth:`Timestamp.isoformat()<pywikibot.time.Timestamp.isoformat>` and
-  :meth:`Timestamp.fromISOformat()<pywikibot.time.Timestamp.fromISOformat>`. (:phab:`T396723`)
-* Suggest installing all requirements for missing dependencies with
-  :mod:`pwb<pywikibot.scripts.wrapper>` wrapper.
-* Support legacy encoded section titles. (:phab:`T133276`)
-
+* Serialize nested form and sense edits in :class:`page.SubEntityCollection
+  <pywikibot.page._collections.SubEntityCollection>` and :class:`LexemePage<pywikibot.LexemePage>`
+  (:phab:`T189321`)
+* Add :attr:`ignore_save_related_errors<bot.BaseBot.ignore_save_related_errors>`
+  and :attr:`ignore_server_errors<bot.BaseBot.ignore_server_errors>` attributes
+  to :class:`bot.BaseBot` and use them in :meth:`userPut()<bot.BaseBot.userPut>`. (:phab:`T156908`)
+* Add support for Scribunto redirects. (:phab:`T417129`)
+* Serialize term removals and empty feature sets in :class:`page.LexemeSubEntity`
+  and :class:`LexemeForm<pywikibot.LexemeForm>`. (:phab:`T189321`)
+* Reload :class:`page.WikibaseEntity` entity
+  state after successful saves. (:phab:`T189321`)
+* Preserve fields during data normalization in :class:`LexemePage<pywikibot.LexemePage>`
+  and :class:`LexemeForm<pywikibot.LexemeForm>`. (:phab:`T189321`)
+* Find headings followed by a multiline comment with :func:`textlib.get_regexes('header')
+  <textlib.get_regexes>`. (:phab:`T209712`)
+* Always set the comment of a :class:`page.Contribution`. (:phab:`T442114`)
+* Keep sub-entity indexes of :class:`page.SubEntityCollection
+  <pywikibot.page._collections.SubEntityCollection>` aligned after mutations. (:phab:`T189321`)
+* Replace recursive orchestration of :class:`site.Uploader<pywikibot.site._upload.Uploader>`.
+  (:phab:`T434936`)
+* Fix :meth:`APISite.interwiki_prefix()<pywikibot.site._apisite.APISite.interwiki_prefix>`
+  functionality. (:phab:`T312699`)
+* Normalize IPv6 addresses in user titles like MediaWiki within
+  :meth:`pywikibot.Link.parse`. (:phab:`T329819`)
+* An IP range in CIDR notation is accepted as *user* in :meth:`APISite.usercontribs()
+  <pywikibot.site._generators.GeneratorsMixin.usercontribs>`. (:phab:`T362377`)
+* The *strict* parameter was added to :func:`tools.is_ip_network` to ignore host
+  bits if set to ``False``.
+* Fix result of :func:`textlib.replaceCategoryLinks` without category links.
+* Avoid mutating class attribute :attr:`BaseBot.available_options<bot.BaseBot.available_options>`
+  with :attr:`BaseBot.update_options<bot.BaseBot.update_options>`. (:phab:`T439883`)
+* Update translations (i18n).
+* Reject nested wikilinks in file captions with :attr:`textlib.FILE_LINK_REGEX`. (:phab:`T396721`)
+* Speed up parsing of API ISO timestamps in :meth:`Timestamp._from_iso8601()
+  <pywikibot.time.Timestamp._from_iso8601>`.
 
 Deprecations
 ============

@@ -87,23 +87,32 @@ def NamespaceFilterPageGenerator(
 
 def PageTitleFilterPageGenerator(
     generator: Iterable[pywikibot.page.BasePage],
-    ignore_list: dict[str, dict[str, str]],
+    ignore_list: dict[str, dict[str, Sequence[str]]],
 ) -> Generator[pywikibot.page.BasePage]:
     """Yield only those pages are not listed in the ignore list.
 
     :param ignore_list: Family names are mapped to dictionaries in which
         language codes are mapped to lists of page titles. Each title must
-        be a valid regex as they are compared using :py:obj:`re.search`.
+        be a valid regex.
     """
+    compiled_ignores: dict[str, tuple[re.Pattern[str], ...]] = {}
     for page in generator:
+        site = page.site
+        sitename = site.sitename
         try:
-            site_ig_list = ignore_list[page.site.family.name][page.site.code]
+            compiled_site_ignores = compiled_ignores[sitename]
         except KeyError:
-            yield page
-            continue
+            try:
+                site_ignores = ignore_list[site.family.name][site.code]
+            except KeyError:
+                yield page
+                continue
+            compiled_site_ignores = tuple(map(re.compile, site_ignores))
+            compiled_ignores[sitename] = compiled_site_ignores
 
         page_title = page.title()
-        if not any(re.search(ig, page_title) for ig in site_ig_list):
+        if not any(pattern.search(page_title)
+                   for pattern in compiled_site_ignores):
             yield page
             continue
 

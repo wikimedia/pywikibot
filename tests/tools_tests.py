@@ -1077,6 +1077,29 @@ class TestIsIpNetwork(TestCase):
                 self.assertFalse(is_ip_network(ip_range))
 
 
+class TestIsIpNetworkNotStrict(TestCase):
+
+    """Unit test class for is_ip_network with the strict parameter."""
+
+    net = False
+
+    def test_host_bits(self) -> None:
+        """Check that host bits are only accepted with strict=False."""
+        for ip_range in ('1.2.3.4/24', '5.119.174.237/16', '192.168.0.0/8',
+                         '2001:0db8::/16'):
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range))
+                self.assertFalse(is_ip_network(ip_range, strict=True))
+                self.assertTrue(is_ip_network(ip_range, strict=False))
+
+    def test_invalid_ranges(self) -> None:
+        """Check that invalid values are rejected with strict=False."""
+        for ip_range in (None, '', '/32', 'a.b.c.d', '1.2.3.256/24',
+                         '2001:db8::aaaa::1/128'):
+            with self.subTest(ip_network=ip_range):
+                self.assertFalse(is_ip_network(ip_range, strict=False))
+
+
 class TestHasModule(TestCase):
 
     """Unit test class for has_module."""

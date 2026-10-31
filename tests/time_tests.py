@@ -63,6 +63,7 @@ class TestTimestamp(TestCase):
         'INVALID': [
             ['200902132331309999', None],
             ['2009-99-99 22:31:30.123456-01', None],
+            ['2009-02-13T23:31:30+00:00Z', None],
             ['1234567890.1234569999', None],
         ],
     }
@@ -176,6 +177,9 @@ class TestTimestamp(TestCase):
         time = time.rstrip('Z')
         self.assertEqual(date, str(t1.date()))
         self.assertEqual(time, str(t1.time()))
+
+        with self.assertRaisesRegex(ValueError, 'does not match ISO8601'):
+            Timestamp.fromISOformat(t1.isoformat(), sep=sep)
 
     def test_iso_format_property(self) -> None:
         """Test iso format properties."""

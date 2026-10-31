@@ -786,7 +786,10 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         else:
             raise TranslationError(f'{Path(__file__).name} script is not '
                                    f'localized for {self.site}')
-        return oldText[:index].rstrip() + ref_section + oldText[index:]
+        # ref_section ends with a line break; do not add another blank
+        # line if the remaining text starts with several line breaks
+        text_after = re.sub(r'\A(?:\r?\n){2,}', '\n', oldText[index:])
+        return oldText[:index].rstrip() + ref_section + text_after
 
     def skip_page(self, page) -> bool:
         """Check whether the page could be processed."""

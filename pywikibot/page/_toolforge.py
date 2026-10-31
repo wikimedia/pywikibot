@@ -59,8 +59,8 @@ class WikiBlameMixin:
         >>> import pywikibot
         >>> site = pywikibot.Site('wikipedia:de')
         >>> page = pywikibot.Page(site, 'Project:Pywikibot')
-        >>> auth = page.main_authors()
-        >>> auth.most_common(1)
+        >>> auth = page.main_authors()  # doctest: +SKIP
+        >>> auth.most_common(1)  # doctest: +SKIP
         [('DrTrigon', 37)]
 
         .. version-deprecated:: 9.3

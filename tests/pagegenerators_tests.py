@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import calendar
 import datetime
+import re
 import sys
 import unittest
 from collections import Counter
@@ -37,7 +38,7 @@ from tests.aspects import (
     require_modules,
 )
 from tests.tools_tests import GeneratorIntersectTestCase
-from tests.utils import expected_failure_if, skipping
+from tests.utils import skipping
 
 
 en_wp_page_titles = (
@@ -158,6 +159,25 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.NamespaceFilterPageGenerator(
             gen, ('Talk', 'Template'), site)
         self.assertLength(tuple(gen), 10)
+
+    def test_PageTitleFilterPageGenerator_compiles_once(self) -> None:
+        """Test ignore patterns are compiled once per site."""
+        patterns = ['^Talk:', '/Meta$']
+        ignore_list = {'wikipedia': {'en': patterns}}
+        pages = list(pagegenerators.PagesFromTitlesGenerator(
+            self.titles, self.site))
+        expected = [page for page in pages
+                    if not page.title().startswith('Talk:')
+                    and not page.title().endswith('/Meta')]
+
+        with mock.patch(
+            'pywikibot.pagegenerators._filters.re.compile', wraps=re.compile
+        ) as compile_pattern:
+            result = list(pagegenerators.PageTitleFilterPageGenerator(
+                pages, ignore_list))
+
+        self.assertEqual(result, expected)
+        self.assertEqual(compile_pattern.call_count, len(patterns))
 
     def test_category_filter_enumerates_once(self) -> None:
         """Test that categories are enumerated once for multiple filters."""
@@ -835,6 +855,18 @@ class DryFactoryGeneratorTest(TestCase):
     code = 'en'
 
     dry = True
+
+    def test_ref_includes_redirects(self) -> None:
+        """Test -ref generator includes redirects before filtering."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        with mock.patch.object(
+                pywikibot.Page, 'getReferences', autospec=True,
+                return_value=iter(())
+        ) as get_references:
+            self.assertTrue(gf.handle_arg('-ref:Main Page'))
+
+        get_references.assert_called_once_with(
+            mock.ANY, filter_redirects=None)
 
     def test_title_filters_run_before_redirect_filter(self) -> None:
         """Test title filters discard pages before redirect checks."""
@@ -2038,7 +2070,6 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
 
     """Test UnconnectedPageGenerator."""
 
-    @expected_failure_if(pywikibot.config.family == 'betawikipedia')  # T439358
     def test_unconnected_with_repo(self) -> None:
         """Test UnconnectedPageGenerator."""
         site = self.site.data_repository()

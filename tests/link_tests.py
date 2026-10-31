@@ -125,6 +125,31 @@ class TestLink(DefaultSiteTestCase):
         self.assertEqual(section_link.title, 'A')
         self.assertEqual(section_link.section, 'B')
 
+    def test_ip_address(self) -> None:
+        """Test that IP addresses in user namespaces are normalized."""
+        ip_tests = [
+            (2, '1.2.3.4', '1.2.3.4'),
+            (2, '2001:db8::1', '2001:DB8:0:0:0:0:0:1'),
+            (2, '2001:0db8::0001', '2001:DB8:0:0:0:0:0:1'),
+            (2, 'fe80::', 'FE80:0:0:0:0:0:0:0'),
+            (2, '1:2:3:4:5:6:7:8', '1:2:3:4:5:6:7:8'),
+            (2, '1::1.2.3.4', '1::1.2.3.4'),
+            (3, '2409:40f3:2b:72d:8000::', '2409:40F3:2B:72D:8000:0:0:0'),
+            (1, '2001:db8::1', '2001:db8::1'),
+        ]
+        site = self.site
+        for ns, ip, title in ip_tests:
+            with self.subTest(ns=ns, ip=ip):
+                link = Link(f'{site.namespace(ns)}:{ip}', site)
+                self.assertEqual(link.namespace, ns)
+                self.assertEqual(link.title, title)
+
+        # the title has to match the title returned by the API (T329819)
+        user = pywikibot.User(site, '2409:40f3:2b:72d:8000::')
+        self.assertTrue(site.sametitle(
+            user.getUserTalkPage().title(),
+            f'{site.namespace(3)}:2409:40F3:2B:72D:8000:0:0:0'))
+
     def test_invalid(self) -> None:
         """Test that invalid titles raise InvalidTitleError."""
         # Bad characters forbidden regardless of wgLegalTitleChars

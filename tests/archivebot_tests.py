@@ -14,9 +14,11 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pywikibot
+from pywikibot import config
 from pywikibot.exceptions import Error
 from pywikibot.textlib import TimeStripper, extract_templates_and_params
 from scripts import archivebot
+from tests import unittest_print
 from tests.aspects import TestCase
 
 
@@ -275,7 +277,10 @@ class TestArchiveBot(TestCase):
                 self.assertIsInstance(thread.code, str)
                 self.assertEqual(thread.code, talk.timestripper.site.code)
                 self.assertIsInstance(thread.content, str)
-                self.assertIsInstance(thread.timestamp, datetime)
+                if config.family == 'wowwiki':
+                    unittest_print('Skipping test for wowwiki due to T439886')
+                else:
+                    self.assertIsInstance(thread.timestamp, datetime)
 
 
 class TestArchiveBotAfterDateUpdate(TestCase):

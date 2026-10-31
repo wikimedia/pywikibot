@@ -887,6 +887,74 @@ class TestPageRepr(DefaultSiteTestCase):
         self.assertEqual(f'{self.page!r}', "Page('Ō')")
 
 
+class TestSetRedirectTarget(DefaultSiteTestCase):
+
+    """Test Page.set_redirect_target without network access."""
+
+    dry = True
+
+    def setUp(self) -> None:
+        """Add a localized Module namespace to the dry site."""
+        super().setUp()
+        self._namespaces = self.site.namespaces
+        namespaces = dict(self._namespaces)
+        namespaces[828] = pywikibot.site.Namespace(
+            828,
+            custom_name='Modulo',
+            canonical_name='Module',
+            defaultcontentmodel='Scribunto',
+            case='first-letter',
+        )
+        self.site._namespaces = pywikibot.site.NamespacesDict(namespaces)
+
+    def tearDown(self) -> None:
+        """Restore the dry site's namespaces."""
+        self.site._namespaces = self._namespaces
+        super().tearDown()
+
+    def _redirect(self, title: str, text: str,
+                  content_model: str) -> pywikibot.Page:
+        """Create a cached redirect page."""
+        page = pywikibot.Page(self.site, title)
+        page._pageid = 1
+        page._isredir = True
+        page._contentmodel = content_model
+        page._text = text
+        page._bot_may_edit = True
+        return page
+
+    def test_scribunto_redirect(self) -> None:
+        """Test setting a localized Scribunto redirect target."""
+        page = self._redirect(
+            'Modulo:SoundTable',
+            'return require [[Modulo:Sound table]]',
+            'Scribunto',
+        )
+        target = pywikibot.Page(
+            self.site, 'Modulo:TabellaSuoni#section')
+
+        page.set_redirect_target(target, keep_section=True, save=False)
+
+        self.assertEqual(
+            page.text, 'return require [[Modulo:TabellaSuoni]]')
+
+    def test_module_wikitext_redirect(self) -> None:
+        """Test that Module documentation keeps wikitext syntax."""
+        page = self._redirect(
+            'Modulo:SoundTable/doc',
+            '#REDIRECT [[Modulo:Sound table/doc]]',
+            'wikitext',
+        )
+        target = pywikibot.Page(self.site, 'Modulo:TabellaSuoni/doc')
+
+        page.set_redirect_target(target, save=False)
+
+        self.assertEqual(
+            page.text,
+            f'#{self.site.redirect()} [[Modulo:TabellaSuoni/doc]]',
+        )
+
+
 class TestPageBotMayEdit(TestCase):
 
     """Test Page.botMayEdit() method."""

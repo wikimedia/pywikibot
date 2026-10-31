@@ -15,6 +15,7 @@ from http import HTTPStatus
 from io import BytesIO
 from platform import python_implementation
 from unittest.mock import Mock, patch
+from urllib.parse import urlencode
 
 import requests
 
@@ -165,7 +166,7 @@ class TestHttpStatus(HttpbinTestCase):
             http.fetch('invalid://url')
 
     def test_follow_redirects(self) -> None:
-        """Test follow 301 redirects correctly."""
+        """Test following 301 and 302 redirects correctly."""
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch('http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status_code, HTTPStatus.OK.value)
@@ -174,15 +175,19 @@ class TestHttpStatus(HttpbinTestCase):
                          HTTPStatus.MOVED_PERMANENTLY.value)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page', r.url)
 
-        r = self.fetch(self.httpbin
-                       + '/redirect-to?url=https://www.wikidata.org')
+        # Use an allowed destination and explicitly request a 302 -> 301 chain.
+        redirect_url = self.httpbin + '/redirect-to'
+        target = redirect_url + '?' + urlencode({
+            'url': 'https://example.com/',
+            'status_code': HTTPStatus.MOVED_PERMANENTLY.value,
+        })
+        r = self.fetch(redirect_url, params={'url': target})
+        self.assertEqual(r.status_code, HTTPStatus.OK.value)
         self.assertIsNotEmpty(r.history)
         self.assertEqual(r.history[0].status_code, HTTPStatus.FOUND.value)
         self.assertEqual(r.history[-1].status_code,
                          HTTPStatus.MOVED_PERMANENTLY.value)
-        self.assertEqual(r.status_code, HTTPStatus.OK.value)
-        self.assertEqual(r.url,
-                         'https://www.wikidata.org/wiki/Wikidata:Main_Page')
+        self.assertEqual(r.url, 'https://example.com/')
 
 
 class UserAgentTestCase(DeprecationTestCase):

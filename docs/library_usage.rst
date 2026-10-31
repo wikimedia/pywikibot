@@ -105,3 +105,70 @@ with the scripts folder. Here is the content:
 
 .. note::
    Also see the documentation at :manpage:`Create your own script`
+
+
+Creating Lexemes
+================
+
+A new :class:`pywikibot.LexemePage` can be saved with either an explicit
+creation dictionary or fields populated on the object. Wikibase requires
+at least one lemma, a language item and a lexical category item. The server
+validates these fields and any optional forms, senses and statements.
+
+The examples below assume ``repo`` is your configured Wikibase repository
+with WikibaseLexeme installed, and ``language_id`` and ``category_id`` are
+existing item IDs in that repository. Saving writes to that repository.
+
+To supply an explicit creation dictionary:
+
+.. code-block:: python
+
+    import pywikibot
+
+    lexeme = pywikibot.LexemePage(repo)
+    lexeme.editEntity({
+        'lemmas': {'en': 'colour'},
+        'language': language_id,
+        'lexicalCategory': category_id,
+        'forms': [{
+            'add': '',
+            'representations': {'en': 'colours'},
+            'grammaticalFeatures': [],
+        }],
+        'senses': [{'add': '', 'glosses': {'en': 'visual appearance'}}],
+    }, summary='Create a Lexeme')
+    print(lexeme.id)
+
+Explicit data takes precedence: fields already set on the object are not
+merged into the supplied dictionary. New forms and senses in an explicit
+operation list require the ``add`` marker.
+
+Alternatively, populate the object and save without a data argument:
+
+.. code-block:: python
+
+    lexeme = pywikibot.LexemePage(repo)
+    lexeme.lemmas['en'] = 'colour'
+    lexeme.language = pywikibot.ItemPage(repo, language_id)
+    lexeme.lexicalCategory = pywikibot.ItemPage(repo, category_id)
+    form = pywikibot.LexemeForm(repo)
+    form.representations['en'] = 'colours'
+    lexeme.forms.append(form)
+    sense = pywikibot.LexemeSense(repo)
+    sense.glosses['en'] = 'visual appearance'
+    lexeme.senses.append(sense)
+    lexeme.editEntity(summary='Create a Lexeme')
+
+After a successful save, ``lexeme.id`` contains the assigned Lexeme ID.
+Cached fields are invalidated and reloaded on access. Reacquire forms,
+senses and claims from the parent to obtain their server-assigned IDs;
+previously retained child objects remain snapshots. For example, use
+``form = lexeme.forms[0]`` before editing that form again. Subsequent calls
+to ``lexeme.editEntity()`` update the existing Lexeme.
+
+A rejected creation leaves local fields available for correction. A lost
+connection or timeout can instead leave the outcome unknown: the server
+may have created the Lexeme even though no response arrived. Check the
+repository before attempting another creation; retrying blindly can create
+a duplicate. Matching lemmas alone do not establish an entry's identity.
+Automatic recovery from uncertain write outcomes is not provided.

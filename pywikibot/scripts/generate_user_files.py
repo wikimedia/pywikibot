@@ -403,7 +403,7 @@ def create_user_config(
         )
         # Arbitrarily use the first key as default settings
         main_family, main_code = userlist[0].family, userlist[0].code
-    botpasswords = '\n'.join(
+    botpassword_text = '\n'.join(
         "('{}', BotPassword('{}', {!r}))".format(*botpassword)
         for botpassword in botpasswords)
 
@@ -432,7 +432,7 @@ def create_user_config(
         f_user.unlink(missing_ok=True)
         raise
 
-    save_botpasswords(botpasswords, f_pass)
+    save_botpasswords(botpassword_text, f_pass)
 
 
 def save_botpasswords(botpasswords: str,

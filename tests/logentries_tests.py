@@ -12,11 +12,7 @@ import unittest
 from contextlib import suppress
 
 import pywikibot
-from pywikibot.exceptions import (
-    ApiTimeoutError,
-    HiddenKeyError,
-    NoMoveTargetError,
-)
+from pywikibot.exceptions import HiddenKeyError, NoMoveTargetError
 from pywikibot.family import AutoFamily
 from pywikibot.logentries import (
     LogEntryFactory,
@@ -59,18 +55,15 @@ class TestLogentriesBase(TestCase):
                                  'https://lobbypedia.de/wiki/Hauptseite'),
             'code': 'de',
             'target': None,
+            'version': '1.31.6',
         }
     }
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        """Skip tests when the Lobbypedia API times out during setup."""
-        try:
-            super().setUpClass()
-        except ApiTimeoutError as e:
-            if e.site and e.site.family.name == 'lobbypedia':
-                raise unittest.SkipTest(f'API timeout on Lobbypedia: {e}')
-            raise
+    def setUp(self) -> None:
+        """Skip Lobbypedia tests which was updated to MW 1.43.9."""
+        if self._testMethodName.endswith('_old'):
+            self.skipTest('Lobbypedia was updated to MW 1.43.9 (T443109).')
+        super().setUp()
 
     def _get_logentry(self, logtype):
         """Retrieve a single log entry."""
@@ -78,7 +71,8 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertEqual(self.site.mw_version, '1.31.6')
+            self.assertEqual(self.site.mw_version,
+                             self.sites[self.site_key]['version'])
 
         with skipping(StopIteration,
                       msg=f'No entry found for {logtype!r}'):

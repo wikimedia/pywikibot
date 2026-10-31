@@ -32,19 +32,21 @@ def main(*args: str) -> None:
     .. version-changed:: 8.2
        *exitmsg* was added for :func:`code.interact`.
     """
-    args = list(args)
+    arguments: list[str]
+
     if '-noimport' in args:
-        args.remove('-noimport')
+        arguments = list(args)
+        arguments.remove('-noimport')
         env = None
         warn_type = 'Ignoring'
     else:
         import pywikibot
-        args = pywikibot.handle_args(args)
+        arguments = pywikibot.handle_args(args)
         env = {'pywikibot': pywikibot}
         warn_type = 'Unknown'
 
-    if args:
-        print(f'{warn_type} arguments: {", ".join(args)}\n')  # noqa: T201
+    if arguments:
+        print(f'{warn_type} arguments: {", ".join(arguments)}\n')  # noqa: T201
 
     # Set up interactive features such as command history.
     # This is defined in the site module of the Python Standard Library,

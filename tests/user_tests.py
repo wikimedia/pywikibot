@@ -355,6 +355,97 @@ class TestUserMethods(DefaultSiteTestCase):
             self.assertEqual(event.user(), user.username)
 
 
+class TestUsercontribsUserParameter(TestCase):
+
+    """Test how usercontribs() passes the user to the API."""
+
+    family = 'wikipedia'
+    code = 'test'
+    dry = True
+
+    def get_request(self, user: str) -> dict:
+        """Return the request parameters set by usercontribs()."""
+        with patch.object(self.site, '_generator') as generator, \
+                patch('pywikibot.data.api.OptionSet'):
+            generator.return_value.request = {}
+            self.site.usercontribs(user=user)
+        return generator.return_value.request
+
+    def test_ip_range(self) -> None:
+        """Test that an IP range is passed as uciprange."""
+        for user in ('5.119.0.0/16', '5.119.174.237/16', '1.2.3.4/32',
+                     '2001:db8::/32'):
+            with self.subTest(user=user):
+                request = self.get_request(user)
+                self.assertEqual(request['uciprange'], user)
+                self.assertNotIn('ucuser', request)
+
+    def test_user_and_ip(self) -> None:
+        """Test that a name or a single IP is passed as ucuser."""
+        for user in ('Example', 'Example/Subpage', '5.119.174.237',
+                     '2001:db8::1'):
+            with self.subTest(user=user):
+                request = self.get_request(user)
+                self.assertEqual(request['ucuser'], user)
+                self.assertNotIn('uciprange', request)
+
+
+class TestUserContributionsWithoutComment(TestCase):
+
+    """Test User.contributions() with API data lacking a comment."""
+
+    family = 'wikipedia'
+    code = 'test'
+    dry = True
+
+    @staticmethod
+    def get_records() -> list[dict]:
+        """Return usercontribs data; the API omits a hidden comment."""
+        return [
+            {'user': 'Example', 'ns': 0, 'title': 'Foo', 'revid': 2,
+             'timestamp': '2026-10-02T12:00:00Z', 'commenthidden': True},
+            {'user': 'Example', 'ns': 0, 'title': 'Bar', 'revid': 1,
+             'timestamp': '2026-10-01T12:00:00Z', 'comment': 'A summary'},
+        ]
+
+    def test_contributions(self) -> None:
+        """Test that a missing comment is yielded as empty string."""
+        user = User(self.site, 'Example')
+        with patch.object(self.site, 'usercontribs',
+                          return_value=iter(self.get_records())):
+            contribs = list(user.contributions(total=2))
+
+        self.assertLength(contribs, 2)
+        page, revid, timestamp, comment = contribs[0]
+        self.assertEqual(page, Page(self.site, 'Foo'))
+        self.assertEqual(revid, 2)
+        self.assertIsInstance(timestamp, Timestamp)
+        self.assertEqual(comment, '')
+        self.assertEqual(contribs[1][3], 'A summary')
+
+    def test_contribs(self) -> None:
+        """Test that a Contribution always has a comment attribute."""
+        user = User(self.site, 'Example')
+        with patch.object(self.site, 'usercontribs',
+                          return_value=iter(self.get_records())):
+            contribs = list(user.contribs(total=2))
+
+        self.assertEqual(contribs[0].comment, '')
+        self.assertTrue(contribs[0].commenthidden)
+        self.assertEqual(contribs[1].comment, 'A summary')
+
+    def test_last_and_first_edit(self) -> None:
+        """Test that last_edit and first_edit accept a missing comment."""
+        user = User(self.site, 'Example')
+        for prop, revid in (('last_edit', 2), ('first_edit', 2)):
+            with self.subTest(prop=prop), patch.object(
+                    self.site, 'usercontribs',
+                    return_value=iter(self.get_records()[:1])):
+                edit = getattr(user, prop)
+                self.assertEqual(edit[1], revid)
+                self.assertEqual(edit[3], '')
+
+
 class TestUserRefreshParameter(DeprecationTestCase):
 
     """Test the rename of the *force* parameter to *refresh*."""

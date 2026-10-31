@@ -10,6 +10,7 @@ A
     Aaron Hill
     adiyetichaves
     Ævar Arnfjörð Bjarmason
+    Akash Kumar
     akashagarwal
     Akaza24
     AkshitKumar
@@ -34,7 +35,7 @@ A
     Antoine Musso
     Anton
     Aram
-    Aryan Dubey
+    Aryan Dubey (Aruotes)
     Avicennasis
     Ayush Yadav
 
@@ -237,6 +238,7 @@ M
     Mohamed Magdy
     MonAx the Developer
     Mpaa
+    Mudit Ranjan
     murfel
     MuhammadShuaib
 

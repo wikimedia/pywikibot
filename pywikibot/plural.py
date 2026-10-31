@@ -89,26 +89,34 @@ plural_rules: dict[str, PluralRule] = {
            3},
 }
 
-plural_rules.update(
-    dict.fromkeys(
-        ['ay', 'bo', 'cgg', 'dz', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km',
-         'ko', 'ky', 'lo', 'ms', 'my', 'sah', 'su', 'th', 'tt', 'ug', 'vi',
-         'wo', 'zh', 'zh-hans', 'zh-hant', 'zh-tw'],
-        {'nplurals': 1, 'plural': 0}))
+plural_rules.update({
+    code: {'nplurals': 1, 'plural': 0}
+    for code in (
+        'ay', 'bo', 'cgg', 'dz', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km',
+        'ko', 'ky', 'lo', 'ms', 'my', 'sah', 'su', 'th', 'tt', 'ug', 'vi',
+        'wo', 'zh', 'zh-hans', 'zh-hant', 'zh-tw',
+    )
+})
 
-plural_rules.update(
-    dict.fromkeys(
-        ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'fr', 'gun', 'ln', 'mfe', 'mg',
-         'mi', 'oc', 'pt-br', 'ti', 'tr', 'uz', 'wa'],
-        {'nplurals': 2, 'plural': lambda n: (n > 1)}))
+plural_rules.update({
+    code: {'nplurals': 2, 'plural': lambda n: n > 1}
+    for code in (
+        'ach', 'ak', 'am', 'arn', 'br', 'fil', 'fr', 'gun', 'ln', 'mfe', 'mg',
+        'mi', 'oc', 'pt-br', 'ti', 'tr', 'uz', 'wa',
+    )
+})
 
-plural_rules.update(
-    dict.fromkeys(
-        ['be', 'bs', 'csb', 'hr', 'ru', 'sr', 'uk'],
-        {'nplurals': 3, 'plural': lambda n:
-         0 if n % 10 == 1 and n % 100 != 11 else
-         1 if (2 <= (n % 10) <= 4) and (n % 100 < 10 or n % 100 >= 20)
-         else 2}))
+plural_rules.update({
+    code: {
+        'nplurals': 3,
+        'plural': lambda n:
+            0 if n % 10 == 1 and n % 100 != 11 else
+            1 if (2 <= (n % 10) <= 4)
+            and (n % 100 < 10 or n % 100 >= 20) else
+            2,
+    }
+    for code in ('be', 'bs', 'csb', 'hr', 'ru', 'sr', 'uk')
+})
 
 
 def plural_rule(lang: str) -> PluralRule:

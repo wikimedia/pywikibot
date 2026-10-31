@@ -152,6 +152,74 @@ class TestInterwikiMapPrefix(TestCase):
                 self.iw_map[prefix]
 
 
+class TestInterwikiPrefix(TestCase):
+
+    """Test interwiki_prefix method with a dry interwiki map."""
+
+    dry = True
+
+    sites = {
+        'dewp': {
+            'family': 'wikipedia',
+            'code': 'de',
+        },
+        'enwp': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'frwp': {
+            'family': 'wikipedia',
+            'code': 'fr',
+        },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+    }
+
+    interwikimap = [
+        {'prefix': 'c', 'local': True,
+         'url': 'https://commons.wikimedia.org/wiki/$1'},
+        {'prefix': 'de', 'local': True, 'localinterwiki': True,
+         'url': 'https://de.wikipedia.org/wiki/$1'},
+        {'prefix': 'en', 'local': True,
+         'url': 'https://en.wikipedia.org/wiki/$1'},
+        {'prefix': 'w', 'local': True,
+         'url': 'https://en.wikipedia.org/wiki/$1'},
+        {'prefix': 'wikipedia', 'local': True,
+         'url': 'https://en.wikipedia.org/wiki/$1'},
+        {'prefix': 'wikipediawikipedia', 'local': True,
+         'url': 'https://en.wikipedia.org/wiki/Wikipedia:$1'},
+    ]
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Set up the article paths and the interwiki map."""
+        super().setUpClass()
+        for key in cls.sites:
+            cls.get_site(key).siteinfo._cache['articlepath'] = (
+                '/wiki/$1', True)
+        cls.get_site('dewp').siteinfo._cache['interwikimap'] = (
+            cls.interwikimap, True)
+
+    def test_interwiki_prefix(self) -> None:
+        """Test interwiki_prefix method."""
+        site = self.get_site('dewp')
+        for key, prefixes in (('dewp', ['de']),
+                              ('enwp', ['w', 'en', 'wikipedia']),
+                              ('commons', ['c'])):
+            with self.subTest(site=key):
+                self.assertEqual(
+                    site.interwiki_prefix(self.get_site(key)), prefixes)
+
+    def test_no_interwiki_prefix(self) -> None:
+        """Test interwiki_prefix method without a prefix to the site."""
+        site = self.get_site('dewp')
+        with self.assertRaisesRegex(
+                KeyError, "There is no interwiki prefix to 'wikipedia:fr'"):
+            site.interwiki_prefix(self.get_site('frwp'))
+
+
 if __name__ == '__main__':
     with suppress(SystemExit):
         unittest.main()

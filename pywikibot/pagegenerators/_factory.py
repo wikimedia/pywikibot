@@ -756,7 +756,7 @@ class GeneratorFactory:
             value = pywikibot.input(
                 'Links to which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value, self.site))
-        return page.getReferences()
+        return page.getReferences(filter_redirects=None)
 
     def _handle_links(self, value: str) -> HANDLER_GEN_TYPE:
         """Handle `-links` argument."""

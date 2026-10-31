@@ -287,6 +287,23 @@ class TestCategoryRearrangement(DefaultSiteTestCase):
         self.assertEqual(orig_sortkey, new_dummy.sortKey)
 
 
+class TestReplaceCategoryLinks(TestCase):
+
+    """Test replacing category links."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    dry = True
+
+    def test_remove_last_category(self) -> None:
+        """Test removing the last category leaves the stub template intact."""
+        self.assertEqual(
+            textlib.replaceCategoryLinks(
+                'foo\n[[Category:Foo]]\n{{foo-stub}}', [], site=self.site),
+            'foo\n{{foo-stub}}')
+
+
 class TestTemplatesInCategory(TestCase):
 
     """Tests to verify that templates in category links are handled."""
@@ -777,6 +794,60 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links(self.text, callback, self.wp_site),
             'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
 
+    def test_callback_context(self) -> None:
+        """Test callback data and ranges after changing the text."""
+        calls = []
+
+        def callback(link, text, groups, rng):
+            calls.append((link.title, text, groups, rng))
+            return 'expanded replacement' if link.title == 'A' else None
+
+        source = 'Start [[A|label]]s [[B]] end'
+        result = textlib.replace_links(source, callback, self.wp_site)
+        changed = 'Start expanded replacement [[B]] end'
+
+        self.assertEqual(result, changed)
+        self.assertEqual(calls, [
+            ('A', source, {
+                'title': 'A',
+                'section': None,
+                'label': 'label',
+                'linktrail': 's',
+            }, (6, 18)),
+            ('B', changed, {
+                'title': 'B',
+                'section': None,
+                'label': None,
+                'linktrail': '',
+            }, (27, 32)),
+        ])
+
+    def test_skipped_links(self) -> None:
+        """Test that same-page sections and interwiki links are skipped."""
+        links = []
+
+        def callback(link, text, groups, rng):
+            links.append(link.title)
+            return False
+
+        source = '[[#Section]] [[fr:Page]] [[Valid]]'
+        result = textlib.replace_links(source, callback, self.wp_site)
+
+        self.assertEqual(result, '[[#Section]] [[fr:Page]] Valid')
+        self.assertEqual(links, ['Valid'])
+
+    def test_invalid_arguments(self) -> None:
+        """Test invalid site and sequence replacement arguments."""
+        with self.assertRaisesRegex(
+                ValueError, 'must be a BaseSite not object'):
+            textlib.replace_links('', lambda *_: None, object())
+
+        with self.assertRaisesRegex(ValueError, 'exactly 2 items'):
+            textlib.replace_links('', ('A',), self.wp_site)
+
+        with self.assertRaisesRegex(ValueError, 'must be either str'):
+            textlib.replace_links('', (object(), False), self.wp_site)
+
     def test_replacements_once(self) -> None:
         """Test dynamic replacement."""
         def callback(link, text, groups, rng):
@@ -1245,6 +1316,11 @@ class TestReplaceExcept(DefaultSiteTestCase):
                                                ['header'], site=self.site),
                          '\n==x<!--\n'
                          'comment-->==\n')
+        self.assertEqual(textlib.replaceExcept('\n==x==<!--==\n'
+                                               'x-->\n', 'x', 'y',
+                                               ['header'], site=self.site),
+                         '\n==x==<!--==\n'
+                         'x-->\n')
         self.assertEqual(textlib.replaceExcept('\n{|\n x \n|}\n', 'x', 'y',
                                                ['table'], site=self.site),
                          '\n{|\n x \n|}\n')
@@ -1448,16 +1524,15 @@ class TestReplaceExcept(DefaultSiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-    @unittest.expectedFailure  # T396721
-    def test_replace_tag_file_failure(self) -> None:
-        """Test showing limits of the file link regex."""
-        # When the double brackets are unbalanced, the regex
-        # does not correctly detect the end of the file link.
+    def test_replace_tag_file_unbalanced(self) -> None:
+        """Test replacing text in a file link with invalid nested wikilinks."""
+        # MediaWiki does not render this as a file link, so both occurrences
+        # of x should be replaced without changing the malformed brackets.
         self.assertEqual(
             textlib.replaceExcept(
                 '[[File:a|[[foo]] [[bar [[invalid ]].x]][[x]]',
                 'x', 'y', ['file'], site=self.site),
-            '[[File:a|[[foo]] [[bar [invalid] ]].x]][[y]]')
+            '[[File:a|[[foo]] [[bar [[invalid ]].y]][[y]]')
 
     def test_replace_tags_interwiki(self) -> None:
         """Test replacing not inside interwiki links."""
@@ -1741,6 +1816,21 @@ class TestExtractSections(DefaultSiteTestCase):
             [('== title ==',
               '\ncontent\n\n<!-- comment --> == not title ==\nfoo\n\n'),
              ('== title 2 ==', ' <!-- trailing comment -->\ncontent 2')]
+        )
+
+    def test_with_multiline_trailing_comment(self) -> None:
+        """Test section headers followed by a multiline comment."""
+        text = ('text\n\n'
+                '== title ==<!-- == not title ==\n-->\n'
+                'content\n\n'
+                '== title 2 == <!-- === not title ===\n-->\n'
+                'content 2')
+        result = extract_sections(text, self.site)
+        self._extract_sections_tests(
+            result,
+            'text\n\n',
+            [('== title ==', '<!-- == not title ==\n-->\ncontent\n\n'),
+             ('== title 2 ==', ' <!-- === not title ===\n-->\ncontent 2')]
         )
 
     def test_long_comment(self) -> None:

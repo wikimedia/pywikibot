@@ -401,10 +401,10 @@ class DuplicateReferences:
 
                 # replace multiple identical references with repeated ref
                 repeated_ref = f'<ref {group}{name=!s} />'
-                for ref in v[IX.reflist][1:]:
+                for ref_match in v[IX.reflist][1:]:
                     # Don't replace inside templates (T266411)
-                    end = replaceExcept(end, re.escape(ref), repeated_ref,
-                                        exceptions=['template'])
+                    end = replaceExcept(end, re.escape(ref_match),
+                                        repeated_ref, exceptions=['template'])
                 text = header + end
 
         # Fix references with different names
