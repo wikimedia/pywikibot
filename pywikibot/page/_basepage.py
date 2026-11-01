@@ -1856,7 +1856,6 @@ class BasePage(ComparableMixin):
         """Convenience function to get the Wikibase item of a page."""
         return pywikibot.ItemPage.fromPage(self)
 
-    @deprecated_signature(since='9.2')
     def templates(self,
                   *,
                   content: bool = False,
@@ -1901,7 +1900,6 @@ class BasePage(ComparableMixin):
 
         return list(self._templates)
 
-    @deprecated_signature(since='9.2')
     def itertemplates(
         self,
         total: int | None = None,
