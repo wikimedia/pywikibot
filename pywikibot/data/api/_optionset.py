@@ -9,7 +9,6 @@ from __future__ import annotations
 from collections.abc import MutableMapping
 
 import pywikibot
-from pywikibot.tools import deprecate_arg
 
 
 __all__ = ['OptionSet']
@@ -27,7 +26,6 @@ class OptionSet(MutableMapping):
     None) will fail.
     """
 
-    @deprecate_arg('dict', 'data')  # since 9.0
     def __init__(self,
                  site: pywikibot.site.APISite | None = None,
                  module: str | None = None,

@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any
 
 from pywikibot import Site
 from pywikibot.site import BaseSite
-from pywikibot.tools import deprecate_arg, first_lower, first_upper
+from pywikibot.tools import first_lower, first_upper
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
@@ -454,7 +454,6 @@ def escapePattern2(
 
 
 @singledispatch
-@deprecate_arg('filter', 'filter_func')  # since 9.0
 def dh(value: int, pattern: str, encf: encf_type, decf: decf_type,
        filter_func: Callable[[int], bool] | None = None) -> str:
     """Function to help with year parsing.
