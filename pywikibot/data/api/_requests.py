@@ -44,7 +44,6 @@ from pywikibot.exceptions import (
 )
 from pywikibot.login import LoginStatus
 from pywikibot.textlib import removeDisabledParts, removeHTMLParts
-from pywikibot.tools import deprecated
 
 
 __all__ = ('CachedRequest', 'Request', 'encode_url')
@@ -414,15 +413,6 @@ class Request(MutableMapping, WaitingMixin):
     def __len__(self) -> int:
         """Implement dict interface."""
         return len(self._params)
-
-    @deprecated('items()', since='9.0.0')
-    def iteritems(self):
-        """Implement dict interface.
-
-        .. version-deprecated:: 9.0
-           Use ``items()`` instead.
-        """
-        return iter(self.items())
 
     def _add_defaults(self) -> None:
         """Add default parameters to the API request.

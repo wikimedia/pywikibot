@@ -55,7 +55,6 @@ Pending removal in Pywikibot 12
 * 9.0.0: ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
 * 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
   (:phab:`T340804`)
-* 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
 
 
 Pending removal in Pywikibot 13
