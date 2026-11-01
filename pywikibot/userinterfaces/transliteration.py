@@ -6,11 +6,7 @@
 """Module to transliterate text."""
 from __future__ import annotations
 
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    deprecate_arg,
-    deprecated_signature,
-)
+from pywikibot.tools import ModuleDeprecationWrapper, deprecated_signature
 
 
 #: Non ascii digits used by the framework
@@ -1127,7 +1123,6 @@ class Transliterator:
             trans[char] = value
         self.trans = trans
 
-    @deprecate_arg('next', 'succ')  # since 9.0
     @deprecated_signature(since='10.6.0')
     def transliterate(self, char: str, /, default: str = '?', *,
                       prev: str = '-', succ: str = '-') -> str:
@@ -1165,7 +1160,6 @@ class Transliterator:
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr('transliterator', Transliterator, since='9.0.0')
 wrapper.add_deprecated_attr('NON_LATIN_DIGITS', NON_ASCII_DIGITS,
                             replacement_name='NON_ASCII_DIGITS',
                             since='10.3.0')
