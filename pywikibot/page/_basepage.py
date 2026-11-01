@@ -1455,7 +1455,6 @@ class BasePage(ComparableMixin):
         # no restricting template found
         return True
 
-    @deprecated_args(botflag='bot')  # since 9.3.0
     def save(self,
              summary: str | None = None,
              watch: str | None = None,
@@ -1600,7 +1599,6 @@ class BasePage(ComparableMixin):
                                         'pywikibot-cosmetic-changes')
         return summary
 
-    @deprecated_args(botflag='bot')  # since 9.3.0
     def put(self, newtext: str,
             summary: str | None = None,
             watch: str | None = None,
@@ -1696,7 +1694,6 @@ class BasePage(ComparableMixin):
         self.clear_cache()
         return self.site.purgepages([self], **kwargs)
 
-    @deprecated_args(botflag='bot')  # since 9.3.0
     def touch(self, callback=None, bot: bool = False, **kwargs) -> None:
         """Make a touch edit for this page.
 

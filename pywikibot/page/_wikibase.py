@@ -47,7 +47,7 @@ from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._filepage import FilePage
 from pywikibot.page._page import BasePage
 from pywikibot.site import DataSite, Namespace
-from pywikibot.tools import cached, deprecated_args, first_upper
+from pywikibot.tools import cached, first_upper
 
 
 __all__ = (
@@ -1331,7 +1331,6 @@ class ItemPage(WikibasePage):
             self._isredir = True
             self._redirtarget = item
 
-    @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
         target_page: ItemPage | str,

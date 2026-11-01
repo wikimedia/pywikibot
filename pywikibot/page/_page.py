@@ -29,7 +29,7 @@ from pywikibot.exceptions import (
 from pywikibot.page._basepage import BasePage
 from pywikibot.page._toolforge import WikiBlameMixin, WikiWhoMixin
 from pywikibot.site import Namespace
-from pywikibot.tools import cached, deprecated_args
+from pywikibot.tools import cached
 
 
 __all__ = ['Page']
@@ -150,7 +150,6 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
             result.append((pywikibot.Page(link, self.site), positional))
         return result
 
-    @deprecated_args(botflag='bot')  # since 9.3.0
     def set_redirect_target(
         self,
         target_page: pywikibot.Page | str,

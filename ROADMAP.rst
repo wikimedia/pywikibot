@@ -38,9 +38,6 @@ removed in the third subsequent major release, remaining available for the two r
 Pending removal in Pywikibot 12
 -------------------------------
 
-* 9.3.0: *botflag* parameter of :meth:`Page.save()<page.BasePage.save>`, :meth:`Page.put()
-  <page.BasePage.put>`, :meth:`Page.touch()<page.BasePage.touch>` and
-  :meth:`Page.set_redirect_target()<page.Page.set_redirect_target>` was renamed to *bot*
 * 9.2.0: Imports of :mod:`logging` functions from the :mod:`bot` module are deprecated and will be desupported
 * 9.2.0: *total* argument in ``-logevents`` pagegenerators option is deprecated;
   use ``-limit`` instead (:phab:`T128981`)
