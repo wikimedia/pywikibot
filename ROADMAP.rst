@@ -16,6 +16,8 @@ Release 12
   a boolean value for *bot*.
 * Remove the deprecated ``xmlreader.parseRestrictions`` alias; use
   :meth:`xmlreader.XmlDump.parse_restrictions` instead.
+* Remove ``Page.main_authors()``, deprecated since 9.3. Use
+  :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` instead.
 
 **Other breaking changes**
 

@@ -9,7 +9,6 @@
 """
 from __future__ import annotations
 
-import collections
 import pickle
 import re
 import urllib.parse
@@ -19,7 +18,7 @@ from typing import Any
 from warnings import warn
 
 import pywikibot
-from pywikibot.tools import deprecated, deprecated_args, remove_last_args
+from pywikibot.tools import remove_last_args
 
 
 class WikiBlameMixin:
@@ -36,46 +35,18 @@ class WikiBlameMixin:
         """Check if WikiHistory is supported."""
         if self.site.family.name != 'wikipedia':
             raise NotImplementedError(
-                'main_authors method is implemented for wikipedia family only')
+                'authorship method is implemented for wikipedia family only')
 
         if (code := self.site.code) not in self.WIKIBLAME_CODES:
             raise NotImplementedError(
-                f'main_authors method is not implemented for wikipedia:{code}')
+                f'authorship method is not implemented for wikipedia:{code}')
 
         if (ns := self.namespace()) not in (0, 4, 10, 12, 14, 100):
             raise NotImplementedError(
-                f'main_authors method is not implemented for {ns} namespace')
+                f'authorship method is not implemented for {ns} namespace')
 
         if not self.exists():
             raise pywikibot.exceptions.NoPageError(self)
-
-    @deprecated('authorship', since='9.3.0')
-    @deprecated_args(onlynew=None)  # since 9.2.0
-    def main_authors(self) -> collections.Counter[str, int]:
-        """Retrieve the 5 topmost main authors of an article.
-
-        Sample:
-
-        >>> import pywikibot
-        >>> site = pywikibot.Site('wikipedia:de')
-        >>> page = pywikibot.Page(site, 'Project:Pywikibot')
-        >>> auth = page.main_authors()  # doctest: +SKIP
-        >>> auth.most_common(1)  # doctest: +SKIP
-        [('DrTrigon', 37)]
-
-        .. version-deprecated:: 9.3
-           use :meth:`authorship` instead.
-        .. seealso:: :meth:`authorship` for further information
-
-        :return: Percentage of edits for each username
-
-        :raise NotImplementedError: unsupported site or unsupported
-            namespace.
-        :raise NoPageError: The page does not exist.
-        :raise ApiTimeoutError: WikiHistory timeout
-        """
-        return collections.Counter(
-            {user: int(cnt) for user, (_, cnt) in self.authorship(5).items()})
 
     @remove_last_args(['revid', 'date'])  # since 10.1.0
     def authorship(
@@ -105,7 +76,7 @@ class WikiBlameMixin:
            :attr:`WIKIBLAME_CODES` are supported.
         .. version-added:: 9.3
            XTools is used to retrieve authors. This method replaces
-           :meth:`main_authors`.
+           ``main_authors()``.
         .. version-changed:: 10.1
            WikiHistory is used to retrieve authors due to :phab:`T392694`.
 
@@ -118,7 +89,7 @@ class WikiBlameMixin:
               .. version-added:: 10.1
 
               - Implemented from version 7.7 until 9.2 (with
-                :meth:`main_authors` method) and from 10.1.
+                ``main_authors()`` method) and from 10.1.
               - Main, Project, Category and Template namespaces are
                 supported
               - Only 'als', 'bar', 'de', 'en', 'it', 'nds' and 'sco'

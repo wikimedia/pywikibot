@@ -22,7 +22,7 @@ class TestWikiBlameMixin(TestCase):
     code = 'nds'
 
     def test_exceptions(self) -> None:
-        """Test that main_authors fails if page does not exist."""
+        """Test that authorship fails if page does not exist."""
         page = pywikibot.Page(self.site, 'Pywikibot')
         title = re.escape(page.title(as_link=True))
         with self.assertRaisesRegex(pywikibot.exceptions.NoPageError,
@@ -32,18 +32,18 @@ class TestWikiBlameMixin(TestCase):
         page = pywikibot.Page(self.site, 'Diskuschoon:Wikipedia')
         with self.assertRaisesRegex(
             NotImplementedError,
-                'main_authors method is not implemented for Talk: namespace'):
+                'authorship method is not implemented for Talk: namespace'):
             page.authorship()
 
         page = pywikibot.Page(pywikibot.Site('wikipedia:nl'),
                               'Project:Pywikibot')
         with self.assertRaisesRegex(
             NotImplementedError,
-                'main_authors method is not implemented for wikipedia:nl'):
+                'authorship method is not implemented for wikipedia:nl'):
             page.authorship()
 
-    def test_main_authors(self) -> None:
-        """Test main_authors() method."""
+    def test_authorship(self) -> None:
+        """Test authorship() method."""
         page = pywikibot.Page(self.site, 'Python (Programmeerspraak)')
         auth = page.authorship(5)
         self.assertLessEqual(len(auth), 5)
@@ -54,7 +54,7 @@ class TestWikiBlameMixin(TestCase):
         self.assertIsInstance(values[1], float)
 
     def test_restrictions(self) -> None:
-        """Test main_authors() method with restrictions."""
+        """Test authorship() method with restrictions."""
         page = pywikibot.Page(pywikibot.Site('wikipedia:en'), 'Python')
         auth = page.authorship(4, min_chars=100, min_pct=5.0)
         self.assertLessEqual(len(auth), 4)
