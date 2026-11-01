@@ -238,9 +238,12 @@ class TestGeoSearch(TestCase):
             patch.object(Request, 'submit', autospec=True) as submit,
         ):
             for inputs, message in cases:
-                with self.subTest(inputs=inputs):
-                    with self.assertRaisesRegex(ValueError, message):
-                        list(self.site.geosearch(**inputs))
+                with (
+                    self.subTest(inputs=inputs),
+                    self.assertRaisesRegex(ValueError, message)
+                ):
+                    list(self.site.geosearch(**inputs))
+
             submit.assert_not_called()
 
             other_page = pywikibot.Page(

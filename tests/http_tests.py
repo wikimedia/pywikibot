@@ -269,14 +269,18 @@ class FetchInputTestCase(TestCase):
                 response.encoding = 'utf-8'
                 response.raw = BytesIO(content)
 
-                with patch.object(http.session, 'request',
-                                  return_value=response):
-                    with http.fetch('https://example.test', stream=True,
-                                    charset=charset) as result:
-                        self.assertEqual(response.raw.tell(), 0)
-                        self.assertEqual(result.encoding, charset or 'utf-8')
-                        self.assertEqual(b''.join(result.iter_content(8)),
-                                         content)
+                with (
+                    patch.object(
+                        http.session, 'request', return_value=response),
+                    http.fetch(
+                        'https://example.test',
+                        stream=True,
+                        charset=charset
+                    ) as result
+                ):
+                    self.assertEqual(response.raw.tell(), 0)
+                    self.assertEqual(result.encoding, charset or 'utf-8')
+                    self.assertEqual(b''.join(result.iter_content(8)), content)
 
     def test_inputs_are_not_modified(self) -> None:
         """Test that headers and callbacks remain unchanged."""

@@ -43,8 +43,10 @@ class TestSaveFailure(TestCase):
     def test_nobots(self) -> None:
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
-        with patch.object(config, 'ignore_bot_templates', False), \
-                self.assertRaisesRegex(OtherPageSaveError, 'nobots'):
+        with (
+            patch.object(config, 'ignore_bot_templates', False),
+            self.assertRaisesRegex(OtherPageSaveError, 'nobots')
+        ):
             page.save()
 
     def test_touch(self) -> None:

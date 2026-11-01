@@ -251,10 +251,12 @@ class TestGlobalBlocks(TestCase):
             ('192.0.2.1/24', 'bgip', [{'id': 2}]),
             ('Example', 'bgtargets', [{'id': 3}]),
         )
-        with patch.object(self.site, 'has_extension', return_value=True), \
-                patch.object(self.site._paraminfo, 'parameter',
-                             return_value={'name': 'targets'}), \
-                patch.object(self.site, 'simple_request') as request:
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site._paraminfo, 'parameter',
+                         return_value={'name': 'targets'}),
+            patch.object(self.site, 'simple_request') as request
+        ):
             for target, parameter, blocks in cases:
                 with self.subTest(target=target):
                     request.return_value.submit.return_value = {
@@ -279,10 +281,11 @@ class TestGlobalBlocks(TestCase):
 
     def test_unsupported_account_query(self) -> None:
         """Do not send an account filter that an older API would ignore."""
-        with patch.object(self.site, 'has_extension', return_value=True), \
-                patch.object(self.site._paraminfo, 'parameter',
-                             return_value=None), \
-                patch.object(self.site, 'simple_request') as request:
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site._paraminfo, 'parameter', return_value=None),
+            patch.object(self.site, 'simple_request') as request
+        ):
             with self.assertRaisesRegex(NotImplementedError,
                                         'global account block queries'):
                 User(self.site, 'Example').is_globally_blocked()
@@ -294,15 +297,19 @@ class TestGlobalBlocks(TestCase):
         with self.assertRaisesRegex(UnknownExtensionError, 'GlobalBlocking'):
             user.is_globally_blocked()
 
-        with patch.object(self.site, 'has_extension', return_value=True), \
-                patch.object(self.site, 'simple_request') as request:
+        with (
+            patch.object(self.site, 'has_extension', return_value=True),
+            patch.object(self.site, 'simple_request') as request
+        ):
             with self.assertRaisesRegex(ValueError, 'must not be empty'):
                 self.site.is_globally_blocked('')
 
             for target in ('Example|Other', '\x1fExample\x1fOther'):
-                with self.subTest(target=target):
-                    with self.assertRaisesRegex(ValueError, 'list separators'):
-                        self.site.is_globally_blocked(target)
+                with (
+                    self.subTest(target=target),
+                    self.assertRaisesRegex(ValueError, 'list separators')
+                ):
+                    self.site.is_globally_blocked(target)
             request.assert_not_called()
 
             request.return_value.submit.side_effect = APIError(
@@ -365,8 +372,10 @@ class TestUsercontribsUserParameter(TestCase):
 
     def get_request(self, user: str) -> dict:
         """Return the request parameters set by usercontribs()."""
-        with patch.object(self.site, '_generator') as generator, \
-                patch('pywikibot.data.api.OptionSet'):
+        with (
+            patch.object(self.site, '_generator') as generator,
+            patch('pywikibot.data.api.OptionSet')
+        ):
             generator.return_value.request = {}
             self.site.usercontribs(user=user)
         return generator.return_value.request

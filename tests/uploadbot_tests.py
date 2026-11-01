@@ -139,8 +139,10 @@ class TestUploadbotTempFiles(TestCase):
         )
 
         for outcome, expected in cases:
-            with self.subTest(outcome=outcome), \
-                    tempfile.TemporaryDirectory() as directory:
+            with (
+                self.subTest(outcome=outcome),
+                tempfile.TemporaryDirectory() as directory
+            ):
                 temp_path = Path(directory) / 'download'
                 temp_path.write_bytes(b'content')
                 site = mock.Mock()

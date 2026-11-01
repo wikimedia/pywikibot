@@ -89,8 +89,10 @@ class TestOAuthUserOverride(PatchingTestCase):
         """Keep OAuth when its identity matches the explicit username."""
         site = _OAuthLoginSite('Xqt', None)
         override = ('wikipedia', 'test', 'Xqt')
-        with patch.object(pywikibot.bot, '_user_override', override), \
-             patch.object(pywikibot, 'info') as info:
+        with (
+            patch.object(pywikibot.bot, '_user_override', override),
+            patch.object(pywikibot, 'info') as info
+        ):
             site.login(cookie_only=True)
 
         self.assertFalse(site._oauth_disabled)
@@ -101,8 +103,10 @@ class TestOAuthUserOverride(PatchingTestCase):
         """Bypass OAuth when ``-user`` requests another identity."""
         site = _OAuthLoginSite('Pywikibot-oauth', 'Xqt')
         override = ('wikipedia', 'test', 'Xqt')
-        with patch.object(pywikibot.bot, '_user_override', override), \
-             patch.object(pywikibot, 'info') as info:
+        with (
+            patch.object(pywikibot.bot, '_user_override', override),
+            patch.object(pywikibot, 'info') as info
+        ):
             site.login(cookie_only=True)
 
         self.assertTrue(site._oauth_disabled)
@@ -114,9 +118,11 @@ class TestOAuthUserOverride(PatchingTestCase):
     def test_mismatching_configured_oauth_user(self) -> None:
         """Reject an OAuth mismatch without an explicit user override."""
         site = _OAuthLoginSite('Pywikibot-oauth', 'Xqt')
-        with patch.object(pywikibot.bot, '_user_override', None), \
-             self.assertRaisesRegex(NoUsernameError,
-                                    'via OAuth as Pywikibot-oauth'):
+        with (
+            patch.object(pywikibot.bot, '_user_override', None),
+            self.assertRaisesRegex(
+                NoUsernameError, 'via OAuth as Pywikibot-oauth')
+        ):
             site.login(cookie_only=True)
 
         self.assertFalse(site._oauth_disabled)
@@ -793,14 +799,18 @@ class TestSiteSysopWrite(TestCase):
         site = self.get_site()
         page = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
-        with self.subTest(test='anInvalidType'), \
+        with (
+            self.subTest(test='anInvalidType'),
             self.assertRaisesRegex(APIError,
-                                   'Invalid protection type "anInvalidType"'):
+                                   'Invalid protection type "anInvalidType"')
+        ):
             site.protect(protections={'anInvalidType': 'sysop'},
                          page=page, summary='Pywikibot unit test')
 
-        with self.subTest(test='anInvalidLevel'), \
-                self.assertRaisesRegex(Error, 'Invalid protection level'):
+        with (
+            self.subTest(test='anInvalidLevel'),
+            self.assertRaisesRegex(Error, 'Invalid protection level')
+        ):
             site.protect(protections={'edit': 'anInvalidLevel'},
                          page=page, summary='Pywikibot unit test')
 

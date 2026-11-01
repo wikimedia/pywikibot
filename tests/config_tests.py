@@ -28,11 +28,13 @@ class ConfigPathTestCase(TestCase):
 
     def test_register_families_zip(self) -> None:
         """Discover and load archived families without duplicate paths."""
-        with TemporaryDirectory() as tmp, \
-                patch.dict(config.family_files, {}, clear=True), \
-                patch.dict(Family._families, {}, clear=True), \
-                patch.dict(sys.modules), \
-                patch.object(sys, 'path', sys.path.copy()):
+        with (
+            TemporaryDirectory() as tmp,
+            patch.dict(config.family_files, {}, clear=True),
+            patch.dict(Family._families, {}, clear=True),
+            patch.dict(sys.modules),
+            patch.object(sys, 'path', sys.path.copy())
+        ):
             archive = Path(tmp) / 'families.zip'
             folder = archive / 'families'
             expected = {}
@@ -60,8 +62,10 @@ class ConfigPathTestCase(TestCase):
 
     def test_register_families_missing_folder(self) -> None:
         """Retain missing-folder and non-directory error handling."""
-        with TemporaryDirectory() as tmp, \
-                patch.dict(config.family_files, {}, clear=True):
+        with (
+            TemporaryDirectory() as tmp,
+            patch.dict(config.family_files, {}, clear=True)
+        ):
             archive = Path(tmp) / 'families.zip'
             with ZipFile(archive, 'w') as zip_file:
                 zip_file.writestr('families/example_family.py', '')
@@ -110,9 +114,11 @@ class ConfigPathTestCase(TestCase):
         )
 
         for path_type, base, child, sibling, relative_child in cases:
-            with self.subTest(path_type=path_type, base=base), \
-                    patch.object(config, 'Path', path_type), \
-                    patch.object(config, 'base_dir', base):
+            with (
+                self.subTest(path_type=path_type, base=base),
+                patch.object(config, 'Path', path_type),
+                patch.object(config, 'base_dir', base)
+            ):
                 self.assertEqual(config.shortpath(base), '')
                 self.assertEqual(config.shortpath(child), relative_child)
                 self.assertEqual(config.shortpath(sibling), sibling)
@@ -121,8 +127,10 @@ class ConfigPathTestCase(TestCase):
         """Test paths on another Windows drive are not shortened."""
         base = r'C:\Users\bot\pywikibot'
         path = r'D:\pywikibot\file.txt'
-        with patch.object(config, 'Path', PureWindowsPath), \
-                patch.object(config, 'base_dir', base):
+        with (
+            patch.object(config, 'Path', PureWindowsPath),
+            patch.object(config, 'base_dir', base)
+        ):
             self.assertEqual(config.shortpath(path), path)
 
 

@@ -93,11 +93,13 @@ class TestHandleArgs(TestCase):
            return_value='generate_user_files')
     def test_user_override(self, *unused) -> None:
         """Test that an explicit username override is retained."""
-        with patch.object(config, 'family', 'wikipedia'), \
-             patch.object(config, 'mylang', 'test'), \
-             patch.object(pywikibot.bot, '_user_override', None), \
-             patch.object(pywikibot, '_sites', {}), \
-             patch.dict(config.usernames['wikipedia'], {}, clear=True):
+        with (
+            patch.object(config, 'family', 'wikipedia'),
+            patch.object(config, 'mylang', 'test'),
+            patch.object(pywikibot.bot, '_user_override', None),
+            patch.object(pywikibot, '_sites', {}),
+            patch.dict(config.usernames['wikipedia'], {}, clear=True)
+        ):
             result = pywikibot.handle_args(['-user:Xqt'], do_help=False)
 
             self.assertIsEmpty(result)

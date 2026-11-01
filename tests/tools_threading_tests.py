@@ -208,11 +208,15 @@ class BoundedThreadPoolTests(TestCase):
                 ThreadPoolExecutor, max_bound=1, max_workers=1
             ) as pool:
                 failure = error('submission failed')
-                with patch.object(ThreadPoolExecutor, 'submit',
-                                  side_effect=failure):
-                    with self.assertRaisesRegex(
-                            error, 'submission failed') as caught:
-                        pool.submit(pow, 2, 3)
+
+                with (
+                    patch.object(
+                        ThreadPoolExecutor, 'submit', side_effect=failure),
+                    self.assertRaisesRegex(
+                        error, 'submission failed') as caught
+                ):
+                    pool.submit(pow, 2, 3)
+
                 self.assertIs(caught.exception, failure)
                 self.assertTrue(
                     pool._bound_semaphore.acquire(blocking=False)

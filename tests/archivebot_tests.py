@@ -87,12 +87,13 @@ class TestArchiveBotFunctions(TestCase):
 
     def _run_main(self, option: str) -> None:
         """Run main with site-dependent work bypassed."""
-        with patch.object(archivebot.pywikibot, 'handle_args',
-                          return_value=[option]):
-            with patch.object(archivebot.pywikibot, 'Site'):
-                with patch.object(archivebot, 'show_md5_key',
-                                  return_value=True):
-                    archivebot.main(option)
+        with (
+            patch.object(
+                archivebot.pywikibot, 'handle_args', return_value=[option]),
+            patch.object(archivebot.pywikibot, 'Site'),
+            patch.object(archivebot, 'show_md5_key', return_value=True)
+        ):
+            archivebot.main(option)
 
     def test_locale_option(self) -> None:
         """Test that the locale option passes a string to setlocale."""
@@ -104,9 +105,11 @@ class TestArchiveBotFunctions(TestCase):
     def test_timezone_option(self) -> None:
         """Test that the timezone option sets the TZ environment variable."""
         environ = {}
-        with patch.object(archivebot.os, 'environ', environ):
-            with patch.object(archivebot.time, 'tzset', create=True) as tzset:
-                self._run_main('-timezone:UTC')
+        with (
+            patch.object(archivebot.os, 'environ', environ),
+            patch.object(archivebot.time, 'tzset', create=True) as tzset
+        ):
+            self._run_main('-timezone:UTC')
 
         self.assertEqual(environ['TZ'], 'UTC')
         tzset.assert_called_once_with()

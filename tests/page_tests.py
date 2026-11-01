@@ -292,11 +292,13 @@ class TestPageGet(DefaultSiteTestCase):
         request = mock.Mock()
         request.submit.return_value = data
 
-        with mock.patch.object(self.site, 'simple_request',
-                               return_value=request):
-            with mock.patch.object(
-                    pywikibot.Page, '_check_section') as check_section:
-                target = page.getRedirectTarget(ignore_section=False)
+        with (
+            mock.patch.object(
+                self.site, 'simple_request', return_value=request),
+            mock.patch.object(
+                pywikibot.Page, '_check_section') as check_section
+        ):
+            target = page.getRedirectTarget(ignore_section=False)
 
         self.assertEqual(target.title(), 'Target#Section')
         check_section.assert_called_once_with()
@@ -400,12 +402,15 @@ class TestPageObjectEnglish(TestCase):
             'File:Example',  # no file extension
             'File:Example #3.jpg',  # file extension in section
         ):
-            with self.subTest(title=title), \
-                    self.assertRaisesRegex(
-                        ValueError,
-                        r'(not.*valid.*file'
-                        r'|not in the file namespace'
-                        r'|does not have a valid extension)'):
+            with (
+                self.subTest(title=title),
+                self.assertRaisesRegex(
+                    ValueError,
+                    r'(not.*valid.*file'
+                    r'|not in the file namespace'
+                    r'|does not have a valid extension)'
+                )
+            ):
                 pywikibot.FilePage(site, title)
 
     def testImageAndDataRepository(self) -> None:
@@ -1637,15 +1642,21 @@ class TestShortLink(TestCase):
         site = self.get_site()
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
 
-        with self.subTest(parameters='defaulted'), \
-             skipping(APIError, code='urlshortener-ratelimit'):
+        with (
+            self.subTest(parameters='defaulted'),
+            skipping(APIError, code='urlshortener-ratelimit')
+        ):
             self.assertEqual(p1.create_short_link(), 'https://w.wiki/3Cy')
-        with self.subTest(with_protocol=True), \
-             skipping(APIError, code='urlshortener-ratelimit'):
+        with (
+            self.subTest(with_protocol=True),
+            skipping(APIError, code='urlshortener-ratelimit')
+        ):
             self.assertEqual(p1.create_short_link(with_protocol=True),
                              'https://w.wiki/3Cy')
-        with self.subTest(permalink=True), \
-             skipping(APIError, code='urlshortener-ratelimit'):
+        with (
+            self.subTest(permalink=True),
+            skipping(APIError, code='urlshortener-ratelimit')
+        ):
             self.assertEqual(p1.create_short_link(permalink=True,
                                                   with_protocol=False),
                              'w.wiki/3Cz')

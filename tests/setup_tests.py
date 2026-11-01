@@ -46,12 +46,13 @@ class TestSetup(TestCase):
             f'not-a-version\n{newer_version}\n{older_version}\n'
         )
 
-        with patch.object(sys, 'argv', ['setup.py', 'sdist']):
-            with patch('builtins.print') as mock_print:
-                with self.assertRaisesRegex(
-                        SystemExit,
-                        r'Build of distribution package canceled'):
-                    setup.get_validated_version('pywikibot')
+        with (
+            patch.object(sys, 'argv', ['setup.py', 'sdist']),
+            patch('builtins.print') as mock_print,
+            self.assertRaisesRegex(
+                SystemExit, r'Build of distribution package canceled')
+        ):
+            setup.get_validated_version('pywikibot')
 
         mock_print.assert_any_call(
             f'\n\nNew version {str(version)!r} is not higher than last '

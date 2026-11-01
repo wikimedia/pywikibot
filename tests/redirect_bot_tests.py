@@ -100,8 +100,10 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         """Test with delete and non-existing sdtemplate."""
         options = {'delete': True, 'sdtemplate': 'txt {{n|a}} txt'}
         bot = RedirectTestRobot('broken', **options)
-        with patch.object(Page, 'exists', new=Mock(return_value=False)), \
-                patch.object(pywikibot, 'warning') as w:
+        with (
+            patch.object(Page, 'exists', new=Mock(return_value=False)),
+            patch.object(pywikibot, 'warning') as w
+        ):
             self.assertEqual(bot.sdtemplate, '')
         w.assert_called_with('No speedy deletion template "n" available.')
 

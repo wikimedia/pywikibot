@@ -1172,9 +1172,11 @@ class TestLexemePage(WikidataTestCase):
                               case='first-letter',
                               defaultcontentmodel='wikibase-lexeme')
         namespaces = NamespacesDict({**repo.namespaces, 146: namespace})
-        with patch.object(repo, '_namespaces', namespaces), \
-                patch.object(repo, '_entity_namespaces',
-                             {'lexeme': namespace}, create=True):
+        with (
+            patch.object(repo, '_namespaces', namespaces),
+            patch.object(repo, '_entity_namespaces',
+                         {'lexeme': namespace}, create=True)
+        ):
             lexeme = LexemePage(repo)
         lexeme.lemmas = LanguageDict({'en': 'colour'})
         self.assertIsEmpty(lexeme.forms)
@@ -1322,19 +1324,27 @@ class TestLexemeSave(WikidataTestCase):
         """Rejected edits preserve changes; failed reloads prevent writes."""
         lexeme = self.lexeme
         lexeme.lemmas['en'] = 'changed'
-        with patch.object(self.repo, 'editEntity',
-                          side_effect=ValueError('rejected')):
-            with self.assertRaisesRegex(ValueError, 'rejected'):
-                lexeme.editEntity({'lemmas': {'en': 'changed'}})
+        with (
+            patch.object(
+                self.repo, 'editEntity', side_effect=ValueError('rejected')),
+            self.assertRaisesRegex(ValueError, 'rejected')
+        ):
+            lexeme.editEntity({'lemmas': {'en': 'changed'}})
         self.assertEqual(lexeme.lemmas['en'], 'changed')
         self.assertEqual(lexeme.latest_revision_id, 1)
         lexeme._update_from_edit_response({'lastrevid': 2}, True)
-        with patch.object(self.repo, 'loadcontent',
-                          side_effect=ValueError('reload failed')), \
-                patch.object(self.repo, 'editEntity') as save:
+        with (
+            patch.object(
+                self.repo,
+                'loadcontent',
+                side_effect=ValueError('reload failed')
+            ),
+            patch.object(self.repo, 'editEntity') as save
+        ):
             with self.assertRaisesRegex(ValueError, 'reload failed'):
                 lexeme.editEntity()
             save.assert_not_called()
+
         self.assertTrue(lexeme._needs_reload)
 
     def test_create(self) -> None:
@@ -1348,11 +1358,15 @@ class TestLexemeSave(WikidataTestCase):
         lexeme.forms.append(form)
         response = copy.deepcopy(self.content)
         response['forms'] = [dict(form.toJSON(), id='L1-F1')]
-        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
-                patch.object(self.repo, 'simple_request') as request, \
-                patch.object(self.repo, 'loadcontent',
-                             side_effect=lambda *args: {
-                                 'L1': copy.deepcopy(response)}):
+        with (
+            patch.object(self.repo, '_tokens', {'csrf': 'token'}),
+            patch.object(self.repo, 'simple_request') as request,
+            patch.object(
+                self.repo,
+                'loadcontent',
+                side_effect=lambda *args: {'L1': copy.deepcopy(response)}
+            )
+        ):
             request.return_value.submit.return_value = {'entity': response}
             lexeme.editEntity()
             params = request.call_args.kwargs
@@ -1384,11 +1398,15 @@ class TestLexemeSave(WikidataTestCase):
                 'lexicalCategory': 'Q1084'}
         original = copy.deepcopy(data)
         callback = MagicMock()
-        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
-                patch.object(self.repo, 'simple_request') as request, \
-                patch.object(pywikibot, 'async_request',
-                             side_effect=lambda func, *args, **kwargs:
-                             func(*args, **kwargs)):
+        with (
+            patch.object(self.repo, '_tokens', {'csrf': 'token'}),
+            patch.object(self.repo, 'simple_request') as request,
+            patch.object(
+                pywikibot,
+                'async_request',
+                side_effect=lambda func, *args, **kwargs: func(*args, **kwargs)
+            )
+        ):
             request.return_value.submit.return_value = {'entity': self.content}
             lexeme.editEntity(data, asynchronous=True, callback=callback)
         self.assertEqual(request.call_args.kwargs['new'], 'lexeme')
@@ -1405,8 +1423,10 @@ class TestLexemeSave(WikidataTestCase):
         lexeme.lemmas['en'] = 'colour'
         error = APIError('missing-field', 'language is required')
         callback = MagicMock()
-        with patch.object(self.repo, '_tokens', {'csrf': 'token'}), \
-                patch.object(self.repo, 'simple_request') as request:
+        with (
+            patch.object(self.repo, '_tokens', {'csrf': 'token'}),
+            patch.object(self.repo, 'simple_request') as request
+        ):
             request.return_value.submit.side_effect = error
             lexeme.editEntity(callback=callback)
         self.assertEqual(lexeme.id, '-1')

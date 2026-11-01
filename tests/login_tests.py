@@ -241,9 +241,10 @@ class TestPasswordFile(DefaultSiteTestCase):
             ".__setitem__('exploit_value', True)"
         )
 
-        with self.subTest(test='Test ValueError'), \
-             self.assertRaisesRegex(ValueError,
-                                    'Invalid password line format'):
+        with (
+            self.subTest(test='Test ValueError'),
+            self.assertRaisesRegex(ValueError, 'Invalid password line format')
+        ):
             self._test_pwfile(f"""
                 ('en', 'wikipedia', 'victim', {exploit_code})
                 """, None)

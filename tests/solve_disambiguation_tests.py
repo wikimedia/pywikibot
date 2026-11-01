@@ -39,11 +39,13 @@ class TestReferringPageGenerator(TestCase):
             self.fail(
                 'References were consumed before yielding the first page')
 
-        with patch('scripts.solve_disambiguation.ignore_title', {}), \
-                patch.object(page, 'getReferences',
-                             return_value=references()) as get_refs, \
-                patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
-                      '.isIgnored', side_effect=lambda page: page == ignored):
+        with (
+            patch('scripts.solve_disambiguation.ignore_title', {}),
+            patch.object(
+                page, 'getReferences', return_value=references()) as get_refs,
+            patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
+                  '.isIgnored', side_effect=lambda page: page == ignored)
+        ):
             gen = iter(ReferringPageGeneratorWithIgnore(page, main_only=True))
             self.assertEqual(next(gen), ref)
             get_refs.assert_called_once_with(with_template_inclusion=False,
@@ -63,12 +65,14 @@ class TestReferringPageGenerator(TestCase):
                 consumed.append(ref)
                 yield ref
 
-        with patch('scripts.solve_disambiguation.ignore_title',
-                   {'wikipedia': {'de': ['Ignored']}}), \
-                patch.object(page, 'getReferences',
-                             side_effect=lambda **kwargs: references()), \
-                patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
-                      '.isIgnored', side_effect=lambda ref: ref == refs[1]):
+        with (
+            patch('scripts.solve_disambiguation.ignore_title',
+                  {'wikipedia': {'de': ['Ignored']}}),
+            patch.object(page, 'getReferences',
+                         side_effect=lambda **kwargs: references()),
+            patch('scripts.solve_disambiguation.PrimaryIgnoreManager'
+                  '.isIgnored', side_effect=lambda ref: ref == refs[1])
+        ):
             gen = iter(ReferringPageGeneratorWithIgnore(page, minimum=2))
             self.assertEqual(next(gen), refs[2])
             self.assertEqual(consumed, refs[:4])

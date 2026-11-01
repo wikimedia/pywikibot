@@ -447,8 +447,10 @@ class CategoryDatabase:
                 'superclass_db': self.superclass_db
             }
             # store dump to disk in binary format
-            with open_archive(filename, 'wb') as f, \
-                    suppress(pickle.PicklingError):
+            with (
+                open_archive(filename, 'wb') as f,
+                suppress(pickle.PicklingError)
+            ):
                 pickle.dump(databases, f, protocol=config.pickle_protocol)
         else:
             with suppress(OSError):

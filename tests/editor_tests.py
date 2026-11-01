@@ -70,9 +70,11 @@ class EditorTestCase(TestCase):
                 os.fstat(handle)
             self.assertEqual(cm.exception.errno, errno.EBADF)
 
-        with patch.object(editor.tempfile, 'mkstemp', side_effect=mkstemp):
-            with patch.object(editor.subprocess, 'run', side_effect=run):
-                self.assertIsNone(editor.TextEditor().edit('text'))
+        with (
+            patch.object(editor.tempfile, 'mkstemp', side_effect=mkstemp),
+            patch.object(editor.subprocess, 'run', side_effect=run)
+        ):
+            self.assertIsNone(editor.TextEditor().edit('text'))
 
 
 if __name__ == '__main__':

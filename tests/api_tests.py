@@ -257,8 +257,10 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod[6:], pi[mod]['name'])
             self.assertEqual(mod, pi[mod]['path'])
 
-        with patch.object(pywikibot, 'warning') as w, \
-                self.assertRaises(KeyError):
+        with (
+            patch.object(pywikibot, 'warning') as w,
+            self.assertRaises(KeyError)
+        ):
             pi.__getitem__('query+foobar')
 
         self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
@@ -482,8 +484,10 @@ class TestDryPageGenerator(TestCase):
     def test_namespace(self) -> None:
         """Test PageGenerator set_namespace."""
         for namespace in (0, 1, None):
-            with self.subTest(namespace=namespace), \
-                    self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
+            with (
+                self.subTest(namespace=namespace),
+                self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE)
+            ):
                 self.gen.set_namespace(namespace)
 
 
@@ -639,8 +643,10 @@ class TestDryQueryGeneratorNamespaceParam(TestCase):
                                      generator='links',
                                      parameters={'titles': 'test'})
         for namespace in (0, 1, None):
-            with self.subTest(namespace=namespace), \
-                    self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE):
+            with (
+                self.subTest(namespace=namespace),
+                self.assertRaisesRegex(TypeError, SET_NAMESPACE_MODULE)
+            ):
                 self.gen.set_namespace(namespace)
 
     def test_namespace_param_is_not_settable(self) -> None:
