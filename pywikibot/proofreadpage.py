@@ -36,7 +36,7 @@ from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
 from pywikibot.page import PageSourceType
-from pywikibot.tools import MediaWikiVersion, cached, remove_last_args
+from pywikibot.tools import MediaWikiVersion, cached
 
 
 try:
@@ -1301,7 +1301,6 @@ class IndexPage(pywikibot.Page):
         return len(self._page_from_numbers)
 
     @check_if_cached
-    @remove_last_args(['content'])  # since 9.0.0
     def page_gen(
         self, start: int = 1,
         end: int | None = None,

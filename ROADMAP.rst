@@ -47,8 +47,6 @@ Pending removal in Pywikibot 12
 -------------------------------
 
 * 9.2.0: Imports of :mod:`logging` functions from the :mod:`bot` module are deprecated and will be desupported
-* 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be
-  ignored (:phab:`T358635`)
 
 
 Pending removal in Pywikibot 13
