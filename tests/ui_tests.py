@@ -19,7 +19,7 @@ from unicodedata import normalize
 from unittest.mock import patch
 
 import pywikibot
-from pywikibot.bot import (
+from pywikibot.logging import (
     CRITICAL,
     DEBUG,
     ERROR,

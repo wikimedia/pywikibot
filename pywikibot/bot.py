@@ -60,7 +60,7 @@ Additionally there is the :class:`AutomaticTWSummaryBot` which
 subclasses :class:`CurrentPageBot` and automatically defines the summary
 when :meth:`put_current` is used.
 
-.. version-deprecated:: 9.2
+.. version-removed:: 12.0
    The functions
    :func:`critical()<pywikibot.logging.critical>`
    :func:`debug()<pywikibot.logging.debug>`
@@ -75,8 +75,8 @@ when :meth:`put_current` is used.
    :attr:`INPUT<pywikibot.logging.INPUT>`
    :attr:`STDOUT<pywikibot.logging.STDOUT>`
    :attr:`VERBOSE<pywikibot.logging.VERBOSE>`
-   and ``WARNING`` imported from :mod:`logging` module are deprecated
-   within this module. Import them directly. These functions can also be
+   and ``WARNING`` imported from :mod:`logging` module were removed
+   from this module. Import them directly. These functions can also be
    used as :mod:`pywikibot` members.
 
 .. version-removed:: 10.0
@@ -164,19 +164,7 @@ from pywikibot.exceptions import (
     VersionParseError,
     WikiBaseError,
 )
-
-# the constants are
-from pywikibot.logging import (  # noqa: F401
-    CRITICAL,
-    DEBUG,
-    ERROR,
-    INFO,
-    INPUT,
-    STDOUT,
-    VERBOSE,
-    WARNING,
-    add_init_routine,
-)
+from pywikibot.logging import add_init_routine
 from pywikibot.logging import debug as _debug
 from pywikibot.logging import error as _error
 from pywikibot.logging import exception as _exception
@@ -184,7 +172,7 @@ from pywikibot.logging import log as _log
 from pywikibot.logging import stdout as _stdout
 from pywikibot.logging import warning as _warning
 from pywikibot.throttle import Throttle
-from pywikibot.tools import redirect_func, strtobool
+from pywikibot.tools import strtobool
 from pywikibot.tools._logging import LoggingFormatter
 
 
@@ -403,23 +391,24 @@ def _init_handlers() -> None:
     if not module_name:
         module_name = 'terminal-interface'
 
-    logging.addLevelName(VERBOSE, 'VERBOSE')
+    logging.addLevelName(pwb_logging.VERBOSE, 'VERBOSE')
     # for messages to be displayed on terminal at "verbose" setting
     # use INFO for messages to be displayed even on non-verbose setting
 
-    logging.addLevelName(STDOUT, 'STDOUT')
+    logging.addLevelName(pwb_logging.STDOUT, 'STDOUT')
     # for messages to be displayed to stdout
 
-    logging.addLevelName(INPUT, 'INPUT')
+    logging.addLevelName(pwb_logging.INPUT, 'INPUT')
     # for prompts requiring user response
 
     root_logger = logging.getLogger('pywiki')
     if root_logger.hasHandlers() and module_name in _handlers_initialized:
         return
-    root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
+    # All records except DEBUG go to the logger.
+    root_logger.setLevel(logging.DEBUG + 1)
 
     warnings_logger = logging.getLogger('py.warnings')
-    warnings_logger.setLevel(DEBUG)
+    warnings_logger.setLevel(logging.DEBUG)
 
     # If there are command line warnings options, do not override them
     if not sys.warnoptions:
@@ -464,7 +453,7 @@ def _init_handlers() -> None:
         )
         file_handler.namer = handler_namer
 
-        file_handler.setLevel(DEBUG)
+        file_handler.setLevel(logging.DEBUG)
         form = LoggingFormatter(
             fmt='%(asctime)s %(caller_file)18s, %(caller_line)4s '
                 'in %(caller_name)18s: %(levelname)-8s %(message)s',
@@ -479,7 +468,7 @@ def _init_handlers() -> None:
                 debuglogger = logging.getLogger('pywiki.' + component)
             else:
                 debuglogger = logging.getLogger('pywiki')
-            debuglogger.setLevel(DEBUG)
+            debuglogger.setLevel(logging.DEBUG)
             debuglogger.addHandler(file_handler)
 
         warnings_logger.addHandler(file_handler)
@@ -2380,35 +2369,3 @@ class WikidataBot(Bot, ExistingPageBot):
 
 
 set_interface(config.userinterface)
-
-critical = redirect_func(pwb_logging.critical,
-                         target_module='pywikibot',
-                         since='9.2.0')
-debug = redirect_func(_debug,
-                      target_module='pywikibot',
-                      since='9.2.0')
-error = redirect_func(_error,
-                      target_module='pywikibot',
-                      since='9.2.0')
-exception = redirect_func(_exception,
-                          target_module='pywikibot',
-                          since='9.2.0')
-log = redirect_func(_log,
-                    target_module='pywikibot',
-                    since='9.2.0')
-output = redirect_func(pwb_logging.output,
-                       target_module='pywikibot',
-                       since='9.2.0')
-stdout = redirect_func(_stdout,
-                       target_module='pywikibot',
-                       since='9.2.0')
-warning = redirect_func(_warning,
-                        target_module='pywikibot',
-                        since='9.2.0')
-
-# NOTE: (T286348)
-# Do not use ModuleDeprecationWrapper with this module.
-# pywikibot.bot.ui would be wrapped through the ModuleDeprecationWrapper
-# and a cannot be changed later. Use another deprecation method instead
-# (until T286348 has been solved somehow different).
-# For Python 3.15+ use lazy imports.

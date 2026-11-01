@@ -45,12 +45,6 @@ Pywikibot follows a clear deprecation policy: features are typically deprecated 
 removed in the third subsequent major release, remaining available for the two releases in between.
 
 
-Pending removal in Pywikibot 12
--------------------------------
-
-* 9.2.0: Imports of :mod:`logging` functions from the :mod:`bot` module are deprecated and will be desupported
-
-
 Pending removal in Pywikibot 13
 -------------------------------
 
