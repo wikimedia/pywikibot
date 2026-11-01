@@ -19,10 +19,7 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot.bot import ShowingListOption
 from pywikibot.data import api
-from pywikibot.exceptions import (
-    ArgumentDeprecationWarning,
-    UnknownExtensionError,
-)
+from pywikibot.exceptions import UnknownExtensionError
 from pywikibot.pagegenerators._filters import (
     CategoryFilterPageGenerator,
     ItemClaimFilterPageGenerator,
@@ -52,7 +49,7 @@ from pywikibot.pagegenerators._generators import (
     WikibaseSearchItemPageGenerator,
     WikidataSPARQLPageGenerator,
 )
-from pywikibot.tools import issue_deprecation_warning, strtobool
+from pywikibot.tools import strtobool
 from pywikibot.tools.collections import DequeGenerator
 from pywikibot.tools.itertools import (
     filter_unique,
@@ -412,8 +409,9 @@ class GeneratorFactory:
     ) -> Iterable[pywikibot.page.BasePage] | None:
         """Parse the -logevent argument information.
 
-        .. version-deprecated:: 9.2
-           the *start* parameter as total amount of pages.
+        .. version-removed:: 12.0
+           The *start* parameter as total amount of pages. Use ``-limit``
+           instead.
 
         :param logtype: A valid logtype
         :param user: A username associated to the log events. Ignored if
@@ -422,37 +420,15 @@ class GeneratorFactory:
             convertible into Timestamp matching '%Y%m%d%H%M%S'.
         :param end: Timestamp to end listing at. This must be
             convertible into a Timestamp matching '%Y%m%d%H%M%S'.
-        :return: The generator or None if invalid 'start/total' or 'end'
+        :return: The generator or None if invalid 'start' or 'end'
             value.
         """
-        def parse_start(
-            start: str | None
-        ) -> tuple[pywikibot.Timestamp | None, int | None]:
-            """Parse start and return (start, total)."""
-            if not start:
-                return None, None
-
-            if len(start) >= 8:
-                return pywikibot.Timestamp.fromtimestampformat(start), None
-
-            instead = (f'-limit option like "-logevents:{logtype}'
-                       f'{"," if user else ""}{user} -limit:{start}"')
-            issue_deprecation_warning('-logevents with total argument',
-                                      instead,
-                                      warning_class=ArgumentDeprecationWarning,
-                                      since='9.2.0')
-            return None, int(start)
-
         try:
-            start_, total = parse_start(start)
+            start_ = (pywikibot.Timestamp.fromtimestampformat(start)
+                      if start else None)
         except ValueError as err:
             pywikibot.error(
                 f'{err}. Start parameter has wrong format!')
-            return None
-
-        if total is not None and total < 0:
-            pywikibot.error(f'Total number of log ({start}) events must be a'
-                            ' positive int.')
             return None
 
         if end is None:
@@ -472,7 +448,7 @@ class GeneratorFactory:
 
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
-        return LogeventsPageGenerator(logtype, user or None, total=total,
+        return LogeventsPageGenerator(logtype, user or None,
                                       start=start_, end=end_)
 
     def _handle_filelinks(self, value: str) -> HANDLER_GEN_TYPE:

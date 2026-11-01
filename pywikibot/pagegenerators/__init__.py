@@ -214,10 +214,9 @@ GENERATOR OPTIONS
 
                         logevent,username,start,end
 
-                    .. version-deprecated:: 9.2
-                       backward compatible *total* argument like
-                       ``logevent,username,total``; use ``-limit`` filter
-                       option instead (see below).
+                    .. version-removed:: 12.0
+                       The *total* argument in ``logevent,username,total``.
+                       Use the ``-limit`` filter option instead (see below).
 
                     To use the default value, use an empty string.
 

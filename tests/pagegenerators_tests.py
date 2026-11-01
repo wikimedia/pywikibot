@@ -31,7 +31,6 @@ from pywikibot.pagegenerators import (
 from tests import join_data_path
 from tests.aspects import (
     DefaultSiteTestCase,
-    DeprecationTestCase,
     RecentChangesTestCase,
     TestCase,
     WikidataTestCase,
@@ -855,6 +854,16 @@ class DryFactoryGeneratorTest(TestCase):
     code = 'en'
 
     dry = True
+
+    def test_logevents_with_total(self) -> None:
+        """Reject the removed total argument without querying the wiki."""
+        with mock.patch('pywikibot.error') as error:
+            result = pagegenerators.GeneratorFactory._parse_log_events(
+                'newusers', start='1')
+        self.assertIsNone(result)
+        error.assert_called_once()
+        self.assertIn('Start parameter has wrong format',
+                      error.call_args[0][0])
 
     def test_ref_includes_redirects(self) -> None:
         """Test -ref generator includes redirects before filtering."""
@@ -1935,8 +1944,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         self.assertEqual(cat.site, fa_wikisource)
 
 
-class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
-                                    DeprecationTestCase):
+class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
 
     """Test GeneratorFactory with pagegenerators.LogeventsPageGenerator."""
 
@@ -1988,17 +1996,6 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         self.assertIsNotNone(gen)
         pages = set(gen)
         self.assertIsEmpty(pages)
-
-    def test_logevents_with_total(self) -> None:
-        """Test -logevents which uses total."""
-        gf = pagegenerators.GeneratorFactory(site=self.site)
-        self.assertTrue(gf.handle_arg('-logevents:newusers,,1'))
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        pages = set(gen)
-        self.assertLength(pages, 1)
-        for item in pages:
-            self.assertIsInstance(item, pywikibot.User)
 
 
 class PageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
