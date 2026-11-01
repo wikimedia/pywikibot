@@ -53,7 +53,6 @@ Pending removal in Pywikibot 12
   <pywikibot.site._apisite.APISite.namespace>` was renamed to ``all_ns``
 * 9.0.0: ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``
 * 9.0.0: ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``
-* 9.0.0: :func:`version.get_toolforge_hostname` is deprecated with no replacement
 * 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
   (:phab:`T340804`)
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``

@@ -10,7 +10,6 @@ import datetime
 import json
 import os
 import pathlib
-import socket
 import subprocess
 import sys
 import sysconfig
@@ -25,26 +24,10 @@ import pywikibot
 from pywikibot import config
 from pywikibot.comms.http import fetch
 from pywikibot.exceptions import VersionParseError
-from pywikibot.tools import deprecated
 
 
 def _get_program_dir() -> str:
     return os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
-
-
-@deprecated(since='9.0.0')
-def get_toolforge_hostname() -> str | None:
-    """Get hostname of the current Toolforge host.
-
-    .. version-added:: 3.0
-    .. version-deprecated:: 9.0
-
-    :return: The hostname of the currently running host,
-             if it is in Wikimedia Toolforge; otherwise return None.
-    """
-    if socket.getfqdn().endswith('.tools.eqiad1.wikimedia.cloud'):
-        return socket.gethostname()
-    return None
 
 
 def getversion(online: bool = True) -> str:
