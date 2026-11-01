@@ -77,7 +77,6 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     deprecated_signature,
-    issue_deprecation_warning,
     merge_unique_dicts,
     normalize_username,
 )
@@ -2154,11 +2153,6 @@ class APISite(
                     raise
 
         token = self.tokens['csrf']
-        if bot is None:
-            issue_deprecation_warning("'None' argument for 'bot' parameter",
-                                      "'True' value", since='9.4.0')
-            bot = True
-
         if bot:
             bot = self.has_right('bot')
             # show a warning if user is a bot member but hasn't bot right

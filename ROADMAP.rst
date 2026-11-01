@@ -11,7 +11,9 @@ Release 12
 
 **Code cleanups**
 
-* (No changes yet)
+* Remove the deprecated conversion of ``bot=None`` to ``bot=True`` in
+  :meth:`APISite.editpage()<pywikibot.site._apisite.APISite.editpage>`; use
+  a boolean value for *bot*.
 
 **Other breaking changes**
 
