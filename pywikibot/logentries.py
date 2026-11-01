@@ -6,13 +6,16 @@
 """Objects representing MediaWiki log entries."""
 from __future__ import annotations
 
-import datetime
 from collections import UserDict
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
 from pywikibot.tools import cached
+
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class LogEntry(UserDict):

@@ -534,7 +534,7 @@ class WbTime(WbRepresentation):
                     and precision in self.PRECISION.values()):
                 prec = precision
             elif isinstance(precision, str) and precision in self.PRECISION:
-                prec = self.PRECISION[cast(str, precision)]
+                prec = self.PRECISION[cast('str', precision)]
             else:
                 raise ValueError(f'Invalid precision: "{precision}"')
 

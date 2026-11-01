@@ -19,7 +19,6 @@ These parameters are supported to specify which pages titles to be used:
 """
 from __future__ import annotations
 
-from collections.abc import Callable, Generator, Iterable
 from typing import TYPE_CHECKING, Any
 
 import pywikibot
@@ -595,6 +594,7 @@ FILTER OPTIONS
 docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable
     PRELOAD_SITE_TYPE = dict[pywikibot.site.BaseSite,
                              list[pywikibot.page.Page]]
 

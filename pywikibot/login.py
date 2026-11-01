@@ -98,7 +98,7 @@ class LoginManager:
         :raises pywikibot.exceptions.NoUsernameError: No username is
             configured for the requested site.
         """
-        site = cast(pywikibot.site.APISite, site or pywikibot.Site())
+        site = cast('pywikibot.site.APISite', site or pywikibot.Site())
 
         if not user:
             config_names = config.usernames

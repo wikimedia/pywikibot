@@ -9,9 +9,8 @@ from __future__ import annotations
 import datetime
 import json
 import uuid
-from collections.abc import Generator, Iterable
 from contextlib import suppress
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from warnings import warn
 
 import pywikibot
@@ -27,6 +26,10 @@ from pywikibot.exceptions import (
 from pywikibot.site._apisite import APISite
 from pywikibot.site._decorators import need_extension, need_right
 from pywikibot.tools import merge_unique_dicts
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
 
 
 __all__ = ('DataSite', )

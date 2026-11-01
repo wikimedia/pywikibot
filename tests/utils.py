@@ -12,12 +12,11 @@ import sys
 import tempfile
 import unittest
 import warnings
-from collections.abc import Sequence
 from contextlib import contextmanager, suppress
 from pathlib import Path
 from platform import python_implementation
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import NoReturn, TypedDict
+from typing import TYPE_CHECKING, NoReturn, TypedDict
 
 import pywikibot
 from pywikibot import config
@@ -28,6 +27,10 @@ from pywikibot.login import LoginStatus
 from pywikibot.site import Namespace
 from pywikibot.tools.collections import EMPTY_DEFAULT
 from tests import _pwb_py
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 OSWIN32 = (sys.platform == 'win32')

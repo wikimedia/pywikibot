@@ -26,11 +26,15 @@ Command line options:
 """
 from __future__ import annotations
 
-from collections.abc import Generator
 from itertools import chain
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 try:

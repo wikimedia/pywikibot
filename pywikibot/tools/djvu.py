@@ -10,9 +10,13 @@ import os
 import re
 import subprocess
 from collections import Counter
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 import pywikibot
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def _call_cmd(args: str | Sequence[str],

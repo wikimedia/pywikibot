@@ -182,12 +182,12 @@ import locale
 import pickle
 import re
 import time
-from collections.abc import Generator
 from contextlib import suppress
 from datetime import timedelta
 from enum import Enum
 from random import choice
 from textwrap import fill
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config, i18n
@@ -199,6 +199,10 @@ from pywikibot.exceptions import (
     UnknownExtensionError,
 )
 from pywikibot.tools import cached
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 locale.setlocale(locale.LC_ALL, '')

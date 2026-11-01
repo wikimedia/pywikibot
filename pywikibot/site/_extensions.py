@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Generator, Iterable
 from ipaddress import ip_network
 from typing import TYPE_CHECKING, Any, Protocol
 
@@ -23,12 +22,14 @@ from pywikibot.exceptions import (
     UnexpectedAPIDataError,
 )
 from pywikibot.site._decorators import need_extension, need_right
-from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import merge_unique_dicts
 
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
+
     from pywikibot.site import NamespacesDict
+    from pywikibot.site._namespace import NamespaceArgType
 
 
 class BaseSiteProtocol(Protocol):

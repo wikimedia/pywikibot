@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Iterable, Mapping, Sequence
 from textwrap import fill
 from typing import TYPE_CHECKING
 
@@ -39,6 +38,7 @@ __all__ = (
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping, Sequence
     from typing import Any, Literal
 
     from pywikibot.page import BaseLink, Link, Page

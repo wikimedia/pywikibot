@@ -117,8 +117,7 @@ from __future__ import annotations
 import re
 import signal
 import sys
-from collections.abc import Generator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import WbTime, textlib
@@ -130,6 +129,10 @@ from pywikibot.exceptions import (
     InvalidTitleError,
     NoPageError,
 )
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 willstop = False

@@ -163,13 +163,12 @@ import math
 import os
 import pickle
 import re
-from collections.abc import Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
 from itertools import chain
 from operator import methodcaller
 from textwrap import fill
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
@@ -190,6 +189,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import open_archive
 from pywikibot.tools.itertools import intersect_generators
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 # This is required for the text that is shown when you run this script

@@ -9,7 +9,6 @@ from __future__ import annotations
 import itertools
 import re
 from collections import Counter
-from collections.abc import Generator, Iterable
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
@@ -48,6 +47,7 @@ from pywikibot.tools import (
 
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
     from typing import Any, Literal, NoReturn
 
     from pywikibot.page import Revision

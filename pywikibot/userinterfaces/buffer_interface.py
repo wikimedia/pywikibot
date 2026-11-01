@@ -11,12 +11,15 @@ from __future__ import annotations
 
 import logging
 import queue
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pywikibot import config
 from pywikibot.logging import INFO, VERBOSE
 from pywikibot.userinterfaces._interface_base import ABUIC
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class UI(ABUIC):

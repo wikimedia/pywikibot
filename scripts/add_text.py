@@ -69,12 +69,16 @@ Furthermore, the following can be used to specify which pages to process...
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import pagegenerators, textlib
 from pywikibot.bot import AutomaticTWSummaryBot, ExistingPageBot
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 DEFAULT_ARGS: dict[str, bool | str] = {

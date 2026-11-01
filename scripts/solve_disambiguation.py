@@ -80,10 +80,10 @@ To complete a move of a page, one can use:
 from __future__ import annotations
 
 import re
-from collections.abc import Generator
 from contextlib import suppress
 from itertools import chain, islice
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators
@@ -106,6 +106,10 @@ from pywikibot.exceptions import (
 from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.formatter import SequenceOutputter
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 # Disambiguation Needed template

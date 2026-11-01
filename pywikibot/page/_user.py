@@ -6,8 +6,7 @@
 """Object representing a Wiki user."""
 from __future__ import annotations
 
-from collections.abc import Generator, Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot.exceptions import (
@@ -24,6 +23,10 @@ from pywikibot.page._revision import Revision
 from pywikibot.time import Timestamp
 from pywikibot.tools import deprecated_args, is_ip_address, is_ip_network
 from pywikibot.tools.collections import DataRecord
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
 
 
 __all__ = ('Contribution', 'User')

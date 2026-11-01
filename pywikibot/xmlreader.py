@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 from xml.etree.ElementTree import Element
 
 
@@ -28,9 +28,11 @@ try:
 except ImportError:
     from xml.etree.ElementTree import ParseError, iterparse
 
-from collections.abc import Callable, Iterator
-
 from pywikibot.tools import open_archive
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
 
 
 @dataclass

@@ -9,14 +9,18 @@ from __future__ import annotations
 import difflib
 import math
 from collections import abc
-from collections.abc import Iterable, Sequence
 from difflib import SequenceMatcher
 from difflib import _format_range_unified  # type: ignore[attr-defined]
 from heapq import nlargest
 from itertools import zip_longest
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot.tools import chars, deprecated_signature
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 
 __all__ = [

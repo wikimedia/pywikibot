@@ -12,9 +12,8 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Iterable
 from contextlib import suppress
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from warnings import warn
 
 import pywikibot
@@ -27,6 +26,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.site import Namespace
 from pywikibot.tools.collections import GeneratorWrapper
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
 
 
 __all__ = (
@@ -527,7 +530,7 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         # mypy cannot infer that support_namespace() guarantees
         # self.limited_module is not None; therefore use cast here.
         param = self.site._paraminfo.parameter(
-            'query+' + cast(str, self.limited_module),
+            'query+' + cast('str', self.limited_module),
             'namespace'
         )
         if isinstance(namespaces, str):

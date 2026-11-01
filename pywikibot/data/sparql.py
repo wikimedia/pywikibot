@@ -156,7 +156,7 @@ class SparqlQuery(WaitingMixin):
         url = endpoint._replace(query=query_string).geturl()
         while True:
             try:
-                self.last_response = cast(Response,
+                self.last_response = cast('Response',
                                           http.fetch(url, headers=headers))
             except Timeout:
                 pass

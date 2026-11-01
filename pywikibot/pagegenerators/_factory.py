@@ -9,7 +9,6 @@ from __future__ import annotations
 import itertools
 import re
 import sys
-from collections.abc import Callable, Iterable, Sequence
 from datetime import timedelta
 from functools import partial
 from itertools import zip_longest
@@ -59,6 +58,7 @@ from pywikibot.tools.itertools import (
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
     from typing import Any, Literal, Optional
 
     from pywikibot.site import BaseSite, Namespace

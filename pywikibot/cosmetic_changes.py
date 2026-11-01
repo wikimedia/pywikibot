@@ -57,10 +57,9 @@ or by adding a list to the given one::
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
 from contextlib import suppress
 from enum import IntEnum
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 from urllib.parse import urlparse, urlunparse
 
 import pywikibot
@@ -69,6 +68,10 @@ from pywikibot.site import Namespace
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.tools.chars import url2string
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 try:
@@ -522,7 +525,7 @@ class CosmeticChangesToolkit:
             replaced = '|'.join(cache.get(p.strip(), p) for p in parts)
 
             # extract namespace
-            m = cast(re.Match[str],
+            m = cast('re.Match[str]',
                      re.match(r'\[\[\s*(?P<namespace>[^:]+)\s*:', linktext))
 
             return f'[[{m["namespace"]}:{match["filename"]}{replaced}]]'

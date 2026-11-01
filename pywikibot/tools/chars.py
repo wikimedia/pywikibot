@@ -7,12 +7,15 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
 from contextlib import suppress
-from typing import cast
+from typing import TYPE_CHECKING, cast
 from urllib.parse import unquote
 
 from pywikibot.tools._unidata import _category_cf
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 # This is a set of all invisible characters
@@ -135,4 +138,4 @@ def url2string(title: str,
                 first_exception = e
 
     # Couldn't convert, raise the first exception
-    raise cast(BaseException, first_exception)
+    raise cast('BaseException', first_exception)

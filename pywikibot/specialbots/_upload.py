@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Callable
 from contextlib import suppress
 from http import HTTPStatus
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 import requests
@@ -24,6 +24,10 @@ from pywikibot import config
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.comms import http
 from pywikibot.exceptions import APIError, FatalServerError, NoPageError
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class UploadRobot(BaseBot):

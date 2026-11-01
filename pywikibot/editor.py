@@ -15,14 +15,17 @@ import shlex
 import subprocess
 import sys
 import tempfile
-from collections.abc import Sequence
 from pathlib import Path
 from sys import platform
 from textwrap import fill
-from typing import Protocol, cast, no_type_check
+from typing import TYPE_CHECKING, Protocol, cast, no_type_check
 
 import pywikibot
 from pywikibot import config
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 try:
@@ -157,7 +160,7 @@ class TextEditor:
                 ' separately on your platform.') + '\n')
 
         assert pywikibot.ui is not None
-        return cast(EditableUI, pywikibot.ui).editText(
+        return cast('EditableUI', pywikibot.ui).editText(
             text, jumpIndex=jumpIndex, highlight=highlight)
 
     @staticmethod

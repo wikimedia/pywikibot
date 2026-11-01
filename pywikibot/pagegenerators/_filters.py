@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import datetime
 import re
-from collections.abc import Generator, Iterable, Sequence
 from functools import partial
 from typing import TYPE_CHECKING, NamedTuple
 
@@ -21,6 +20,7 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if TYPE_CHECKING:
+    from collections.abc import Generator, Iterable, Sequence
     from typing import Union
 
     from pywikibot.site import BaseSite, Namespace

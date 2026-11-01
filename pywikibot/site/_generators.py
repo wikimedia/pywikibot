@@ -9,7 +9,6 @@ from __future__ import annotations
 import heapq
 import itertools
 import typing
-from collections.abc import Callable, Generator, Iterable
 from contextlib import suppress
 from itertools import zip_longest
 from typing import Any
@@ -27,7 +26,6 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.site._decorators import need_right
-from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import (
     deprecated_args,
     deprecated_signature,
@@ -38,10 +36,15 @@ from pywikibot.tools.itertools import filter_unique, union_generators
 
 
 if typing.TYPE_CHECKING:
+    from collections.abc import Callable, Generator, Iterable
     from datetime import datetime
 
     from pywikibot.data.api import ParamInfo, Request
-    from pywikibot.site._namespace import NamespacesDict, SingleNamespaceType
+    from pywikibot.site._namespace import (
+        NamespaceArgType,
+        NamespacesDict,
+        SingleNamespaceType,
+    )
     from pywikibot.site._tokenwallet import TokenWallet
     from pywikibot.tools import MediaWikiVersion
 

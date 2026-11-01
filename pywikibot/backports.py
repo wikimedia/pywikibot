@@ -313,4 +313,6 @@ if PYTHON_VERSION < (3, 15) or SPHINX_RUNNING:
                 return Union[other, self]
 
 else:
-    from builtins import sentinel  # type: ignore[no-redef, attr-defined]
+    from builtins import (  # type: ignore[no-redef, attr-defined] # noqa: TC003, E501
+        sentinel,
+    )

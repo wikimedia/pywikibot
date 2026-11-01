@@ -11,7 +11,6 @@ import re
 import time
 import webbrowser
 from collections import defaultdict
-from collections.abc import Iterable
 from contextlib import suppress
 from textwrap import fill
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, TypeVar
@@ -84,6 +83,8 @@ from pywikibot.tools.collections import RateLimit
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pywikibot.page import BasePage
 
     _CompType = int | str | pywikibot.page.Page | pywikibot.page.Revision

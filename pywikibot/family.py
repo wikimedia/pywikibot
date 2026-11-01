@@ -14,7 +14,6 @@ import sys
 import types
 import urllib.parse as urlparse
 import warnings
-from collections.abc import Mapping, Sequence
 from importlib import import_module
 from itertools import chain
 from os.path import basename, dirname, splitext
@@ -31,6 +30,7 @@ from pywikibot.tools import classproperty, deprecated
 logger = logging.getLogger('pywiki.wiki.family')
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
     CrossnamespaceType = collections.defaultdict[str, dict[str, list[int]]]
 
 # Legal characters for Family.name and Family.langs keys

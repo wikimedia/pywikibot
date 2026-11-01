@@ -11,8 +11,7 @@ import logging
 import re
 import sys
 import threading
-from collections.abc import Iterable, Sequence
-from typing import Any, Literal, NoReturn, TextIO
+from typing import TYPE_CHECKING, Any, Literal, NoReturn, TextIO
 
 import pywikibot
 from pywikibot import config
@@ -27,6 +26,10 @@ from pywikibot.bot_choice import (
 from pywikibot.logging import INFO, INPUT, STDOUT, VERBOSE, WARNING
 from pywikibot.userinterfaces import transliteration
 from pywikibot.userinterfaces._interface_base import ABUIC
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
 
 
 transliterator = transliteration.Transliterator(config.console_encoding)

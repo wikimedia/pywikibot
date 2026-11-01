@@ -17,12 +17,10 @@ import shutil
 import stat
 import subprocess
 import sys
-from collections.abc import Callable
 from contextlib import suppress
 from functools import total_ordering, wraps
 from pathlib import Path
-from types import TracebackType
-from typing import IO, Any, Literal
+from typing import IO, TYPE_CHECKING, Any, Literal
 from warnings import catch_warnings, showwarning, warn
 
 import packaging.version
@@ -43,6 +41,11 @@ from pywikibot.tools._deprecate import (
     remove_last_args,
 )
 from pywikibot.tools._unidata import _first_upper_exception
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import TracebackType
 
 
 try:  # Python 3.14+

@@ -11,7 +11,6 @@ import io
 import re
 import typing
 from collections import abc
-from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from functools import partial
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any
@@ -31,6 +30,14 @@ from pywikibot.tools.itertools import filter_unique
 
 
 if TYPE_CHECKING:
+    from collections.abc import (
+        Callable,
+        Generator,
+        Iterable,
+        Iterator,
+        Sequence,
+    )
+
     from pywikibot.site import BaseSite, NamespaceArgType
     from pywikibot.site._namespace import SingleNamespaceType
     from pywikibot.time import Timestamp

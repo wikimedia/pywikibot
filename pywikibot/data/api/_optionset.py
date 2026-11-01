@@ -7,8 +7,11 @@
 from __future__ import annotations
 
 from collections.abc import MutableMapping
+from typing import TYPE_CHECKING
 
-import pywikibot
+
+if TYPE_CHECKING:
+    import pywikibot
 
 
 __all__ = ['OptionSet']

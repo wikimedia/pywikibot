@@ -48,8 +48,8 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
-from collections.abc import Container
 from contextlib import suppress
+from typing import TYPE_CHECKING
 
 import mwparserfromhell
 
@@ -57,6 +57,10 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import BaseBot, suggest_help
 from pywikibot.site import Namespace
+
+
+if TYPE_CHECKING:
+    from collections.abc import Container
 
 
 def verbose_output(string) -> None:

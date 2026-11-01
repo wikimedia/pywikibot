@@ -359,10 +359,10 @@ import os
 import re
 import sys
 from collections import Counter, defaultdict
-from collections.abc import Iterable
 from contextlib import suppress
 from pathlib import Path
 from textwrap import fill
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import (
@@ -399,6 +399,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import first_upper, issue_deprecation_warning
 from pywikibot.tools.collections import SizedKeyCollection
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 docuReplacements = {

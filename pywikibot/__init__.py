@@ -12,7 +12,6 @@ import re
 import sys
 import threading
 import warnings
-from collections.abc import Callable
 from contextlib import suppress
 from functools import cache
 from queue import Queue
@@ -70,6 +69,8 @@ from pywikibot.tools import (
 
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pywikibot.site import APISite
 
 if PYTHON_VERSION >= (3, 13):
@@ -244,7 +245,7 @@ def Site(code: str | None = None,  # noqa: N802
     if not isinstance(fam, Family):
         fam = Family.load(fam)
 
-    fam = cast(Family, fam)
+    fam = cast('Family', fam)
     interface = interface or fam.interface(code)
 
     # config.usernames is initialised with a defaultdict for each family name
@@ -261,7 +262,7 @@ def Site(code: str | None = None,  # noqa: N802
 
     if not isinstance(interface, type):
         # If it isn't a class, assume it is a string
-        interface = cast(str, interface)
+        interface = cast('str', interface)
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:

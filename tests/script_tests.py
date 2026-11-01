@@ -9,15 +9,19 @@ from __future__ import annotations
 
 import sys
 import unittest
-from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pywikibot.bot import global_args as pwb_args
 from pywikibot.tools import has_module
 from tests import join_root_path, unittest_print
 from tests.aspects import DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import execute_pwb
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 scripts_path = join_root_path('scripts')

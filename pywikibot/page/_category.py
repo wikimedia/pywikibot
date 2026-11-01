@@ -7,11 +7,14 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Generator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot.page._page import Page
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 __all__ = ('Category', )

@@ -17,13 +17,14 @@ from string import digits as _decimalDigits  # noqa: N812
 from typing import TYPE_CHECKING, Any
 
 from pywikibot import Site
-from pywikibot.site import BaseSite
 from pywikibot.tools import first_lower, first_upper
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
 if TYPE_CHECKING:
     from typing import Union
+
+    from pywikibot.site import BaseSite
     tuplst_type = list[tuple[Callable[[Union[int, str]], Any],
                              Callable[[Union[int, str]], bool]]]
     encf_type = Callable[[int], Union[int, Sequence[int]]]

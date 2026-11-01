@@ -80,11 +80,10 @@ Furthermore the following options are provided:
 from __future__ import annotations
 
 import datetime
-from collections.abc import Generator
 from contextlib import suppress
 from itertools import islice
 from textwrap import fill
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 import pywikibot.data
@@ -104,6 +103,10 @@ from pywikibot.exceptions import (
     UnsupportedPageError,
 )
 from pywikibot.textlib import extract_templates_and_params_regex_simple
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 BROKEN_REDIRECT_TEMPLATE = 'Q11838699', 'Q4847311', 'Q21528265'

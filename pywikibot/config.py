@@ -52,7 +52,6 @@ import re
 import stat
 import sys
 import types
-from collections.abc import Mapping
 from locale import getlocale
 from os import environ, getenv
 from pathlib import Path
@@ -66,6 +65,7 @@ from pywikibot.logging import error, info, warning
 
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     _DabComDict = collections.defaultdict[str, dict[str, str]]
 
 _ValueType = TypeVar('_ValueType')

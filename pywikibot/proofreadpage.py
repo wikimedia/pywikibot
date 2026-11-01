@@ -20,11 +20,10 @@ import collections.abc
 import json
 import re
 import time
-from collections.abc import Callable, Iterable, Sequence
 from functools import partial
 from http import HTTPStatus
 from itertools import pairwise
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import unquote
 from weakref import WeakKeyDictionary
 
@@ -35,8 +34,13 @@ from pywikibot import textlib
 from pywikibot.comms import http
 from pywikibot.data.api import ListGenerator, Request
 from pywikibot.exceptions import Error, InvalidTitleError, OtherPageSaveError
-from pywikibot.page import PageSourceType
 from pywikibot.tools import MediaWikiVersion, cached
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Sequence
+
+    from pywikibot.page import PageSourceType
 
 
 try:

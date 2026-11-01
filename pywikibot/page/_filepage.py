@@ -12,10 +12,10 @@ This module includes objects:
 """
 from __future__ import annotations
 
-from collections.abc import Iterable
 from http import HTTPStatus
 from os import PathLike
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
 import pywikibot
@@ -23,6 +23,10 @@ from pywikibot.comms import http
 from pywikibot.exceptions import NoPageError
 from pywikibot.page._page import Page
 from pywikibot.tools import compute_file_hash
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 __all__ = (

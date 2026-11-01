@@ -84,8 +84,8 @@ from __future__ import annotations
 import collections
 import re
 import time
-from collections.abc import Generator
 from itertools import zip_longest
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config, i18n
@@ -105,6 +105,10 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import Family
 from pywikibot.site import Namespace
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 try:

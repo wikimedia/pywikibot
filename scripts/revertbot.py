@@ -48,17 +48,21 @@ Users who want to customize the behaviour should subclass the
 from __future__ import annotations
 
 import abc
-from collections.abc import Mapping
 from textwrap import fill
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pywikibot
 from pywikibot import i18n
 from pywikibot.bot import OptionHandler
 from pywikibot.date import format_date, formatYear
 from pywikibot.exceptions import APIError, Error
-from pywikibot.page import Contribution
 from pywikibot.tools import deprecated
+
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from pywikibot.page import Contribution
 
 
 class AbstractRevertBot(OptionHandler, abc.ABC):

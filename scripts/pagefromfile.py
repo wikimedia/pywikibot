@@ -79,14 +79,18 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Generator
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pywikibot
 from pywikibot import config, i18n
 from pywikibot.bot import CurrentPageBot, OptionHandler, SingleSiteBot
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.collections import GeneratorWrapper
+
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 CTX_ATTR = '_content_ctx'

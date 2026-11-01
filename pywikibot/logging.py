@@ -42,11 +42,14 @@ __all__ = (
 import logging
 import os
 import sys
-from collections.abc import Callable
 
 # logging levels
 from logging import CRITICAL, DEBUG, ERROR, INFO, WARNING
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 STDOUT = 16  #:

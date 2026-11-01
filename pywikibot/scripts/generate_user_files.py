@@ -22,12 +22,15 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Callable
 from pathlib import Path
 from textwrap import fill
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
 
 from pywikibot.scripts import _import_with_no_user_config
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 # DISABLED_SECTIONS cannot be copied; variables must be set manually

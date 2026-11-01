@@ -11,11 +11,14 @@ from __future__ import annotations
 
 import urllib.parse
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pywikibot.comms import http
 from pywikibot.exceptions import ApiNotAvailableError, CitoidError
-from pywikibot.site import BaseSite
+
+
+if TYPE_CHECKING:
+    from pywikibot.site import BaseSite
 
 
 VALID_FORMAT = [

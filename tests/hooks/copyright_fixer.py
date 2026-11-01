@@ -13,9 +13,13 @@ from __future__ import annotations
 import re
 import subprocess
 import sys
-from collections.abc import Sequence
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 PATTERN = re.compile(
