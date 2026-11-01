@@ -77,7 +77,7 @@ if PYTHON_VERSION >= (3, 13):
 else:
     class ShutDown(Exception):
 
-        """Dummy exception for Python 3.9-3.12."""
+        """Dummy exception for Python 3.10-3.12."""
 
 
 __all__ = (

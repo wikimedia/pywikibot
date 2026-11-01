@@ -20,7 +20,7 @@ To get started on proper usage of the bot framework, please refer to:
   * googlesearch-python to access Google Web API for use with pagegenerators.py
 
 
-You need to have at least Python version `3.9 <https://www.python.org/downloads/>`_
+You need to have at least Python version `3.10 <https://www.python.org/downloads/>`_
 or newer installed on your computer to be able to run any of the code in this
 package. Please refer the manual at mediawiki for further details and
 restrictions.

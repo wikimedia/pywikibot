@@ -30,8 +30,6 @@ The entire suite of tests may be run in the following ways from the root directo
 
 **pytest**
 
-.. note:: Running the test suite with pytest requires Python 3.10 or higher.
-
 ::
 
     pip install "pytest >= 9.0.3"

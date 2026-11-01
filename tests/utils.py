@@ -665,8 +665,6 @@ def skipping(*exceptions: BaseException,
         ):
             page.save()
 
-    .. note:: The last sample uses Python 3.10 syntax.
-
     .. version-added:: 6.2
     .. version-changed:: 9.3
        *code* parameter was added

@@ -18,6 +18,7 @@ from unittest.mock import patch
 import pywikibot
 from pywikibot import config
 from pywikibot.scripts import wrapper
+from pywikibot.tools import PYTHON_VERSION
 from tests import create_path_func, join_tests_path
 from tests.aspects import PwbTestCase
 from tests.utils import execute, execute_pwb
@@ -160,15 +161,12 @@ class TestPwb(PwbTestCase):
         :func:`pywikibot.scripts.wrapper.run` (T420109).
         """
         eps = entry_points()
-        try:
-            console = eps.select(group='console_scripts')
-        except AttributeError:  # Python < 3.10 compatibility path
-            console = eps.get('console_scripts', [])  # type: ignore[arg-type]
+        console = eps.select(group='console_scripts')
 
         pwb_eps = [ep for ep in console if ep.name == 'pwb']
 
         if not pwb_eps:
-            if sys.version_info >= (3, 11):
+            if PYTHON_VERSION >= (3, 11):
                 import tomllib
             else:
                 try:
