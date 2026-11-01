@@ -3,11 +3,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-"""Iterator functions.
-
-.. note:: ``pairwise()`` function introduced in Python 3.10 is backported
-   in :mod:`backports`
-"""
+"""Iterator functions."""
 from __future__ import annotations
 
 import collections

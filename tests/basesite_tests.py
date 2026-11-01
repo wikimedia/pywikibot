@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import unittest
 from contextlib import suppress
+from types import NoneType
 
 import pywikibot
-from pywikibot.backports import NoneType
 from pywikibot.exceptions import Error
 from tests.aspects import DefaultSiteTestCase, TestCase
 

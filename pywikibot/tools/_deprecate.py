@@ -33,19 +33,14 @@ from contextlib import suppress
 from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec
-from typing import TYPE_CHECKING, Any
+from types import NoneType
+from typing import Any
 from warnings import warn
 
 
-# Unable to import SPHINX_RUNNING from tools and NoneType from backports
-# because of circular imports; adding them here.
-PYTHON_VERSION: tuple[int, int, int] = sys.version_info[:3]
+# Unable to import SPHINX_RUNNING from tools
+# because of circular imports; adding it here.
 SPHINX_RUNNING: bool = 'sphinx' in sys.modules
-
-if PYTHON_VERSION < (3, 10):
-    NoneType = type(None)
-elif not TYPE_CHECKING:
-    from types import NoneType
 
 
 class _NotImplementedWarning(RuntimeWarning):

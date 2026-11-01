@@ -15,11 +15,11 @@ from contextlib import closing, suppress
 from dataclasses import dataclass
 from functools import lru_cache
 from html.parser import HTMLParser
+from itertools import pairwise
 from typing import NamedTuple
 from urllib.parse import quote
 
 import pywikibot
-from pywikibot.backports import pairwise
 from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset

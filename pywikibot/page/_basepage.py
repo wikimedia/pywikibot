@@ -13,13 +13,13 @@ from collections.abc import Generator, Iterable
 from contextlib import suppress
 from itertools import islice
 from textwrap import shorten, wrap
+from types import NoneType
 from typing import TYPE_CHECKING
 from urllib.parse import quote_from_bytes
 from warnings import warn
 
 import pywikibot
 from pywikibot import Timestamp, config, date, i18n, textlib, tools
-from pywikibot.backports import NoneType
 from pywikibot.cosmetic_changes import CANCEL, CosmeticChangesToolkit
 from pywikibot.exceptions import (
     Error,

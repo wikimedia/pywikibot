@@ -10,8 +10,8 @@ from __future__ import annotations
 import sys
 import unittest
 from contextlib import suppress
+from types import NoneType
 
-from pywikibot.backports import NoneType
 from pywikibot.data.wikistats import WikiStats
 from tests.aspects import TestCase
 

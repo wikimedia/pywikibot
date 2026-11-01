@@ -24,31 +24,6 @@ from pywikibot.tools import PYTHON_VERSION, SPHINX_RUNNING
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Iterable
 
-
-if PYTHON_VERSION < (3, 10) or SPHINX_RUNNING:
-    from itertools import tee
-
-    NoneType = type(None)
-
-    # bpo-38200
-    def pairwise(iterable):
-        """Return successive overlapping pairs taken from the input iterable.
-
-        .. seealso:: :python:`itertools.pairwise
-           <library/itertools.html#itertools.pairwise>`,
-           backported from Python 3.10.
-        .. version-added:: 7.6
-        .. version-removed:: 12.0
-        """
-        a, b = tee(iterable)
-        next(b, None)
-        return zip(a, b)
-
-elif not TYPE_CHECKING:
-    from itertools import pairwise  # noqa: F401
-    from types import NoneType  # noqa: F401
-
-
 # gh-98363
 if PYTHON_VERSION < (3, 13) or SPHINX_RUNNING:
     def batched(iterable, n: int, *,

@@ -206,6 +206,7 @@ import time
 from collections import defaultdict
 from contextlib import nullcontext
 from hashlib import md5
+from itertools import pairwise
 from math import ceil
 from textwrap import fill
 from typing import Any
@@ -213,7 +214,6 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import i18n
-from pywikibot.backports import pairwise
 from pywikibot.exceptions import Error, NoPageError
 from pywikibot.textlib import (
     TimeStripper,

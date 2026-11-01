@@ -20,13 +20,13 @@ from __future__ import annotations
 import json
 from datetime import timedelta
 from functools import partial
+from types import NoneType
 from typing import Any
 
 from requests.packages.urllib3.exceptions import ProtocolError
 from requests.packages.urllib3.util.response import httplib
 
 from pywikibot import Site, Timestamp, config, debug, warning
-from pywikibot.backports import NoneType
 from pywikibot.comms.http import user_agent
 from pywikibot.site import BaseSite
 from pywikibot.tools import cached, deprecated_args
