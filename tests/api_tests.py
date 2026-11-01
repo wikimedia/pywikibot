@@ -557,9 +557,10 @@ class TestPropertyGenerator(TestCase):
         titles = [link.title(with_section=False) for link in links]
         params = {
             'rvprop': 'ids|flags|timestamp|user|comment|content',
-            'titles': '|'.join(titles)}
-        if self.site.mw_version >= '1.32':
-            params['rvslots'] = 'main'
+            'rvslots': 'main',
+            'titles': '|'.join(titles),
+        }
+
         gen = api.PropertyGenerator(
             site=self.site,
             prop='revisions|info|categoryinfo|langlinks|templates',

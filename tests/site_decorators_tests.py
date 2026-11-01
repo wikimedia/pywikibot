@@ -32,7 +32,7 @@ class DecoratorTestsBase(TestCase):
         self._logged_in_as = None
         self.obsolete = False
         super().setUp()
-        self.version = lambda: '1.27'  # lowest supported release
+        self.version = lambda: '1.33'  # lowest supported release
 
     def user(self):
         """Fake the logged in user."""
@@ -198,43 +198,43 @@ class TestNeedVersion(DeprecationTestCase):
     def setUp(self) -> None:
         """Set up test method."""
         super().setUp()
-        self.version = lambda: '1.23'
+        self.version = lambda: '1.33'
 
-    @need_version('1.24')
+    @need_version('1.34')
     def too_new(self) -> bool:
         """Method which is to new."""
         return True  # pragma: no cover
 
-    @need_version('1.23')
+    @need_version('1.33')
     def old_enough(self) -> bool:
         """Method which is as new as the server."""
         return True
 
-    @need_version('1.22')
+    @need_version('1.32')
     def older(self) -> bool:
         """Method which is old enough."""
         return True
 
-    @need_version('1.24')
+    @need_version('1.34')
     @deprecated
     def deprecated_unavailable_method(self) -> bool:
         """Method which is to new and then deprecated."""
         return True  # pragma: no cover
 
     @deprecated
-    @need_version('1.24')
+    @need_version('1.34')
     def deprecated_unavailable_method2(self) -> bool:
         """Method which is deprecated first and then to new."""
         return True  # pragma: no cover
 
-    @need_version('1.22')
+    @need_version('1.32')
     @deprecated
     def deprecated_available_method(self) -> bool:
         """Method which is old enough and then deprecated."""
         return True
 
     @deprecated
-    @need_version('1.22')
+    @need_version('1.32')
     def deprecated_available_method2(self) -> bool:
         """Method which is deprecated first and then old enough."""
         return True

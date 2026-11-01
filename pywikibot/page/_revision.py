@@ -49,14 +49,11 @@ class Revision(DataRecord):
 
         data.setdefault('comment', '')
         data.setdefault('user', '')
+        data.setdefault('slots', {})
 
-        if 'slots' in data:  # mw 1.32+
-            mainslot = data['slots'].get('main', {})
-            data['text'] = mainslot.get('*')
-            data['contentmodel'] = mainslot.get('contentmodel')
-        else:
-            data['slots'] = None
-            data['text'] = data.get('*')
+        mainslot = data['slots'].get('main', {})
+        data['text'] = mainslot.get('*')
+        data['contentmodel'] = mainslot.get('contentmodel')
 
         data.setdefault('sha1')
         if data['sha1'] is None and data['text'] is not None:

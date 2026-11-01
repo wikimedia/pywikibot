@@ -25,7 +25,7 @@ from pywikibot.tools import MediaWikiVersion
 SERVER_DB_ERROR_MSG = \
     '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
-MIN_VERSION = MediaWikiVersion('1.31')
+MIN_VERSION = MediaWikiVersion('1.33')
 
 
 class MWSite:
@@ -39,7 +39,7 @@ class MWSite:
             occurred while loading the site
         :raises Timeout: a timeout occurred while loading the site
         :raises RuntimeError: Version not found or version less than
-            1.31
+            1.33
         """
         fromurl = fromurl.removesuffix('$1')
 
@@ -79,7 +79,8 @@ class MWSite:
             raise RuntimeError(f'Unsupported url: {self.fromurl}')
 
         if not self.version or self.version < MIN_VERSION:
-            raise RuntimeError(f'Unsupported version: {self.version}')
+            raise RuntimeError(
+                f'Unsupported version of {self.fromurl}: {self.version}')
 
         if not self.articlepath:
             if isinstance(self.private_wiki, Exception):

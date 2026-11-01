@@ -495,7 +495,7 @@ def require_version(version_needed: str, /, reason: str = ''):
     """Skip test unless a minimum MediaWiki version is available.
 
     The required version must include a comparison operator (e.g.
-    :code:`<1.31wmf4` or :code:`>=1.43`). If the site's version does not
+    :code:`<1.33wmf4` or :code:`>=1.45`). If the site's version does not
     satisfy the condition, the test is skipped.
 
     This decorator can only be used for :class:`TestCase` having a

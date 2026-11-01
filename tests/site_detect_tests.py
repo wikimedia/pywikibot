@@ -59,7 +59,6 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
 
     standard_version_sites = (
         'http://www.ck-wissen.de/ckwiki/index.php?title=$1',
-        'http://www.wikichristian.org/index.php?title=$1',
     )
 
     non_standard_version_sites = (
@@ -70,6 +69,7 @@ class MediaWikiSiteTestCase(SiteDetectionTestCase):
         'http://tfwiki.net/wiki/$1',  # 1.19.5-1+deb7u1
         'http://www.werelate.org/wiki/$1',
         'https://en.wikifur.com/wiki/$1',  # 1.23.16
+        'http://www.wikichristian.org/index.php?title=$1',  # 1.32.1
     )
 
     no_sites = (

@@ -385,8 +385,8 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
     def _add_slots(self) -> None:
         """Add slots to params if the site supports multi-content revisions.
 
-        On MW 1.32+ the following query parameters require slots to be given
-        when content or contentmodel is requested.
+        The following query parameters require slots to be given when
+        content or contentmodel is requested.
 
         * prop=revisions
         * prop=deletedrevisions or
@@ -396,8 +396,6 @@ class QueryGenerator(APIGeneratorBase, GeneratorWrapper):
         More info:
         https://lists.wikimedia.org/hyperkitty/list/mediawiki-api-announce@lists.wikimedia.org/message/AXO4G4OOMTG7CEUU5TGAWXBI2LD4G3BC/
         """
-        if self.site.mw_version < '1.32':
-            return
         request = self.request
         # If using any deprecated_params, do not add slots. Usage of
         # these parameters together with slots is forbidden and the user will

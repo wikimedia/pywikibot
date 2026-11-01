@@ -1315,10 +1315,10 @@ class APISite(
             pywikibot.error(msg)
             raise
 
-        if MediaWikiVersion(version) < '1.31':
+        if MediaWikiVersion(version) < '1.33':
             raise RuntimeError(f'Pywikibot "{pywikibot.__version__}" does not '
                                f'support MediaWiki "{version}".\nUse '
-                               f'Pywikibot prior to "10.0" branch instead.')
+                               f'Pywikibot prior to "12.0" branch instead.')
         return version
 
     @property

@@ -110,12 +110,12 @@ class TestRequireVersion(DefaultSiteTestCase):
         """Test method for decorator with invalid parameter."""
         self.assertTrue(False, 'should never happen')  # pragma: no cover
 
-    @require_version('>=1.31')
+    @require_version('>=1.33')
     def method_succeed(self) -> None:
         """Test that decorator passes."""
         self.assertTrue(False, 'intentional fail for method_succeed test')
 
-    @require_version('<1.31')
+    @require_version('<1.33')
     def method_fail(self) -> None:
         """Test that decorator skips."""
         self.assertTrue(False, 'intentional fail for test')  # pragma: no cover
@@ -143,12 +143,12 @@ class TestRequireVersion(DefaultSiteTestCase):
         with self.assertRaisesRegex(ValueError, 'Invalid version number'):
             require_version('>bar')(self.method_failing)(self)
         with self.assertRaisesRegex(unittest.SkipTest,
-                                    r'MediaWiki < v1\.31 required'):
-            require_version('<1.31')(self.method_failing)(self)
+                                    r'MediaWiki < v1\.33 required'):
+            require_version('<1.33')(self.method_failing)(self)
         with self.assertRaisesRegex(
                 unittest.SkipTest,
-                r'MediaWiki < v1\.31 required to run this test'):
-            require_version('<1.31',
+                r'MediaWiki < v1\.33 required to run this test'):
+            require_version('<1.33',
                             'run this test')(self.method_failing)(self)
 
     def test_decorator(self) -> None:
@@ -158,7 +158,7 @@ class TestRequireVersion(DefaultSiteTestCase):
                 'intentional fail for method_succeed test'):
             self.method_succeed()
         with self.assertRaisesRegex(unittest.SkipTest,
-                                    r'MediaWiki < v1\.31 required'):
+                                    r'MediaWiki < v1\.33 required'):
             self.method_fail()
 
 

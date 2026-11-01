@@ -764,12 +764,12 @@ class GeneratorsMixin:
 
         :return: rvprop items
         """
-        props = ['comment', 'contentmodel', 'flags', 'ids', 'parsedcomment',
-                 'sha1', 'size', 'tags', 'timestamp', 'user', 'userid']
+        props = [
+            'comment', 'contentmodel', 'flags', 'ids', 'parsedcomment',
+            'roles', 'sha1', 'size', 'tags', 'timestamp', 'user', 'userid',
+        ]
         if content:
             props.append('content')
-        if self.mw_version >= '1.32':
-            props.append('roles')
         return props
 
     def loadrevisions(

@@ -516,7 +516,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
             self.assertGreaterEqual(impage.title(with_ns=False), 'Ba')
-        # Bug T17985 - reverse and start combined; fixed in v 1.14
         for impage in mysite.allimages(start='Da', reverse=True, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
