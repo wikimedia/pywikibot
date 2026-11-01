@@ -29,7 +29,6 @@ from pywikibot.exceptions import (
 from pywikibot.site._decorators import need_right
 from pywikibot.site._namespace import NamespaceArgType
 from pywikibot.tools import (
-    deprecate_arg,
     deprecated_args,
     deprecated_signature,
     is_ip_address,
@@ -2487,7 +2486,6 @@ class GeneratorsMixin:
         """
         return self.querypage('Listredirects', total)
 
-    @deprecate_arg('type', 'protect_type')  # since 9.0
     def protectedpages(
         self,
         namespace: NamespaceArgType = 0,

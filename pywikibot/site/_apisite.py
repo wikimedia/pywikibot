@@ -74,7 +74,6 @@ from pywikibot.site._upload import Uploader
 from pywikibot.tools import (
     MediaWikiVersion,
     cached,
-    deprecate_arg,
     deprecated,
     deprecated_args,
     deprecated_signature,
@@ -1467,7 +1466,6 @@ class APISite(
         # 'title' is expected to be URL-encoded already
         return self.siteinfo['articlepath'].replace('$1', title)
 
-    @deprecate_arg('all', 'all_ns')  # since 9.0
     def namespace(self, num: int, all_ns: bool = False) -> str | Namespace:
         """Return string containing local name of namespace 'num'.
 

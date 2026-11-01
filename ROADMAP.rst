@@ -45,10 +45,6 @@ Pending removal in Pywikibot 12
   use ``-limit`` instead (:phab:`T128981`)
 * 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be
   ignored (:phab:`T358635`)
-* 9.0.0: The ``type`` parameter of :meth:`site.APISite.protectedpages()
-  <pywikibot.site._generators.GeneratorsMixin.protectedpages>` was renamed to ``protect_type``
-* 9.0.0: The ``all`` parameter of :meth:`site.APISite.namespace()
-  <pywikibot.site._apisite.APISite.namespace>` was renamed to ``all_ns``
 * 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
   (:phab:`T340804`)
 
