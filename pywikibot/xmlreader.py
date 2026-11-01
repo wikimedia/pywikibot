@@ -30,11 +30,7 @@ except ImportError:
 
 from collections.abc import Callable, Iterator
 
-from pywikibot.tools import (
-    ModuleDeprecationWrapper,
-    issue_deprecation_warning,
-    open_archive,
-)
+from pywikibot.tools import issue_deprecation_warning, open_archive
 
 
 @dataclass
@@ -331,11 +327,3 @@ class XmlDump:
             content_model=(revision.findtext(f'{uri}model') or 'wikitext'),
             # could get comment, minor as well
         )
-
-
-wrapper = ModuleDeprecationWrapper(__name__)
-wrapper.add_deprecated_attr(
-    'parseRestrictions',
-    XmlDump.parse_restrictions,
-    replacement_name='pywikibot.xmlreader.XmlDump.parseRestrictions',
-    since='9.0.0')

@@ -14,6 +14,8 @@ Release 12
 * Remove the deprecated conversion of ``bot=None`` to ``bot=True`` in
   :meth:`APISite.editpage()<pywikibot.site._apisite.APISite.editpage>`; use
   a boolean value for *bot*.
+* Remove the deprecated ``xmlreader.parseRestrictions`` alias; use
+  :meth:`xmlreader.XmlDump.parse_restrictions` instead.
 
 **Other breaking changes**
 
