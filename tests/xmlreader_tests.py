@@ -11,7 +11,6 @@ import unittest
 from contextlib import suppress
 
 from pywikibot import xmlreader
-from pywikibot.tools import suppress_warnings
 from tests import join_xml_data_path
 from tests.aspects import TestCase
 
@@ -42,16 +41,16 @@ class ExportDotThreeTestCase(TestCase):
         self.assertEqual('Pear', pages[0].title)
 
     def test_XmlDumpFoundRev(self) -> None:
-        """Test loading the first, earliest and latest revision."""
+        """Test explicit revision selection and the latest revision default."""
         tests = {
             'first_found': ('Automated conversion', '185185'),
             'earliest': ('Automated conversion', '185185'),
             'latest': ('sp', '188924'),
+            None: ('sp', '188924'),
         }
         for revisions, (comment, revid) in tests.items():
-            with suppress_warnings(
-                    r".+'allrevisions' is deprecated since release 9\.0\.0"):
-                pages = get_entries('article-pear.xml', revisions=revisions)
+            kwargs = {'revisions': revisions} if revisions else {}
+            pages = get_entries('article-pear.xml', **kwargs)
             with self.subTest(revisions=revisions):
                 self.assertLength(pages, 1)
                 page = pages[0]

@@ -30,7 +30,7 @@ except ImportError:
 
 from collections.abc import Callable, Iterator
 
-from pywikibot.tools import issue_deprecation_warning, open_archive
+from pywikibot.tools import open_archive
 
 
 @dataclass
@@ -100,6 +100,10 @@ class XmlDump:
        `allrevisions` parameter is deprecated due to :phab:`T340804`,
        `revisions` parameter was introduced as replacement.
        `root` attribute was removed.
+    .. version-removed:: 12.0
+       The `allrevisions` parameter.
+    .. version-changed:: 12.0
+       The default for `revisions` is ``latest`` instead of ``first_found``.
 
     Usage example:
 
@@ -116,9 +120,6 @@ class XmlDump:
     Pear 188924
     >>>
 
-    :param allrevisions: boolean
-        If True, parse all revisions instead of only the latest one.
-        Default: False.
     :param on_error: a callable which is invoked within :meth:`parse`
         method when a ParseError occurs. The exception is passed to this
         callable. Otherwise the exception is raised.
@@ -127,16 +128,14 @@ class XmlDump:
         * `latest` (most recent revision, by largest `revisionid`)
         * `earliest` (first revision, by smallest `revisionid`)
         * `all` (all revisions for each page)
-        Default: `first_found`
+        Default: `latest`
     """
 
     def __init__(
         self,
         filename,
         *,
-        allrevisions: bool | str | None = None,
-        # when allrevisions removed, revisions can default to 'latest'
-        revisions: str = 'first_found',
+        revisions: str = 'latest',
         on_error: Callable[[ParseError], None] | None = None,
     ) -> None:
         """Initializer."""
@@ -149,20 +148,6 @@ class XmlDump:
             'earliest': self._parse_only_earliest,
             'all': self._parse_all,
         }
-
-        if allrevisions:
-            issue_deprecation_warning(
-                'allrevisions=True',
-                "revisions='all'",
-                since='9.0.0')
-            revisions = 'all'
-        elif revisions == 'first_found':
-            issue_deprecation_warning(
-                'allrevisions=False returns first revision found,'
-                " usually earliest. For most recent, use revisions='latest'. "
-                "For oldest, use revisions='earliest',"
-                "'allrevisions'",
-                since='9.0.0')
 
         if revisions not in self.rev_actions:
             actions = str(list(self.rev_actions)).strip('[]')

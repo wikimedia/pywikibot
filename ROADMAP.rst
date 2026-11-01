@@ -19,6 +19,10 @@ Release 12
 
 **Other breaking changes**
 
+* :class:`xmlreader.XmlDump` now defaults to ``revisions='latest'`` instead of
+  ``'first_found'``. Use ``revisions='first_found'`` explicitly to retain the
+  previous revision selection. (:phab:`T340804`)
+
 * Return insertion-ordered plain dictionaries for template parameters from
   :func:`textlib.extract_templates_and_params`,
   :func:`textlib.extract_templates_and_params_regex_simple`, and
@@ -47,8 +51,6 @@ Pending removal in Pywikibot 12
   use ``-limit`` instead (:phab:`T128981`)
 * 9.0.0: The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` is deprecated and will be
   ignored (:phab:`T358635`)
-* 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
-  (:phab:`T340804`)
 
 
 Pending removal in Pywikibot 13
