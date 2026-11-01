@@ -57,8 +57,6 @@ Pending removal in Pywikibot 12
 * 9.0.0: ``allrevisions`` parameter of :class:`xmlreader.XmlDump` is deprecated, use ``revisions`` instead
   (:phab:`T340804`)
 * 9.0.0: ``iteritems`` method of :class:`data.api.Request` will be removed in favour of ``items``
-* 9.0.0: ``SequenceOutputter.output()`` is deprecated in favour of the
-  :attr:`tools.formatter.SequenceOutputter.out` property
 
 
 Pending removal in Pywikibot 13

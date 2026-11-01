@@ -8,9 +8,6 @@ from __future__ import annotations
 
 import math
 
-from pywikibot.logging import info
-from pywikibot.tools import deprecated
-
 
 class SequenceOutputter:
 
@@ -52,13 +49,3 @@ class SequenceOutputter:
         else:
             content = ''
         return self.prefix + content + self.suffix
-
-    @deprecated('pywikibot.info(SequenceOutputter.out)', since='9.0.0')
-    def output(self) -> None:
-        """Output the text of the current sequence.
-
-        .. version-deprecated:: 9.0
-           Use :func:`pywikibot.info()<pywikibot.logging.info>` with
-           :attr:`out` property.
-        """
-        info(self.out)
