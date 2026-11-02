@@ -390,7 +390,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertIsInstance(page, pywikibot.Page)
         self.assertTrue(page.exists())
         try:
-            self.assertEqual(page.namespace(), namespace)
+            ns = page.namespace()
+            self.assertEqual(ns, namespace,
+                             msg=f'{page} namespace {ns} != {namespace}')
         except InvalidTitleError:
             return False
         return True
