@@ -453,15 +453,25 @@ class ProofreadPage(pywikibot.Page):
     _WMFOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=tesseract&'
                    'langs[]={lang}&image={url_image}&uselang={lang}')
 
-    # googleOCR ocr utility
+    # Google OCR utility
     _GOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=google&'
                  'langs[]={lang}&image={url_image}')
+
+    # Transkribus OCR utility
+    _TRANSKRIBUS_CMD = ('https://ocr.wmcloud.org/api.php?engine=transkribus&'
+                        'langs[]={lang}&image={url_image}')
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
     _WMFOCR = 'wmfOCR'
     _GOOGLE_OCR = 'googleOCR'
-    _OCR_CMDS = {_WMFOCR: _WMFOCR_CMD, _GOOGLE_OCR: _GOCR_CMD}
+    _TRANSKRIBUS = 'transkribus'
+
+    _OCR_CMDS = {
+        _WMFOCR: _WMFOCR_CMD,
+        _GOOGLE_OCR: _GOCR_CMD,
+        _TRANSKRIBUS: _TRANSKRIBUS_CMD,
+    }
     _OCR_METHODS = list(_OCR_CMDS)
 
     def __init__(self, source: PageSourceType, title: str = '') -> None:
@@ -939,7 +949,8 @@ class ProofreadPage(pywikibot.Page):
         for retry in range(5, 30, 5):
             pywikibot.debug(f'{ocr_tool}: get URI {cmd_uri!r}')
             try:
-                response = http.fetch(cmd_uri)
+                # OCR sometimes takes more than 45 seconds
+                response = http.fetch(cmd_uri, timeout=120)
             except ReadTimeout as e:
                 pywikibot.warning(f'ReadTimeout {cmd_uri}: {e}')
             except Exception as e:
@@ -970,8 +981,11 @@ class ProofreadPage(pywikibot.Page):
 
         return error, parser_func(_text)
 
-    def _do_ocr(self, ocr_tool: str | None = None
-                ) -> tuple[bool, str | Exception]:
+    def _do_ocr(
+        self,
+        ocr_tool: str | None = None,
+        lang: str | None = None,
+    ) -> tuple[bool, str | Exception]:
         """Do ocr using specified ocr_tool method."""
         try:
             url_image = self.url_image
@@ -992,14 +1006,18 @@ class ProofreadPage(pywikibot.Page):
 
         params = {
             'url_image': url_image,
-            'lang': self.site.lang,
+            'lang': lang or self.site.lang,
             'user': self.site.user(),
         }
         cmd_uri = cmd_fmt.format_map(params)
 
         return self._ocr_callback(cmd_uri, ocr_tool=ocr_tool)
 
-    def ocr(self, ocr_tool: str | None = None) -> str:
+    def ocr(
+        self,
+        ocr_tool: str | None = None,
+        lang: str | None = None,
+    ) -> str:
         """Do OCR of ProofreadPage scan.
 
         The text returned by this function shall be assigned to
@@ -1014,7 +1032,10 @@ class ProofreadPage(pywikibot.Page):
         .. version-removed:: 9.2
            `phetools` support is not available anymore.
 
-        :param ocr_tool: Either 'wmfOCR' or 'googleOCR'; default is 'wmfOCR'
+        :param ocr_tool: Either 'wmfOCR', 'googleOCR' or 'transkribus';
+            default is 'wmfOCR'.
+        :param lang: Language code (for tesseract/google) or model name
+            (for transkribus). Defaults to site language.
         :return: OCR text for the page.
         :raises TypeError: Wrong ocr_tool keyword arg.
         :raises ValueError: Something went wrong with OCR process.
@@ -1026,7 +1047,7 @@ class ProofreadPage(pywikibot.Page):
             raise TypeError(
                 f'ocr_tool must be in {self._OCR_METHODS}, not {ocr_tool!r}.')
 
-        error, text = self._do_ocr(ocr_tool=ocr_tool)
+        error, text = self._do_ocr(ocr_tool=ocr_tool, lang=lang)
         if not error and isinstance(text, str):
             return text
 

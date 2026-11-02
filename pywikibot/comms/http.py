@@ -519,7 +519,10 @@ def fetch(uri: str,
 
         auth = requests_oauthlib.OAuth1(*auth)
 
-    timeout = config.socket_timeout
+    if 'timeout' in kwargs:
+        timeout = kwargs.pop('timeout')
+    else:
+        timeout = config.socket_timeout
 
     try:
         # Note that the connections are pooled which mean that a future
