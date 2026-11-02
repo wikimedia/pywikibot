@@ -26,17 +26,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11', '3.13', '3.14', '3.15']
+        python-version: ['3.11', '3.15']
         os: [windows-latest, macOS-latest]
         include:
-          - python-version: '3.13'
           - python-version: '3.15'
+            os: ubuntu-latest
+          - python-version: '3.16-dev'
+            os: ubuntu-latest
     steps:
       - name: set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
+        if: matrix.python-version != '3.16-dev'
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: ${{ endsWith(matrix.python-version, '-dev') }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: deadsnakes/action@v3.2.0
+        if: matrix.python-version == '3.16-dev'
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: checkout
         uses: actions/checkout@v7
         with:
