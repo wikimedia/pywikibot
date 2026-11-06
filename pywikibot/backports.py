@@ -305,12 +305,11 @@ if PYTHON_VERSION < (3, 15) or SPHINX_RUNNING:
             # Python < 3.12 or GraalPy
             return sys._getframe(d).f_globals.get('__name__', default)
 
-        if PYTHON_VERSION >= (3, 10):
-            def __or__(self, other: object) -> Any:
-                return Union[self, other]
+        def __or__(self, other: object) -> Any:
+            return Union[self, other]
 
-            def __ror__(self, other: object) -> Any:
-                return Union[other, self]
+        def __ror__(self, other: object) -> Any:
+            return Union[other, self]
 
 else:
     from builtins import (  # type: ignore[no-redef, attr-defined] # noqa: TC003, E501
