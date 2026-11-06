@@ -71,13 +71,15 @@ class ConfigPathTestCase(TestCase):
                 zip_file.writestr('families/example_family.py', '')
             for folder in (Path(tmp) / 'missing', archive / 'missing'):
                 with self.subTest(folder=folder):
-                    with self.assertRaises(FileNotFoundError):
+                    msg = r'Family folder .* does not exist'
+                    with self.assertRaisesRegex(FileNotFoundError, msg):
                         config.register_families_folder(folder)
                     config.register_families_folder(folder,
                                                     not_exists_ok=True)
             file_path = Path(tmp) / 'plain.txt'
             file_path.touch()
-            with self.assertRaises(NotADirectoryError):
+            with self.assertRaisesRegex(NotADirectoryError,
+                                        'Not a directory'):
                 config.register_families_folder(file_path)
             self.assertEqual(config.family_files, {})
 
