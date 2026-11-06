@@ -134,7 +134,7 @@ skip_empty = true
 exclude_also = [
     "@(abc\\.)?abstractmethod",
     "@deprecated\\([^\\)]+\\)",
-    "@unittest\\.skip",
+    "@unittest\\.skip\\(",
     "class .+\\bProtocol\\):",
     "except (ImportError|ModuleNotFoundError)",
     "except (Quit)?KeyboardInterrupt",
