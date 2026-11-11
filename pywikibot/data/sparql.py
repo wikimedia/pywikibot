@@ -6,6 +6,7 @@
 """SPARQL Query interface."""
 from __future__ import annotations
 
+from http import HTTPStatus
 from textwrap import fill
 from typing import Any, cast
 from urllib.parse import quote, urlparse
@@ -13,7 +14,7 @@ from urllib.parse import quote, urlparse
 from requests import JSONDecodeError, Response
 from requests.exceptions import Timeout
 
-from pywikibot import Site
+from pywikibot import Site, warning
 from pywikibot.comms import http
 from pywikibot.data import WaitingMixin
 from pywikibot.exceptions import Error, NoUsernameError, ServerError
@@ -21,6 +22,7 @@ from pywikibot.exceptions import Error, NoUsernameError, ServerError
 
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}
+INVALID_TOKEN = 'invalid returnUrlToken'
 
 
 class SparqlQuery(WaitingMixin):
@@ -161,10 +163,16 @@ class SparqlQuery(WaitingMixin):
             except Timeout:
                 pass
             except ServerError as e:
-                if not e.unicode.startswith('500'):
+                if not e.unicode.startswith(
+                        str(HTTPStatus.INTERNAL_SERVER_ERROR)):
                     raise
             else:
-                break
+                if (self.last_response.status_code == HTTPStatus.BAD_REQUEST
+                    and self.last_response.headers.get(
+                        'x-centralauth-status') == INVALID_TOKEN):
+                    warning('%s; retrying', INVALID_TOKEN)
+                else:
+                    break
             self.wait(uri=url)
 
         try:

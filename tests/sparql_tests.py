@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import unittest
 from contextlib import suppress
+from http import HTTPStatus
 from unittest.mock import patch
 
 import pywikibot
@@ -94,6 +95,7 @@ class Container:
     def __init__(self, value) -> None:
         """Create container."""
         self.text = value
+        self.status_code = HTTPStatus.OK
 
     def json(self):
         """Simulate Response.json()."""  # noqa: D402
