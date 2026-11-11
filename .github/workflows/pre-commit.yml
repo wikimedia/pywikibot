@@ -56,6 +56,6 @@ jobs:
           git submodule sync
           git -c protocol.version=2 submodule update --init --force --depth=1
       - name: run pre-commit
-        uses: pre-commit/action@v3.0.1
+        uses: ./.github/actions/pre-commit
         env:
           SKIP: copyright
