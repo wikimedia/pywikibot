@@ -451,15 +451,15 @@ class ProofreadPage(pywikibot.Page):
 
     # Wikimedia OCR utility
     _WMFOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=tesseract&'
-                   'langs[]={lang}&image={url_image}&uselang={lang}')
+                   'langs[]={lang}&image={url_image}&uselang={lang}{crop}')
 
     # Google OCR utility
     _GOCR_CMD = ('https://ocr.wmcloud.org/api.php?engine=google&'
-                 'langs[]={lang}&image={url_image}')
+                 'langs[]={lang}&image={url_image}{crop}')
 
     # Transkribus OCR utility
     _TRANSKRIBUS_CMD = ('https://ocr.wmcloud.org/api.php?engine=transkribus&'
-                        'langs[]={lang}&image={url_image}')
+                        'langs[]={lang}&image={url_image}{crop}')
 
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
@@ -985,6 +985,7 @@ class ProofreadPage(pywikibot.Page):
         self,
         ocr_tool: str | None = None,
         lang: str | None = None,
+        crop: dict[str, int] | None = None,
     ) -> tuple[bool, str | Exception]:
         """Do ocr using specified ocr_tool method."""
         try:
@@ -1004,10 +1005,32 @@ class ProofreadPage(pywikibot.Page):
             raise TypeError(
                 f"ocr_tool must be in {self._OCR_METHODS}, not '{ocr_tool}'.")
 
+        if crop is not None:
+            if not isinstance(crop, dict):
+                error_text = f'crop must be of type dict, not {type(crop)}'
+                pywikibot.error(error_text)
+                return True, error_text
+            try:
+                crop_params = [
+                    f'&crop[x]={crop["x"]}',
+                    f'&crop[y]={crop["y"]}',
+                    f'&crop[height]={crop["height"]}',
+                    f'&crop[width]={crop["width"]}',
+                ]
+                crop_cmd = ''.join(crop_params)
+            except KeyError:
+                error_text = ('crop must be a dict with parameters: '
+                              'x, y, height and width')
+                pywikibot.error(error_text)
+                return True, error_text
+        else:
+            crop_cmd = ''
+
         params = {
             'url_image': url_image,
             'lang': lang or self.site.lang,
             'user': self.site.user(),
+            'crop': crop_cmd,
         }
         cmd_uri = cmd_fmt.format_map(params)
 
@@ -1017,6 +1040,7 @@ class ProofreadPage(pywikibot.Page):
         self,
         ocr_tool: str | None = None,
         lang: str | None = None,
+        crop: dict[str, int] | None = None,
     ) -> str:
         """Do OCR of ProofreadPage scan.
 
@@ -1036,6 +1060,9 @@ class ProofreadPage(pywikibot.Page):
             default is 'wmfOCR'.
         :param lang: Language code (for tesseract/google) or model name
             (for transkribus). Defaults to site language.
+        :param crop: :param crop: Dictionary defining the OCR bounding
+            box with integer pixel values for keys 'x', 'y',
+            'height', and 'width'.
         :return: OCR text for the page.
         :raises TypeError: Wrong ocr_tool keyword arg.
         :raises ValueError: Something went wrong with OCR process.
@@ -1047,7 +1074,7 @@ class ProofreadPage(pywikibot.Page):
             raise TypeError(
                 f'ocr_tool must be in {self._OCR_METHODS}, not {ocr_tool!r}.')
 
-        error, text = self._do_ocr(ocr_tool=ocr_tool, lang=lang)
+        error, text = self._do_ocr(ocr_tool=ocr_tool, lang=lang, crop=crop)
         if not error and isinstance(text, str):
             return text
 
