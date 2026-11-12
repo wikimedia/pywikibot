@@ -46,10 +46,12 @@ extra_deps = {
     'wikitextparser': ['wikitextparser>=0.56.4'],
     'mysql': ['PyMySQL >= 1.1.2'],
     # Pillow cannot be installed with GraalPy or PyPy < 3.11
+    # T444595: No Pillow wheel for Windows CPython 3.16.
     'Tkinter': [
         'Pillow>=12.2.0; platform_python_implementation == "PyPy" '
         'and python_version >= "3.11"',
-        'Pillow>=12.2.0; platform_python_implementation == "CPython"',
+        'Pillow>=12.2.0; platform_python_implementation == "CPython" '
+        'and (sys_platform != "win32" or python_version != "3.16")',
     ],
     'mwoauth': [
         'PyJWT != 2.10.0, != 2.10.1',  # T380270
