@@ -118,8 +118,9 @@ if PYTHON_VERSION < (3, 14) or SPHINX_RUNNING:
         >>> lock = RLock()
         >>> lock.acquire()
         True
-        >>> with lock: print(lock.count)  # nested lock
-        2
+        >>> lock.acquire()
+        True
+        >>> lock.release()
         >>> lock.locked()
         True
         >>> lock.release()

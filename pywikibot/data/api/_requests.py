@@ -115,7 +115,8 @@ class Request(MutableMapping, WaitingMixin):
 
     Example:
 
-    >>> r = Request(parameters={'action': 'query', 'meta': 'userinfo'})
+    >>> r = Request(site=pywikibot.Site(),
+    ...             parameters={'action': 'query', 'meta': 'userinfo'})
     >>> # This is equivalent to
     >>> # https://{path}/api.php?action=query&meta=userinfo&format=json
     >>> # change a parameter
