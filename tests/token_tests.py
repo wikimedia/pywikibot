@@ -78,8 +78,10 @@ class TestSiteTokens(DeprecationTestCase, DefaultSiteTestCase):
         """Test invalid token."""
         redirected_tokens = ['edit', 'move', 'delete']
         for ttype in [*redirected_tokens, 'invalidtype']:
-            with self.assertRaisesRegex(KeyError, r'Invalid token'):
-                self.site.tokens['invalidtype']
+            with self.subTest(token_type=ttype), self.assertRaisesRegex(
+                KeyError, r'Invalid token'
+            ):
+                self.site.tokens[ttype]
 
 
 class TokenTestBase(TestCaseBase):
