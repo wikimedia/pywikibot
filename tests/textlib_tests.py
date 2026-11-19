@@ -1139,6 +1139,14 @@ class TestDigitsConversion(TestCase):
                 '299792458 flash', 'fa'), '۲۹۹۷۹۲۴۵۸ flash')
         self.assertEqual(
             textlib.to_local_digits('299792458', 'km'), '២៩៩៧៩២៤៥៨')
+        self.assertEqual(
+            textlib.to_local_digits(299792458, 'ar'), '٢٩٩٧٩٢٤٥٨')
+        self.assertEqual(
+            textlib.to_local_digits(299792458, 'as'), '২৯৯৭৯২৪৫৮')
+        self.assertEqual(
+            textlib.to_local_digits(299792458, 'mr'), '२९९७९२४५८')
+        self.assertEqual(
+            textlib.to_local_digits(299792458, 'ur'), '۲۹۹۷۹۲۴۵۸')
 
     def test_to_latin(self) -> None:
         """Test converting local digits to ASCII digits."""
@@ -1155,6 +1163,14 @@ class TestDigitsConversion(TestCase):
             textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', ['km', 'en']), '299792458')
         self.assertEqual(
             textlib.to_ascii_digits('២៩៩៧៩២៤៥៨', ['en']), '២៩៩៧៩២៤៥៨')
+        self.assertEqual(
+            textlib.to_ascii_digits('٢٩٩٧٩٢٤٥٨', 'ar'), '299792458')
+        self.assertEqual(
+            textlib.to_ascii_digits('২৯৯৭৯২৪৫৮', 'as'), '299792458')
+        self.assertEqual(
+            textlib.to_ascii_digits('२९९७९२४५८', 'mr'), '299792458')
+        self.assertEqual(
+            textlib.to_ascii_digits('۲۹۹۷۹۲۴۵۸', 'ur'), '299792458')
 
 
 class TestReplaceExcept(DefaultSiteTestCase):

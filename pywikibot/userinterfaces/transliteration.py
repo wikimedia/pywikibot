@@ -11,6 +11,8 @@ from pywikibot.tools import ModuleDeprecationWrapper, deprecated_signature
 
 #: Non ascii digits used by the framework
 NON_ASCII_DIGITS = {
+    'ar': '٠١٢٣٤٥٦٧٨٩',
+    'as': '০১২৩৪৫৬৭৮৯',
     'bn': '০১২৩৪৫৬৭৮৯',
     'ckb': '٠١٢٣٤٥٦٧٨٩',
     'fa': '۰۱۲۳۴۵۶۷۸۹',
@@ -20,10 +22,12 @@ NON_ASCII_DIGITS = {
     'kn': '೦೧೨೩೪೫೬೭೮೯',
     'lo': '໐໑໒໓໔໕໖໗໘໙',
     'ml': '൦൧൨൩൪൫൬൭൮൯',
+    'mr': '०१२३४५६७८९',
     'ne': '०१२३४५६७८९',
     'or': '୦୧୨୩୪୫୬୭୮୯',
     'pa': '੦੧੨੩੪੫੬੭੮੯',
     'te': '౦౧౨౩౪౫౬౭౮౯',
+    'ur': '۰۱۲۳۴۵۶۷۸۹',
 }
 
 
