@@ -23,6 +23,9 @@ Furthermore, the following command line parameters are supported:
 -always       Don't prompt you for each replacement.
 
 -quiet        Use this option to get less output
+-force        Use this option to insert reference list even if no <ref>
+              tag can be found. Useful for references coming from
+              templates/wikidata.
 
 If neither a page title nor a page generator is given, it takes all pages from
 the default maintenance category.
@@ -602,6 +605,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
         """Initializer."""
         self.available_options.update({
             'verbose': True,
+            'force': False,
         })
         super().__init__(**kwargs)
 
@@ -637,7 +641,7 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
                         'No changes necessary: references template found.')
                 return False
 
-        if not self.refR.search(oldTextCleaned):
+        if not self.opt.force and not self.refR.search(oldTextCleaned):
             if self.opt.verbose:
                 pywikibot.info('No changes necessary: no ref tags found.')
             return False
@@ -859,6 +863,8 @@ def main(*args: str) -> None:
             options['always'] = True
         elif opt == '-quiet':
             options['verbose'] = False
+        elif opt == '-force':
+            options['force'] = True
         else:
             genFactory.handle_arg(arg)
 
