@@ -573,6 +573,22 @@ referencesSubstitute = {
     },
 }
 
+startTemplates: dict[str, dict[str, list[str]]]
+"""Templates which are placed at the start of the page. The references section
+should be placed after these templates."""
+
+startTemplates = {
+    'wikipedia': {
+        'ro': [
+            '{{Introducere așezare}}',
+            '{{commons}}',
+            '{{commonscat}}',
+            '{{commons-inline}}',
+            '{{commonscat-inline}}',
+        ],
+    }
+}
+
 noTitleRequired: list[str] = ['be', 'szl']
 """Sites where no title is required for references template as it is already
 included there."""
@@ -757,9 +773,21 @@ class NoReferencesBot(AutomaticTWSummaryBot, SingleSiteBot, ExistingPageBot):
             f'{commentPattern})$',
             re.DOTALL
         )
+        # Sites without translated start templates have no special handling
+        start_templates = [
+            template.lower()
+            for template in i18n.translate(self.site, startTemplates) or []
+        ]
         tmpText = oldText
         while True:
             match = metadataR.search(tmpText)
+            if match and match.group(0).lower().strip() in start_templates:
+                if self.opt.verbose:
+                    pywikibot.info(
+                        f'Found a template that is part of the start of an '
+                        f'article: {match.group(0).strip()}\n'
+                        f'Will not place the references section before it.')
+                break
             if match:
                 tmpText = tmpText[:match.start()]
             else:
