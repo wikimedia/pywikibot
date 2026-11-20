@@ -203,6 +203,12 @@ placeBeforeSections = {
         'Ver também',
         'Notas',
     ],
+    'ro': [
+        'Vezi și',
+        'Bibliografie',
+        'Lectură suplimentare',
+        'Legături externe',
+    ],
     'ru': [
         'Литература',
         'Ссылки',
@@ -412,6 +418,9 @@ referencesSections = {
         ],
         'pt': [
             'Referências',
+        ],
+        'ro': [
+            'Note',
         ],
         'ru': [
             'Примечания',
