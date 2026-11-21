@@ -24,7 +24,6 @@ from pywikibot.exceptions import InvalidTitleError, SiteDefinitionError
 from pywikibot.family import Family
 from pywikibot.time import TZoneFixedOffset
 from pywikibot.tools import ModuleDeprecationWrapper, first_lower, first_upper
-from pywikibot.tools.chars import INVISIBLE_REGEX
 from pywikibot.userinterfaces.transliteration import NON_ASCII_DIGITS
 
 
@@ -1188,10 +1187,12 @@ class Section(NamedTuple):
         .. version-added:: 8.2
         .. version-changed:: 11.0
            Invisible chars like LTR or RTO are removed.
+        .. version-changed:: 12.0
+           No longer remove invisible characters like LTR or RTO, as
+           this causes regressions in languages using ZWNJ.
         """
         level = self.level
-        title = self.title[level:-level].strip()
-        return INVISIBLE_REGEX.sub('', title)
+        return self.title[level:-level].strip()
 
 
 class SectionList(list):
