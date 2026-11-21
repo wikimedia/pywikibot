@@ -160,7 +160,7 @@ def is_url(value: str) -> bool:
     >>> is_url('abc:def.png')
     False
 
-    .. version-added:: next
+    .. version-added:: 12.0
 
     :param value: Value to check
     """

@@ -298,7 +298,7 @@ class FilePage(Page):
 
         .. version-changed:: 11.8
            The *comment* keyword was renamed to *summary*.
-        .. version-changed:: next
+        .. version-changed:: 12.0
            *source* is only taken as URL if it starts with a URL scheme;
            a local path like ``C://image.png`` is no longer uploaded as
            URL.

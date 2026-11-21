@@ -4,6 +4,28 @@ Scripts Changelog
 12.0.0
 ------
 
+clean_sandbox
+^^^^^^^^^^^^^
+
+* L10N Updates
+
+coordinate_import
+^^^^^^^^^^^^^^^^^
+
+* Save coordinates using :meth:`CoordImportRobot.user_add_claim
+  <coordinate_import.CoordImportRobot.user_add_claim>`
+
+next_version
+^^^^^^^^^^^^
+
+* Support ``next`` in all version specifiers including deprecation decorators
+  and deprecation warning function.
+
+patrol
+^^^^^^
+
+* Only report successful patrols. (:phab:`T439789`)
+
 upload
 ^^^^^^
 

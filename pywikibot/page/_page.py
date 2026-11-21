@@ -80,7 +80,7 @@ class Page(BasePage, WikiBlameMixin, WikiWhoMixin):
         Disabled parts and whitespace are stripped, except for
         whitespace in anonymous positional arguments.
 
-        .. version-changed:: next
+        .. version-changed:: 12.0
            Parameter mappings are plain :class:`dict` instances instead of
            :class:`collections.OrderedDict` instances.
 

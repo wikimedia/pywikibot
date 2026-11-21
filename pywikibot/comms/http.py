@@ -440,6 +440,8 @@ def fetch(uri: str,
        Avoid mutating headers inputs.
     .. version-changed:: 11.9
        Streamed responses no longer read the body to detect its encoding.
+    .. version-changed:: 12.0
+       Take the *timeout* keyword parameter into account.
 
     See :py:obj:`requests.Session.request` for parameters.
 
@@ -451,20 +453,24 @@ def fetch(uri: str,
         pywikibot's UA, str to specify own UA. This behaviour might be
         overridden by domain in config.
 
+    :keyword auth: Authentication handler. If omitted, authentication is
+        read from :attr:`config.authenticate`; use ``None`` to disable
+        configured authentication.
+    :keyword callbacks: Methods to call once data is fetched
+    :type callbacks: list of callable
     :keyword charset: Either a valid charset (usable for str.decode())
         or None to automatically choose the charset from the returned
         header (defaults to latin-1 when not streaming)
     :type charset: CodecInfo, str, None
     :keyword bool stream: Defer reading the response body until consumed.
-        When True, use the explicit *charset* or retain the encoding chosen
-        by requests from the response headers, without inspecting the body.
+        When True, use the explicit *charset* or retain the encoding
+        chosen by requests from the response headers, without inspecting
+        the body.
+    :keyword int | float | tuple(int | float) timeout: How many seconds
+        to wait for the server to send data before giving up. If not
+        given, :attr:`config.socket_timeout` is used.
     :keyword verify: Verify the SSL certificate (default is True)
     :type verify: bool or path to certificates
-    :keyword callbacks: Methods to call once data is fetched
-    :type callbacks: list of callable
-    :keyword auth: Authentication handler. If omitted, authentication is read
-        from :attr:`config.authenticate`; use ``None`` to disable configured
-        authentication.
     """
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.

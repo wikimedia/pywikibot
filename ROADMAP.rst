@@ -3,7 +3,15 @@ Release 12
 
 **Improvements**
 
-* (No changes yet)
+* Various performance, stability, and code quality improvements.
+* Retry :class:`SPARQL queries<data.sparql.SparqlQuery>` when CentralAuth
+  tokens are invalid. (:phab:`T444491`)
+* Explicitly track :mod:`pagegenerators` options. (:phab:`T430137`)
+* Recompute category position after removing templates in :func:`textlib.replaceCategoryLinks`
+* Improve the color palette of :class:`interwiki_graph.GraphDrawer`. (:phab:`T442972`)
+* Take the *timeout* keyword parameter into account in :func:`comms.http.fetch`.
+* Add Transkribus OCR support to the :mod:`proofreadpage` module. (:phab:`T443330`)
+* Update translations (i18n).
 
 **Bugfixes**
 
@@ -11,29 +19,62 @@ Release 12
   <pywikibot.FilePage.upload>` and :class:`specialbots.UploadRobot`; a local path
   containing ``://`` like ``C://image.png`` is uploaded as file. :func:`tools.is_url`
   was added for this check. (:phab:`T164450`)
+* Use the page's data repository for its :meth:`page.BasePage.coordinates`. (:phab:`T363303`)
+
 
 **Code cleanups**
 
-* Remove the deprecated conversion of ``bot=None`` to ``bot=True`` in
-  :meth:`APISite.editpage()<pywikibot.site._apisite.APISite.editpage>`; use
-  a boolean value for *bot*.
-* Remove the deprecated ``xmlreader.parseRestrictions`` alias; use
-  :meth:`xmlreader.XmlDump.parse_restrictions` instead.
+* Imports of :mod:`logging` functions from the :mod:`bot` module are are no longer supported.
 * Remove ``Page.main_authors()``, deprecated since 9.3. Use
   :meth:`Page.authorship()<page._toolforge.WikiBlameMixin.authorship>` instead.
-
-**Other breaking changes**
-
+* The *content* parameter of :meth:`proofreadpage.IndexPage.page_gen` was dropped. (:phab:`T358635`)
+* *total* argument in ``-logevents`` pagegenerators option was dropped;
+  use ``-limit`` instead. (:phab:`T128981`)
 * :class:`xmlreader.XmlDump` now defaults to ``revisions='latest'`` instead of
   ``'first_found'``. Use ``revisions='first_found'`` explicitly to retain the
   previous revision selection. (:phab:`T340804`)
+* Remove the deprecated ``xmlreader.parseRestrictions`` alias; use
+  :meth:`xmlreader.XmlDump.parse_restrictions` instead.
+* Remove the deprecated conversion of ``bot=None`` to ``bot=True`` in
+  :meth:`APISite.editpage()<pywikibot.site._apisite.APISite.editpage>`; use
+  a boolean value for *bot*.
+* *botflag* parameter of :meth:`Page.save()<page.BasePage.save>`, :meth:`Page.put()
+  <page.BasePage.put>`, :meth:`Page.touch()<page.BasePage.touch>` and
+  :meth:`Page.set_redirect_target()<page.Page.set_redirect_target>` was dropped; use *bot* instead.
+* :meth:`BaseSite.languages()<pywikibot.site._basesite.BaseSite.languages>` was removed in
+  favour of :attr:`BaseSite.codes<pywikibot.site._basesite.BaseSite.codes>`.
+* :meth:`DataSite.getPropertyType()<pywikibot.site._datasite.DataSite.getPropertyType>`
+  was removed in favour of :meth:`DataSite.get_property_type()
+  <pywikibot.site._datasite.DataSite.get_property_type>`.
+* :meth:`page.BasePage.userName` and :meth:`page.BasePage.isIpEdit` was removed in favour of
+  ``user`` or ``anon`` attributes of :attr:`page.BasePage.latest_revision` property.
+* The ``type`` parameter of :meth:`site.APISite.protectedpages()
+  <pywikibot.site._generators.GeneratorsMixin.protectedpages>` was renamed to ``protect_type``.
+* The ``all`` parameter of :meth:`site.APISite.namespace()
+  <pywikibot.site._apisite.APISite.namespace>` was renamed to ``all_ns``.
+* ``filter`` parameter of :func:`date.dh` was renamed to ``filter_func``.
+* ``dict`` parameter of :class:`data.api.OptionSet` was renamed to ``data``.
+* All parameters of :meth:`Page.templates<page.BasePage.templates>` and
+  :meth:`Page.itertemplates()<page.BasePage.itertemplates>` must be given as keyworded arguments.
+* ``iteritems`` method of :class:`data.api.Request` was removed; use ``items`` instead.
+* :func:`version.get_toolforge_hostname` was remmoved.
+* ``SequenceOutputter.output()`` was dropped; use :attr:`tools.formatter.SequenceOutputter.out`
+  property instead.
+* ``next`` parameter of :meth:`userinterfaces.transliteration.Transliterator.transliterate`
+  was removed; use ``succ`` instead.
+* ``userinterfaces.transliteration.transliterator`` object was dropped;  use
+  :class:`Transliterator<userinterfaces.transliteration.Transliterator>` instead.
 
+**Other breaking changes**
+
+* Support for MediaWiki <= 1.32 has been dropped. (:phab:`T430457`)
 * Return insertion-ordered plain dictionaries for template parameters from
   :func:`textlib.extract_templates_and_params`,
   :func:`textlib.extract_templates_and_params_regex_simple`, and
   :attr:`page.Page.raw_extracted_templates`. These replace ``OrderedDict``;
   mapping equality no longer compares parameter order, and ``OrderedDict``
   methods such as ``move_to_end()`` are no longer available on the results.
+* Python 3.9 support was dropped. (:phab:`T423572`)
 
 Deprecations
 ============

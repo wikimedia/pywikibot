@@ -1930,6 +1930,8 @@ def replaceCategoryLinks(oldtext: str,
 
     .. version-changed:: 8.0
        *addOnly* was renamed to *add_only*.
+    .. version-changed:: 12.0
+       Recompute category position after removing templates.
 
     :param oldtext: The text that needs to be replaced.
     :param new: Should be a list of Category objects or strings
@@ -2134,7 +2136,7 @@ def extract_templates_and_params(
        *mwparserfromhell* is strictly recommended.
     .. version-changed:: 11.1
        Raise ModuleNotFoundError if no wikitext parser is installed.
-    .. version-changed:: next
+    .. version-changed:: 12.0
        Parameter mappings are plain :class:`dict` instances instead of
        :class:`collections.OrderedDict` instances.
 
@@ -2203,7 +2205,7 @@ def extract_templates_and_params_regex_simple(text: str):
     This method will incorrectly split arguments when an argument value
     contains a '|', such as {{template|a={{b|c}} }}.
 
-    .. version-changed:: next
+    .. version-changed:: 12.0
        Parameter mappings are plain :class:`dict` instances instead of
        :class:`collections.OrderedDict` instances, retaining insertion order.
 

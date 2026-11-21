@@ -209,7 +209,7 @@ class GeneratorFactory:
         by filter options or by the *gen* parameter of
         :meth:`getCombinedGenerator`.
 
-        .. version-added:: next
+        .. version-added:: 12.0
         """
         return self._generator_specified
 
