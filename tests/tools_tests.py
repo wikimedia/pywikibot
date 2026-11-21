@@ -29,7 +29,7 @@ from pywikibot.tools import (
     is_url,
     suppress_warnings,
 )
-from pywikibot.tools.collections import GeneratorWrapper
+from pywikibot.tools.collections import GeneratorWrapper, SizedKeyCollection
 from pywikibot.tools.itertools import (
     filter_unique,
     intersect_generators,
@@ -89,6 +89,59 @@ class TestGeneratorWrapper(TestCase):
         self.generator.assert_called_once_with()
         self.assertEqual(next(self.wrapper), 0)
         self.assertEqual(self.generator.call_count, 2)
+
+
+class TestSizedKeyCollection(TestCase):
+
+    """Test SizedKeyCollection."""
+
+    net = False
+
+    def test_sized_key_collection(self) -> None:
+        """Test basic operations and remove cleanup."""
+        class Item:
+
+            def __init__(self, key: str, val: int) -> None:
+                self.k = key
+                self.v = val
+
+        col = SizedKeyCollection('k')
+        self.assertEqual(len(col), 0)
+        self.assertNotIn('a', col)
+
+        item1 = Item('a', 1)
+        item2 = Item('a', 2)
+        item3 = Item('b', 3)
+        col.append(item1)
+        col.append(item2)
+        col.append(item3)
+
+        self.assertEqual(len(col), 3)
+        self.assertIn('a', col)
+        self.assertIn('b', col)
+        self.assertEqual(list(col.keys()), ['a', 'b'])
+
+        col.remove(item1)
+        self.assertEqual(len(col), 2)
+        self.assertIn('a', col)
+
+        col.remove(item2)
+        self.assertEqual(len(col), 1)
+        self.assertNotIn('a', col)
+        self.assertEqual(list(col.keys()), ['b'])
+
+        # Removing item with non-existent key does not raise KeyError
+        col.remove(Item('c', 4))
+        self.assertEqual(len(col), 1)
+
+        # Removing item not in collection does not raise ValueError
+        col.remove(Item('b', 99))
+        self.assertEqual(len(col), 1)
+
+        col.remove_key('b')
+        self.assertEqual(len(col), 0)
+        self.assertNotIn('b', col)
+        self.assertEqual(list(col.keys()), [])
 
 
 class OpenArchiveTestCase(TestCase):

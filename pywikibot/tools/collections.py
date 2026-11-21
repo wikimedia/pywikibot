@@ -115,9 +115,19 @@ class SizedKeyCollection(Collection):
         key = getattr(value, self.keyattr)
         if callable(key):
             key = key()
-        with suppress(ValueError):
-            self.data[key].remove(value)
-            self.size -= 1
+        try:
+            values = self.data[key]
+        except KeyError:
+            return
+
+        try:
+            values.remove(value)
+        except ValueError:
+            return
+
+        self.size -= 1
+        if not values:
+            del self.data[key]
 
     def remove_key(self, key) -> None:
         """Remove all values for a given key."""
