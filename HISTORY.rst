@@ -427,7 +427,6 @@ Release History
 
 **Bugfixes**
 
-* Remove invisible chars from :attr:`textlib.Section.heading`. (:phab:`T411307`)
 * Do not raise :exc:`exceptions.UnknownExtensionError` within
   :meth:`APISite.page_from_repository()<pywikibot.site._apisite.APISite.page_from_repository>`
   on non-Wikibase sites (:phab:`T414068`)

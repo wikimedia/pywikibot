@@ -37,6 +37,13 @@ revertbot script
    :no-members:
    :noindex:
 
+review script
+=============
+
+.. automodule:: scripts.review
+   :no-members:
+   :noindex:
+
 speedy\_delete script
 =====================
 

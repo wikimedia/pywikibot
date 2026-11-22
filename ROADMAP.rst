@@ -3,6 +3,9 @@ Release 12
 
 **Improvements**
 
+* Add crop support to OCR in :class:`proofreadpage.ProofreadPage`. (:phab:`T443552`)
+* Add missing language mappings for ar, as, mr and ur to
+  :attr:`userinterfaces.transliteration.NON_ASCII_DIGITS`. (:phab:`T445470`)
 * Various performance, stability, and code quality improvements.
 * Retry :class:`SPARQL queries<data.sparql.SparqlQuery>` when CentralAuth
   tokens are invalid. (:phab:`T444491`)
@@ -15,6 +18,8 @@ Release 12
 
 **Bugfixes**
 
+* Clean up empty keys and suppress KeyError in
+  :meth:`tools.collections.SizedKeyCollection.remove`. (:phab:`T445740`)
 * Only take a source starting with a URL scheme as URL in :meth:`FilePage.upload()
   <pywikibot.FilePage.upload>` and :class:`specialbots.UploadRobot`; a local path
   containing ``://`` like ``C://image.png`` is uploaded as file. :func:`tools.is_url`

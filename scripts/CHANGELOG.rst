@@ -4,10 +4,7 @@ Scripts Changelog
 12.0.0
 ------
 
-clean_sandbox
-^^^^^^^^^^^^^
-
-* L10N Updates
+* L10N Updates for several scripts.
 
 coordinate_import
 ^^^^^^^^^^^^^^^^^
@@ -21,10 +18,20 @@ next_version
 * Support ``next`` in all version specifiers including deprecation decorators
   and deprecation warning function.
 
+noreferences
+^^^^^^^^^^^^
+
+* Add *-force* option to allow adding reference lists to pages without `<ref>`` tags.
+
 patrol
 ^^^^^^
 
 * Only report successful patrols. (:phab:`T439789`)
+
+review
+^^^^^^
+
+* Script to review or unreview FlaggedRevs pages was added (:phab:`T439954`)
 
 upload
 ^^^^^^
@@ -75,11 +82,6 @@ clean_sandbox
 ^^^^^^^^^^^^^
 
 * Fix L10N for arzwiki.
-
-review
-^^^^^^
-
-* Script to review or unreview FlaggedRevs pages was added (:phab:`T439954`)
 
 solve_disambiguation
 ^^^^^^^^^^^^^^^^^^^^

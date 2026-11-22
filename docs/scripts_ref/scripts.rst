@@ -215,6 +215,11 @@ revertbot script
 
 .. automodule:: scripts.revertbot
 
+review script
+=============
+
+.. automodule:: scripts.review
+
 solve\_disambiguation script
 ============================
 

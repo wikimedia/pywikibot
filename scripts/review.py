@@ -59,6 +59,8 @@ Unreview the stable revision of a page:
 Review unreviewed pages with a summary:
 
     python pwb.py review -unreviewed -summary:"Reviewed latest version"
+
+.. version-added:: 12.0
 """
 from __future__ import annotations
 
@@ -137,10 +139,7 @@ def unreviewed_pages_generator(
 
 class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
 
-    """Bot to review and unreview pages with FlaggedRevs.
-
-    .. version-added:: 11.9
-    """
+    """Bot to review and unreview pages with FlaggedRevs."""
 
     update_options = {
         'summary': None,
