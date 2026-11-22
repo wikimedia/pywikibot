@@ -403,6 +403,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase,
         'noreferences',
         'nowcommons',
         'patrol',
+        'review',  # T445774
         'shell',
         'speedy_delete',
         'unusedfiles',  # not localized for default sites
