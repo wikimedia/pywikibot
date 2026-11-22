@@ -6,6 +6,7 @@
 """Test tools package alone which doesn't fit into other tests."""
 from __future__ import annotations
 
+import copy
 import decimal
 import hashlib
 import io
@@ -29,7 +30,11 @@ from pywikibot.tools import (
     is_url,
     suppress_warnings,
 )
-from pywikibot.tools.collections import GeneratorWrapper, SizedKeyCollection
+from pywikibot.tools.collections import (
+    DataRecord,
+    GeneratorWrapper,
+    SizedKeyCollection,
+)
 from pywikibot.tools.itertools import (
     filter_unique,
     intersect_generators,
@@ -142,6 +147,66 @@ class TestSizedKeyCollection(TestCase):
         self.assertEqual(len(col), 0)
         self.assertNotIn('b', col)
         self.assertEqual(list(col.keys()), [])
+
+
+class TestDataRecord(TestCase):
+
+    """Test DataRecord collection."""
+
+    net = False
+
+    def test_datarecord_basic(self) -> None:
+        """Test basic DataRecord operations."""
+        d = DataRecord(sample='test', num=42)
+        self.assertEqual(len(d), 2)
+        self.assertEqual(d.sample, 'test')
+        self.assertEqual(d['sample'], 'test')
+        self.assertEqual(d.num, 42)
+        self.assertEqual(d['num'], 42)
+        self.assertEqual(list(d), ['sample', 'num'])
+        self.assertIn('sample', d)
+        self.assertNotIn('missing', d)
+
+    def test_datarecord_getattr_hasattr(self) -> None:
+        """Test hasattr and getattr behavior."""
+        d = DataRecord(foo='bar')
+        self.assertHasAttr(d, 'foo')
+        self.assertNotHasAttr(d, 'bar')
+        self.assertEqual(getattr(d, 'bar', 'default'), 'default')
+        with self.assertRaises(AttributeError):
+            _ = d.bar
+
+    def test_datarecord_copy(self) -> None:
+        """Test copy.copy and copy.deepcopy on DataRecord."""
+        d = DataRecord(name='test', items_list=[1, 2, 3])
+        d_copy = copy.copy(d)
+        self.assertEqual(d_copy.name, 'test')
+        self.assertEqual(d_copy.items_list, [1, 2, 3])
+        self.assertIs(d_copy._data, d._data)
+
+        d_deep = copy.deepcopy(d)
+        self.assertEqual(d_deep.name, 'test')
+        self.assertEqual(d_deep.items_list, [1, 2, 3])
+        self.assertIsNot(d_deep._data, d._data)
+        d_deep.items_list.append(4)
+        self.assertEqual(d.items_list, [1, 2, 3])
+
+    def test_revision_copy(self) -> None:
+        """Test copy.copy and copy.deepcopy on Revision."""
+        from pywikibot.page import Revision
+
+        r = Revision(comment='Edit summary', user='TestUser')
+        self.assertHasAttr(r, 'comment')
+        self.assertNotHasAttr(r, 'nonexistent')
+        self.assertEqual(getattr(r, 'nonexistent', 'fallback'), 'fallback')
+
+        r_copy = copy.copy(r)
+        self.assertEqual(r_copy.comment, 'Edit summary')
+        self.assertEqual(r_copy.user, 'TestUser')
+
+        r_deep = copy.deepcopy(r)
+        self.assertEqual(r_deep.comment, 'Edit summary')
+        self.assertEqual(r_deep.user, 'TestUser')
 
 
 class OpenArchiveTestCase(TestCase):

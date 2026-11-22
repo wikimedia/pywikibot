@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import collections
+import copy
 from abc import ABC, abstractmethod
 from collections.abc import Collection, Generator, Iterator, Mapping
 from contextlib import suppress
@@ -436,14 +437,25 @@ class DataRecord(Mapping):
 
     def __getitem__(self, name: str) -> Any:
         """Return a data item by name."""
-        return self._data[name]
+        try:
+            return self._data[name]
+        except KeyError:
+            return self.__missing__(name)
 
     def __getattr__(self, name: str) -> Any:
         """Return a data item by attribute name."""
-        if name in self._data:
+        if name == '_data':
+            raise AttributeError(name)
+
+        if '_data' in self.__dict__ and name in self._data:
             return self._data[name]
 
-        return self.__missing__(name)
+        try:
+            return self.__missing__(name)
+        except KeyError:
+            raise AttributeError(
+                f'{type(self).__name__!r} object has no attribute {name!r}'
+            ) from None
 
     def __iter__(self):
         """Return an iterator over data item names."""
@@ -464,3 +476,25 @@ class DataRecord(Mapping):
         for missing data items.
         """
         raise KeyError(key)
+
+    def __copy__(self):
+        """Return a shallow copy of the DataRecord."""
+        cls = self.__class__
+        new_instance = cls.__new__(cls)
+        new_instance.__dict__.update(self.__dict__)
+        return new_instance
+
+    def __deepcopy__(self, memo: dict[int, Any] | None = None):
+        """Return a deep copy of the DataRecord."""
+        if memo is None:
+            memo = {}
+        cls = self.__class__
+        new_instance = cls.__new__(cls)
+        memo[id(self)] = new_instance
+        for k, v in self.__dict__.items():
+            if k == '_data':
+                new_instance._data = MappingProxyType(
+                    copy.deepcopy(dict(self._data), memo))
+            else:
+                new_instance.__dict__[k] = copy.deepcopy(v, memo)
+        return new_instance
