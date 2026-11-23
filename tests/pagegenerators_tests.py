@@ -931,14 +931,19 @@ class DryFactoryGeneratorTest(TestCase):
         gf.handle_arg('-ns:1,6')
         self.assertEqual(gf.namespaces, {1, 6})
         self.assertIsInstance(gf.namespaces, frozenset)
-        with self.assertRaises(RuntimeError):
+        msg = (
+            '-namespace/ns option must be provided before'
+            ' -newpages/-random/-randomredirect/-linter'
+        )
+        with self.assertRaisesRegex(RuntimeError, msg):
             gf.handle_arg('-ns:0')
         self.assertEqual(gf.namespaces, {1, 6})
 
     def test_unsupported_quality_level_filter(self) -> None:
         """Test unsupported option."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        with self.assertRaises(UnknownExtensionError):
+        msg = r'^Ql filtering needs a site with ProofreadPage extension\.$'
+        with self.assertRaisesRegex(UnknownExtensionError, msg):
             gf.handle_arg('-ql:2')
 
     def test_one_excluded_namespaces(self) -> None:
@@ -1571,13 +1576,17 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handle_arg('-recentchanges:120,70')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError,
+                                    r'^More than two parameters passed\.$'):
             gf.handle_arg('-recentchanges:3,2,1')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError,
+                                    r'^Negative valued parameters passed\.$'):
             gf.handle_arg('-recentchanges:12,-12')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError,
+                                    r'^More than two parameters passed\.$'):
             gf.handle_arg('-recentchanges:visualeditor,3,2,1')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError,
+                                    r'could not convert string to float:'):
             gf.handle_arg('-recentchanges:"mobile edit,-10,20"')
 
     def test_recentchanges_rctag(self) -> None:
@@ -2048,7 +2057,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase):
         gf = factory()
         self.assertFalse(gf.handle_arg('-log'))
         self.assertFalse(gf.handle_arg('-log:text_here'))
-        with self.assertRaises(NotImplementedError):
+        msg = r'^Invalid -logevents parameter "anyevent"$'
+        with self.assertRaisesRegex(NotImplementedError, msg):
             gf.handle_arg('-logevents:anyevent')
         # test that old format log option is not handled by any handler method.
         gf_mock = mock.create_autospec(gf)
@@ -2212,7 +2222,11 @@ class TestLinksearchPageGenerator(TestCase):
 
     def test_double_opposite_protocols(self) -> None:
         """Test LinksearchPageGenerator with two opposite protocols."""
-        with self.assertRaises(ValueError):
+        msg = (
+            r"^Protocol 'https' was specified, but 'http' was found in"
+            r' searched url$'
+        )
+        with self.assertRaisesRegex(ValueError, msg):
             pagegenerators.LinksearchPageGenerator('http://w.wiki',
                                                    protocol='https',
                                                    site=self.site)
