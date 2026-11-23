@@ -1292,7 +1292,8 @@ class TestStringFunctions(TestCase):
         for string in ('False', 'F', 'No', 'n', 'oFF', '0'):
             with self.subTest(falsity=string):
                 self.assertFalse(tools.strtobool(string))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError,
+                                    r"invalid truth value 'okay'"):
             tools.strtobool('okay')
 
 
@@ -1390,11 +1391,20 @@ class TestTinyCache(TestCase):
                          'method_with_args')
         self.assertEqual(self.foo.read, 1)
         self.assertHasAttr(self.foo, '_method_with_args')
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            TypeError,
+            r'takes 1 positional argument but 2 were given'
+        ):
             self.foo.method_with_args(True)
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            TypeError,
+            r"got an unexpected keyword argument 'bar'"
+        ):
             self.foo.method_with_args(bar='baz')
-        with self.assertRaises(TypeError):
+        with self.assertRaisesRegex(
+            TypeError,
+            r"got an unexpected keyword argument 'foo'"
+        ):
             self.foo.method_with_args(1, 2, foo='bar')
         self.assertEqual(self.foo.method_with_args(force=True),
                          'method_with_args')
