@@ -32,6 +32,8 @@ review
 ^^^^^^
 
 * Script to review or unreview FlaggedRevs pages was added (:phab:`T439954`)
+* Automatic revision review for trusted users via ``-auto`` and
+  ``-trusted`` options was added (:phab:`T439954`)
 
 upload
 ^^^^^^

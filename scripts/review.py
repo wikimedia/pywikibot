@@ -17,6 +17,13 @@ Furthermore, the following command line parameters are supported:
 -unreview         Unreview (unapprove) the stable revision of a page using
                   FlaggedRevs.
 
+-auto             Automatically review the latest eligible revision after the
+                  stable revision made by trusted users.
+
+-trusted:USERS    Specify trusted user(s) as a comma-separated list.
+                  Edits by these users (and users with the autoreview right)
+                  are eligible for review.
+
 -pending          Generate pages with pending changes from the FlaggedRevs
                   extension. This is the default generator when reviewing.
 
@@ -43,6 +50,14 @@ Furthermore, the following command line parameters are supported:
 Review pages with pending changes:
 
     python pwb.py review -pending
+
+Automatically review pending changes by trusted users:
+
+    python pwb.py review -auto -always
+
+Automatically review pending changes with additional trusted users:
+
+    python pwb.py review -auto -trusted:BotUser,AdminName -always
 
 Review a specific page:
 
@@ -78,6 +93,12 @@ from pywikibot.bot import (
 from pywikibot.data import api
 from pywikibot.exceptions import (
     APIError,
+    ApiNotAvailableError,
+    ApiTimeoutError,
+    ClientError,
+    InvalidTitleError,
+    PageLoadRelatedError,
+    ServerError,
     UnexpectedAPIDataError,
     UnknownExtensionError,
     UserRightsError,
@@ -147,11 +168,20 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
         'flag': None,
         'refresh': False,
         'unreview': False,
+        'auto': False,
+        'trusted': (),
     }
 
     def __init__(self, **kwargs) -> None:
         """Initializer."""
         super().__init__(**kwargs)
+        if self.opt.auto and self.opt.unreview:
+            raise ValueError(
+                'The -auto and -unreview options cannot be used together.')
+        if self.opt.auto and self.opt.revid is not None:
+            raise ValueError(
+                'The -auto and -revid options cannot be used together.')
+
         if self.opt.revid is not None:
             try:
                 self.opt.revid = int(self.opt.revid)
@@ -165,6 +195,27 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
                 raise ValueError(
                     f'Invalid -flag option: {self.opt.flag}') from e
 
+        self.trusted_users: set[str] = set()
+        if self.opt.trusted:
+            if isinstance(self.opt.trusted, str):
+                self.trusted_users.update(
+                    u.strip()
+                    for u in self.opt.trusted.split(',')
+                    if u.strip()
+                )
+            else:
+                for item in self.opt.trusted:
+                    if isinstance(item, str):
+                        self.trusted_users.update(
+                            u.strip()
+                            for u in item.split(',')
+                            if u.strip()
+                        )
+                    else:
+                        self.trusted_users.add(str(item))
+
+        self._trusted_users_cache: dict[str, bool] = {}
+
     def setup(self) -> None:
         """Check whether FlaggedRevs is available on the site."""
         super().setup()
@@ -172,15 +223,204 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
             raise UnknownExtensionError(
                 f'FlaggedRevs extension is not enabled on {self.site}.')
 
+    def is_trusted_user(self, username: str | None) -> bool:
+        """Determine whether a username is trusted for automatic review.
+
+        Checks against explicitly configured trusted users and the
+        user's ``autoreview`` right via API. Results are cached per bot
+        instance.
+
+        :param username: The username to check.
+        :return: True if the user is trusted, False otherwise.
+        """
+        if not username:
+            return False
+
+        if username in self.trusted_users:
+            return True
+
+        if username in self._trusted_users_cache:
+            return self._trusted_users_cache[username]
+
+        try:
+            user = pywikibot.User(self.site, username)
+            if user.isAnonymous():
+                is_trusted = False
+            else:
+                is_trusted = 'autoreview' in user.rights(
+                    refresh=self.opt.refresh)
+            self._trusted_users_cache[username] = is_trusted
+            return is_trusted
+        except (
+            APIError,
+            ApiNotAvailableError,
+            ApiTimeoutError,
+            ClientError,
+            InvalidTitleError,
+            ServerError,
+            UnexpectedAPIDataError,
+            UserRightsError,
+            ValueError,
+        ) as e:
+            pywikibot.warning(
+                f'Could not determine rights for user "{username}": {e}')
+            return False
+
+    def _find_auto_revid(self, page: pywikibot.Page) -> int | None:
+        """Find the latest eligible revision to auto-review.
+
+        Inspects unreviewed revisions after the current stable revision
+        in chronological order. If an untrusted edit is encountered,
+        returns the revision immediately prior to that edit. If all
+        unreviewed edits are trusted, returns the latest unreviewed
+        revision. If no eligible revision exists, returns None.
+
+        :param page: The Page object to inspect.
+        :return: Revision ID to review, or None if no eligible revision.
+        """
+        try:
+            stable_revid = page.stable_revision_id
+            latest_revid = page.latest_revision_id
+        except (
+            APIError,
+            ApiNotAvailableError,
+            ApiTimeoutError,
+            ClientError,
+            PageLoadRelatedError,
+            ServerError,
+            UnexpectedAPIDataError,
+        ) as e:
+            pywikibot.error(
+                f'Failed to load revision metadata for '
+                f'{page.title(as_link=True)}: {e}')
+            return None
+
+        if latest_revid is None:
+            pywikibot.info(
+                f'Page {page.title(as_link=True)} has no revisions to review, '
+                'skipping.')
+            return None
+
+        if stable_revid is not None and stable_revid == latest_revid:
+            pywikibot.info(
+                f'Page {page.title(as_link=True)} has no unreviewed revisions '
+                f'(latest revision {latest_revid} is already stable), '
+                'skipping.')
+            return None
+
+        endtime = None
+        if stable_revid is not None:
+            try:
+                stable_rev = page.get_revision(stable_revid, content=False)
+                endtime = stable_rev.timestamp
+            except (
+                APIError,
+                ApiNotAvailableError,
+                ApiTimeoutError,
+                ClientError,
+                PageLoadRelatedError,
+                ServerError,
+                UnexpectedAPIDataError,
+            ) as e:
+                pywikibot.error(
+                    f'Failed to load stable revision {stable_revid} for '
+                    f'{page.title(as_link=True)}: {e}')
+                return None
+
+        try:
+            raw_revs = list(page.revisions(reverse=False, endtime=endtime))
+            sorted_revs = sorted(
+                raw_revs,
+                key=lambda rev: (rev.timestamp, rev.revid),
+                reverse=True,
+            )
+            unreviewed = []
+            found_stable = False
+            for rev in sorted_revs:
+                if stable_revid is not None and rev.revid == stable_revid:
+                    found_stable = True
+                    break
+                unreviewed.append(rev)
+
+            if stable_revid is not None and not found_stable:
+                pywikibot.warning(
+                    f'Stable revision {stable_revid} not found in history of '
+                    f'{page.title(as_link=True)}, skipping.')
+                return None
+
+        except (
+            APIError,
+            ApiNotAvailableError,
+            ApiTimeoutError,
+            ClientError,
+            PageLoadRelatedError,
+            ServerError,
+            UnexpectedAPIDataError,
+        ) as e:
+            pywikibot.error(
+                f'Failed to load revisions for {page.title(as_link=True)}: '
+                f'{e}')
+            return None
+
+        if not unreviewed:
+            pywikibot.info(
+                f'Page {page.title(as_link=True)} has no unreviewed revisions '
+                f'after stable revision {stable_revid}, skipping.')
+            return None
+
+        unreviewed.reverse()
+
+        eligible_revision = None
+        for rev in unreviewed:
+            user = getattr(rev, 'user', None)
+            if not user:
+                pywikibot.info(
+                    f'Revision {rev.revid} on {page.title(as_link=True)} has '
+                    'missing or hidden user, stopping inspection.')
+                break
+
+            if self.is_trusted_user(user):
+                eligible_revision = rev
+            else:
+                pywikibot.info(
+                    'Untrusted edit encountered on '
+                    f'{page.title(as_link=True)}: revision {rev.revid} by '
+                    f'user "{user}".')
+                break
+
+        if eligible_revision is None:
+            pywikibot.info(
+                f'No eligible revisions to auto-review on '
+                f'{page.title(as_link=True)}, skipping.')
+            return None
+
+        return eligible_revision.revid
+
     def treat_page(self) -> None:
         """Process the current page."""
         page = self.current_page
-        if not page.exists():
+        try:
+            exists = page.exists()
+        except (
+            APIError,
+            ApiNotAvailableError,
+            ApiTimeoutError,
+            ClientError,
+            PageLoadRelatedError,
+            ServerError,
+            UnexpectedAPIDataError,
+        ) as e:
+            pywikibot.error(
+                f'Failed to check if {page.title(as_link=True)} exists: {e}')
+            return
+
+        if not exists:
             pywikibot.warning(
                 f'Page {page.title(as_link=True)} does not exist, skipping.')
             return
 
         is_unreview = self.opt.unreview
+        is_auto = self.opt.auto
         action = 'unreview' if is_unreview else 'review'
 
         if self.opt.refresh and self.opt.revid is None:
@@ -189,6 +429,7 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
                     del page.stable_revision_id
                 else:
                     del page.latest_revision_id
+                    del page.stable_revision_id
 
         if self.opt.revid is not None:
             revid = self.opt.revid
@@ -198,6 +439,10 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
                 pywikibot.info(
                     f'Page {page.title(as_link=True)} has no stable revision '
                     'to unreview, skipping.')
+                return
+        elif is_auto:
+            revid = self._find_auto_revid(page)
+            if revid is None:
                 return
         else:
             revid = page.latest_revision_id
@@ -232,8 +477,16 @@ class ReviewBot(SingleSiteBot, ConfigParserBot, CurrentPageBot):
                 self.counter['reviewed'] += 1
                 pywikibot.info(
                     f'Reviewed {page.title(as_link=True)} (revid {revid})')
-        except (APIError, UnexpectedAPIDataError, UserRightsError,
-                ValueError) as e:
+        except (
+            APIError,
+            ApiNotAvailableError,
+            ApiTimeoutError,
+            ClientError,
+            ServerError,
+            UnexpectedAPIDataError,
+            UserRightsError,
+            ValueError,
+        ) as e:
             pywikibot.error(
                 f'Failed to {action} {page.title(as_link=True)}: {e}')
 
@@ -262,6 +515,17 @@ def main(*args: str) -> None:
         elif opt == '-unreview':
             has_unreview = True
             options['unreview'] = True
+        elif opt == '-auto':
+            options['auto'] = True
+        elif opt == '-trusted':
+            if not value:
+                value = pywikibot.input('Please enter trusted username(s):')
+            users = [u.strip() for u in value.split(',') if u.strip()]
+            if not users:
+                pywikibot.error('No trusted users specified.')
+                return
+            options.setdefault('trusted', []).extend(users)
+            options['auto'] = True
         elif opt in ('-always', '-refresh'):
             options[opt[1:]] = True
         elif opt == '-revid':
@@ -294,6 +558,16 @@ def main(*args: str) -> None:
     if has_review and has_unreview:
         pywikibot.error(
             'The -review and -unreview options cannot be used together.')
+        return
+
+    if options.get('auto') and has_unreview:
+        pywikibot.error(
+            'The -auto and -unreview options cannot be used together.')
+        return
+
+    if options.get('auto') and options.get('revid') is not None:
+        pywikibot.error(
+            'The -auto and -revid options cannot be used together.')
         return
 
     if has_pending and has_unreviewed:
