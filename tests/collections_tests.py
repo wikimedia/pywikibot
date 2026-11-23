@@ -341,9 +341,11 @@ class TestSubEntityJSON(DataCollectionTestCase):
         self.assertEqual(data, original)
         self.assertEqual(LexemeFormCollection.normalizeData(normalized),
                          normalized)
+        msg = r'^Subentities require id, add, or id with remove$'
         for invalid in ({}, {'remove': ''}, {'add': '', 'remove': ''},
                         {'id': 'L1-F1', 'add': ''}):
-            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+            with self.subTest(invalid=invalid), \
+                 self.assertRaisesRegex(ValueError, msg):
                 LexemeFormCollection.normalizeData([invalid])
 
 

@@ -277,7 +277,11 @@ class TestNamespacesDictLookupName(TestCase):
                         result = eval(f'self.namespaces.{name}.id')
                         self.assertEqual(result, ns_id)
                     else:
-                        with self.assertRaises(AttributeError):
+                        msg = (
+                            r"^'NamespacesDict' object has no attribute "
+                            f"'{name}'$"
+                        )
+                        with self.assertRaisesRegex(AttributeError, msg):
                             exec(f'self.namespaces.{name}.id')
 
     def test_lookup_normalized_name(self) -> None:
