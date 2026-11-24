@@ -227,16 +227,16 @@ class TestUploaderStateTransitions(TestCase):
             summary='upload test', chunk_size=1024,
             ignore_warnings=True)
 
-        with self.assertRaises(ValueError) as cm:
+        msg = (
+            '^The SHA1 of 1024 bytes of the stashed "upload-key" is '
+            '3503db342c8dfb0a38db0682b7370ddd271fa163 '
+            'while the local file is '
+            '3dd334f11aa1e780d636416dc0649b96b67588b6$'
+        )
+        with self.assertRaisesRegex(ValueError, msg):
             uploader._upload(
                 ignore_warnings=True, report_success=False,
                 file_key='upload-key', offset=1024)
-
-        self.assertEqual(
-            str(cm.exception),
-            'The SHA1 of 1024 bytes of the stashed "upload-key" is '
-            '3503db342c8dfb0a38db0682b7370ddd271fa163 while the local file is '
-            '3dd334f11aa1e780d636416dc0649b96b67588b6')
         self.assertEqual(
             site.stash_calls, [('upload-key', ['size', 'sha1'])])
         self.assertIsEmpty(site.requests)
@@ -469,15 +469,14 @@ class TestUpload(TestCase):
             comment='pywikibot test', text=page.text,
             chunk_size=1024, ignore_warnings=True,
             report_success=False)
-        with self.assertRaises(ValueError) as cm:
+        msg = (
+            f'^For the file key "{self._file_key}" '
+            'the server reported a size 1024 while the offset was 0$'
+        )
+        with self.assertRaisesRegex(ValueError, msg):
             uploader._upload(
                 ignore_warnings=True, report_success=False,
                 file_key=self._file_key, offset=self._offset)
-        self.assertEqual(
-            str(cm.exception),
-            f'For the file key "{self._file_key}" the server reported a size'
-            ' 1024 while the offset was 0'
-        )
         self._verify_stash()
 
     def test_offset_oversize(self) -> None:
@@ -491,15 +490,15 @@ class TestUpload(TestCase):
             comment='pywikibot test', text=page.text,
             chunk_size=1024, ignore_warnings=True,
             report_success=False)
-        with self.assertRaises(ValueError) as cm:
+        msg = (
+            f'^For the file key "{self._file_key}" '
+            'the offset was set to 2000 while the file is only 1276'
+            r' bytes large\.$'
+        )
+        with self.assertRaisesRegex(ValueError, msg):
             uploader._upload(
                 ignore_warnings=True, report_success=False,
                 file_key=self._file_key, offset=self._offset)
-        self.assertEqual(
-            str(cm.exception),
-            f'For the file key "{self._file_key}" the offset was set to 2000'
-            ' while the file is only 1276 bytes large.'
-        )
         self._verify_stash()
 
 
