@@ -98,7 +98,10 @@ class TestMustBe(DecoratorTestsBase):
         retval = self.call_this_sysop_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        with self.assertRaises(UserRightsError):
+        msg = (
+            r'^User "sysop" is not part of the required user group "steward"$'
+        )
+        with self.assertRaisesRegex(UserRightsError, msg):
             self.call_this_steward_req_function(args, kwargs)
 
     def test_must_be_user(self) -> None:
@@ -109,7 +112,8 @@ class TestMustBe(DecoratorTestsBase):
         retval = self.call_this_user_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        with self.assertRaises(UserRightsError):
+        msg = r'^User "user" is not part of the required user group "sysop"$'
+        with self.assertRaisesRegex(UserRightsError, msg):
             self.call_this_sysop_req_function(args, kwargs)
 
     def test_override_usertype(self) -> None:
@@ -132,7 +136,11 @@ class TestMustBe(DecoratorTestsBase):
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
         self.login('user')
-        with self.assertRaises(UserRightsError):
+        msg = (
+            r'^Site .*? has been closed\.'
+            r' Only steward can perform requested action\.$'
+        )
+        with self.assertRaisesRegex(UserRightsError, msg):
             self.call_this_user_req_function(args, kwargs)
 
 
@@ -183,7 +191,8 @@ class TestNeedRight(DecoratorTestsBase):
         retval = self.call_this_move_req_function(*args, **kwargs)
         self.assertEqual(retval[0], args)
         self.assertEqual(retval[1], kwargs)
-        with self.assertRaises(UserRightsError):
+        msg = r'^User "user" does not have required user right "edit"'
+        with self.assertRaisesRegex(UserRightsError, msg):
             self.call_this_edit_req_function(args, kwargs)
 
 
@@ -241,7 +250,11 @@ class TestNeedVersion(DeprecationTestCase):
 
     def test_need_version(self) -> None:
         """Test need_version when the version is new, exact or old enough."""
-        with self.assertRaises(NotImplementedError):
+        msg = (
+            r'^Method or function "too_new"\n'
+            r"isn't implemented in MediaWiki version < 1\.34$"
+        )
+        with self.assertRaisesRegex(NotImplementedError, msg):
             self.too_new()
         self.assertTrue(self.old_enough())
         self.assertTrue(self.older())
