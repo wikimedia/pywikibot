@@ -511,9 +511,10 @@ class TestIgnoreSaveErrors(TestCase):
     def test_base_bot(self) -> None:
         """Test that BaseBot raises errors by default."""
         bot = pywikibot.bot.BaseBot(always=True)
-        with self.assertRaises(OtherPageSaveError):
+        msg_bots = r'Editing restricted by \{\{bots\}\} template'
+        with self.assertRaisesRegex(OtherPageSaveError, msg_bots):
             self.put(bot, OtherPageSaveError)
-        with self.assertRaises(ServerError):
+        with self.assertRaisesRegex(ServerError, r'^server error$'):
             self.put(bot, ServerError('server error'))
         self.assertFalse(
             self.put(bot, OtherPageSaveError,
@@ -523,10 +524,11 @@ class TestIgnoreSaveErrors(TestCase):
         """Test that CurrentPageBot ignores save related errors."""
         bot = pywikibot.bot.CurrentPageBot(always=True)
         self.assertFalse(self.put(bot, OtherPageSaveError))
-        with self.assertRaises(OtherPageSaveError):
+        msg_bots = r'Editing restricted by \{\{bots\}\} template'
+        with self.assertRaisesRegex(OtherPageSaveError, msg_bots):
             self.put(bot, OtherPageSaveError,
                      ignore_save_related_errors=False)
-        with self.assertRaises(ServerError):
+        with self.assertRaisesRegex(ServerError, r'^server error$'):
             self.put(bot, ServerError('server error'))
 
     def test_ignore_server_errors(self) -> None:
@@ -534,7 +536,7 @@ class TestIgnoreSaveErrors(TestCase):
         bot = pywikibot.bot.CurrentPageBot(always=True)
         bot.ignore_server_errors = True
         self.assertFalse(self.put(bot, ServerError('server error')))
-        with self.assertRaises(ServerError):
+        with self.assertRaisesRegex(ServerError, r'^server error$'):
             self.put(bot, ServerError('server error'),
                      ignore_server_errors=False)
 
