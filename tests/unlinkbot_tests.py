@@ -38,7 +38,7 @@ class TestChoiceOptions(TestCase):
         option = EditReplacementError()
         self.assertTrue(option.stop)
         self.assertEqual(option.result('*'), option)
-        with self.assertRaises(EditReplacementError):
+        with self.assertRaisesRegex(EditReplacementError, '^$'):
             raise EditReplacementError
 
 
