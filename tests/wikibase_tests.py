@@ -163,7 +163,11 @@ class TestWikibaseParser(WikidataTestCase):
 
     def test_wbparse_raises_valueerror(self) -> None:
         """Test invalid value condition."""
-        with self.assertRaises(ValueError):
+        msg = (
+            r'^wikibase-parse-error-quantity: The quantity value is'
+            r' malformed\.'
+        )
+        with self.assertRaisesRegex(ValueError, msg):
             self.site.parsevalue('quantity', ['Not a quantity'])
 
 
