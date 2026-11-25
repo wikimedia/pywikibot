@@ -347,7 +347,8 @@ class TestProofreadPageValidSite(TestCase):
     def test_invalid_existing_page_source(self) -> None:
         """Test ProofreadPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid['title'])
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             ProofreadPage(source)
 
     def test_invalid_not_existing_page_source(self) -> None:
@@ -365,14 +366,16 @@ class TestProofreadPageValidSite(TestCase):
         """Test ProofreadPage from Page not existing in non-Page ns."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid['title1'])
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             ProofreadPage(source)
 
     def test_invalid_link_source(self) -> None:
         """Test ProofreadPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid['title'],
                                 source=self.site)
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             ProofreadPage(source)
 
     def test_valid_link_source(self) -> None:
@@ -660,21 +663,24 @@ class TestIndexPageValidSite(BS4TestCase):
     def test_invalid_existing_page_as_source(self) -> None:
         """Test IndexPage from invalid existing Page as source."""
         source = pywikibot.Page(self.site, self.existing_invalid_title)
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             IndexPage(source)
 
     def test_invalid_not_existing_page_as_source(self) -> None:
         """Test IndexPage from Page not existing in non-Page ns as source."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid_title)
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             IndexPage(source)
 
     def test_invalid_link_as_source(self) -> None:
         """Test IndexPage from invalid Link as source."""
         source = pywikibot.Link(self.not_existing_invalid_title,
                                 source=self.site)
-        with self.assertRaises(ValueError):
+        msg = r'^Page .* must belong to .* namespace$'
+        with self.assertRaisesRegex(ValueError, msg):
             IndexPage(source)
 
     def test_valid_link_as_source(self) -> None:
