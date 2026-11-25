@@ -173,7 +173,8 @@ class TestDataRecord(TestCase):
         self.assertHasAttr(d, 'foo')
         self.assertNotHasAttr(d, 'bar')
         self.assertEqual(getattr(d, 'bar', 'default'), 'default')
-        with self.assertRaises(AttributeError):
+        msg = r"^'DataRecord' object has no attribute 'bar'$"
+        with self.assertRaisesRegex(AttributeError, msg):
             _ = d.bar
 
     def test_datarecord_copy(self) -> None:
