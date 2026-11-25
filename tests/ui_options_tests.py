@@ -198,7 +198,7 @@ class TestChoiceOptions(TestCase):
         option = ChoiceException('Test', 'T')
         self.assertTrue(option.stop)
         self.assertEqual(option.result('*'), option)
-        with self.assertRaises(ChoiceException):
+        with self.assertRaisesRegex(ChoiceException, r"^\('Test', 'T'\)$"):
             raise ChoiceException('Test', 'T')
 
     def test_quit_keyboard_interrupt(self) -> None:
@@ -208,7 +208,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.result('*'), option)
         self.assertEqual(option.option, 'quit')
         self.assertEqual(option.shortcut, 'q')
-        with self.assertRaises(QuitKeyboardInterrupt):
+        with self.assertRaisesRegex(QuitKeyboardInterrupt, '^$'):
             raise QuitKeyboardInterrupt
 
 
