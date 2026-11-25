@@ -539,7 +539,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
         pages = mysite.querypage('Longpages', total=10)
         for p in pages:
             self.assertIsInstance(p, pywikibot.Page)
-        with self.assertRaises(ValueError):
+        msg = r"^LongpageX not in \['Ancientpages', "
+        with self.assertRaisesRegex(ValueError, msg):
             mysite.querypage('LongpageX')
 
     def test_longpages(self) -> None:
@@ -666,16 +667,18 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     self.assertIn(prop, block)
 
         # starttime earlier than endtime
+        msg_follow = r"^blocks: 'start' must follow 'end' with reverse=False"
         with (
             self.subTest(starttime=low, endtime=high, reverse=False),
-            self.assertRaises(ValueError)
+            self.assertRaisesRegex(ValueError, msg_follow)
         ):
             mysite.blocks(total=5, starttime=low, endtime=high)
 
         # reverse: endtime earlier than starttime
+        msg_precede = r"^blocks: 'start' must precede 'end' with reverse=True"
         with (
             self.subTest(starttime=high, endtime=low, reverse=True),
-            self.assertRaises(ValueError)
+            self.assertRaisesRegex(ValueError, msg_precede)
         ):
             mysite.blocks(total=5, starttime=high, endtime=low, reverse=True)
 
@@ -708,9 +711,18 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(link, pywikibot.Page)
             self.assertIn(link.namespace(), (2, 3))
 
-        with self.assertRaises(ValueError):
+        msg_http = (
+            r"^Protocol 'http' was specified, but 'https' was found in"
+            r' searched url$'
+        )
+        with self.assertRaisesRegex(ValueError, msg_http):
             mysite.exturlusage('https://www.google.com', protocol='http')
-        with self.assertRaises(ValueError):
+
+        msg_https = (
+            r"^Protocol 'https' was specified, but 'http' was found in"
+            r' searched url$'
+        )
+        with self.assertRaisesRegex(ValueError, msg_https):
             mysite.exturlusage('http://www.google.com', protocol='https')
 
     def test_protectedpages_create(self) -> None:
@@ -779,23 +791,39 @@ class TestSiteGenerators(DefaultSiteTestCase):
         func = self.site.assert_valid_iter_params
 
         # reverse=False, is_ts=False
+        msg_precede_not_ts = (
+            r"^m: 'start' must precede 'end' with reverse=False and"
+            r' is_ts=False'
+        )
         self.assertIsNone(func('m', 1, 2, False, is_ts=False))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, msg_precede_not_ts):
             func('m', 2, 1, False, is_ts=False)
 
         # reverse=False, is_ts=True
+        msg_follow_ts = (
+            r"^m: 'start' must follow 'end' with reverse=False and"
+            r' is_ts=True'
+        )
         self.assertIsNone(func('m', 2, 1, False, is_ts=True))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, msg_follow_ts):
             func('m', 1, 2, False, is_ts=True)
 
         # reverse=True, is_ts=False
+        msg_follow_not_ts = (
+            r"^m: 'start' must follow 'end' with reverse=True and"
+            r' is_ts=False'
+        )
         self.assertIsNone(func('m', 2, 1, True, is_ts=False))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, msg_follow_not_ts):
             func('m', 1, 2, True, is_ts=False)
 
         # reverse=True, is_ts=True
+        msg_precede_ts = (
+            r"^m: 'start' must precede 'end' with reverse=True and"
+            r' is_ts=True'
+        )
         self.assertIsNone(func('m', 1, 2, True, is_ts=True))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, msg_precede_ts):
             func('m', 2, 1, True, is_ts=True)
 
 
