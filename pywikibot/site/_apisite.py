@@ -575,9 +575,9 @@ class APISite(
         >>> site = pywikibot.Site()
         >>> limit = site.ratelimit('edit')  # get rate limit for 'edit' action
         >>> limit
-        RateLimit(group='ip', hits=8, seconds=60)
+        RateLimit(group='ip', hits=5, seconds=60)
         >>> limit.delay  # delay and ratio must be get as attributes
-        7.5
+        12.0
         >>> site.ratelimit('purge').hits  # get purge hits
         30
         >>> group, *limit = site.ratelimit('urlshortcode')
