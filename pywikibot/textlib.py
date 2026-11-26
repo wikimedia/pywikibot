@@ -1881,6 +1881,9 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     :param add_only: If add_only is True, the old category won't be
         replaced and the category given will be added after it.
     :return: The modified text
+
+    .. version-changed:: 12.0
+       Categories with an empty sort key (pipe trick) are matched.
     """
     if site is None:
         site = pywikibot.Site()
@@ -1894,10 +1897,10 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     title = case_escape(site.namespaces[14].case, title, underscore=True)
     categoryR = re.compile(
         rf'\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
-        r'((?:\|[^]]+)?\]\])', re.IGNORECASE)
+        r'((?:\|[^]]*)?\]\])', re.IGNORECASE)
     categoryRN = re.compile(
         rf'^[^\S\n]*\[\[\s*({catNamespace})\s*:\s*{title}[\s\u200e\u200f]*'
-        r'((?:\|[^]]+)?\]\])[^\S\n]*\n', re.IGNORECASE | re.MULTILINE)
+        r'((?:\|[^]]*)?\]\])[^\S\n]*\n', re.IGNORECASE | re.MULTILINE)
     exceptions = ['comment', 'math', 'nowiki', 'pre', 'syntaxhighlight']
     if newcat is None:
         # First go through and try the more restrictive regex that removes

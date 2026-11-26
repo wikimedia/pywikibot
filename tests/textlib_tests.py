@@ -285,6 +285,19 @@ class TestCategoryRearrangement(DefaultSiteTestCase):
         self.assertIsNotNone(new_dummy.sortKey)
         self.assertEqual(orig_sortkey, new_dummy.sortKey)
 
+    def test_in_place_empty_sortkey(self) -> None:
+        """Test in-place category replacement with an empty sort key pipe."""
+        old = '[[Category:Cat2|]]'
+        cat = pywikibot.Category(self.site, 'Cat2')
+        new_cat = pywikibot.Category(self.site, 'NewCat')
+        res = textlib.replaceCategoryInPlace(old, cat, new_cat, site=self.site)
+        self.assertEqual(res, '[[Category:NewCat|]]')
+
+        # Test removal of category with empty sort key
+        removed = textlib.replaceCategoryInPlace(
+            old, cat, None, site=self.site)
+        self.assertEqual(removed, '')
+
 
 class TestReplaceCategoryLinks(TestCase):
 
