@@ -1038,6 +1038,13 @@ The text message is:
             pywikibot.log(f'Login status: {self.site._loginstatus.name}')
             return False
 
+        # A login request has a login token instead of a 'token'
+        # parameter. Another thread may have finished its login while
+        # this one is still running, so the status check above does not
+        # catch it. The login code fetches a new login token itself.
+        if 'token' not in self._params:  # T423001
+            return False
+
         # invalidate superior wiki cookies (T224712)
         pywikibot.data.api._invalidate_superior_cookies(self.site.family)
         # update tokens

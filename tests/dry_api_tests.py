@@ -261,6 +261,31 @@ class DryWriteAssertTests(DefaultSiteTestCase):
         self.assertTrue(self.site.logged_in())
 
 
+class DryBadTokenTests(DefaultSiteTestCase):
+
+    """Test bad token handling of Request objects."""
+
+    dry = True
+
+    def test_login_request(self) -> None:
+        """Test that a bad login token is left to the login code.
+
+        Another thread may finish its login while this login request is
+        still running, so the login status is no longer IN_PROGRESS when
+        the API answers with badtoken (T423001).
+        """
+        self.site._loginstatus = LoginStatus.AS_USER
+        for params in ({'action': 'login', 'lgtoken': 'abc'},
+                       {'action': 'clientlogin', 'logintoken': 'abc'}):
+            req = Request(site=self.site, parameters=params)
+            with (
+                self.subTest(action=params['action']),
+                patch.object(self.site.tokens, 'update_tokens') as update
+            ):
+                self.assertFalse(req._bad_token('badtoken'))
+                update.assert_not_called()
+
+
 class DryMimeTests(TestCase):
 
     """Test MIME request handling without a real site."""
