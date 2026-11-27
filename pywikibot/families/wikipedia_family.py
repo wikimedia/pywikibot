@@ -111,6 +111,7 @@ class Family(family.WikimediaSubdomainFamily):
         'tr': ('Kategori yönlendirme',),
         'uk': ('Categoryredirect',),
         'ur': ('زمرہ رجوع مکرر',),
+        'vec': ('Category redirect',),
         'vi': ('Đổi hướng thể loại',),
         'yi': ('קאטעגאריע אריבערפירן',),
         'zh': ('分类重定向',),
