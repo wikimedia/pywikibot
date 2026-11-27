@@ -90,5 +90,72 @@ class TestReferencesSpacing(TestCase):
                          'Text.\n\n== Reference ==\n<references />\n')
 
 
+class TestVenetianReferences(TestCase):
+
+    """Test reference handling on Venetian Wikipedia."""
+
+    family = 'wikipedia'
+    code = 'vec'
+    dry = True
+
+    def test_existing_templates(self) -> None:
+        """Test recognition of local reference templates."""
+        bot = NoReferencesBot(site=self.site)
+        for template in ('Notasion', 'Reflist', 'References'):
+            with self.subTest(template=template):
+                text = 'Text.<ref>Source</ref>\n{{' + template + '}}'
+                self.assertFalse(bot.lacksReferences(text))
+
+    def test_existing_references_tag(self) -> None:
+        """Test recognition of the standard references tag."""
+        bot = NoReferencesBot(site=self.site)
+        text = 'Text.<ref>Source</ref>\n<references />'
+        self.assertFalse(bot.lacksReferences(text))
+
+    def test_missing_references(self) -> None:
+        """Test detection of missing references."""
+        bot = NoReferencesBot(site=self.site)
+        self.assertTrue(bot.lacksReferences('Text.<ref>Source</ref>'))
+        self.assertFalse(bot.lacksReferences('Text.'))
+
+    def test_existing_sections(self) -> None:
+        """Test recognition of existing reference headings."""
+        bot = NoReferencesBot(site=self.site)
+        for heading in ('Notasion', 'Note'):
+            with self.subTest(heading=heading):
+                text = f'Text.\n\n== {heading} ==\n'
+                result = bot.addReferences(text)
+                self.assertIn('{{Notasion}}', result)
+                self.assertEqual(result.count('== '), 1)
+                self.assertIn(f'== {heading} ==', result)
+
+    def test_new_section(self) -> None:
+        """Test creation of a Venetian references section."""
+        bot = NoReferencesBot(site=self.site)
+        expected = 'Text.\n\n== Notasion ==\n{{Notasion}}\n'
+        self.assertEqual(bot.addReferences('Text.'), expected)
+
+    def test_section_placement(self) -> None:
+        """Test placement before trailing article sections."""
+        bot = NoReferencesBot(site=self.site)
+        headings = (
+            'Bibliografia',
+            'Varda anca',
+            'Altri projeti',
+            'Linganbi foresti',
+            'Łigamenti foresti',
+            'Łigadure foreste',
+            'Ligamenti de fora',
+        )
+        for heading in headings:
+            with self.subTest(heading=heading):
+                text = f'Text.\n\n== {heading} ==\nContent.'
+                result = bot.addReferences(text)
+                self.assertLess(
+                    result.index('== Notasion =='),
+                    result.index(f'== {heading} =='),
+                )
+
+
 if __name__ == '__main__':
     unittest.main()

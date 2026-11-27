@@ -256,6 +256,15 @@ placeBeforeSections = {
         'حوالہ جات',
         'بیرونی روابط',
     ],
+    'vec': [
+        'Bibliografia',
+        'Varda anca',
+        'Altri projeti',
+        'Linganbi foresti',
+        'Łigamenti foresti',
+        'Łigadure foreste',
+        'Ligamenti de fora',
+    ],
     'zh': [
         '外部链接',
         '外部連结',
@@ -460,6 +469,7 @@ referencesSections = {
             'حوالہ جات',
             'حوالہ',
         ],
+        'vec': ['Notasion', 'Note'],
         'zh': [
             '參考資料',
             '参考资料',
@@ -535,6 +545,7 @@ referencesTemplates = {
                'Ref-list', 'Примечания', 'Przypisy', 'Reflist+'],
         'ur': ['Reflist', 'Refs', 'Reference',
                'حوالہ جات', 'حوالے'],
+        'vec': ['Notasion', 'Reflist', 'References'],
         'zh': ['Reflist', 'RefFoot', 'NoteFoot'],
     },
 }
@@ -569,6 +580,7 @@ referencesSubstitute = {
         'th': '{{รายการอ้างอิง}}',
         'uk': '{{Reflist}}',
         'ur': '{{حوالہ جات}}',
+        'vec': '{{Notasion}}',
         'zh': '{{reflist}}',
     },
 }
